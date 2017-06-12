@@ -1,0 +1,58 @@
+-- MySQL dump 10.13  Distrib 5.6.26, for Linux (i686)
+--
+-- Host: localhost    Database: operation
+-- ------------------------------------------------------
+-- Server version	5.6.26
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `opr_monthly_dtl`
+--
+
+DROP TABLE IF EXISTS `opr_monthly_dtl`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `opr_monthly_dtl` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `hdr_id` int(10) unsigned NOT NULL,
+  `data_field` char(5) NOT NULL,
+  `data_value` varchar(100) DEFAULT NULL,
+  `manual_input` char(1) NOT NULL,
+  `lcu` varchar(30) DEFAULT NULL,
+  `luu` varchar(30) DEFAULT NULL,
+  `lcd` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `lud` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `opr_monthly_dtl`
+--
+
+LOCK TABLES `opr_monthly_dtl` WRITE;
+/*!40000 ALTER TABLE `opr_monthly_dtl` DISABLE KEYS */;
+INSERT INTO `opr_monthly_dtl` VALUES (1,1,'10001','10','',NULL,'test','2017-05-25 09:51:54','2017-06-07 07:22:17'),(2,1,'10002','10','',NULL,'test','2017-05-25 09:51:54','2017-06-07 07:22:17'),(3,1,'10003','10','',NULL,'test','2017-05-25 09:51:54','2017-06-07 07:22:17'),(4,1,'10004','10','',NULL,'test','2017-05-25 09:51:54','2017-06-07 07:22:17'),(5,1,'10005','10','',NULL,'test','2017-05-25 09:51:54','2017-06-07 07:22:17'),(6,1,'10006','10','',NULL,'test','2017-05-25 09:51:54','2017-06-07 07:22:17'),(7,1,'10007','50','Y',NULL,'test','2017-05-31 02:04:00','2017-06-07 07:22:17'),(8,1,'10008','4.25','Y',NULL,'test','2017-05-31 02:04:00','2017-06-07 07:35:40'),(9,1,'10009','0.35','Y',NULL,'test','2017-05-31 02:04:31','2017-06-07 07:35:40'),(10,1,'10010','4.6','Y',NULL,'test','2017-05-31 02:04:31','2017-06-07 07:35:40'),(11,3,'10001','','',NULL,'test','2017-05-25 09:51:54','2017-06-07 08:02:30'),(12,3,'10002','','',NULL,'test','2017-05-25 09:51:54','2017-06-07 08:02:34'),(13,3,'10003','','',NULL,'test','2017-05-25 09:51:54','2017-06-07 08:02:32'),(14,3,'10004','','',NULL,'test','2017-05-25 09:51:54','2017-06-07 08:02:31'),(15,3,'10005','','',NULL,'test','2017-05-25 09:51:54','2017-06-07 08:02:35'),(16,3,'10006','','',NULL,'test','2017-05-25 09:51:54','2017-06-07 08:02:38'),(17,3,'10007','','Y',NULL,'test','2017-05-31 02:04:00','2017-06-07 08:02:44'),(18,3,'10008','','Y',NULL,'test','2017-05-31 02:04:00','2017-06-07 08:02:41'),(19,3,'10009','','Y',NULL,'test','2017-05-31 02:04:31','2017-06-07 08:02:46'),(20,3,'10010','','Y',NULL,'test','2017-05-31 02:04:31','2017-06-07 08:02:39');
+/*!40000 ALTER TABLE `opr_monthly_dtl` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2017-06-08 15:27:11

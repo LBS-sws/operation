@@ -37,6 +37,12 @@ return array(
 'Group'=>'群組',
 'Access Template'=>'權限範本',
 
+    //沈超添加開始
+    'Goods Summary Entry'=>'物品管理',
+    'Order Summary Entry'=>'訂單管理',
+    'Technician Summary Entry'=>'技術員管理',
+    //沈超添加結束
+
 'New'=>'新增',
 'Renew'=>'續約',
 'Resume'=>'恢復',

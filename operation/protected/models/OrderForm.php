@@ -43,6 +43,11 @@ class OrderForm extends CFormModel
 	//驗證訂單內的物品
     public function validateGoods($attribute, $params){
 	    $goods_list = $this->goods_list;
+        if(count($this->goods_list)<1){
+            $message = Yii::t('procurement','Fill in at least one goods');
+            $this->addError($attribute,$message);
+            return false;
+        }
         foreach ($goods_list as $key =>$goods){
             if(empty($goods["goods_id"]) && empty($goods["goods_num"])){
                 unset($this->goods_list[$key]);

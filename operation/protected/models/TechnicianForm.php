@@ -1,6 +1,6 @@
 <?php
 
-class OrderForm extends CFormModel
+class TechnicianForm extends CFormModel
 {
 	public $id;
 	public $order_user;
@@ -31,10 +31,9 @@ class OrderForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, order_user, technician, status, remark, luu, lcu, lud, lcd','safe'),
+			array('id, status, remark, luu, lud','safe'),
             array('goods_list','required'),
             array('goods_list','validateGoods'),
-            array('technician','validateTe'),
             //array('order_num','numerical','allowEmpty'=>true,'integerOnly'=>true),
             //array('order_num','in','range'=>range(0,600)),
 		);
@@ -44,33 +43,16 @@ class OrderForm extends CFormModel
     public function validateGoods($attribute, $params){
 	    $goods_list = $this->goods_list;
         foreach ($goods_list as $key =>$goods){
-            if(empty($goods["goods_id"]) && empty($goods["goods_num"])){
-                unset($this->goods_list[$key]);
-            }else if (empty($goods["goods_id"]) || empty($goods["goods_num"])){
-                $message = Yii::t('procurement','The goods or quantity cannot be empty');
-                $this->addError($attribute,$message);
-                return false;
-            }else if(!is_numeric($goods["goods_id"])){
-                $message = Yii::t('procurement','goods does not exist');
-                $this->addError($attribute,$message);
-                return false;
-            }else if(!is_numeric($goods["goods_num"])){
-                $message = Yii::t('procurement','Goods Number can only be numbered');
+            if(empty($goods["id"]) || empty($goods["confirm_num"])){
+                $message = Yii::t('procurement','Actual Number cannot be empty');
                 $this->addError($attribute,$message);
                 return false;
             }
-        }
-        if(count($this->goods_list)<1){
-            $message = Yii::t('procurement','Fill in at least one goods');
-            $this->addError($attribute,$message);
-        }
-    }
-
-	//驗證技術員是否填寫
-    public function validateTe($attribute, $params){
-        if($this->technician == "" && $this->status == "sent"){
-            $message = Yii::t('procurement','The order send must specify the technician');
-            $this->addError($attribute,$message);
+            if(!is_numeric($goods["confirm_num"])){
+                $message = Yii::t('procurement','Actual Number can only be numbered');
+                $this->addError($attribute,$message);
+                return false;
+            }
         }
     }
 
@@ -133,18 +115,6 @@ class OrderForm extends CFormModel
         return $rs;
     }
 
-    //獲取所有用戶列表
-    public function getUserListArr(){
-        $arr=array(""=>"");
-        $suffix = Yii::app()->params['envSuffix'];
-        $table = "security".$suffix.".sec_user";
-        $rs = Yii::app()->db->createCommand()->select("username")->from($table)->queryAll();
-        foreach ($rs as $row){
-            $arr[$row["username"]] = $row["username"];
-        }
-        return $arr;
-    }
-
 	public function retrieveData($index) {
 		$city = Yii::app()->user->city();
 		$rows = Yii::app()->db->createCommand()->select("id, order_code, order_user, technician, status, remark")
@@ -182,19 +152,8 @@ class OrderForm extends CFormModel
 	protected function saveGoods(&$connection) {
 		$sql = '';
         switch ($this->scenario) {
-            case 'delete':
-                $sql = "delete from opr_order where id = :id";
-                break;
-            case 'new':
-                $sql = "insert into opr_order(
-							order_user, technician, remark, status, lcu, lcd
-						) values (
-							:order_user,:technician,:remark, :status, :lcu, :lcd
-						)";
-                break;
             case 'edit':
                 $sql = "update opr_order set
-							technician = :technician,
 							remark = :remark,
 							luu = :luu,
 							lud = :lud,
@@ -211,46 +170,18 @@ class OrderForm extends CFormModel
         $command=$connection->createCommand($sql);
         if (strpos($sql,':id')!==false)
             $command->bindParam(':id',$this->id,PDO::PARAM_INT);
-        if (strpos($sql,':order_user')!==false)
-            $command->bindParam(':order_user',$order_username,PDO::PARAM_STR);
-        if (strpos($sql,':status')!==false){
-            if($this->scenario == "new"){
-                $this->status = "pending";
-            }
+        if (strpos($sql,':status')!==false)
             $command->bindParam(':status',$this->status,PDO::PARAM_STR);
-        }
-
-        if (strpos($sql,':technician')!==false)
-            $command->bindParam(':technician',$this->technician,PDO::PARAM_STR);
         if (strpos($sql,':remark')!==false)
             $command->bindParam(':remark',$this->remark,PDO::PARAM_STR);
         if (strpos($sql,':lud')!==false)
             $command->bindParam(':lud',date('Y-m-d H:i:s'),PDO::PARAM_STR);
         if (strpos($sql,':luu')!==false)
             $command->bindParam(':luu',$uid,PDO::PARAM_STR);
-        if (strpos($sql,':lcu')!==false)
-            $command->bindParam(':lcu',$uid,PDO::PARAM_STR);
-        if (strpos($sql,':lcd')!==false)
-            $command->bindParam(':lcd',date('Y-m-d H:i:s'),PDO::PARAM_STR);
         $command->execute();
 
-        if ($this->scenario=='new'){
-            $this->id = Yii::app()->db->getLastInsertID();
-            $this->scenario = "edit";
-            $code = strval($this->id);
-            $this->order_code = "";
-            for($i = 0;$i < 5-strlen($code);$i++){
-                $this->order_code.="0";
-            }
-            $this->order_code .= $code;
-            Yii::app()->db->createCommand()->update('opr_order', array(
-                'order_code'=>$this->order_code,
-            ), 'id=:id', array(':id'=>$this->id));
-        }
-        if ($this->scenario=='delete'){
-            Yii::app()->db->createCommand()->delete('opr_order_status', 'order_id=:order_id', array(':order_id'=>$this->id));
-            Yii::app()->db->createCommand()->delete('opr_order_goods', 'order_id=:order_id', array(':order_id'=>$this->id));
-        }else{
+        if(!empty($this->id)){
+            //狀態添加
             Yii::app()->db->createCommand()->insert('opr_order_status', array(
                 'order_id'=>$this->id,
                 'status'=>$this->status,
@@ -260,25 +191,14 @@ class OrderForm extends CFormModel
             ));
         }
 
-        //物品的添加、修改
+        //物品的修改
         foreach ($this->goods_list as $goods){
-            if(empty($goods["id"])){
-                //添加
-                Yii::app()->db->createCommand()->insert('opr_order_goods', array(
-                    'goods_id'=>$goods["goods_id"],
-                    'order_id'=>$this->id,
-                    'goods_num'=>$goods["goods_num"],
-                    'lcu'=>$uid,
-                    'lcd'=>date('Y-m-d H:i:s'),
-                ));
-            }else{
-                //修改
+            if(!empty($goods["id"])) {
                 Yii::app()->db->createCommand()->update('opr_order_goods', array(
-                    'goods_id'=>$goods["goods_id"],
-                    'goods_num'=>$goods["goods_num"],
+                    'confirm_num' => $goods["confirm_num"],
                     'luu'=>$uid,
-                    'lud'=>date('Y-m-d H:i:s'),
-                ), 'id=:id', array(':id'=>$goods["id"]));
+                    'lud' => date('Y-m-d H:i:s'),
+                ), 'id=:id', array(':id' => $goods["id"]));
             }
         }
 		return true;

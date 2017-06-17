@@ -1,13 +1,13 @@
 <tr>
     <th></th>
     <th>
-        <?php echo TbHtml::link($this->getLabelName('goods_id').$this->drawOrderArrow('goods_id'),'#',$this->createOrderLink('order-list','goods_id'))
+        <?php echo TbHtml::link($this->getLabelName('order_code').$this->drawOrderArrow('order_code'),'#',$this->createOrderLink('order-list','order_code'))
         ;
         ?>
     </th>
     <th>
-        <?php echo TbHtml::link($this->getLabelName('order_num').$this->drawOrderArrow('order_num'),'#',$this->createOrderLink('order-list','order_num'))
-        ;
+        <?php
+            echo "<a href='#'>".Yii::t("procurement","Goods List")."</a>";
         ?>
     </th>
     <th>

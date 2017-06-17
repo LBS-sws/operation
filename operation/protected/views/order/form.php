@@ -34,8 +34,8 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
 		?>
 <?php if ($model->scenario!='view'): ?>
 			<?php
-            if($model->technician == Yii::app()->user->name || $model->status == "pending" || $model->status == "cancelled"||$model->scenario=='new'){
-                //訂單發送且技術人員不是當前登錄人則無法保存
+            if($model->status == "pending" || $model->status == "cancelled"||$model->scenario=='new'){
+                //訂單發送則無法修改
                 echo TbHtml::button('<span class="fa fa-upload"></span> '.Yii::t('misc','Save'), array(
                     'submit'=>Yii::app()->createUrl('order/save')));
             }
@@ -54,55 +54,100 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
 			<?php echo $form->hiddenField($model, 'scenario'); ?>
 			<?php echo $form->hiddenField($model, 'id'); ?>
 
+
+            <?php if ($model->scenario!='new'): ?>
+                <div class="form-group">
+                    <?php echo $form->labelEx($model,'order_code',array('class'=>"col-sm-2 control-label")); ?>
+                    <div class="col-sm-3">
+                        <?php echo $form->textField($model, 'order_code',
+                            array('readonly'=>true)
+                        ); ?>
+                    </div>
+                </div>
+            <?php endif ?>
+
             <div class="form-group">
-                <?php echo $form->labelEx($model,'goods_id',array('class'=>"col-sm-2 control-label")); ?>
-                <div class="col-sm-3">
-                    <?php
-                    if($model->status != "pending" && $model->status != "cancelled" && $model->scenario!='new'){
-                        //當訂單狀態不是等待或取消則不能修改
-                        echo "<input type='hidden' name='OrderForm[goods_id]' value='".$model->goods_id."' id='OrderForm_goods_id'>";
-                        echo "<input type='text' class='form-control' readonly value='".$model->getGoodNameToId($model->goods_id)["name"]."'>";
-                    }else{
-                        echo $form->dropDownList($model, 'goods_id',$model->getGoodsListArr(),
-                            array('disabled'=>($model->scenario=='view'))
-                        );
-                    }
-                    ?>
+                <?php echo $form->labelEx($model,'goods_list',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-9">
+                    <table class="table table-bordered table-striped disabled" id="table-change">
+                        <thead>
+                        <tr>
+                            <td><?php echo Yii::t("procurement","Goods Name")?></td>
+                            <td><?php echo Yii::t("procurement","Type")?></td>
+                            <td><?php echo Yii::t("procurement","Unit")?></td>
+                            <td><?php echo Yii::t("procurement","Price（RMB）")?></td>
+                            <td><?php echo Yii::t("procurement","Goods Number")?></td>
+                            <td><?php echo Yii::t("procurement","Total（RMB）")?></td>
+                            <td>&nbsp;</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php if (empty($model->goods_list)): ?>
+                            <tr datanum="0">
+                                <td>
+                                    <input type="text" class="form-control testInput" name="OrderForm[goods_list][0][name]">
+                                    <input type="hidden" name="OrderForm[goods_list][0][goods_id]" value="">
+                                </td>
+                                <td><input type="text" class="form-control" name="OrderForm[goods_list][0][type]" readonly></td>
+                                <td><input type="text" class="form-control" name="OrderForm[goods_list][0][unit]" readonly></td>
+                                <td><input type="text" class="form-control" name="OrderForm[goods_list][0][price]" readonly></td>
+                                <td><input type="number" min="0" class="form-control numChange" name="OrderForm[goods_list][0][goods_num]"></td>
+                                <td><input type="text" class="form-control" readonly></td>
+                                <td>
+                                    <button type="button" class="btn btn-danger delGoods"><?php echo Yii::t("misc","Delete")?></button>
+                                </td>
+                            </tr>
+                       <?php else: ?>
+
+                        <?php foreach ($model->goods_list as $key => $val) {?>
+                                <?php
+                                $con_num = $key;
+                                if(!empty($val['id'])){
+                                    $con_num = $val['id'];
+                                }
+                                ?>
+                                <tr datanum="<?php echo $con_num;?>">
+                                    <td>
+                                        <input type="text" class="form-control testInput" name="OrderForm[goods_list][<?php echo $con_num;?>][name]" value="<?php echo $val['name']?>">
+                                        <input type="hidden" name="OrderForm[goods_list][<?php echo $con_num;?>][goods_id]" value="<?php echo $val['goods_id']?>">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" readonly  name="OrderForm[goods_list][<?php echo $con_num;?>][type]" value="<?php echo $val['type']?>">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" readonly  name="OrderForm[goods_list][<?php echo $con_num;?>][unit]" value="<?php echo $val['unit']?>">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" readonly  name="OrderForm[goods_list][<?php echo $con_num;?>][price]" value="<?php echo $val['price']?>">
+                                    </td>
+                                    <td>
+                                        <input type="number" min="0" class="form-control numChange" name="OrderForm[goods_list][<?php echo $con_num;?>][goods_num]" value="<?php echo $val['goods_num']?>">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" readonly>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger delGoods"><?php echo Yii::t("misc","Delete")?></button>
+                                        <?php if (!empty($val['id'])): ?>
+                                            <input type="hidden" name="OrderForm[goods_list][<?php echo $con_num;?>][id]" value="<?php if (!empty($val['id'])){ echo $val['id'];}?>">
+                                        <?php endif;?>
+                                    </td>
+                                </tr>
+                        <?php }?>
+
+                        <?php endif; ?>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="5"></td>
+                            <td class="text-success fa-2x">0</td>
+                            <td class="text-center"><button type="button" class="btn btn-primary" id="addGoods"><?php echo Yii::t("misc","Add")?></button></td>
+                        </tr>
+                        </tfoot>
+                    </table>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label class = "col-sm-2 control-label"><?php echo Yii::t("procurement","Type")?></label>
-                <div class="col-sm-3">
-                    <input type="text" readonly disabled id="goodsType" value="" class="form-control">
-                </div>
-            </div>
-            <div class="form-group">
-                <label class = "col-sm-2 control-label"><?php echo Yii::t("procurement","Unit")?></label>
-                <div class="col-sm-3">
-                    <input type="text" readonly disabled id="goodsUnit" value="" class="form-control">
-                </div>
-            </div>
-            <div class="form-group">
-                <label class = "col-sm-2 control-label"><?php echo Yii::t("procurement","Price（RMB）")?></label>
-                <div class="col-sm-3">
-                    <input type="text" readonly disabled id="goodsPrice" value="" class="form-control">
-                </div>
-            </div>
-            <div class="form-group">
-                <?php echo $form->labelEx($model,'order_num',array('class'=>"col-sm-2 control-label")); ?>
-                <div class="col-sm-3">
-                    <?php echo $form->numberField($model, 'order_num',
-                        array('size'=>4,'min'=>0,'readonly'=>((($model->status != "pending" && $model->status != "cancelled")||$model->scenario=='view')&&$model->scenario!='new'))
-                    ); ?>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class = "col-sm-2 control-label"><?php echo Yii::t("procurement","Total Price（RMB）")?></label>
-                <div class="col-sm-3">
-                    <input type="text" readonly disabled id="goodsTotalPrice" value="" class="form-control">
-                </div>
-            </div>
             <div class="form-group">
                 <?php echo $form->labelEx($model,'technician',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
@@ -131,35 +176,16 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                 </div>
             <?php endif ?>
 
-            <!--當被指定為技術員時-->
-            <?php if ($model->technician == Yii::app()->user->name && $model->status !="pending" && $model->status !="cancelled"): ?>
-                <legend>&nbsp;</legend>
-                <div class="form-group">
-                    <?php echo $form->labelEx($model,'order_user',array('class'=>"col-sm-2 control-label")); ?>
-                    <div class="col-sm-7">
-                        <?php echo $form->textField($model, 'order_user',
-                            array('size'=>40,'maxlength'=>250,'readonly'=>true)
-                        ); ?>
-                    </div>
+            <?php if ($model->status!='sent' && $model->status!='approve' && $model->status!='reject'): ?>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'remark',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-7">
+                    <?php echo $form->textArea($model, 'remark',
+                        array('rows'=>4,'cols'=>50,'maxlength'=>1000,'readonly'=>($model->scenario=='view'))
+                    ); ?>
                 </div>
-                <div class="form-group">
-                    <?php echo $form->labelEx($model,'confirm_num',array('class'=>"col-sm-2 control-label")); ?>
-                    <div class="col-sm-3">
-                        <?php echo $form->numberField($model, 'confirm_num',
-                            array('size'=>4,'min'=>0,'readonly'=>($model->scenario=='view'))
-                        ); ?>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <?php echo $form->labelEx($model,'remark',array('class'=>"col-sm-2 control-label")); ?>
-                    <div class="col-sm-7">
-                        <?php echo $form->textArea($model, 'remark',
-                            array('rows'=>4,'cols'=>50,'maxlength'=>1000,'readonly'=>($model->scenario=='view'))
-                        ); ?>
-                    </div>
-                </div>
+            </div>
             <?php endif ?>
-
             <!--訂單狀態一覽-->
             <?php if ($model->scenario!='new'): ?>
                 <legend>&nbsp;</legend>
@@ -172,13 +198,14 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                                     <th><?php echo Yii::t("procurement","Order Status"); ?></th>
                                     <th><?php echo Yii::t("procurement","Operator User"); ?></th>
                                     <th><?php echo Yii::t("procurement","Operator Time"); ?></th>
+                                    <th><?php echo Yii::t("procurement","Remark"); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
                             <?php
                             if(!empty($model->statusList)){
                                 foreach ($model->statusList as $statusOne){
-                                    echo "<tr><td>".Yii::t("procurement",$statusOne["status"])."</td><td>".Yii::t("procurement",$statusOne["lcu"])."</td><td>".Yii::t("procurement",$statusOne["time"])."</td></tr>";
+                                    echo "<tr><td>".Yii::t("procurement",$statusOne["status"])."</td><td>".$statusOne["lcu"]."</td><td>".$statusOne["time"]."</td><td>".$statusOne["r_remark"]."</td></tr>";
                                 }
                             }
                             ?>
@@ -192,47 +219,17 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
 </section>
 <?php
 $goodList = json_encode($model->getGoodsList());
+$tableBool = 1;//表格內的輸入框能否輸入
+if($model->status == "pending" || $model->status == "cancelled"||$model->scenario=='new'){
+    $tableBool = 0;
+}
 $js = '
-    $("#OrderForm_goods_id").on("change",function(){
-        var goodArr = '.$goodList.';
-        var option = $(this).val();
-        var goodOne = "";
-        for(var i=0;i<goodArr.length;i++){
-            if(goodArr[i]["id"] == option){
-                goodOne = goodArr[i];
-                break;
-            }
-        }
-        if(goodOne != ""){
-            $("#goodsType").val(goodOne["type"]);
-            $("#goodsUnit").val(goodOne["unit"]);
-            $("#goodsPrice").val(goodOne["price"]);
-        }else{
-            $("#goodsType").val("");
-            $("#goodsUnit").val("");
-            $("#goodsPrice").val("");
-        }
-        priceChange();
-    }).trigger("change");
-    
-    $("#OrderForm_confirm_num,#OrderForm_order_num").on("input",priceChange);
-    
-    function priceChange(){
-        var price = 0;
-        var num = 0;
-        if($("#OrderForm_order_num").val() != "" && !isNaN($("#OrderForm_order_num").val())){
-            num = parseFloat($("#OrderForm_order_num").val());
-        }
-        if($("#OrderForm_confirm_num").val() != "" && !isNaN($("#OrderForm_confirm_num").val())){
-            num = parseFloat($("#OrderForm_confirm_num").val());
-        }
-        if($("#goodsPrice").val() != ""){
-            price = parseFloat($("#goodsPrice").val());
-        }
-        if(!isNaN(price) && !isNaN(num)){
-            $("#goodsTotalPrice").val((price*100000)*num/100000);
-        }
-    }
+inputDownList('.$goodList.',tableGoodsChange);
+$("#addGoods").on("click",{btnStr:"'.Yii::t("misc","Delete").'"},addGoodsTable);
+$("body").delegate(".delGoods","click","'.Yii::t("procurement","Are you sure you want to delete this data?").'",delGoodsTable);
+$("body").delegate(".numChange","input",goodsTotalPrice);
+goodsTotalPrice();
+disabledTable('.$tableBool.');
 ';
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 ?>
@@ -240,6 +237,8 @@ Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_R
 <?php
 $js = Script::genReadonlyField();
 Yii::app()->clientScript->registerScript('readonlyClass',$js,CClientScript::POS_READY);
+Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/goodsChange.js", CClientScript::POS_END);
+Yii::app()->clientScript->registerCssFile(Yii::app()->baseUrl . "/css/goodsChange.css");
 ?>
 
 <?php $this->endWidget(); ?>

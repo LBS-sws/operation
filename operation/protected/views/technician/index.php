@@ -1,9 +1,9 @@
 <?php
-$this->pageTitle=Yii::app()->name . ' - Order List';
+$this->pageTitle=Yii::app()->name . ' - Technician List';
 ?>
 
 <?php $form=$this->beginWidget('TbActiveForm', array(
-'id'=>'order-list',
+'id'=>'technician-list',
 'enableClientValidation'=>true,
 'clientOptions'=>array('validateOnSubmit'=>true,),
 'layout'=>TbHtml::FORM_LAYOUT_INLINE,
@@ -11,7 +11,7 @@ $this->pageTitle=Yii::app()->name . ' - Order List';
 
 <section class="content-header">
 	<h1>
-		<strong><?php echo Yii::t('app','Order Summary Entry'); ?></strong>
+		<strong><?php echo Yii::t('app','Technician Summary Entry'); ?></strong>
 	</h1>
 <!--
 	<ol class="breadcrumb">
@@ -23,23 +23,11 @@ $this->pageTitle=Yii::app()->name . ' - Order List';
 </section>
 
 <section class="content">
-    <div class="box">
-        <div class="box-body">
-            <div class="btn-group" role="group">
-                <?php
-                //var_dump(Yii::app()->session['rw_func']);
-                echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('procurement','Add Order'), array(
-                    'submit'=>Yii::app()->createUrl('order/new'),
-                ));
-                ?>
-            </div>
-        </div>
-    </div>
 	<?php $this->widget('ext.layout.ListPageWidget', array(
 			'title'=>Yii::t('procurement','Order List'),
 			'model'=>$model,
-				'viewhdr'=>'//order/_listhdr',
-				'viewdtl'=>'//order/_listdtl',
+				'viewhdr'=>'//technician/_listhdr',
+				'viewdtl'=>'//technician/_listdtl',
 				'search'=>array(
 							'order_code',
 							'order_user',

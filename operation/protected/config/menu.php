@@ -8,6 +8,21 @@ return array(
 				'access'=>'YA01',
 				'url'=>'/monthly/index',
 			),
+            //物品管理
+			'Goods Summary Entry'=>array(
+				'access'=>'YA01',
+				'url'=>'/goods/index',
+			),
+            //訂貨管理
+            'Order Summary Entry'=>array(
+                'access'=>'YA01',
+                'url'=>'/order/index',
+            ),
+            //技術員管理
+            'Technician Summary Entry'=>array(
+                'access'=>'YA01',
+                'url'=>'/technician/index',
+            ),
 		),
 	),
 	'Report'=>array(
@@ -23,6 +38,7 @@ return array(
 			),
 		),
 	),
+
 //	'System Setting'=>array(
 //		'access'=>'YC',
 //		'items'=>array(

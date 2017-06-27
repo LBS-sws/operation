@@ -14,6 +14,11 @@ return array(
 	'Misc'=>'其他',
 
 	'Sales Summary Entry'=>'营业报告输入',
+    //沈超添加開始
+	'Goods Summary Entry'=>'物品管理',
+	'Order Summary Entry'=>'订单管理',
+	'Technician Summary Entry'=>'技术员管理',
+    //沈超添加結束
 
 	
 	'Report'=>'报表',

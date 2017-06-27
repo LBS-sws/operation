@@ -19,42 +19,93 @@ class TechnicianController extends Controller
 		$this->render('index',array('model'=>$model));
 	}
 
+    public function actionSave()
+    {
+        if (isset($_POST['TechnicianForm'])) {
+            $model = new TechnicianForm($_POST['TechnicianForm']['scenario']);
+            $model->attributes = $_POST['TechnicianForm'];
+            if ($model->validate()) {
+                $model->saveData();
+                Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
+                $this->redirect(Yii::app()->createUrl('technician/edit',array('index'=>$model->id)));
+            } else {
+                $message = CHtml::errorSummary($model);
+                Dialog::message(Yii::t('dialog','Validation Message'), $message);
+                $model->statusList = OrderForm::getStatusListToId($model->id);
+                $this->render('form',array('model'=>$model,));
+            }
+        }
+    }
+    //完成收貨
+    public function actionFinish()
+    {
+        if (isset($_POST['TechnicianForm'])) {
+            $model = new TechnicianForm("finish");
+            $model->attributes = $_POST['TechnicianForm'];
+            $model->saveData();
+            $model->scenario = "edit";
+            Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
+            $this->redirect(Yii::app()->createUrl('technician/edit',array('index'=>$model->id)));
+        }
+    }
 
-	public function actionSave()
-	{
-		if (isset($_POST['TechnicianForm'])) {
-			$model = new TechnicianForm($_POST['TechnicianForm']['scenario']);
-			$model->attributes = $_POST['TechnicianForm'];
-			if ($model->validate()) {
-				$model->saveData();
-				Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
-				$this->redirect(Yii::app()->createUrl('technician/edit',array('index'=>$model->id)));
-			} else {
-				$message = CHtml::errorSummary($model);
-				Dialog::message(Yii::t('dialog','Validation Message'), $message);
+    //提交審核
+    public function actionAudit()
+    {
+        if (isset($_POST['TechnicianForm'])) {
+            $scenario =$_POST['TechnicianForm']['scenario'];
+            $model = new TechnicianForm("audit");
+            $model->attributes = $_POST['TechnicianForm'];
+            if ($model->validate()) {
+                $model->saveData();
+                $model->scenario = "edit";
+                Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done and Sent Notification'));
+                $this->redirect(Yii::app()->createUrl('technician/edit',array('index'=>$model->id)));
+            } else {
+                $message = CHtml::errorSummary($model);
+                Dialog::message(Yii::t('dialog','Validation Message'), $message);
+                $model->scenario = $scenario;
                 $model->statusList = $model->getStatusListToId($model->id);
-				$this->render('form',array('model'=>$model,));
-			}
-		}
-	}
+                $this->render('form',array('model'=>$model,));
+            }
+        }
+    }
 
-	public function actionView($index)
-	{
-		$model = new TechnicianForm('view');
-		if (!$model->retrieveData($index)) {
-			throw new CHttpException(404,'The requested page does not exist.');
-		} else {
-			$this->render('form',array('model'=>$model,));
-		}
-	}
+    public function actionView($index)
+    {
+        $model = new TechnicianForm('view');
+        if (!$model->retrieveData($index)) {
+            throw new CHttpException(404,'The requested page does not exist.');
+        } else {
+            $this->render('form',array('model'=>$model,));
+        }
+    }
 
-	public function actionEdit($index)
-	{
-		$model = new TechnicianForm('edit');
-		if (!$model->retrieveData($index)) {
-			throw new CHttpException(404,'The requested page does not exist.');
-		} else {
-			$this->render('form',array('model'=>$model,));
-		}
-	}
+    public function actionNew()
+    {
+        $model = new TechnicianForm('new');
+        $this->render('form',array('model'=>$model,));
+    }
+
+    public function actionEdit($index)
+    {
+        $model = new TechnicianForm('edit');
+        if (!$model->retrieveData($index)) {
+            throw new CHttpException(404,'The requested page does not exist.');
+        } else {
+            $this->render('form',array('model'=>$model,));
+        }
+    }
+
+    public function actionDelete()
+    {
+        $model = new TechnicianForm('delete');
+        if (isset($_POST['TechnicianForm'])) {
+            $model->attributes = $_POST['TechnicianForm'];
+            $model->saveData();
+            Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Record Deleted'));
+        }
+        $this->redirect(Yii::app()->createUrl('technician/index'));
+    }
+
 }

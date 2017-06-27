@@ -1,16 +1,14 @@
 <?php
 
-class GoodsList extends CListPageModel
+class ActivityList extends CListPageModel
 {
 	public function attributeLabels()
 	{
 		return array(	
-			'goods_code'=>Yii::t('procurement','Goods Code'),
-			'name'=>Yii::t('procurement','Name'),
-			'goods_class'=>Yii::t('procurement','Goods Class'),
-			'type'=>Yii::t('procurement','Type'),
-			'unit'=>Yii::t('procurement','Unit'),
-			'price'=>Yii::t('procurement','Price（RMB）'),
+			'activity_code'=>Yii::t('procurement','Activity Code'),
+			'activity_title'=>Yii::t('procurement','Activity Title'),
+			'start_time'=>Yii::t('procurement','Start Time'),
+			'end_time'=>Yii::t('procurement','End Time'),
 		);
 	}
 	
@@ -18,31 +16,22 @@ class GoodsList extends CListPageModel
 	{
 		$city = Yii::app()->user->city();
 		$sql1 = "select *
-				from opr_goods
+				from opr_order_activity
 				where id>0 
 			";
 		$sql2 = "select count(id)
-				from opr_goods
+				from opr_order_activity
 				where id>0 
 			";
 		$clause = "";
 		if (!empty($this->searchField) && !empty($this->searchValue)) {
 			$svalue = str_replace("'","\'",$this->searchValue);
 			switch ($this->searchField) {
-				case 'goods_code':
-					$clause .= General::getSqlConditionClause('goods_code', $svalue);
+				case 'activity_code':
+					$clause .= General::getSqlConditionClause('activity_code', $svalue);
 					break;
-				case 'name':
-					$clause .= General::getSqlConditionClause('name', $svalue);
-					break;
-				case 'type':
-					$clause .= General::getSqlConditionClause('type', $svalue);
-					break;
-				case 'unit':
-					$clause .= General::getSqlConditionClause('unit', $svalue);
-					break;
-				case 'price':
-					$clause .= General::getSqlConditionClause('price', $svalue);
+				case 'activity_title':
+					$clause .= General::getSqlConditionClause('activity_title', $svalue);
 					break;
 			}
 		}
@@ -66,12 +55,10 @@ class GoodsList extends CListPageModel
 			foreach ($records as $k=>$record) {
 					$this->attr[] = array(
 						'id'=>$record['id'],
-						'name'=>$record['name'],
-						'type'=>$record['type'],
-						'unit'=>$record['unit'],
-						'price'=>$record['price'],
-						'goods_code'=>$record['goods_code'],
-						'goods_class'=>Yii::t('procurement',$record['goods_class']),
+						'activity_code'=>$record['activity_code'],
+						'activity_title'=>$record['activity_title'],
+						'start_time'=>$record['start_time'],
+						'end_time'=>$record['end_time']
 					);
 			}
 		}

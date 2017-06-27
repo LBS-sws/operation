@@ -20,4 +20,13 @@ class OrderGoods extends CActiveRecord{
     {
         return 'id';
     }
+
+    public function getArrGoodsClass(){
+        return array(
+            ""=>"",
+            "Import"=>Yii::t("procurement","Import"),      //進口貨
+            "Domestic"=>Yii::t("procurement","Domestic"), //國內貨
+            "Fast"=>Yii::t("procurement","Fast")           //快速貨
+        );
+    }
 }

@@ -1,5 +1,5 @@
 <?php
-$htmlTrHref = $this->getLink('YC02', 'technician/edit', 'technician/view', array('index'=>$this->record['id']));
+$htmlTrHref = $this->getLink('YS01', 'purchase/edit', 'purchase/view', array('index'=>$this->record['id']));
 switch ($this->record['status']){
     case "sent":
         echo "<tr class='clickable-row text-primary' data-href='$htmlTrHref'>";
@@ -20,9 +20,11 @@ switch ($this->record['status']){
         echo "<tr class='clickable-row' data-href='$htmlTrHref'>";
 }
 ?>
-	<td><?php echo $this->drawEditButton('YC02', 'technician/edit', 'technician/view', array('index'=>$this->record['id'])); ?></td>
+	<td><?php echo $this->drawEditButton('YS01', 'purchase/edit', 'purchase/view', array('index'=>$this->record['id'])); ?></td>
 	<td><?php echo $this->record['lcd']; ?></td>
 	<td><?php echo $this->record['order_code']; ?></td>
+	<td><?php echo OrderList::getCityNameToCode($this->record['city']); ?></td>
+	<td><?php echo $this->record['order_class']; ?></td>
 	<td>
         <?php
         $con_num = 0;
@@ -36,5 +38,5 @@ switch ($this->record['status']){
             }
         ?>
     </td>
-    <td><?php echo OrderList::printOrderStatus($this->record['status']);?></td>
+    <td><?php echo OrderList::printPurchaseStatus($this->record['status']);?></td>
 </tr>

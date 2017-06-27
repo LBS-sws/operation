@@ -3,7 +3,9 @@
 class GoodsForm extends CFormModel
 {
 	public $id;
+	public $goods_code;
 	public $name;
+	public $goods_class;
 	public $type;
 	public $unit;
 	public $price;
@@ -13,7 +15,9 @@ class GoodsForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
+            'goods_code'=>Yii::t('procurement','Goods Code'),
             'name'=>Yii::t('procurement','Name'),
+            'goods_class'=>Yii::t('procurement','Goods Class'),
             'type'=>Yii::t('procurement','Type'),
             'unit'=>Yii::t('procurement','Unit'),
             'price'=>Yii::t('procurement','Price（RMB）'),
@@ -26,12 +30,15 @@ class GoodsForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, name, type, unit, price, lcu, luu','safe'),
+			array('id, goods_code, name, goods_class, type, unit, price, lcu, luu','safe'),
+            array('goods_code','required'),
             array('name','required'),
+            array('goods_class','required'),
             array('type','required'),
             array('unit','required'),
             array('price','required'),
 			array('name','validateName'),
+			array('goods_code','validateCode'),
 		);
 	}
 
@@ -46,10 +53,21 @@ class GoodsForm extends CFormModel
             $this->addError($attribute,$message);
         }
 	}
+	public function validateCode($attribute, $params){
+        $id = -1;
+        if(!empty($this->id)){
+            $id = $this->id;
+        }
+        $rows = Yii::app()->db->createCommand()->select("id")->from("opr_goods")->where('goods_code=:goods_code and id!=:id', array(':goods_code'=>$this->goods_code,':id'=>$id))->queryAll();
+        if(count($rows)>0){
+            $message = Yii::t('procurement','the Goods Code of already exists');
+            $this->addError($attribute,$message);
+        }
+	}
 
 	public function retrieveData($index) {
 		$city = Yii::app()->user->city();
-		$rows = Yii::app()->db->createCommand()->select("id,name,type,unit,price")
+		$rows = Yii::app()->db->createCommand()->select("id,name,type,unit,price,goods_code,goods_class")
             ->from("opr_goods")->where("id=:id",array(":id"=>$index))->queryAll();
 		if (count($rows) > 0) {
 			foreach ($rows as $row) {
@@ -58,6 +76,8 @@ class GoodsForm extends CFormModel
                 $this->type = $row['type'];
                 $this->unit = $row['unit'];
                 $this->price = $row['price'];
+                $this->goods_code = $row['goods_code'];
+                $this->goods_class = $row['goods_class'];
                 break;
 			}
 		}
@@ -86,9 +106,9 @@ class GoodsForm extends CFormModel
                 break;
             case 'new':
                 $sql = "insert into opr_goods(
-							name, type, unit, price
+							name, type, unit, price, goods_code, goods_class
 						) values (
-							:name, :type, :unit, :price
+							:name, :type, :unit, :price, :goods_code, :goods_class
 						)";
                 break;
             case 'edit':
@@ -96,6 +116,8 @@ class GoodsForm extends CFormModel
 							name = :name, 
 							type = :type, 
 							unit = :unit,
+							goods_class = :goods_class,
+							goods_code = :goods_code,
 							price = :price
 						where id = :id
 						";
@@ -111,6 +133,10 @@ class GoodsForm extends CFormModel
             $command->bindParam(':id',$this->id,PDO::PARAM_INT);
         if (strpos($sql,':name')!==false)
             $command->bindParam(':name',$this->name,PDO::PARAM_STR);
+        if (strpos($sql,':goods_code')!==false)
+            $command->bindParam(':goods_code',$this->goods_code,PDO::PARAM_STR);
+        if (strpos($sql,':goods_class')!==false)
+            $command->bindParam(':goods_class',$this->goods_class,PDO::PARAM_STR);
         if (strpos($sql,':type')!==false)
             $command->bindParam(':type',$this->type,PDO::PARAM_STR);
         if (strpos($sql,':unit')!==false)

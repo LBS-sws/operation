@@ -11,7 +11,7 @@ $this->pageTitle=Yii::app()->name . ' - Order List';
 
 <section class="content-header">
 	<h1>
-		<strong><?php echo Yii::t('app','Order Summary Entry'); ?></strong>
+		<strong><?php echo Yii::t('app','Order List'); ?></strong>
 	</h1>
 <!--
 	<ol class="breadcrumb">
@@ -28,9 +28,10 @@ $this->pageTitle=Yii::app()->name . ' - Order List';
             <div class="btn-group" role="group">
                 <?php
                 //var_dump(Yii::app()->session['rw_func']);
-                echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('procurement','Add Order'), array(
-                    'submit'=>Yii::app()->createUrl('order/new'),
-                ));
+                if (Yii::app()->user->validRWFunction('YS02'))
+                    echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('procurement','Add Order'), array(
+                        'submit'=>Yii::app()->createUrl('order/new'),
+                    ));
                 ?>
             </div>
         </div>
@@ -42,9 +43,7 @@ $this->pageTitle=Yii::app()->name . ' - Order List';
 				'viewdtl'=>'//order/_listdtl',
 				'search'=>array(
 							'order_code',
-							'order_user',
-							'technician',
-							'status',
+							'activity_id',
 						),
 		));
 	?>

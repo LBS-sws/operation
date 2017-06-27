@@ -10,19 +10,9 @@ return array(
 			),
             //物品管理
 			'Goods Summary Entry'=>array(
-				'access'=>'YA01',
+				'access'=>'YA02',
 				'url'=>'/goods/index',
 			),
-            //訂貨管理
-            'Order Summary Entry'=>array(
-                'access'=>'YA01',
-                'url'=>'/order/index',
-            ),
-            //技術員管理
-            'Technician Summary Entry'=>array(
-                'access'=>'YA01',
-                'url'=>'/technician/index',
-            ),
 		),
 	),
 	'Report'=>array(
@@ -35,6 +25,43 @@ return array(
 			'Report Manager'=>array(
 				'access'=>'YB01',
 				'url'=>'/queue/index',
+			),
+		),
+	),
+    //訂貨管理
+	'Order'=>array(
+		'access'=>'YS',
+		'items'=>array(
+            //訂單活動
+			'Order Activity'=>array(
+				'access'=>'YS03',
+				'url'=>'/activity/index',
+			),
+            //訂貨列表(下訂單)
+			'Order List'=>array(
+				'access'=>'YS02',
+				'url'=>'/order/index',
+			),
+            //訂貨處理(採購)
+			'Order Purchase'=>array(
+				'access'=>'YS01',
+				'url'=>'/purchase/index',
+			),
+		),
+	),
+    //技術員入口
+	'Technician'=>array(
+		'access'=>'YC',
+		'items'=>array(
+            //訂貨列表(下訂單)
+			'Order List'=>array(
+				'access'=>'YC02',
+				'url'=>'/technician/index',
+			),
+            //訂貨處理(倉庫出貨)
+			'Order Purchase'=>array(
+				'access'=>'YC01',
+				'url'=>'/delivery/index',
 			),
 		),
 	),

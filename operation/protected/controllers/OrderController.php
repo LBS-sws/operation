@@ -38,6 +38,41 @@ class OrderController extends Controller
 		}
 	}
 
+	//完成收貨
+	public function actionFinish()
+	{
+		if (isset($_POST['OrderForm'])) {
+			$model = new OrderForm("finish");
+            $model->attributes = $_POST['OrderForm'];
+            $model->saveData();
+            $model->scenario = "edit";
+            Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
+            $this->redirect(Yii::app()->createUrl('order/edit',array('index'=>$model->id)));
+		}
+	}
+
+    //提交審核
+	public function actionAudit()
+	{
+		if (isset($_POST['OrderForm'])) {
+		    $scenario =$_POST['OrderForm']['scenario'];
+			$model = new OrderForm("audit");
+			$model->attributes = $_POST['OrderForm'];
+			if ($model->validate()) {
+				$model->saveData();
+                $model->scenario = "edit";
+				Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done and Sent Notification'));
+				$this->redirect(Yii::app()->createUrl('order/edit',array('index'=>$model->id)));
+			} else {
+				$message = CHtml::errorSummary($model);
+				Dialog::message(Yii::t('dialog','Validation Message'), $message);
+                $model->scenario = $scenario;
+                $model->statusList = $model->getStatusListToId($model->id);
+				$this->render('form',array('model'=>$model,));
+			}
+		}
+	}
+
 	public function actionView($index)
 	{
 		$model = new OrderForm('view');

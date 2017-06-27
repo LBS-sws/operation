@@ -1,9 +1,12 @@
 <?php
-$this->pageTitle=Yii::app()->name . ' - Technician List';
+if (empty($model->activity_title)){
+    $this->redirect(Yii::app()->createUrl('purchase/index'));
+}
+$this->pageTitle=Yii::app()->name . ' - Purchase List';
 ?>
 
 <?php $form=$this->beginWidget('TbActiveForm', array(
-'id'=>'technician-list',
+'id'=>'order-list',
 'enableClientValidation'=>true,
 'clientOptions'=>array('validateOnSubmit'=>true,),
 'layout'=>TbHtml::FORM_LAYOUT_INLINE,
@@ -11,7 +14,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician List';
 
 <section class="content-header">
 	<h1>
-		<strong><?php echo Yii::t('procurement','Technician'); ?></strong>
+		<strong><?php echo $model->activity_title; ?></strong>
 	</h1>
 <!--
 	<ol class="breadcrumb">
@@ -26,23 +29,20 @@ $this->pageTitle=Yii::app()->name . ' - Technician List';
     <div class="box">
         <div class="box-body">
             <div class="btn-group" role="group">
-                <?php
-                //var_dump(Yii::app()->session['rw_func']);
-                if (Yii::app()->user->validRWFunction('YC02'))
-                    echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('procurement','Add Order'), array(
-                        'submit'=>Yii::app()->createUrl('technician/new'),
-                    ));
+                <?php echo TbHtml::button('<span class="fa fa-reply"></span> '.Yii::t('misc','Back'), array(
+                    'submit'=>Yii::app()->createUrl('purchase/index')));
                 ?>
             </div>
         </div>
     </div>
-	<?php $this->widget('ext.layout.ListPageWidget', array(
+	<?php $this->widget('ext.layout.ListPageWidgetTwo', array(
 			'title'=>Yii::t('procurement','Order List'),
 			'model'=>$model,
-				'viewhdr'=>'//technician/_listhdr',
-				'viewdtl'=>'//technician/_listdtl',
+				'viewhdr'=>'//purchase/_listhdr_detail',
+				'viewdtl'=>'//purchase/_listdtl_detail',
 				'search'=>array(
 							'order_code',
+							'city',
 						),
 		));
 	?>

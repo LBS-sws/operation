@@ -14,11 +14,6 @@ return array(
 	'Misc'=>'其他',
 
 	'Sales Summary Entry'=>'营业报告输入',
-    //沈超添加開始
-	'Goods Summary Entry'=>'物品管理',
-	'Order Summary Entry'=>'订单管理',
-	'Technician Summary Entry'=>'技术员管理',
-    //沈超添加結束
 
 	
 	'Report'=>'报表',
@@ -65,5 +60,16 @@ return array(
 	'Account Type'=>'账户类别',
 	'Transaction Type'=>'交易类别',
 	'Account'=>'账户',
+
+    //沈超添加開始
+    'Order'=>'订单',
+    'Order Access'=>'订单权限',
+    'Order List'=>'订单列表',
+    'Order Purchase'=>'订单采购',
+
+    'Technician'=>'技术员',
+    'Goods Summary Entry'=>'物品管理',
+    'Order Activity'=>'订单活动',
+    //沈超添加結束
 );
 ?>

@@ -1,6 +1,6 @@
 <?php
 
-class TechnicianList extends CListPageModel
+class DeliveryList extends CListPageModel
 {
     public function attributeLabels()
     {
@@ -15,6 +15,7 @@ class TechnicianList extends CListPageModel
             'status'=>Yii::t('procurement','Order Status'),
             'city'=>Yii::t('procurement','Order For City'),
             'lcd'=>Yii::t('procurement','Apply for time'),
+            'lcu'=>Yii::t('procurement','Apply for user'),
         );
     }
 
@@ -25,11 +26,11 @@ class TechnicianList extends CListPageModel
         $userName = Yii::app()->user->name;
         $sql1 = "select *
 				from opr_order
-				where (city = '$city' AND judge=0 AND lcu='$userName') 
+				where (city = '$city' AND judge=0 AND status != 'pending' AND status != 'cancelled') 
 			";
         $sql2 = "select count(id)
 				from opr_order
-				where (city = '$city' AND judge=0 AND lcu='$userName') 
+				where (city = '$city' AND judge=0 AND status != 'pending' AND status != 'cancelled') 
 			";
         $clause = "";
         if (!empty($this->searchField) && !empty($this->searchValue)) {
@@ -39,6 +40,9 @@ class TechnicianList extends CListPageModel
                     $clause .= General::getSqlConditionClause('lcd', $svalue);
                 case 'order_code':
                     $clause .= General::getSqlConditionClause('order_code', $svalue);
+                    break;
+                case 'lcu':
+                    $clause .= General::getSqlConditionClause('lcu', $svalue);
                     break;
             }
         }
@@ -63,13 +67,12 @@ class TechnicianList extends CListPageModel
                 $this->attr[] = array(
                     'id'=>$record['id'],
                     'order_code'=>$record['order_code'],
-                    'order_class'=>Yii::t("procurement",$record['order_class']),
-                    //'activity_id'=>$this->getActivityTitleToId($record['activity_id']),
                     'goods_list'=>OrderForm::getGoodsListToId($record['id']),
                     'order_user'=>$record['order_user'],
                     'technician'=>$record['technician'],
                     'status'=>$record['status'],
                     'city'=>$record['city'],
+                    'lcu'=>$record['lcu'],
                     'lcd'=>date("Y-m-d",strtotime($record['lcd'])),
                 );
             }

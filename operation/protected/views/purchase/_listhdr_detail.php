@@ -11,8 +11,8 @@
         ?>
     </th>
     <th>
-        <?php
-        echo "<a href='#'>".Yii::t("procurement","Order of Activity")."</a>";
+        <?php echo TbHtml::link($this->getLabelName('city').$this->drawOrderArrow('city'),'#',$this->createOrderLink('order-list','city'))
+        ;
         ?>
     </th>
     <th>

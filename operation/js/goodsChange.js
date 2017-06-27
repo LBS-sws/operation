@@ -1,4 +1,4 @@
-function inputDownList(arr,fn){
+function inputDownList(arr,fn,bool){
 
     //獲取焦點后
     $("body").delegate(".testInput","focus",function (e) {
@@ -11,13 +11,18 @@ function inputDownList(arr,fn){
         });
         $(ul).addClass("dropdown-menu");
         $.each( arr, function(key, val){
+            if(bool && val["goods_class"] != $("#OrderForm_order_class").val()){
+                return true;
+            }
             var li = document.createElement("li");
             $(li).attr({
                 "dataid":val["id"],
+                "datacode":val["goods_code"],
+                "dataname":val["name"],
                 "dataunit":val["unit"],
                 "dataprice":val["price"],
                 "datatype":val["type"]
-            }).append("<a href='#'>"+val["name"]+"</a>");
+            }).append("<a href='#'>"+val["goods_code"]+" -- "+val["name"]+"</a>");
             $(ul).append(li);
         });
         $(div).append(ul);
@@ -31,10 +36,10 @@ function inputDownList(arr,fn){
         });
         //選擇菜單的某個元素
         $(".dropdown-div>.dropdown-menu").delegate("a","mousedown",function () {
-            $that.val($(this).text());
+            $that.val($(this).parent("li").attr("datacode"));
             $that.next("input").val($(this).parent("li").attr("dataid"));
             if(fn != undefined){
-                fn($that,$(this).parent("li"));
+                fn($that,$(this).parent("li"),bool);
             }
         });
         //鍵盤事件下拉菜單發送變化
@@ -42,14 +47,19 @@ function inputDownList(arr,fn){
             $(ul).html("");
             $.each( arr, function(key, val){
                 var str = $that.val();
-                if(val["name"].split(str).length > 1){
+                if(val["goods_code"].split(str).length > 1 ){
+                    if(bool && val["goods_class"] != $("#OrderForm_order_class").val()){
+                        return true;
+                    }
                     var li = document.createElement("li");
                     $(li).attr({
                         "dataid":val["id"],
+                        "datacode":val["goods_code"],
+                        "dataname":val["name"],
                         "dataunit":val["unit"],
                         "dataprice":val["price"],
                         "datatype":val["type"]
-                    }).append("<a href='#'>"+val["name"]+"</a>");
+                    }).append("<a href='#'>"+val["goods_code"]+" -- "+val["name"]+"</a>");
                     $(ul).append(li);
                 }
             });
@@ -79,7 +89,7 @@ function inputDownList(arr,fn){
         var lastname = "";
         $.each(arr,function (index, obj) {
             if(obj["id"] == id){
-                lastname = obj["name"];
+                lastname = obj["goods_code"];
                 if(lastname == name){
                     bool = false;
                     return false;
@@ -93,14 +103,17 @@ function inputDownList(arr,fn){
 
 }
 //表格內的物品發生變化，價格隨之變化
-function tableGoodsChange($ele,$li) {
+function tableGoodsChange($ele,$li,bool) {
     var $tr = $ele.parents("tr");
     if($tr.length > 0){
         var $tr = $ele.parents("tr");
-        $tr.find("td").eq(1).find("input:first").val($li.attr("datatype"));
-        $tr.find("td").eq(2).find("input:first").val($li.attr("dataunit"));
-        $tr.find("td").eq(3).find("input:first").val($li.attr("dataprice"));
-        goodsTotalPrice();
+        $tr.find("input.name").val($li.attr("dataname"));
+        $tr.find("input.type").val($li.attr("datatype"));
+        $tr.find("input.unit").val($li.attr("dataunit"));
+        $tr.find("input.price").val($li.attr("dataprice"));
+        if(bool){
+            goodsTotalPrice();
+        }
     }
 }
 
@@ -109,8 +122,8 @@ function goodsTotalPrice() {
     var $table = $("#table-change>tbody");
     var totalPrice = 0;
     $table.find("tr").each(function () {
-        var price = $(this).find("td").eq(3).find("input:first").val();
-        var num = $(this).find("td").eq(4).find("input:first").val();
+        var price = $(this).find("input.price").val();
+        var num = $(this).find("input.goods_num").val();
         var sum = 0;
         var tem = "";
 
@@ -133,7 +146,7 @@ function goodsTotalPrice() {
             }
         }
         totalPrice=(sum*100000 +totalPrice*100000)/100000;
-        $(this).find("td").eq(5).find("input:first").val(sum);
+        $(this).find("input.sum").val(sum);
     });
     $("#table-change>tfoot>tr>td").eq(1).text(totalPrice);
 }
@@ -144,20 +157,48 @@ function addGoodsTable(data) {
         return false;
     }
     var num = $("#table-change>tbody>tr:last").attr("datanum");
-    if(num == "" && num == undefined && isNaN(num)){
+    num = $("#table-change>tbody>tr").length < 1?0:num;
+    if(num == undefined && num == "" && num == undefined && isNaN(num)){
         alert("添加異常，請刷新頁面");
         return false;
     }
     num = parseInt(num)+1;
     var html ='<tr datanum="'+num+'">'+
         '<td>' +
-        '<input type="text" class="form-control testInput" name="OrderForm[goods_list]['+num+'][name]" >' +
+        '<input type="text" autocomplete="off" class="form-control testInput" name="OrderForm[goods_list]['+num+'][goods_code]" >' +
         '<input type="hidden" name="OrderForm[goods_list]['+num+'][goods_id]"></td>'+
-    '<td><input type="text" class="form-control" name="OrderForm[goods_list]['+num+'][type]" readonly></td>'+
-    '<td><input type="text" class="form-control" name="OrderForm[goods_list]['+num+'][unit]" readonly></td>'+
-    '<td><input type="text" class="form-control" name="OrderForm[goods_list]['+num+'][price]" readonly></td>'+
-    '<td><input type="number" min="0" class="form-control numChange" name="OrderForm[goods_list]['+num+'][goods_num]"></td>'+
-    '<td><input type="text" class="form-control" readonly></td>'+
+    '<td><input type="text" class="form-control name" name="OrderForm[goods_list]['+num+'][name]" readonly></td>'+
+    '<td><input type="text" class="form-control type" name="OrderForm[goods_list]['+num+'][type]" readonly></td>'+
+    '<td><input type="text" class="form-control unit" name="OrderForm[goods_list]['+num+'][unit]" readonly></td>'+
+    '<td><input type="text" class="form-control price" name="OrderForm[goods_list]['+num+'][price]" readonly></td>'+
+    '<td><input type="number" min="0" class="form-control numChange goods_num" name="OrderForm[goods_list]['+num+'][goods_num]"></td>'+
+    '<td><input type="text" class="form-control sum" readonly></td>'+
+    '<td><button type="button" class="btn btn-danger delGoods">'+data.data.btnStr+'</button></td>'+
+    '</tr>';
+
+    $("#table-change>tbody").append(html);
+}
+
+//向表格內添加物品
+function addGoodsTableTwo(data) {
+    if($(this).prop("disabled")){
+        return false;
+    }
+    var num = $("#table-change>tbody>tr:last").attr("datanum");
+    num = $("#table-change>tbody>tr").length < 1?0:num;
+    if(num == undefined && num == "" && num == undefined && isNaN(num)){
+        alert("添加異常，請刷新頁面");
+        return false;
+    }
+    num = parseInt(num)+1;
+    var html ='<tr datanum="'+num+'">'+
+        '<td>' +
+        '<input type="text" autocomplete="off" class="form-control testInput" name="TechnicianForm[goods_list]['+num+'][goods_code]" >' +
+        '<input type="hidden" name="TechnicianForm[goods_list]['+num+'][goods_id]"></td>'+
+    '<td><input type="text" class="form-control name" name="TechnicianForm[goods_list]['+num+'][name]" readonly></td>'+
+    '<td><input type="text" class="form-control type" name="TechnicianForm[goods_list]['+num+'][type]" readonly></td>'+
+    '<td><input type="text" class="form-control unit" name="TechnicianForm[goods_list]['+num+'][unit]" readonly></td>'+
+    '<td><input type="number" min="0" class="form-control numChange goods_num" name="TechnicianForm[goods_list]['+num+'][goods_num]"></td>'+
     '<td><button type="button" class="btn btn-danger delGoods">'+data.data.btnStr+'</button></td>'+
     '</tr>';
 

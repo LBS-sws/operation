@@ -1,9 +1,9 @@
 <?php
-$this->pageTitle=Yii::app()->name . ' - Technician List';
+$this->pageTitle=Yii::app()->name . ' - Order Activity';
 ?>
 
 <?php $form=$this->beginWidget('TbActiveForm', array(
-'id'=>'technician-list',
+'id'=>'activity-list',
 'enableClientValidation'=>true,
 'clientOptions'=>array('validateOnSubmit'=>true,),
 'layout'=>TbHtml::FORM_LAYOUT_INLINE,
@@ -11,7 +11,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician List';
 
 <section class="content-header">
 	<h1>
-		<strong><?php echo Yii::t('procurement','Technician'); ?></strong>
+		<strong><?php echo Yii::t('app','Order Activity'); ?></strong>
 	</h1>
 <!--
 	<ol class="breadcrumb">
@@ -28,21 +28,21 @@ $this->pageTitle=Yii::app()->name . ' - Technician List';
             <div class="btn-group" role="group">
                 <?php
                 //var_dump(Yii::app()->session['rw_func']);
-                if (Yii::app()->user->validRWFunction('YC02'))
-                    echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('procurement','Add Order'), array(
-                        'submit'=>Yii::app()->createUrl('technician/new'),
-                    ));
+                echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('procurement','Add Activity'), array(
+                    'submit'=>Yii::app()->createUrl('activity/new'),
+                ));
                 ?>
             </div>
         </div>
     </div>
 	<?php $this->widget('ext.layout.ListPageWidget', array(
-			'title'=>Yii::t('procurement','Order List'),
+			'title'=>Yii::t('procurement','Order Activity List'),
 			'model'=>$model,
-				'viewhdr'=>'//technician/_listhdr',
-				'viewdtl'=>'//technician/_listdtl',
+				'viewhdr'=>'//activity/_listhdr',
+				'viewdtl'=>'//activity/_listdtl',
 				'search'=>array(
-							'order_code',
+							'activity_code',
+							'activity_title',
 						),
 		));
 	?>

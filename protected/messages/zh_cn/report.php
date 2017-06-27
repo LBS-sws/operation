@@ -1,0 +1,45 @@
+<?php
+return array(
+	'City'=>'地区',
+	'Type'=>'类别',
+	'Year'=>'年',
+	'Month'=>'月',
+	'Nil'=>'无资料',
+	'Page'=>'页',
+	'Date'=>'日期',
+	'Start Date'=>'开始日期',
+	'End Date'=>'结束日期',
+	'Dear All'=>'各位',
+	'Region'=>'区域',
+	
+	'Sales Summary Report'=>'销售报告总汇',
+	'Ref. No.'=>'编号',
+	'Detail'=>'摘要',
+	'Amount'=>'金额',
+	'Total Sales'=>'销售合计',
+	'Total'=>'合计',
+	'RMB'=>'人民币',
+	'Remarks'=>'备注',
+	
+	'Item'=>'项目',
+	'Last Balance'=>'上日金额',
+	'Curr. Paid'=>'今日付款',
+	'Curr. Received'=>'今日收款',
+	'Curr. Balance'=>'今日金额',
+	'Customer Name'=>'客户名称',
+	'Charge Item'=>'收款项目',
+	'Service Month'=>'服务费用日期',
+	'United Invoice No.'=>'United 账单号码',
+	'Paid Method'=>'付款方式',
+	'Grand Total'=>'总计',
+	'No Record'=>'没有相关记录',
+	
+	'China & Franchise'=>'中国及加盟商',
+	'South East Asia'=>'东南亚',
+	'All'=>'全部',
+	'Clean_PC_Misc_Paper'=>'清洁_灭虫_杂项_纸品',
+	'Puriscent'=>'飘盈香',
+	'Formaldehye'=>'甲醛',
+
+);
+?>

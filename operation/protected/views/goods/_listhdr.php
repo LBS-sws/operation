@@ -1,7 +1,17 @@
 <tr>
     <th></th>
     <th>
+        <?php echo TbHtml::link($this->getLabelName('goods_code').$this->drawOrderArrow('goods_code'),'#',$this->createOrderLink('goods-list','goods_code'))
+        ;
+        ?>
+    </th>
+    <th>
         <?php echo TbHtml::link($this->getLabelName('name').$this->drawOrderArrow('name'),'#',$this->createOrderLink('goods-list','name'))
+        ;
+        ?>
+    </th>
+    <th>
+        <?php echo TbHtml::link($this->getLabelName('goods_class').$this->drawOrderArrow('goods_class'),'#',$this->createOrderLink('goods-list','goods_class'))
         ;
         ?>
     </th>

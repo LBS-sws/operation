@@ -51,16 +51,32 @@ $this->pageTitle=Yii::app()->name . ' - Goods Summary Form';
 			<?php echo $form->hiddenField($model, 'id'); ?>
 
             <div class="form-group">
+                <?php echo $form->labelEx($model,'goods_code',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-4">
+                    <?php echo $form->numberField($model, 'goods_code',
+                        array('min'=>0,'readonly'=>($model->scenario=='view'))
+                    ); ?>
+                </div>
+            </div>
+            <div class="form-group">
                 <?php echo $form->labelEx($model,'name',array('class'=>"col-sm-2 control-label")); ?>
-                <div class="col-sm-7">
+                <div class="col-sm-4">
                     <?php echo $form->textField($model, 'name',
                         array('size'=>40,'maxlength'=>250,'readonly'=>($model->scenario=='view'))
                     ); ?>
                 </div>
             </div>
             <div class="form-group">
+                <?php echo $form->labelEx($model,'goods_class',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-4">
+                    <?php echo $form->dropDownList($model, 'goods_class',OrderGoods::getArrGoodsClass(),
+                        array('disabled'=>($model->scenario =='view'))
+                    ); ?>
+                </div>
+            </div>
+            <div class="form-group">
                 <?php echo $form->labelEx($model,'type',array('class'=>"col-sm-2 control-label")); ?>
-                <div class="col-sm-7">
+                <div class="col-sm-4">
                     <?php echo $form->textField($model, 'type',
                         array('size'=>40,'maxlength'=>250,'readonly'=>($model->scenario=='view'))
                     ); ?>
@@ -68,7 +84,7 @@ $this->pageTitle=Yii::app()->name . ' - Goods Summary Form';
             </div>
             <div class="form-group">
                 <?php echo $form->labelEx($model,'unit',array('class'=>"col-sm-2 control-label")); ?>
-                <div class="col-sm-7">
+                <div class="col-sm-4">
                     <?php echo $form->textField($model, 'unit',
                         array('size'=>40,'maxlength'=>250,'readonly'=>($model->scenario=='view'))
                     ); ?>
@@ -76,7 +92,7 @@ $this->pageTitle=Yii::app()->name . ' - Goods Summary Form';
             </div>
             <div class="form-group">
                 <?php echo $form->labelEx($model,'price',array('class'=>"col-sm-2 control-label")); ?>
-                <div class="col-sm-7">
+                <div class="col-sm-4">
                     <?php echo $form->textField($model, 'price',
                         array('size'=>40,'maxlength'=>250,'readonly'=>($model->scenario=='view'))
                     ); ?>

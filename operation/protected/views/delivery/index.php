@@ -23,19 +23,6 @@ $this->pageTitle=Yii::app()->name . ' - Delivery List';
 </section>
 
 <section class="content">
-    <div class="box">
-        <div class="box-body">
-            <div class="btn-group" role="group">
-                <?php
-                //var_dump(Yii::app()->session['rw_func']);
-                if (Yii::app()->user->validRWFunction('YC02'))
-                    echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('procurement','Add Order'), array(
-                        'submit'=>Yii::app()->createUrl('delivery/new'),
-                    ));
-                ?>
-            </div>
-        </div>
-    </div>
 	<?php $this->widget('ext.layout.ListPageWidget', array(
 			'title'=>Yii::t('procurement','Order List'),
 			'model'=>$model,

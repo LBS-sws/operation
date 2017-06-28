@@ -1,3 +1,14 @@
+var repeatId = [];//物品的所有Id
+
+function changeRepeatId() {
+    var $brotherInput = $("#table-change input.testInput");
+    repeatId = [];
+    $brotherInput.each(function () {
+        var goods_id = $(this).next("input").val();
+        repeatId.push(goods_id);
+    })
+}
+
 function inputDownList(arr,fn,bool){
 
     //獲取焦點后
@@ -12,6 +23,11 @@ function inputDownList(arr,fn,bool){
         $(ul).addClass("dropdown-menu");
         $.each( arr, function(key, val){
             if(bool && val["goods_class"] != $("#OrderForm_order_class").val()){
+                //類型是否一致
+                return true;
+            }
+            if(bool  && ($.inArray(val["id"],repeatId))>=0){
+                //去除已經存在的物品
                 return true;
             }
             var li = document.createElement("li");
@@ -49,6 +65,11 @@ function inputDownList(arr,fn,bool){
                 var str = $that.val();
                 if(val["goods_code"].split(str).length > 1 ){
                     if(bool && val["goods_class"] != $("#OrderForm_order_class").val()){
+                        //類型是否一致
+                        return true;
+                    }
+                    if(bool  && ($.inArray(val["id"],repeatId))>=0){
+                        //去除已經存在的物品
                         return true;
                     }
                     var li = document.createElement("li");
@@ -113,6 +134,7 @@ function tableGoodsChange($ele,$li,bool) {
         $tr.find("input.price").val($li.attr("dataprice"));
         if(bool){
             goodsTotalPrice();
+            changeRepeatId();
         }
     }
 }
@@ -177,9 +199,10 @@ function addGoodsTable(data) {
     '</tr>';
 
     $("#table-change>tbody").append(html);
+    changeRepeatId();
 }
 
-//向表格內添加物品
+//向表格內添加物品(技術員)
 function addGoodsTableTwo(data) {
     if($(this).prop("disabled")){
         return false;

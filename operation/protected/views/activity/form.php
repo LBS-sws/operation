@@ -66,6 +66,16 @@ $this->pageTitle=Yii::app()->name . ' - Order Activity Form';
                     ); ?>
                 </div>
             </div>
+
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'order_class',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-4">
+                    <?php echo $form->dropDownList($model, 'order_class',$model->getOrderClassNotFast(),
+                        array('disabled'=>($model->scenario =='view'))
+                    ); ?>
+                </div>
+            </div>
+
             <div class="form-group">
                 <?php echo $form->labelEx($model,'start_time',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
@@ -94,80 +104,11 @@ $this->pageTitle=Yii::app()->name . ' - Order Activity Form';
             </div>
 
             <div class="form-group">
-                <label class="col-sm-2 control-label required">
-                    <?php echo Yii::t("procurement","Order Access")?>
-                    <span class="required">*</span>
-                </label>
-                <div class="col-sm-8">
-                    <table class="table table-bordered table-striped">
-                        <thead>
-                        <tr>
-                            <td width="15%"><?php echo Yii::t("procurement","Order Class");?></td>
-                            <td width="30%"><?php echo Yii::t("procurement","Start Time");?></td>
-                            <td width="30%"><?php echo Yii::t("procurement","End Time");?></td>
-                            <td width="20%"><?php echo Yii::t("procurement","Access Number");?></td>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td><?php echo Yii::t("procurement","Import");?></td>
-                            <td>
-                                <div class="input-group date">
-                                    <div class="input-group-addon">
-                                        <i class="fa fa-calendar"></i>
-                                    </div>
-                                    <?php echo $form->textField($model, 'import_start_time',
-                                        array('class'=>'form-control pull-right','readonly'=>($model->scenario=='view'),));
-                                    ?>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="input-group date">
-                                    <div class="input-group-addon">
-                                        <i class="fa fa-calendar"></i>
-                                    </div>
-                                    <?php echo $form->textField($model, 'import_end_time',
-                                        array('class'=>'form-control pull-right','readonly'=>($model->scenario=='view'),));
-                                    ?>
-                                </div>
-                            </td>
-                            <td>
-                                <?php echo $form->numberField($model, 'import_num',
-                                    array('min'=>0,'readonly'=>($model->scenario=='view'))
-                                ); ?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><?php echo Yii::t("procurement","Domestic");?></td>
-                            <td>
-                                <div class="input-group date">
-                                    <div class="input-group-addon">
-                                        <i class="fa fa-calendar"></i>
-                                    </div>
-                                    <?php echo $form->textField($model, 'domestic_start_time',
-                                        array('class'=>'form-control pull-right','readonly'=>($model->scenario=='view'),));
-                                    ?>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="input-group date">
-                                    <div class="input-group-addon">
-                                        <i class="fa fa-calendar"></i>
-                                    </div>
-                                    <?php echo $form->textField($model, 'domestic_end_time',
-                                        array('class'=>'form-control pull-right','readonly'=>($model->scenario=='view'),));
-                                    ?>
-                                </div>
-                            </td>
-                            <td>
-                                <?php echo $form->numberField($model, 'domestic_num',
-                                    array('min'=>0,'readonly'=>($model->scenario=='view'))
-                                ); ?>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-
+                <?php echo $form->labelEx($model,'num',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-4">
+                    <?php echo $form->numberField($model, 'num',
+                        array('min'=>1,'readonly'=>($model->scenario=='view'))
+                    ); ?>
                 </div>
             </div>
 		</div>
@@ -181,10 +122,6 @@ if ($model->scenario!='view') {
     $js = Script::genDatePicker(array(
         'ActivityForm_start_time',
         'ActivityForm_end_time',
-        'ActivityForm_import_start_time',
-        'ActivityForm_import_end_time',
-        'ActivityForm_domestic_start_time',
-        'ActivityForm_domestic_end_time',
     ));
     Yii::app()->clientScript->registerScript('datePick',$js,CClientScript::POS_READY);
 }

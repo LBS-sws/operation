@@ -1,6 +1,6 @@
 <?php
 
-class PurchaseForm extends CFormModel
+class FastForm extends CFormModel
 {
 	public $id;
 	public $order_user;

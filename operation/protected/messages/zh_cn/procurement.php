@@ -11,6 +11,10 @@ return array(
 	'Order List'=>'订货列表',
     'Order Status List'=>'订货状态列表',
 	'Add Order'=>'添加订货',
+	'Headquarters Number'=>'总部数量限制',
+	'Area Number'=>'区域数量限制',
+	'Not Font Goods'=>'没有找到该货物',
+	'Max Number is'=>'最大数量是',
 
 
 	'Type'=>'包装规格',
@@ -27,6 +31,7 @@ return array(
 	'Import'=>'进口货',
 	'Domestic'=>'国内货',
 	'Fast'=>'快速货',
+	'Fast Order'=>'快速訂單',
 
 	'Goods Class'=>'物品分类',
 	'Goods Code'=>'物品编号',
@@ -122,5 +127,9 @@ return array(
     'Has been approved, Shipped out'=>'已审核，已发货',
     'Have read,Drop shipping'=>'已查看，待发货',
 
+    'Delivery List'=>'订单采购',
+    'Number Restrictions'=>'数量限制',
+    ' Not Null'=>'不能为空',
+    'Fast Form'=>'快速订单审核',
 );
 ?>

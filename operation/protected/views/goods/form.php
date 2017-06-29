@@ -24,11 +24,6 @@ $this->pageTitle=Yii::app()->name . ' - Goods Summary Form';
 <section class="content">
 	<div class="box"><div class="box-body">
 	<div class="btn-group" role="group">
-		<?php
-        echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('procurement','Add Goods'), array(
-            'submit'=>Yii::app()->createUrl('goods/new'),
-        ));
-		?>
 		<?php echo TbHtml::button('<span class="fa fa-reply"></span> '.Yii::t('misc','Back'), array(
 				'submit'=>Yii::app()->createUrl('goods/index')));
 		?>
@@ -95,6 +90,22 @@ $this->pageTitle=Yii::app()->name . ' - Goods Summary Form';
                 <div class="col-sm-4">
                     <?php echo $form->textField($model, 'price',
                         array('size'=>40,'maxlength'=>250,'readonly'=>($model->scenario=='view'))
+                    ); ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'big_num',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-4">
+                    <?php echo $form->numberField($model, 'big_num',
+                        array('min'=>0,'readonly'=>($model->scenario=='view'))
+                    ); ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'small_num',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-4">
+                    <?php echo $form->numberField($model, 'small_num',
+                        array('min'=>0,'readonly'=>($model->scenario=='view'))
                     ); ?>
                 </div>
             </div>

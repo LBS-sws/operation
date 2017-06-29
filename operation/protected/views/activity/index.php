@@ -43,6 +43,8 @@ $this->pageTitle=Yii::app()->name . ' - Order Activity';
 				'search'=>array(
 							'activity_code',
 							'activity_title',
+							'order_class',
+							'num',
 						),
 		));
 	?>

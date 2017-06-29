@@ -7,12 +7,8 @@ class PurchaseView extends CFormModel
 	public $activity_title;
 	public $start_time;
 	public $end_time;
-	public $import_start_time;
-	public $import_end_time;
-	public $import_num;
-	public $domestic_start_time;
-    public $domestic_end_time;
-    public $domestic_num;
+	public $num;
+	public $order_class;
     public $luu;
     public $lcu;
     public $lud;
@@ -25,12 +21,8 @@ class PurchaseView extends CFormModel
             'activity_title'=>Yii::t('procurement','Activity Title'),
             'start_time'=>Yii::t('procurement','Start Time'),
             'end_time'=>Yii::t('procurement','End Time'),
-            'import_start_time'=>Yii::t('procurement','Import Start Time'),
-            'import_end_time'=>Yii::t('procurement','Import End Time'),
-            'import_num'=>Yii::t('procurement','Import Num'),
-            'domestic_start_time'=>Yii::t('procurement','Domestic Start Time'),
-            'domestic_end_time'=>Yii::t('procurement','Domestic End Time'),
-            'domestic_num'=>Yii::t('procurement','Domestic Num'),
+            'num'=>Yii::t('procurement','Number Restrictions'),
+            'order_class'=>Yii::t('procurement','Order Class')
 		);
 	}
 
@@ -46,12 +38,8 @@ class PurchaseView extends CFormModel
                 $this->activity_title = $row['activity_title'];
                 $this->start_time = $row['start_time'];
                 $this->end_time = $row['end_time'];
-                $this->import_start_time = $row['import_start_time'];
-                $this->import_end_time = $row['import_end_time'];
-                $this->import_num = $row['import_num'];
-                $this->domestic_start_time = $row['domestic_start_time'];
-                $this->domestic_end_time = $row['domestic_end_time'];
-                $this->domestic_num = $row['domestic_num'];
+                $this->num = $row['num'];
+                $this->order_class = $row['order_class'];
                 break;
 			}
 		}
@@ -60,9 +48,9 @@ class PurchaseView extends CFormModel
 
 	public function getHeaderList() {
 		return array(
-		    "order_class"=>"Order Class",
+		    //"order_class"=>"Order Class",
 		    "goods_class"=>"Goods Class",
-		    "city_class"=>"City Class"
+		    //"city_class"=>"City Class"
         );
 	}
 	public function getBodyList($str) {

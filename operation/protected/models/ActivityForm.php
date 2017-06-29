@@ -7,12 +7,8 @@ class ActivityForm extends CFormModel
 	public $activity_title;
 	public $start_time;
 	public $end_time;
-	public $import_start_time;
-	public $import_end_time;
-	public $import_num;
-	public $domestic_start_time;
-    public $domestic_end_time;
-    public $domestic_num;
+	public $order_class;
+	public $num;
     public $luu;
     public $lcu;
     public $lud;
@@ -25,12 +21,8 @@ class ActivityForm extends CFormModel
             'activity_title'=>Yii::t('procurement','Activity Title'),
             'start_time'=>Yii::t('procurement','Start Time'),
             'end_time'=>Yii::t('procurement','End Time'),
-            'import_start_time'=>Yii::t('procurement','Import Start Time'),
-            'import_end_time'=>Yii::t('procurement','Import End Time'),
-            'import_num'=>Yii::t('procurement','Import Num'),
-            'domestic_start_time'=>Yii::t('procurement','Domestic Start Time'),
-            'domestic_end_time'=>Yii::t('procurement','Domestic End Time'),
-            'domestic_num'=>Yii::t('procurement','Domestic Num'),
+            'num'=>Yii::t('procurement','Number Restrictions'),
+            'order_class'=>Yii::t('procurement','Order Class')
 		);
 	}
 
@@ -40,19 +32,16 @@ class ActivityForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, activity_code, activity_title, start_time, end_time, import_start_time, import_end_time, import_num, domestic_start_time, domestic_end_time, domestic_num','safe'),
+			array('id, activity_code, activity_title, start_time, end_time, order_class, num','safe'),
             array('activity_code','required'),
             array('activity_title','required'),
             array('start_time','required'),
             array('end_time','required'),
-            array('import_start_time','required'),
-            array('import_end_time','required'),
-            array('import_num','required'),
-            array('domestic_start_time','required'),
-            array('domestic_end_time','required'),
-            array('domestic_num','required'),
+            array('order_class','required'),
+            array('num','required'),
 			array('activity_code','validateCode'),
 			array('activity_title','validateTitle'),
+            array('num','numerical','allowEmpty'=>false,'integerOnly'=>true,'min'=>1),
 		);
 	}
 
@@ -81,19 +70,12 @@ class ActivityForm extends CFormModel
         }
 	}
 
-	//根據當前時間點輸出可用活動
-    public function getActivityToNow(){
-	    $arr = array(""=>"");
-        $rows = Yii::app()->db->createCommand()->select("id,activity_title")->from("opr_order_activity")
-            ->where('start_time <:date and end_time >:date', array(':date'=>date("Y-m-d")))->queryAll();
-        if($rows){
-            foreach ($rows as $row){
-                $arr[$row['id']] = $row['activity_title'];
-            }
-        }
-        return $arr;
+	//刪除快速訂單
+    public function getOrderClassNotFast(){
+	    $arr = OrderGoods::getArrGoodsClass();
+	    unset($arr["Fast"]);
+	    return $arr;
     }
-
 
 	public function retrieveData($index) {
 		$city = Yii::app()->user->city();
@@ -106,12 +88,8 @@ class ActivityForm extends CFormModel
                 $this->activity_title = $row['activity_title'];
                 $this->start_time = $row['start_time'];
                 $this->end_time = $row['end_time'];
-                $this->import_start_time = $row['import_start_time'];
-                $this->import_end_time = $row['import_end_time'];
-                $this->import_num = $row['import_num'];
-                $this->domestic_start_time = $row['domestic_start_time'];
-                $this->domestic_end_time = $row['domestic_end_time'];
-                $this->domestic_num = $row['domestic_num'];
+                $this->order_class = $row['order_class'];
+                $this->num = $row['num'];
                 break;
 			}
 		}
@@ -153,9 +131,9 @@ class ActivityForm extends CFormModel
                 break;
             case 'new':
                 $sql = "insert into opr_order_activity(
-							activity_code, activity_title, start_time, end_time, import_start_time, import_end_time, import_num, domestic_start_time, domestic_end_time, domestic_num, lcu, lcd
+							activity_code, activity_title, start_time, end_time, order_class, num, lcu, lcd
 						) values (
-							:activity_code, :activity_title, :start_time, :end_time, :import_start_time, :import_end_time, :import_num, :domestic_start_time, :domestic_end_time, :domestic_num, :lcu, :lcd
+							:activity_code, :activity_title, :start_time, :end_time, :order_class, :num, :lcu, :lcd
 						)";
                 break;
             case 'edit':
@@ -164,12 +142,8 @@ class ActivityForm extends CFormModel
 							activity_title = :activity_title, 
 							start_time = :start_time,
 							end_time = :end_time,
-							import_start_time = :import_start_time,
-							import_end_time = :import_end_time,
-							import_num = :import_num,
-							domestic_start_time = :domestic_start_time,
-							domestic_end_time = :domestic_end_time,
-							domestic_num = :domestic_num,
+							order_class = :order_class,
+							num = :num,
 							luu = :luu,
 							lud = :lud
 						where id = :id
@@ -193,18 +167,10 @@ class ActivityForm extends CFormModel
             $command->bindParam(':start_time',$this->start_time,PDO::PARAM_STR);
         if (strpos($sql,':end_time')!==false)
             $command->bindParam(':end_time',$this->end_time,PDO::PARAM_STR);
-        if (strpos($sql,':import_start_time')!==false)
-            $command->bindParam(':import_start_time',$this->import_start_time,PDO::PARAM_STR);
-        if (strpos($sql,':import_end_time')!==false)
-            $command->bindParam(':import_end_time',$this->import_end_time,PDO::PARAM_STR);
-        if (strpos($sql,':import_num')!==false)
-            $command->bindParam(':import_num',$this->import_num,PDO::PARAM_INT);
-        if (strpos($sql,':domestic_start_time')!==false)
-            $command->bindParam(':domestic_start_time',$this->domestic_start_time,PDO::PARAM_STR);
-        if (strpos($sql,':domestic_end_time')!==false)
-            $command->bindParam(':domestic_end_time',$this->domestic_end_time,PDO::PARAM_STR);
-        if (strpos($sql,':domestic_num')!==false)
-            $command->bindParam(':domestic_num',$this->domestic_num,PDO::PARAM_INT);
+        if (strpos($sql,':order_class')!==false)
+            $command->bindParam(':order_class',$this->order_class,PDO::PARAM_STR);
+        if (strpos($sql,':num')!==false)
+            $command->bindParam(':num',$this->num,PDO::PARAM_INT);
 
         if (strpos($sql,':luu')!==false)
             $command->bindParam(':luu',$uid,PDO::PARAM_STR);

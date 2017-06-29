@@ -73,6 +73,7 @@ return array(
     'Technician'=>'技術員',
     'Goods Summary Entry'=>'物品管理',
     'Order Activity'=>'訂單活動',
+    'Fast Order'=>'快速訂單',
     //沈超添加結束
 );
 ?>

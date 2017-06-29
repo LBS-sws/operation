@@ -106,7 +106,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                             <td width="10%"><?php echo Yii::t("procurement","Unit")?></td>
                             <td width="15%"><?php echo Yii::t("procurement","Price（RMB）")?></td>
                             <td width="10%"><?php echo Yii::t("procurement","Goods Number")?></td>
-                            <?php if ($model->scenario=='edit' && $model->status == "approve"): ?>
+                            <?php if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished")): ?>
                             <td width="10%"><?php echo Yii::t("procurement","Actual Number")?></td>
                             <?php endif ?>
                             <td width="15%"><?php echo Yii::t("procurement","Total（RMB）")?></td>
@@ -127,7 +127,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                                 $tableTr.="<td><input type='text' class='form-control unit' readonly name='OrderForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
                                 $tableTr.="<td><input type='text' class='form-control price' readonly name='OrderForm[goods_list][$con_num][price]' value='".$val['price']."'></td>";
                                 $tableTr.="<td><input type='number' class='form-control numChange goods_num' name='OrderForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
-                                if($model->scenario=='edit' && $model->status == "approve"){
+                                if($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished")){
                                     $tableTr.="<td><input type='number' class='form-control confirm_num' name='OrderForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
                                 }
                                 $tableTr.="<td><input type='text' class='form-control sum' readonly></td>";
@@ -145,7 +145,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                         <tfoot>
                         <tr>
                             <?php
-                            if ($model->scenario=='edit' && $model->status == "approve"){
+                            if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished")){
                                 echo '<td colspan="7"></td>';
                             }else{
                                 echo '<td colspan="6"></td>';
@@ -162,7 +162,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
             <div class="form-group">
                 <?php echo $form->labelEx($model,'activity_id',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
-                    <?php echo $form->dropDownList($model, 'activity_id',ActivityForm::getActivityToNow(),
+                    <?php echo $form->dropDownList($model, 'activity_id',$model->getActivityToNow(),
                         array('disabled'=>($model->scenario =='view' || $model->status != "pending"))
                     ); ?>
                 </div>
@@ -187,6 +187,7 @@ if ($model->scenario!='new')
     $this->renderPartial('//site/flowlist',array('model'=>$model));
 ?>
 <?php
+//OrderForm_activity_id
 $goodList = json_encode($model->getGoodsList());
 $tableBool = 1;//表格內的輸入框能否輸入
 if($model->status == "pending" || $model->status == "cancelled"||$model->scenario=='new'){
@@ -209,8 +210,21 @@ $("#OrderForm_order_class").on("change",function(){
         }
     }
     orderClass = $(this).val();
+    activityChange();
 });
+function activityChange(){
+    if($("#OrderForm_order_class").val() == "Fast"){
+        $("#OrderForm_activity_id").prop("disabled",true).after("<input type=\'hidden\' name=\'OrderForm[activity_id]\' value=0>");
+        $("#OrderForm_activity_id").parents(".form-group").addClass("hide");
+    }else{
+        $("#OrderForm_activity_id").prop("disabled",false).next("input").remove();
+        $("#OrderForm_activity_id").parents(".form-group").removeClass("hide");
+    }
+}
 ';
+if($model->status == "pending" || $model->order_class == "Fast"){
+    $js.="activityChange()";
+}
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 ?>
 

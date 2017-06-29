@@ -1,11 +1,11 @@
 <?php
 if (empty($model->id)&&$model->scenario == "edit"){
-    $this->redirect(Yii::app()->createUrl('purchase/index'));
+    $this->redirect(Yii::app()->createUrl('fast/index'));
 }
-$this->pageTitle=Yii::app()->name . ' - Purchase Form';
+$this->pageTitle=Yii::app()->name . ' - Fast Form';
 ?>
 <?php $form=$this->beginWidget('TbActiveForm', array(
-'id'=>'purchase-form',
+'id'=>'fast-form',
 'enableClientValidation'=>true,
 'clientOptions'=>array('validateOnSubmit'=>true,),
 'layout'=>TbHtml::FORM_LAYOUT_HORIZONTAL,
@@ -13,7 +13,7 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
 
 <section class="content-header">
 	<h1>
-		<strong><?php echo Yii::t('procurement','Purchase Form'); ?></strong>
+		<strong><?php echo Yii::t('procurement','Fast Form'); ?></strong>
 	</h1>
 <!--
 	<ol class="breadcrumb">
@@ -28,18 +28,18 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
 	<div class="box"><div class="box-body">
 	<div class="btn-group" role="group">
 		<?php echo TbHtml::button('<span class="fa fa-reply"></span> '.Yii::t('misc','Back'), array(
-				'submit'=>Yii::app()->createUrl('Purchase/detail?index='.$model->activity_id)));
+				'submit'=>Yii::app()->createUrl('fast/index')));
 		?>
 <?php if ($model->scenario!='view'): ?>
 			<?php
             if($model->status == "sent" || $model->status == "read"){
                 //存為草稿
                 echo TbHtml::button('<span class="fa fa-save"></span> '.Yii::t('misc','Save'), array(
-                    'submit'=>Yii::app()->createUrl('Purchase/save')));
+                    'submit'=>Yii::app()->createUrl('fast/save')));
 
                 //发货
                 echo TbHtml::button('<span class="fa fa-upload"></span> '.Yii::t('procurement','Shipments'), array(
-                    'submit'=>Yii::app()->createUrl('Purchase/audit')));
+                    'submit'=>Yii::app()->createUrl('fast/audit')));
             }
 			?>
 <?php endif ?>
@@ -50,7 +50,7 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
                     if($model->status == "sent" || $model->status == "read") {
                         //拒絕
                         echo TbHtml::button('<span class="fa fa-mail-reply-all"></span> ' . Yii::t('procurement', 'Reject'), array(
-                            'submit' => Yii::app()->createUrl('Purchase/reject')));
+                            'submit' => Yii::app()->createUrl('fast/reject')));
                     }
                     //流程
                     echo TbHtml::button('<span class="fa fa-file-text-o"></span> '.Yii::t('misc','Flow'), array(
@@ -111,18 +111,18 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
                                 $con_num = empty($val['id'])?$key:$val['id'];
                                 $tableTr = "<tr datanum='$con_num'>";
 
-                                $tableTr.="<td><input type='text' class='form-control testInput' readonly name='PurchaseForm[goods_list][$con_num][goods_code]' value='".$val['goods_code']."'>";
-                                $tableTr.="<input type='hidden' name='PurchaseForm[goods_list][$con_num][goods_id]' value='".$val['goods_id']."'>";
-                                $tableTr.="<input type='hidden' name='PurchaseForm[goods_list][$con_num][id]' value='".$val['id']."'></td>";
-                                $tableTr.="<td><input type='text' class='form-control name' readonly name='PurchaseForm[goods_list][$con_num][name]' value='".$val['name']."'></td>";
-                                $tableTr.="<td><input type='text' class='form-control type' readonly name='PurchaseForm[goods_list][$con_num][type]' value='".$val['type']."'></td>";
-                                $tableTr.="<td><input type='text' class='form-control unit' readonly name='PurchaseForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
-                                $tableTr.="<td><input type='text' class='form-control price' readonly name='PurchaseForm[goods_list][$con_num][price]' value='".$val['price']."'></td>";
-                                $tableTr.="<td><input type='number' class='form-control' readonly name='PurchaseForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
+                                $tableTr.="<td><input type='text' class='form-control testInput' readonly name='FastForm[goods_list][$con_num][goods_code]' value='".$val['goods_code']."'>";
+                                $tableTr.="<input type='hidden' name='FastForm[goods_list][$con_num][goods_id]' value='".$val['goods_id']."'>";
+                                $tableTr.="<input type='hidden' name='FastForm[goods_list][$con_num][id]' value='".$val['id']."'></td>";
+                                $tableTr.="<td><input type='text' class='form-control name' readonly name='FastForm[goods_list][$con_num][name]' value='".$val['name']."'></td>";
+                                $tableTr.="<td><input type='text' class='form-control type' readonly name='FastForm[goods_list][$con_num][type]' value='".$val['type']."'></td>";
+                                $tableTr.="<td><input type='text' class='form-control unit' readonly name='FastForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
+                                $tableTr.="<td><input type='text' class='form-control price' readonly name='FastForm[goods_list][$con_num][price]' value='".$val['price']."'></td>";
+                                $tableTr.="<td><input type='number' class='form-control' readonly name='FastForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
                                 if($model->status == "sent" || $model->status == "read"){
-                                    $tableTr.="<td><input type='number' class='form-control numChange goods_num' name='PurchaseForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
+                                    $tableTr.="<td><input type='number' class='form-control numChange goods_num' name='FastForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
                                 }else{
-                                    $tableTr.="<td><input type='number' class='form-control numChange goods_num' readonly name='PurchaseForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
+                                    $tableTr.="<td><input type='number' class='form-control numChange goods_num' readonly name='FastForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
                                 }
                                 $tableTr.="<td><input type='text' class='form-control sum' readonly></td>";
 
@@ -138,15 +138,6 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
                         </tr>
                         </tfoot>
                     </table>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <?php echo $form->labelEx($model,'activity_id',array('class'=>"col-sm-2 control-label")); ?>
-                <div class="col-sm-4">
-                    <?php echo $form->dropDownList($model, 'activity_id',$model->getActivityToNow(),
-                        array('disabled'=>true)
-                    ); ?>
                 </div>
             </div>
 

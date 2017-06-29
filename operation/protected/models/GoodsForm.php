@@ -9,6 +9,8 @@ class GoodsForm extends CFormModel
 	public $type;
 	public $unit;
 	public $price;
+	public $big_num;
+	public $small_num;
 	public $luu;
 	public $lcu;
 
@@ -21,6 +23,8 @@ class GoodsForm extends CFormModel
             'type'=>Yii::t('procurement','Type'),
             'unit'=>Yii::t('procurement','Unit'),
             'price'=>Yii::t('procurement','Price（RMB）'),
+            'big_num'=>Yii::t('procurement','Headquarters Number'),
+            'small_num'=>Yii::t('procurement','Area Number'),
 		);
 	}
 
@@ -30,13 +34,17 @@ class GoodsForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, goods_code, name, goods_class, type, unit, price, lcu, luu','safe'),
+			array('id, goods_code, name, goods_class, type, unit, price, big_num, small_num, lcu, luu','safe'),
             array('goods_code','required'),
+            array('goods_code','numerical','allowEmpty'=>false,'integerOnly'=>true),
             array('name','required'),
             array('goods_class','required'),
+            array('big_num','numerical','allowEmpty'=>true,'integerOnly'=>true,'min'=>0),
+            array('small_num','numerical','allowEmpty'=>true,'integerOnly'=>true,'min'=>0),
             array('type','required'),
             array('unit','required'),
             array('price','required'),
+            array('price','numerical','allowEmpty'=>false,'integerOnly'=>false),
 			array('name','validateName'),
 			array('goods_code','validateCode'),
 		);
@@ -67,7 +75,7 @@ class GoodsForm extends CFormModel
 
 	public function retrieveData($index) {
 		$city = Yii::app()->user->city();
-		$rows = Yii::app()->db->createCommand()->select("id,name,type,unit,price,goods_code,goods_class")
+		$rows = Yii::app()->db->createCommand()->select("id,name,type,unit,price,goods_code,goods_class,big_num,small_num")
             ->from("opr_goods")->where("id=:id",array(":id"=>$index))->queryAll();
 		if (count($rows) > 0) {
 			foreach ($rows as $row) {
@@ -78,6 +86,8 @@ class GoodsForm extends CFormModel
                 $this->price = $row['price'];
                 $this->goods_code = $row['goods_code'];
                 $this->goods_class = $row['goods_class'];
+                $this->big_num = $row['big_num'];
+                $this->small_num = $row['small_num'];
                 break;
 			}
 		}
@@ -106,9 +116,9 @@ class GoodsForm extends CFormModel
                 break;
             case 'new':
                 $sql = "insert into opr_goods(
-							name, type, unit, price, goods_code, goods_class
+							name, type, unit, price, goods_code, goods_class, big_num, small_num
 						) values (
-							:name, :type, :unit, :price, :goods_code, :goods_class
+							:name, :type, :unit, :price, :goods_code, :goods_class, :big_num, :small_num
 						)";
                 break;
             case 'edit':
@@ -118,6 +128,8 @@ class GoodsForm extends CFormModel
 							unit = :unit,
 							goods_class = :goods_class,
 							goods_code = :goods_code,
+							big_num = :big_num,
+							small_num = :small_num,
 							price = :price
 						where id = :id
 						";
@@ -129,8 +141,18 @@ class GoodsForm extends CFormModel
         $uid = Yii::app()->user->id;
 
         $command=$connection->createCommand($sql);
+        if(empty($this->big_num)){
+            $this->big_num = 0;
+        }
+        if(empty($this->small_num)){
+            $this->small_num = 0;
+        }
         if (strpos($sql,':id')!==false)
             $command->bindParam(':id',$this->id,PDO::PARAM_INT);
+        if (strpos($sql,':big_num')!==false)
+            $command->bindParam(':big_num',$this->big_num,PDO::PARAM_INT);
+        if (strpos($sql,':small_num')!==false)
+            $command->bindParam(':small_num',$this->small_num,PDO::PARAM_INT);
         if (strpos($sql,':name')!==false)
             $command->bindParam(':name',$this->name,PDO::PARAM_STR);
         if (strpos($sql,':goods_code')!==false)

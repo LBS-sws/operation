@@ -7,11 +7,43 @@ class ActivityList extends CListPageModel
 		return array(	
 			'activity_code'=>Yii::t('procurement','Activity Code'),
 			'activity_title'=>Yii::t('procurement','Activity Title'),
+			'order_class'=>Yii::t('procurement','Order Class'),
 			'start_time'=>Yii::t('procurement','Start Time'),
 			'end_time'=>Yii::t('procurement','End Time'),
+            'num'=>Yii::t('procurement','Number Restrictions'),
 		);
 	}
-	
+
+	public function orderClassEnToInput($str){
+	    switch (Yii::app()->language){
+            case "zh_cn":
+                if(strpos("进口货",$str)>=0){
+                    return "进口货";
+                }
+                if(strpos("国内货",$str)>=0){
+                    return "国内货";
+                }
+                if(strpos("快速货",$str)>=0){
+                    return "快速货";
+                }
+            case "zh_tw":
+                if(strpos("進口貨",$str)>=0){
+                    return "進口貨";
+                }
+                if(strpos("國內貨",$str)>=0){
+                    return "國內貨";
+                }
+                if(strpos("快速貨",$str)>=0){
+                    return "快速貨";
+                }
+            case "en":
+                return $str;
+            default:
+                return "1111";
+        }
+    }
+
+
 	public function retrieveDataByPage($pageNum=1)
 	{
 		$city = Yii::app()->user->city();
@@ -32,6 +64,12 @@ class ActivityList extends CListPageModel
 					break;
 				case 'activity_title':
 					$clause .= General::getSqlConditionClause('activity_title', $svalue);
+					break;
+				case 'num':
+					$clause .= General::getSqlConditionClause('num', $svalue);
+					break;
+				case 'order_class':
+					$clause .= General::getSqlConditionClause('order_class', orderClassEnToInput($svalue));
 					break;
 			}
 		}
@@ -57,6 +95,8 @@ class ActivityList extends CListPageModel
 						'id'=>$record['id'],
 						'activity_code'=>$record['activity_code'],
 						'activity_title'=>$record['activity_title'],
+						'order_class'=>Yii::t("procurement",$record['order_class']),
+						'num'=>$record['num'],
 						'start_time'=>$record['start_time'],
 						'end_time'=>$record['end_time']
 					);

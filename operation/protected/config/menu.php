@@ -47,6 +47,11 @@ return array(
 				'access'=>'YS01',
 				'url'=>'/purchase/index',
 			),
+            //快速訂單
+			'Fast Order'=>array(
+				'access'=>'YS04',
+				'url'=>'/fast/index',
+			),
 		),
 	),
     //技術員入口

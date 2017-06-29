@@ -75,14 +75,25 @@ class TechnicianForm extends CFormModel
                 $message = Yii::t('procurement','The goods or quantity cannot be empty');
                 $this->addError($attribute,$message);
                 return false;
-            }else if(!is_numeric($goods["goods_id"])){
+            }else if(!is_numeric($goods["goods_id"])|| floor($goods["goods_id"])!=$goods["goods_id"]){
                 $message = Yii::t('procurement','goods does not exist');
                 $this->addError($attribute,$message);
                 return false;
-            }else if(!is_numeric($goods["goods_num"])){
+            }else if(!is_numeric($goods["goods_num"])|| floor($goods["goods_num"])!=$goods["goods_num"]){
                 $message = Yii::t('procurement','Goods Number can only be numbered');
                 $this->addError($attribute,$message);
                 return false;
+            }else{
+                $list = PurchaseView::getGoodsToGoodsId($goods["goods_id"]);
+                if (empty($list)){
+                    $message = Yii::t('procurement','Not Font Goods').$goods["goods_id"]."a";
+                    $this->addError($attribute,$message);
+                    return false;
+                }elseif (intval($list["small_num"])<intval($goods["goods_num"])){
+                    $message = $list["name"]." ".Yii::t('procurement','Max Number is').$list["small_num"];
+                    $this->addError($attribute,$message);
+                    return false;
+                }
             }
         }
         if(count($this->goods_list)<1){

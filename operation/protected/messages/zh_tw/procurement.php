@@ -11,6 +11,10 @@ return array(
     'Order List'=>'訂貨列表',
     'Order Status List'=>'訂貨狀態列表',
     'Add Order'=>'添加訂貨',
+    'Headquarters Number'=>'總部數量限制',
+    'Area Number'=>'區域數量限制',
+    'Not Font Goods'=>'沒有找到該貨物',
+    'Max Number is'=>'最大數量是',
 
 
     'Goods Name'=>'物品名稱',
@@ -125,5 +129,10 @@ return array(
     'pending approval'=>'待審核',
     'Has been approved, Shipped out'=>'已審核，已發貨',
     'Have read,Drop shipping'=>'已查看，待發貨',
+
+    'Delivery List'=>'訂單採購',
+    'Number Restrictions'=>'數量限制',
+    ' Not Null'=>'不能為空',
+    'Fast Form'=>'快速訂單審核',
 );
 ?>

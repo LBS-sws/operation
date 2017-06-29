@@ -66,6 +66,7 @@ return array(
     'Order Access'=>'订单权限',
     'Order List'=>'订单列表',
     'Order Purchase'=>'订单采购',
+    'Fast Order'=>'快速订单',
 
     'Technician'=>'技术员',
     'Goods Summary Entry'=>'物品管理',

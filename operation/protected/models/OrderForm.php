@@ -58,7 +58,7 @@ class OrderForm extends CFormModel
             array('goods_list','required'),
             array('order_class','required'),
             array('goods_list','validateGoods'),
-            array('activity_id','required','on'=>'audit'),
+            //array('activity_id','required','on'=>'audit'),
             array('activity_id','validateActivity','on'=>'audit'),
             //array('order_num','numerical','allowEmpty'=>true,'integerOnly'=>true),
             //array('order_num','in','range'=>range(0,600)),
@@ -80,14 +80,25 @@ class OrderForm extends CFormModel
                 $message = Yii::t('procurement','The goods or quantity cannot be empty');
                 $this->addError($attribute,$message);
                 return false;
-            }else if(!is_numeric($goods["goods_id"])){
+            }else if(!is_numeric($goods["goods_id"])|| floor($goods["goods_id"])!=$goods["goods_id"]){
                 $message = Yii::t('procurement','goods does not exist');
                 $this->addError($attribute,$message);
                 return false;
-            }else if(!is_numeric($goods["goods_num"])){
+            }else if(!is_numeric($goods["goods_num"])|| floor($goods["goods_num"])!=$goods["goods_num"]){
                 $message = Yii::t('procurement','Goods Number can only be numbered');
                 $this->addError($attribute,$message);
                 return false;
+            }else{
+                $list = PurchaseView::getGoodsToGoodsId($goods["goods_id"]);
+                if (empty($list)){
+                    $message = Yii::t('procurement','Not Font Goods').$goods["goods_id"]."a";
+                    $this->addError($attribute,$message);
+                    return false;
+                }elseif (intval($list["big_num"])<intval($goods["goods_num"])){
+                    $message = $list["name"]." ".Yii::t('procurement','Max Number is').$list["big_num"];
+                    $this->addError($attribute,$message);
+                    return false;
+                }
             }
         }
         if(count($this->goods_list)<1){
@@ -96,39 +107,30 @@ class OrderForm extends CFormModel
         }
     }
     public function validateActivity($attribute, $params){
-        if(!empty($this->activity_id)&&!empty($this->order_class)){
+        if(!empty($this->activity_id) &&!empty($this->order_class) && $this->order_class != "Fast"){
             $nowDate = date("Y-m-d");
             $activityList = true;
             $city = Yii::app()->user->city();
-            switch ($this->order_class){
-                case "Import":
-                    $rows = Yii::app()->db->createCommand()->select("id")
-                        ->from("opr_order")
-                        ->where('activity_id = :activity_id and judge=1 and order_class="Import" and city=:city and status!="pending"',
-                            array(':activity_id'=>$this->activity_id,':city'=>$city))->queryAll();
-                    $num = $rows?count($rows):0;
-                    $activityList = Yii::app()->db->createCommand()->select()->from("opr_order_activity")
-                        ->where('id=:id and import_start_time<:date and import_end_time>:date and import_num>:num',
-                            array(':id'=>$this->activity_id,':date'=>$nowDate,':num'=>$num))->queryAll();
-                    break;
-                case "Domestic":
-                    $rows = Yii::app()->db->createCommand()->select("id")
-                        ->from("opr_order")
-                        ->where('activity_id = :activity_id and judge=1 and order_class="Domestic" and city=:city and status!="pending"',
-                            array(':activity_id'=>$this->activity_id,':city'=>$city))->queryAll();
-                    $num = $rows?count($rows):0;
-                    $activityList = Yii::app()->db->createCommand()->select()->from("opr_order_activity")
-                        ->where('id=:id and domestic_start_time<:date and domestic_end_time>:date and domestic_num>:num',
-                            array(':id'=>$this->activity_id,':date'=>$nowDate,':num'=>$num))->queryAll();
-                    break;
-                default:
-                    $activityList = Yii::app()->db->createCommand()->select()->from("opr_order_activity")
-                        ->where('id=:id and start_time<:date and end_time>:date',array(':id'=>$this->activity_id,':date'=>$nowDate))->queryAll();
-            }
-            if(!$activityList){
-                $message = Yii::t('procurement',$this->order_class).Yii::t('procurement',' Order for Over time Or Order Number Quantity over limit');
+            if($this->order_class == "Import"||$this->order_class == "Domestic"){
+                $rows = Yii::app()->db->createCommand()->select("id")
+                    ->from("opr_order")
+                    ->where('activity_id = :activity_id and judge=1 and order_class=:order_class and city=:city and status!="pending"',
+                        array(':activity_id'=>$this->activity_id,':city'=>$city,':order_class'=>$this->order_class))->queryAll();
+                $num = $rows?count($rows):0;
+                $rs = Yii::app()->db->createCommand()->select()->from("opr_order_activity")
+                    ->where('id=:id and start_time<:date and end_time>:date and num>:num and order_class=:order_class',
+                        array(':id'=>$this->activity_id,':date'=>$nowDate,':num'=>$num,':order_class'=>$this->order_class))->queryAll();
+                if(!$rs){
+                    $message = Yii::t('procurement',$this->order_class).Yii::t('procurement',' Order for Over time Or Order Number Quantity over limit');
+                    $this->addError($attribute,$message);
+                }
+            }else{
+                $message = Yii::t('procurement',$this->order_class).Yii::t('procurement','Error:Not Font Order Class');
                 $this->addError($attribute,$message);
             }
+        }elseif ($this->activity_id == 0 && $this->order_class != "Fast"){
+            $message = Yii::t('procurement',"Order of Activity").Yii::t('procurement',' Not Null');
+            $this->addError($attribute,$message);
         }
     }
 
@@ -149,6 +151,20 @@ class OrderForm extends CFormModel
     public function getGoodsList(){
         $rs = Yii::app()->db->createCommand()->select()->from("opr_goods")->queryAll();
         return $rs;
+    }
+
+    //根據當前時間點輸出可用活動
+    public function getActivityToNow(){
+        $arr[$this->activity_id] = OrderList::getActivityTitleToId($this->activity_id);
+        $rows = Yii::app()->db->createCommand()->select("id,activity_title")->from("opr_order_activity")
+            ->where('start_time <:date and end_time >:date and id != :id',
+                array(':date'=>date("Y-m-d"),':id'=>$this->activity_id))->queryAll();
+        if($rows){
+            foreach ($rows as $row){
+                $arr[$row['id']] = $row['activity_title'];
+            }
+        }
+        return $arr;
     }
 
     //獲取所有用戶列表

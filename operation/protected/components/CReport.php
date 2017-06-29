@@ -7,7 +7,6 @@ class CReport {
 	public $excel;
 	public $title;
 	public $subtitle;
-	public $pos
 	
 	public function genReport() {
 		return;

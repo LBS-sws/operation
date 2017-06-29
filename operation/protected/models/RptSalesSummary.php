@@ -5,7 +5,6 @@ class RptSalesSummary extends CReport {
 	protected $region;
 	protected $posrow = 4;
 	protected $poscol = 2;
-	protected $excel;
 	protected $labels;
 	
 	public function genReport() {
@@ -47,7 +46,8 @@ class RptSalesSummary extends CReport {
 		
 		$sql = "select a.*, h.region, h.name as city_name, 
 					b.data_value as cln, c.data_value as pc, d.data_value as misc,
-					e.data_value as puri, f.data_value as meth, g.data_value as ppr 
+					e.data_value as puri, f.data_value as meth, g.data_value as ppr,
+					workflow$suffix.RequestStatus('OPRPT',a.id,a.lcd) as wfstatus
 				from opr_monthly_hdr a 
 					inner join security$suffix.sec_city h on a.city=h.code 
 					left outer join opr_monthly_dtl b on a.id=b.hdr_id and b.data_field='10001'
@@ -73,6 +73,16 @@ class RptSalesSummary extends CReport {
 					$temp[$citycode] = $detail;
 					$detail = array();
 					$citycode = $row['city'];
+				}
+				
+				// Not accepted item
+				if ($row['wfstatus']!='ED') {
+					$row['cln'] = 0;
+					$row['pc'] = 0;
+					$row['misc'] = 0;
+					$row['puri'] = 0;
+					$row['meth'] = 0;
+					$row['ppr'] = 0;
 				}
 				
 				$detail[] = $row;
@@ -177,8 +187,10 @@ class RptSalesSummary extends CReport {
 		foreach ($this->data as $citycode=>$record) {
 			$y = $this->posrow;
 			foreach ($record as $row) {
-				$y++;
-
+				while ($y - $this->posrow != $row['month_no'] && $y - $this->posrow <= 12) {
+					$y++;
+				}
+				
 				$cln = empty($row['cln']) ? 0 : $row['cln'];
 				$pc = empty($row['pc']) ? 0 : $row['pc'];
 				$misc = empty($row['misc']) ? 0 : $row['misc'];

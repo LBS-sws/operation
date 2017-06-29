@@ -5,13 +5,22 @@ class MonthlyForm extends CFormModel
 	public $id;
 	public $year_no;
 	public $month_no;
+	public $lcd;
 	public $record = array();
+	public $wfstatus;
+	public $wfstatusdesc;
+	public $city;
+	public $city_name;
+	public $listform;
 
 	public function attributeLabels()
 	{
 		return array(
+			'city'=>Yii::t('misc','City'),
+			'city_name'=>Yii::t('misc','City'),
 			'year_no'=>Yii::t('report','Year'),
 			'month_no'=>Yii::t('report','Month'),
+			'wfstatusdesc'=>Yii::t('workflow','Flow Status'),
 		);
 	}
 
@@ -21,7 +30,7 @@ class MonthlyForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, year_no, month_no','safe'),
+			array('id, year_no, month_no, lcd, city, city_name, wfstatus, wfstatusdesc, listform','safe'),
 			array('record','validateRecord'),
 		);
 	}
@@ -45,11 +54,15 @@ class MonthlyForm extends CFormModel
 	}
 
 	public function retrieveData($index) {
-		$city = Yii::app()->user->city();
-		$sql = "select a.year_no, a.month_no, b.id, b.hdr_id, b.data_field, b.data_value, c.name, c.upd_type, c.field_type, b.manual_input    
-				from opr_monthly_hdr a, opr_monthly_dtl b, opr_monthly_field c 
-				where a.id=$index and a.city='$city'
+		$suffix = Yii::app()->params['envSuffix'];
+		$citylist = Yii::app()->user->city_allow();
+		$sql = "select a.year_no, a.month_no, b.id, b.hdr_id, b.data_field, b.data_value, c.name, c.upd_type, c.field_type, b.manual_input, a.lcd, 
+				a.city, d.name as city_name, workflow$suffix.RequestStatus('OPRPT',a.id,a.lcd) as wfstatus,
+				workflow$suffix.RequestStatusDesc('OPRPT',a.id,a.lcd) as wfstatusdesc
+				from opr_monthly_hdr a, opr_monthly_dtl b, opr_monthly_field c, security$suffix.sec_city d  
+				where a.id=$index and a.city in ($citylist)
 				and a.id=b.hdr_id and b.data_field=c.code
+				and a.city=d.code 
 				and c.status='Y'
 			";
 		$rows = Yii::app()->db->createCommand($sql)->queryAll();
@@ -61,6 +74,11 @@ class MonthlyForm extends CFormModel
 					$this->id = $hid;
 					$this->year_no = $row['year_no'];
 					$this->month_no = $row['month_no'];
+					$this->city = $row['city'];
+					$this->city_name = $row['city_name'];
+					$this->lcd = $row['lcd'];
+					$this->wfstatus = $row['wfstatus'];
+					$this->wfstatusdesc = $row['wfstatusdesc'];
 				}
 				$temp = array();
 				$temp['id'] = $row['id'];
@@ -77,6 +95,79 @@ class MonthlyForm extends CFormModel
 		return true;
 	}
 	
+	public function submit()
+	{
+		$wf = new WorkflowOprpt;
+		$connection = $wf->openConnection();
+		try {
+			$this->saveMonthly($connection);
+			if ($wf->startProcess('OPRPT',$this->id,$this->lcd)) {
+				$wf->saveRequestData('CITY',$this->city);
+				$wf->saveRequestData('CITYNAME',$this->city_name);
+				$wf->saveRequestData('REQ_USER',Yii::app()->user->id);
+				$wf->saveRequestData('YEAR',$this->year_no);
+				$wf->saveRequestData('MONTH',$this->month_no);
+				$wf->takeAction('SUBMIT');
+			}
+			$wf->transaction->commit();
+		}
+		catch(Exception $e) {
+			$wf->transaction->rollback();
+			throw new CHttpException(404,'Cannot update.'.$e->getMessage());
+		}
+	}
+
+	public function resubmit()
+	{
+		$wf = new WorkflowOprpt;
+		$connection = $wf->openConnection();
+		try {
+			$this->saveMonthly($connection);
+			if ($wf->startProcess('OPRPT',$this->id,$this->lcd)) {
+				$wf->takeAction('RESUBMIT');
+			}
+			$wf->transaction->commit();
+		}
+		catch(Exception $e) {
+			$wf->transaction->rollback();
+			throw new CHttpException(404,'Cannot update.'.$e->getMessage());
+		}
+	}
+
+	public function accept()
+	{
+		$wf = new WorkflowOprpt;
+		$connection = $wf->openConnection();
+		try {
+			$this->saveMonthly($connection);
+			if ($wf->startProcess('OPRPT',$this->id,$this->lcd)) {
+				$wf->takeAction('APPROVE');
+			}
+			$wf->transaction->commit();
+		}
+		catch(Exception $e) {
+			$wf->transaction->rollback();
+			throw new CHttpException(404,'Cannot update.'.$e->getMessage());
+		}
+	}
+
+	public function reject()
+	{
+		$wf = new WorkflowOprpt;
+		$connection = $wf->openConnection();
+		try {
+			$this->saveMonthly($connection);
+			if ($wf->startProcess('OPRPT',$this->id,$this->lcd)) {
+				$wf->takeAction('DENY');
+			}
+			$wf->transaction->commit();
+		}
+		catch(Exception $e) {
+			$wf->transaction->rollback();
+			throw new CHttpException(404,'Cannot update.'.$e->getMessage());
+		}
+	}
+
 	public function saveData()
 	{
 		$connection = Yii::app()->db;
@@ -105,7 +196,7 @@ class MonthlyForm extends CFormModel
 		}
 		if (empty($sql)) return false;
 
-		$city = Yii::app()->user->city();
+		$city = $this->city; //Yii::app()->user->city();
 		$uid = Yii::app()->user->id;
 		
 		$select = "select code from opr_monthly_field 
@@ -136,5 +227,9 @@ class MonthlyForm extends CFormModel
 			$command->execute();
 		}
 		return true;
+	}
+	
+	public function isReadOnly() {
+		return ($this->scenario=='view'|| strpos('~~PS~','~'.$this->wfstatus.'~')===false);
 	}
 }

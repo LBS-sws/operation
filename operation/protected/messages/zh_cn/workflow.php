@@ -22,5 +22,6 @@ return array(
 	'Submit (Start)'=>'提交 (开始)',
 	'[Action]'=>'[待执行]',
 	'[Notice]'=>'[通知]',
+	'Flow Status'=>'流程状态',
 );
 ?>

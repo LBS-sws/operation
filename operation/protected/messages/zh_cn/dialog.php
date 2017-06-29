@@ -42,6 +42,8 @@ return array(
 	'Download'=>'下载',
 	'Request Approved'=>'批准申请完成',
 	'Request Denied'=>'拒绝申请完成',
+	'Acceptance Done'=>'批准完成',
+	'Rejection Done'=>'拒绝完成',
 	'Submission Done'=>'提交完成',
 	'Request Signed'=>'签字完成',
 	'Cancel Done'=>'取消完成',

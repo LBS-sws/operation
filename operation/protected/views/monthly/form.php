@@ -24,13 +24,33 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 <section class="content">
 	<div class="box"><div class="box-body">
 	<div class="btn-group" role="group">
-		<?php echo TbHtml::button('<span class="fa fa-reply"></span> '.Yii::t('misc','Back'), array(
-				'submit'=>Yii::app()->createUrl('monthly/index'))); 
+		<?php 
+			$retPath = 'monthly/'.$model->listform;
+			echo TbHtml::button('<span class="fa fa-reply"></span> '.Yii::t('misc','Back'), array(
+				'submit'=>Yii::app()->createUrl($retPath))); 
 		?>
-<?php if ($model->scenario!='view'): ?>
-			<?php echo TbHtml::button('<span class="fa fa-upload"></span> '.Yii::t('misc','Save'), array(
-				'submit'=>Yii::app()->createUrl('monthly/save'))); 
-			?>
+<?php if (!$model->isReadOnly() && (empty($model->wfstatus) || $model->wfstatus=='PS') && Yii::app()->user->validRWFunction('YA01')): ?>
+		<?php echo TbHtml::button('<span class="fa fa-save"></span> '.Yii::t('misc','Save'), array(
+			'submit'=>Yii::app()->createUrl('monthly/save'),)); 
+		?>
+<?php endif ?>
+<?php if (!$model->isReadOnly() && empty($model->wfstatus) && Yii::app()->user->validRWFunction('YA01')) : ?>
+		<?php echo TbHtml::button('<span class="fa fa-upload"></span> '.Yii::t('misc','Submit'), array(
+			'submit'=>Yii::app()->createUrl('monthly/submit'))); 
+		?>
+<?php endif ?>
+<?php if (!$model->isReadOnly() && $model->wfstatus=='PS' && Yii::app()->user->validRWFunction('YA01')): ?>
+		<?php echo TbHtml::button('<span class="fa fa-save"></span> '.Yii::t('misc','Submit'), array(
+			'submit'=>Yii::app()->createUrl('monthly/resubmit'))); 
+		?>
+<?php endif ?>
+<?php if ($model->wfstatus=='PA' && Yii::app()->user->validFunction('YN01')): ?>
+		<?php echo TbHtml::button('<span class="fa fa-check"></span> '.Yii::t('misc','Approve'), array(
+			'submit'=>Yii::app()->createUrl('monthly/accept')));
+		?>
+		<?php echo TbHtml::button('<span class="fa fa-remove"></span> '.Yii::t('misc','Deny'), array(
+			'submit'=>Yii::app()->createUrl('monthly/reject')));
+		?>
 <?php endif ?>
 	</div>
 	</div></div>
@@ -39,15 +59,19 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 		<div class="box-body">
 			<?php echo $form->hiddenField($model, 'scenario'); ?>
 			<?php echo $form->hiddenField($model, 'id'); ?>
+			<?php echo $form->hiddenField($model, 'lcd'); ?>
+			<?php echo $form->hiddenField($model, 'city'); ?>
+			<?php echo $form->hiddenField($model, 'wfstatus'); ?>
+			<?php echo $form->hiddenField($model, 'listform'); ?>
 
 			<div class="form-group">
-				<?php echo $form->labelEx($model,'year_no',array('class'=>"col-sm-1 control-label")); ?>
+				<?php echo $form->labelEx($model,'year_no',array('class'=>"col-sm-2 control-label")); ?>
 				<div class="col-sm-2">
 					<?php echo $form->textField($model, 'year_no', 
 						array('size'=>10,'readonly'=>true)
 					); ?>
 				</div>
-				<?php echo $form->labelEx($model,'month_no',array('class'=>"col-sm-1 control-label")); ?>
+				<?php echo $form->labelEx($model,'month_no',array('class'=>"col-sm-2 control-label")); ?>
 				<div class="col-sm-2">
 					<?php echo $form->textField($model, 'month_no', 
 						array('size'=>10,'readonly'=>true)
@@ -55,6 +79,21 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 				</div>
 			</div>
 	
+			<div class="form-group">
+				<?php echo $form->labelEx($model,'city_name',array('class'=>"col-sm-2 control-label")); ?>
+				<div class="col-sm-2">
+					<?php echo $form->textField($model, 'city_name', 
+						array('size'=>10,'readonly'=>true)
+					); ?>
+				</div>
+				<?php echo $form->labelEx($model,'wfstatusdesc',array('class'=>"col-sm-2 control-label")); ?>
+				<div class="col-sm-3">
+					<?php echo $form->textField($model, 'wfstatusdesc', 
+						array('size'=>10,'readonly'=>true)
+					); ?>
+				</div>
+			</div>
+
 			<legend>&nbsp;</legend>
 	
 <?php
@@ -70,7 +109,7 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 		echo '</div>';
 		echo '<div class="col-sm-3">';
 		echo TbHtml::textField($name_prefix.'[datavalue]',$data['datavalue'],
-				array('size'=>40,'maxlength'=>100,'readonly'=>($model->scenario=='view'||$data['updtype']!='M'))
+				array('size'=>40,'maxlength'=>100,'readonly'=>($model->isReadOnly()||$data['updtype']!='M'))
 			);		
 		echo TbHtml::hiddenField($name_prefix.'[id]',$data['id']);
 		echo TbHtml::hiddenField($name_prefix.'[code]',$data['code']);

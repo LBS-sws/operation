@@ -17,44 +17,63 @@ class ActivityList extends CListPageModel
 	public function orderClassEnToInput($str){
 	    switch (Yii::app()->language){
             case "zh_cn":
-                if(strpos("进口货",$str)>=0){
-                    return "进口货";
+                if(strpos("货",$str)||strpos("货",$str)===0){
+                    return "";
                 }
-                if(strpos("国内货",$str)>=0){
-                    return "国内货";
+                if(strpos("进口货",$str)||strpos("进口货",$str)===0){
+                    return "Import";
                 }
-                if(strpos("快速货",$str)>=0){
-                    return "快速货";
+                if(strpos("国内货",$str)||strpos("国内货",$str)===0){
+                    return "Domestic";
                 }
+                if(strpos("快速货",$str)||strpos("快速货",$str)===0){
+                    return "Fast";
+                }
+                break;
             case "zh_tw":
-                if(strpos("進口貨",$str)>=0){
-                    return "進口貨";
+                if(strpos("货",$str)){
+                    return "";
                 }
-                if(strpos("國內貨",$str)>=0){
-                    return "國內貨";
+                if(strpos("進口貨",$str)||strpos("進口貨",$str)===0){
+                    return "Import";
                 }
-                if(strpos("快速貨",$str)>=0){
-                    return "快速貨";
+                if(strpos("國內貨",$str)||strpos("國內貨",$str)===0){
+                    return "Domestic";
                 }
+                if(strpos("快速貨",$str)||strpos("快速貨",$str)===0){
+                    return "Fast";
+                }
+                break;
             case "en":
                 return $str;
-            default:
-                return "1111";
         }
+        return "1111";
     }
 
 
-	public function retrieveDataByPage($pageNum=1)
+	public function retrieveDataByPage($pageNum=1,$type="active")
 	{
 		$city = Yii::app()->user->city();
-		$sql1 = "select *
+		$date = date("Y-m-d");
+		if($type === "active"){
+            $sql1 = "select *
 				from opr_order_activity
 				where id>0 
 			";
-		$sql2 = "select count(id)
+            $sql2 = "select count(id)
 				from opr_order_activity
 				where id>0 
 			";
+        }else{
+            $sql1 = "select *
+				from opr_order_activity
+				where start_time < '$date' AND end_time >'$date'
+			";
+            $sql2 = "select count(id)
+				from opr_order_activity
+				where start_time < '$date' AND end_time >'$date'
+			";
+        }
 		$clause = "";
 		if (!empty($this->searchField) && !empty($this->searchValue)) {
 			$svalue = str_replace("'","\'",$this->searchValue);
@@ -69,7 +88,7 @@ class ActivityList extends CListPageModel
 					$clause .= General::getSqlConditionClause('num', $svalue);
 					break;
 				case 'order_class':
-					$clause .= General::getSqlConditionClause('order_class', orderClassEnToInput($svalue));
+					$clause .= General::getSqlConditionClause('order_class', $this->orderClassEnToInput($svalue));
 					break;
 			}
 		}

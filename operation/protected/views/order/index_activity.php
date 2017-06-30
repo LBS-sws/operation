@@ -1,5 +1,5 @@
 <?php
-$this->pageTitle=Yii::app()->name . ' - Order List';
+$this->pageTitle=Yii::app()->name . ' - Add Order';
 ?>
 
 <?php $form=$this->beginWidget('TbActiveForm', array(
@@ -11,7 +11,7 @@ $this->pageTitle=Yii::app()->name . ' - Order List';
 
 <section class="content-header">
 	<h1>
-		<strong><?php echo Yii::t('app','Order List'); ?></strong>
+		<strong><?php echo Yii::t('app','Add Order'); ?></strong>
 	</h1>
 <!--
 	<ol class="breadcrumb">
@@ -23,14 +23,28 @@ $this->pageTitle=Yii::app()->name . ' - Order List';
 </section>
 
 <section class="content">
+    <div class="box">
+        <div class="box-body">
+            <div class="btn-group" role="group">
+                <?php
+                //var_dump(Yii::app()->session['rw_func']);
+                echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('procurement','Fast Order'), array(
+                    'submit'=>Yii::app()->createUrl('order/new?index=0'),
+                ));
+                ?>
+            </div>
+        </div>
+    </div>
 	<?php $this->widget('ext.layout.ListPageWidget', array(
-			'title'=>Yii::t('procurement','Order List'),
+			'title'=>Yii::t('procurement','Order Activity List'),
 			'model'=>$model,
-				'viewhdr'=>'//order/_listhdr',
-				'viewdtl'=>'//order/_listdtl',
+				'viewhdr'=>'//order/_listhdr_activity',
+				'viewdtl'=>'//order/_listdtl_activity',
 				'search'=>array(
-							'order_code',
-							'activity_id',
+							'activity_code',
+							'activity_title',
+							'order_class',
+							'num',
 						),
 		));
 	?>

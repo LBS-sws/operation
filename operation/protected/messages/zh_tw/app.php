@@ -66,6 +66,8 @@ return array(
 
     //沈超添加開始
     'Order'=>'訂單',
+    'Activity'=>'活動',
+    'Add Order'=>'添加訂單',
     'Order Access'=>'訂單權限',
     'Order List'=>'訂單列表',
     'Order Purchase'=>'訂單採購',
@@ -74,6 +76,7 @@ return array(
     'Goods Summary Entry'=>'物品管理',
     'Order Activity'=>'訂單活動',
     'Fast Order'=>'快速訂單',
+    'Technician take Goods'=>'技術員拿貨',
     //沈超添加結束
 );
 ?>

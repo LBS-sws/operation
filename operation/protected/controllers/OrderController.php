@@ -83,10 +83,15 @@ class OrderController extends Controller
 		}
 	}
 
-    public function actionNew()
+    public function actionNew($index)
     {
         $model = new OrderForm('new');
-        $this->render('form',array('model'=>$model,));
+        $model->activity_id = $index;
+        if ($model->validateLogin()){
+            $this->render('form',array('model'=>$model,));
+        }else{
+            $this->redirect(Yii::app()->createUrl('order/activity'));
+        }
     }
 
 	public function actionEdit($index)
@@ -120,4 +125,20 @@ class OrderController extends Controller
         }
     }
 
+    //區域訂單活動
+    public function actionActivity($pageNum=0){
+        $model = new ActivityList;
+        if (isset($_POST['ActivityList'])) {
+            $model->attributes = $_POST['ActivityList'];
+        } else {
+            $session = Yii::app()->session;
+            if (isset($session['criteria_ya01']) && !empty($session['fcriteria_ya01'])) {
+                $criteria = $session['criteria_ya01'];
+                $model->setCriteria($criteria);
+            }
+        }
+        $model->determinePageNum($pageNum);
+        $model->retrieveDataByPage($model->pageNum,"order");
+        $this->render('index_activity',array('model'=>$model));
+    }
 }

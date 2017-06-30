@@ -56,7 +56,6 @@ class OrderForm extends CFormModel
 		return array(
 			array('id, order_code, order_user, order_class, activity_id, technician, status, remark, luu, lcu, lud, lcd','safe'),
             array('goods_list','required'),
-            array('order_class','required'),
             array('goods_list','validateGoods'),
             //array('activity_id','required','on'=>'audit'),
             array('activity_id','validateActivity','on'=>'audit'),
@@ -132,6 +131,24 @@ class OrderForm extends CFormModel
             $message = Yii::t('procurement',"Order of Activity").Yii::t('procurement',' Not Null');
             $this->addError($attribute,$message);
         }
+    }
+
+    //驗證是否正常進入
+    public function validateLogin(){
+        if($this->activity_id == 0){
+            $this->order_class = "Fast";
+            return true;
+        }
+        if (is_numeric($this->activity_id)){
+            $rs = Yii::app()->db->createCommand()->select("order_class")
+                ->from("opr_order_activity")->where('start_time < :date AND end_time >:date AND id =:id',
+                    array(':date'=>date("Y-m-d"),":id"=>$this->activity_id))->queryAll();
+            if($rs){
+                $this->order_class = $rs[0]["order_class"];
+                return true;
+            }
+        }
+        return false;
     }
 
     //根據訂單id查訂單所有狀態
@@ -218,12 +235,14 @@ class OrderForm extends CFormModel
 	protected function saveGoods(&$connection) {
 		$sql = '';
         $goodsBool = true;
+        $insetBool = false;
         switch ($this->scenario) {
             case 'delete':
                 $sql = "delete from opr_order where id = :id and judge=1";
                 $goodsBool = false;
                 break;
             case 'new':
+                $insetBool = true;
                 $sql = "insert into opr_order(
 							order_user, order_class, activity_id, remark, status, lcu, lcd
 						) values (
@@ -241,7 +260,15 @@ class OrderForm extends CFormModel
 						";
                 break;
             case 'audit':
-                $sql = "update opr_order set
+                if(empty($this->id)){
+                    $insetBool = true;
+                    $sql = "insert into opr_order(
+							order_user, order_class, activity_id, remark, status, lcu, lcd
+						) values (
+							:order_user,:order_class,:activity_id,:remark, :status, :lcu, :lcd
+						)";
+                }else{
+                    $sql = "update opr_order set
 							order_class = :order_class,
 							activity_id = :activity_id,
 							remark = :remark,
@@ -250,6 +277,7 @@ class OrderForm extends CFormModel
 							status = :status
 						where id = :id and judge=1
 						";
+                }
                 break;
             case 'finish':
                 $sql = "update opr_order set
@@ -301,7 +329,7 @@ class OrderForm extends CFormModel
             $command->bindParam(':lcd',date('Y-m-d H:i:s'),PDO::PARAM_STR);
         $command->execute();
 
-        if ($this->scenario=='new'){
+        if ($insetBool){
             $this->id = Yii::app()->db->getLastInsertID();
             $this->scenario = "edit";
             $code = strval($this->id);

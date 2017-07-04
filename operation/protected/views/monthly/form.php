@@ -139,6 +139,7 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 			$('#MonthlyForm_record_10008_datavalue').val(parseFloat(document.getElementById('MonthlyForm_record_10007_datavalue').value) * 8.5 / 100);
 			$('#MonthlyForm_record_10009_datavalue').val(parseFloat(document.getElementById('MonthlyForm_record_10006_datavalue').value) * 3.5 / 100);
 			$('#MonthlyForm_record_10010_datavalue').val(parseFloat(document.getElementById('MonthlyForm_record_10008_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_10009_datavalue').value));
+			$('#MonthlyForm_record_10011_datavalue').val(parseFloat(document.getElementById('MonthlyForm_record_10006_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_10007_datavalue').value));
 		});
 		
 </script>

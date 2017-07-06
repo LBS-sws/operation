@@ -200,13 +200,13 @@ class MonthlyForm extends CFormModel
 		$city = $this->city; //Yii::app()->user->city();
 		$uid = Yii::app()->user->id;
 		
-		$select = "select code from opr_monthly_field 
+		$select = "select function_name from opr_monthly_field 
 					where status = 'Y'
 					order by code
 				";
 		$rows = Yii::app()->db->createCommand($select)->queryAll();
 		foreach ($rows as $row) {
-			$code = $row['code'];
+			$code = $row['function_name'];
 			$command=$connection->createCommand($sql);
 			if (strpos($sql,':id')!==false)
 				$command->bindParam(':id',$this->record[$code]['id'],PDO::PARAM_INT);

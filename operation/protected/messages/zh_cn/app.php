@@ -15,6 +15,7 @@ return array(
 
 	'Sales Summary Entry'=>'营业报告输入',
 	'Sales Summary Enquiry'=>'营业报告查询',
+	'Report Approval'=>'营业报告审核',
 	
 	'Report'=>'报表',
 	'Sales Summary'=>'营业报告',

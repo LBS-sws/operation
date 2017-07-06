@@ -106,7 +106,7 @@ return array(
 			'class'=>'CHttpSession',
 			'cookieMode'=>'allow',
 			'cookieParams'=>array(
-				'domain'=>'192.168.0.162',
+				'domain'=>'test.lbsgroup.com.cn',
 			),
 		),
 		
@@ -144,17 +144,17 @@ return array(
 		'envSuffix'=>'dev',
 		'systemMapping'=>array(
 				'drs'=>array(
-						'webroot'=>'http://192.168.0.162/swoper-web',
+						'webroot'=>'http://test.lbsgroup.com.cn/swoper-web',
 						'name'=>'Daily Report',
 						'icon'=>'fa fa-pencil-square-o',
 					),	
 				'acct'=>array(
-						'webroot'=>'http://192.168.0.162/acct',
+						'webroot'=>'http://test.lbsgroup.com.cn/acct',
 						'name'=>'Accounting',
 						'icon'=>'fa fa-money',
 					),
 				'ops'=>array(
-						'webroot'=>'http://192.168.0.162/operation',
+						'webroot'=>'http://test.lbsgroup.com.cn/operation',
 						'name'=>'Operation',
 						'icon'=>'fa fa-gears',
 					),

@@ -128,18 +128,18 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 
 <script>
 		
-		$('#MonthlyForm_record_1_datavalue, #MonthlyForm_record_2_datavalue, #MonthlyForm_record_3_datavalue, #MonthlyForm_record_4_datavalue, #MonthlyForm_record_5_datavalue, #MonthlyForm_record_6_datavalue').keyup(function() {
+		$('#MonthlyForm_record_1_datavalue, #MonthlyForm_record_2_datavalue, #MonthlyForm_record_3_datavalue, #MonthlyForm_record_4_datavalue, #MonthlyForm_record_5_datavalue, #MonthlyForm_record_6_datavalue').focusout(function() {
 			$('#MonthlyForm_record_1_datavalue').val((+$('#MonthlyForm_record_1_datavalue').val() || 0 ));
 			$('#MonthlyForm_record_2_datavalue').val((+$('#MonthlyForm_record_2_datavalue').val() || 0 ));
 			$('#MonthlyForm_record_3_datavalue').val((+$('#MonthlyForm_record_3_datavalue').val() || 0 ));
 			$('#MonthlyForm_record_4_datavalue').val((+$('#MonthlyForm_record_4_datavalue').val() || 0 ));
 			$('#MonthlyForm_record_5_datavalue').val((+$('#MonthlyForm_record_5_datavalue').val() || 0 ));
 			$('#MonthlyForm_record_6_datavalue').val((+$('#MonthlyForm_record_6_datavalue').val() || 0 ));
-			$('#MonthlyForm_record_7_datavalue').val(parseFloat(document.getElementById('MonthlyForm_record_1_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_2_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_3_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_4_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_5_datavalue').value));
-			$('#MonthlyForm_record_8_datavalue').val(parseFloat(document.getElementById('MonthlyForm_record_7_datavalue').value) * 8.5 / 100);
-			$('#MonthlyForm_record_9_datavalue').val(parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) * 3.5 / 100);
-			$('#MonthlyForm_record_10_datavalue').val(parseFloat(document.getElementById('MonthlyForm_record_8_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_9_datavalue').value));
-			$('#MonthlyForm_record_11_datavalue').val(parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_7_datavalue').value));
+			$('#MonthlyForm_record_7_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_1_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_2_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_3_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_4_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_5_datavalue').value)).toFixed(2));
+			$('#MonthlyForm_record_8_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_7_datavalue').value) * 8.5 / 100).toFixed(2));
+			$('#MonthlyForm_record_9_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) * 3.5 / 100).toFixed(2));
+			$('#MonthlyForm_record_10_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_8_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_9_datavalue').value)).toFixed(2));
+			$('#MonthlyForm_record_11_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_7_datavalue').value)).toFixed(2));
 		});
 		
 </script>

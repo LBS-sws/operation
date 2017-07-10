@@ -84,13 +84,13 @@ class TechnicianForm extends CFormModel
                 $this->addError($attribute,$message);
                 return false;
             }else{
-                $list = PurchaseView::getGoodsToGoodsId($goods["goods_id"]);
+                $list = WarehouseForm::getGoodsToGoodsId($goods["goods_id"]);
                 if (empty($list)){
                     $message = Yii::t('procurement','Not Font Goods').$goods["goods_id"]."a";
                     $this->addError($attribute,$message);
                     return false;
-                }elseif (intval($list["small_num"])<intval($goods["goods_num"])){
-                    $message = $list["name"]." ".Yii::t('procurement','Max Number is').$list["small_num"];
+                }elseif (intval($list["inventory"])<intval($goods["goods_num"])){
+                    $message = $list["name"]."：".Yii::t('procurement','Cannot exceed the quantity of Inventory')."（".$list["inventory"]."）";
                     $this->addError($attribute,$message);
                     return false;
                 }
@@ -113,7 +113,7 @@ class TechnicianForm extends CFormModel
             foreach ($rows as $row) {
                 $this->id = $row['id'];
                 $this->order_code = $row['order_code'];
-                $this->goods_list = OrderForm::getGoodsListToId($row['id']);
+                $this->goods_list = WarehouseForm::getGoodsListToId($row['id']);
                 $this->order_user = $row['order_user'];
                 //$this->technician = $row['technician'];
                 $this->status = $row['status'];
@@ -142,12 +142,14 @@ class TechnicianForm extends CFormModel
     protected function saveGoods(&$connection) {
         $sql = '';
         $goodsBool = true;
+        $insetBool = false;
         switch ($this->scenario) {
             case 'delete':
                 $sql = "delete from opr_order where id = :id and judge=0 and lcu=:lcu";
                 $goodsBool = false;
                 break;
             case 'new':
+                $insetBool = true;
                 $sql = "insert into opr_order(
 							order_user, remark, status, lcu, lcd
 						) values (
@@ -163,13 +165,22 @@ class TechnicianForm extends CFormModel
 						";
                 break;
             case 'audit':
-                $sql = "update opr_order set
+                if(empty($this->id)){
+                    $insetBool = true;
+                    $sql = "insert into opr_order(
+							order_user, remark, status, lcu, lcd
+						) values (
+							:order_user,:remark, :status, :lcu, :lcd
+						)";
+                }else{
+                    $sql = "update opr_order set
 							remark = :remark,
 							luu = :luu,
 							lud = :lud,
 							status = :status
 						where id = :id and judge=0
 						";
+                }
                 break;
             case 'finish':
                 $sql = "update opr_order set
@@ -217,7 +228,7 @@ class TechnicianForm extends CFormModel
             $command->bindParam(':lcd',date('Y-m-d H:i:s'),PDO::PARAM_STR);
         $command->execute();
 
-        if ($this->scenario=='new'){
+        if ($insetBool){
             $this->id = Yii::app()->db->getLastInsertID();
             $this->scenario = "edit";
             $code = strval($this->id);

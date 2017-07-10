@@ -1,5 +1,5 @@
 <?php
-$htmlTrHref = $this->getLink('YS02', 'order/edit', 'order/view', array('index'=>$this->record['id']));
+$htmlTrHref = $this->getLink('YD03', 'order/edit', 'order/view', array('index'=>$this->record['id']));
 switch ($this->record['status']){
     case "sent":
         echo "<tr class='clickable-row text-primary' data-href='$htmlTrHref'>";
@@ -20,7 +20,7 @@ switch ($this->record['status']){
         echo "<tr class='clickable-row' data-href='$htmlTrHref'>";
 }
 ?>
-	<td><?php echo $this->drawEditButton('YS02', 'order/edit', 'order/view', array('index'=>$this->record['id'])); ?></td>
+	<td><?php echo $this->drawEditButton('YD03', 'order/edit', 'order/view', array('index'=>$this->record['id'])); ?></td>
 	<td><?php echo $this->record['lcd']; ?></td>
 	<td><?php echo $this->record['order_code']; ?></td>
 	<td><?php echo $this->record['activity_id']; ?></td>

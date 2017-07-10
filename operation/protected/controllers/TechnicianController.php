@@ -65,7 +65,7 @@ class TechnicianController extends Controller
                 $message = CHtml::errorSummary($model);
                 Dialog::message(Yii::t('dialog','Validation Message'), $message);
                 $model->scenario = $scenario;
-                $model->statusList = $model->getStatusListToId($model->id);
+                $model->statusList = OrderForm::getStatusListToId($model->id);
                 $this->render('form',array('model'=>$model,));
             }
         }

@@ -5,5 +5,5 @@
 	<td><?php echo $this->record['goods_class']; ?></td>
 	<td><?php echo $this->record['type']; ?></td>
 	<td><?php echo $this->record['unit']; ?></td>
-	<td><?php echo $this->record['price']; ?></td>
+	<td><?php echo sprintf("%.2f", $this->record['price']); ?></td>
 </tr>

@@ -65,7 +65,7 @@ class TechnicianList extends CListPageModel
                     'order_code'=>$record['order_code'],
                     'order_class'=>Yii::t("procurement",$record['order_class']),
                     //'activity_id'=>$this->getActivityTitleToId($record['activity_id']),
-                    'goods_list'=>OrderForm::getGoodsListToId($record['id']),
+                    'goods_list'=>WarehouseForm::getGoodsListToId($record['id']),
                     'order_user'=>$record['order_user'],
                     'technician'=>$record['technician'],
                     'status'=>$record['status'],

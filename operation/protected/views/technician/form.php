@@ -39,7 +39,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                     'submit'=>Yii::app()->createUrl('technician/save')));
             }
 
-            if($model->status == "pending" && $model->scenario=='edit'){
+            if($model->status == "pending" && ($model->scenario=='edit' || $model->scenario=='new')){
                 //提交審核
                 echo TbHtml::button('<span class="fa fa-upload"></span> '.Yii::t('procurement','For audit'), array(
                     'submit'=>Yii::app()->createUrl('technician/audit')));
@@ -165,7 +165,7 @@ if ($model->scenario!='new')
     $this->renderPartial('//site/flowlist',array('model'=>$model));
 ?>
 <?php
-$goodList = json_encode(OrderForm::getGoodsList());
+$goodList = json_encode(WarehouseForm::getGoodsList());
 $tableBool = 1;//表格內的輸入框能否輸入
 if($model->status == "pending" || $model->status == "cancelled"||$model->scenario=='new'){
     $tableBool = 0;
@@ -175,7 +175,7 @@ inputDownList('.$goodList.',tableGoodsChange,false);
 $("#addGoods").on("click",{btnStr:"'.Yii::t("misc","Delete").'"},addGoodsTableTwo);
 $("body").delegate(".delGoods","click","'.Yii::t("procurement","Are you sure you want to delete this data?").'",delGoodsTable);
 disabledTable('.$tableBool.');
-
+changeRepeatId();
 ';
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 ?>

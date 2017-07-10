@@ -61,6 +61,17 @@ class DeliveryForm extends CFormModel
                 $message = Yii::t('procurement','Actual Number can only be numbered');
                 $this->addError($attribute,$message);
                 return false;
+            }else{
+                $list = WarehouseForm::getGoodsToGoodsId($goods["goods_id"]);
+                if (empty($list)){
+                    $message = Yii::t('procurement','Not Font Goods').$goods["goods_id"]."a";
+                    $this->addError($attribute,$message);
+                    return false;
+                }elseif (intval($list["inventory"])<intval($goods["confirm_num"])){
+                    $message = $list["name"]."：".Yii::t('procurement','Cannot exceed the quantity of Inventory')."（".$list["inventory"]."）";
+                    $this->addError($attribute,$message);
+                    return false;
+                }
             }
         }
         if(count($this->goods_list)<1){
@@ -77,7 +88,7 @@ class DeliveryForm extends CFormModel
 			foreach ($rows as $row) {
                 $this->id = $row['id'];
                 $this->order_code = $row['order_code'];
-                $this->goods_list = OrderForm::getGoodsListToId($row['id']);
+                $this->goods_list = WarehouseForm::getGoodsListToId($row['id']);
                 $this->order_user = $row['order_user'];
                 //$this->technician = $row['technician'];
                 $this->status = $row['status'];
@@ -181,8 +192,23 @@ class DeliveryForm extends CFormModel
                     'luu'=>$uid,
                     'lud'=>date('Y-m-d H:i:s'),
                 ), 'id=:id', array(':id'=>$goods["id"]));
+                if ($this->scenario == "audit"){
+                    //減少庫存 inventory
+                    $this->reduceInventory($goods["goods_id"],$goods["confirm_num"]);
+                }
             }
         }
 		return true;
 	}
+
+    //減少庫存
+	public function reduceInventory($goodsId,$num){
+        if(empty($goodsId)||!is_numeric($goodsId) || floor($goodsId)!=$goodsId){
+            return false;
+        }
+        if(empty($num)||!is_numeric($num) || floor($num)!=$num){
+            return false;
+        }
+        Yii::app()->db->createCommand("update opr_warehouse set inventory=inventory-$num where id=$goodsId")->execute();
+    }
 }

@@ -141,7 +141,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                                 $tableTr.="<td><input type='text' class='form-control name' readonly name='OrderForm[goods_list][$con_num][name]' value='".$val['name']."'></td>";
                                 $tableTr.="<td><input type='text' class='form-control type' readonly name='OrderForm[goods_list][$con_num][type]' value='".$val['type']."'></td>";
                                 $tableTr.="<td><input type='text' class='form-control unit' readonly name='OrderForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
-                                $tableTr.="<td><input type='text' class='form-control price' readonly name='OrderForm[goods_list][$con_num][price]' value='".$val['price']."'></td>";
+                                $tableTr.="<td><input type='text' class='form-control price' readonly name='OrderForm[goods_list][$con_num][price]' value='".sprintf("%.2f", $val['price'])."'></td>";
                                 $tableTr.="<td><input type='number' class='form-control numChange goods_num' name='OrderForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
                                 if($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished")){
                                     $tableTr.="<td><input type='number' class='form-control confirm_num' name='OrderForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";

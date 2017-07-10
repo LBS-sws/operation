@@ -51,22 +51,27 @@ return array(
 	),
     //區域管理員下單
 	'Order'=>array(
-		'access'=>'YS',
+		'access'=>'YD',
 		'items'=>array(
             //訂單活動(下訂單)
             'Add Order'=>array(
-                'access'=>'YS05',
+                'access'=>'YD04',
                 'url'=>'/order/activity',
             ),
             //訂貨列表(下訂單)
             'Order List'=>array(
-                'access'=>'YS02',
+                'access'=>'YD03',
                 'url'=>'/order/index',
             ),
             //區域管理員處理技術員的訂單
             'Technician take Goods'=>array(
-                'access'=>'YC01',
+                'access'=>'YD02',
                 'url'=>'/delivery/index',
+            ),
+            //倉庫管理
+            'Warehouse Info'=>array(
+                'access'=>'YD01',
+                'url'=>'/warehouse/index',
             ),
 		),
 	),

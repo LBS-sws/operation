@@ -134,5 +134,11 @@ return array(
     'Number Restrictions'=>'數量限制',
     ' Not Null'=>'不能為空',
     'Fast Form'=>'快速訂單審核',
+
+    //倉庫信息
+    'Inventory'=>'庫存',
+    'Shipments Info'=>'發貨信息',
+    'Shipments Form'=>'發貨表單',
+    'Cannot exceed the quantity of Inventory'=>'不能超過庫存的數量'
 );
 ?>

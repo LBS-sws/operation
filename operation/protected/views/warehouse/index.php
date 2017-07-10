@@ -1,9 +1,9 @@
 <?php
-$this->pageTitle=Yii::app()->name . ' - Delivery List';
+$this->pageTitle=Yii::app()->name . ' - Warehouse Info';
 ?>
 
 <?php $form=$this->beginWidget('TbActiveForm', array(
-'id'=>'delivery-list',
+'id'=>'warehouse-list',
 'enableClientValidation'=>true,
 'clientOptions'=>array('validateOnSubmit'=>true,),
 'layout'=>TbHtml::FORM_LAYOUT_INLINE,
@@ -11,7 +11,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery List';
 
 <section class="content-header">
 	<h1>
-		<strong><?php echo Yii::t('procurement','Delivery List'); ?></strong>
+		<strong><?php echo Yii::t('app','Warehouse Info'); ?></strong>
 	</h1>
 <!--
 	<ol class="breadcrumb">
@@ -23,14 +23,29 @@ $this->pageTitle=Yii::app()->name . ' - Delivery List';
 </section>
 
 <section class="content">
+    <div class="box">
+        <div class="box-body">
+            <div class="btn-group" role="group">
+                <?php
+                //var_dump(Yii::app()->session['rw_func']);
+                if (Yii::app()->user->validRWFunction('YA02'))
+                    echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('procurement','Add Goods'), array(
+                        'submit'=>Yii::app()->createUrl('warehouse/new'),
+                    ));
+                ?>
+            </div>
+        </div>
+    </div>
 	<?php $this->widget('ext.layout.ListPageWidget', array(
-			'title'=>Yii::t('procurement','Order List'),
+			'title'=>Yii::t('procurement','Goods List'),
 			'model'=>$model,
-				'viewhdr'=>'//delivery/_listhdr',
-				'viewdtl'=>'//delivery/_listdtl',
+				'viewhdr'=>'//warehouse/_listhdr',
+				'viewdtl'=>'//warehouse/_listdtl',
 				'search'=>array(
-							'order_code',
-							'lcu',
+							'name',
+							'type',
+							'unit',
+							'inventory',
 						),
 		));
 	?>

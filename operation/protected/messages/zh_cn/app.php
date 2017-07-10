@@ -75,6 +75,7 @@ return array(
     'Goods Summary Entry'=>'物品管理',
     'Order Activity'=>'订单活动',
     'Technician take Goods'=>'技术员拿货',
+    'Warehouse Info'=>'仓库信息',
     //沈超添加結束
 );
 ?>

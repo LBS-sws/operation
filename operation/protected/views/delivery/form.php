@@ -105,10 +105,9 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                             <td><?php echo Yii::t("procurement","Goods Name")?></td>
                             <td width="11%"><?php echo Yii::t("procurement","Type")?></td>
                             <td width="10%"><?php echo Yii::t("procurement","Unit")?></td>
-                            <td width="12%"><?php echo Yii::t("procurement","Price（RMB）")?></td>
+                            <td width="12%"><?php echo Yii::t("procurement","Inventory")?></td>
                             <td width="10%"><?php echo Yii::t("procurement","Goods Number")?></td>
                             <td width="10%"><?php echo Yii::t("procurement","Actual Number")?></td>
-                            <td width="12%"><?php echo Yii::t("procurement","Total（RMB）")?></td>
                         </tr>
                         </thead>
                         <tbody>
@@ -124,26 +123,19 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                             $tableTr.="<td><input type='text' class='form-control name' readonly name='DeliveryForm[goods_list][$con_num][name]' value='".$val['name']."'></td>";
                             $tableTr.="<td><input type='text' class='form-control type' readonly name='DeliveryForm[goods_list][$con_num][type]' value='".$val['type']."'></td>";
                             $tableTr.="<td><input type='text' class='form-control unit' readonly name='DeliveryForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
-                            $tableTr.="<td><input type='text' class='form-control price' readonly name='DeliveryForm[goods_list][$con_num][price]' value='".$val['price']."'></td>";
+                            $tableTr.="<td><input type='text' class='form-control unit' readonly name='DeliveryForm[goods_list][$con_num][inventory]' value='".$val['inventory']."'></td>";
                             $tableTr.="<td><input type='number' class='form-control' readonly name='DeliveryForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
                             if($model->status == "sent" || $model->status == "read"){
                                 $tableTr.="<td><input type='number' class='form-control numChange goods_num' name='DeliveryForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
                             }else{
                                 $tableTr.="<td><input type='number' class='form-control numChange goods_num' readonly name='DeliveryForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
                             }
-                            $tableTr.="<td><input type='text' class='form-control sum' readonly></td>";
 
                             $tableTr.="</tr>";
                             echo $tableTr;
                         }
                         ?>
                         </tbody>
-                        <tfoot>
-                        <tr>
-                            <td colspan="7"></td>
-                            <td class="text-success fa-2x">0</td>
-                        </tr>
-                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -163,19 +155,10 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
 <?php
 $this->renderPartial('//site/flowlist',array('model'=>$model));
 ?>
-<?php
-$js = '
-$("body").delegate(".numChange","input",goodsTotalPrice);
-goodsTotalPrice();
-';
-Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
-?>
 
 <?php
 $js = Script::genReadonlyField();
 Yii::app()->clientScript->registerScript('readonlyClass',$js,CClientScript::POS_READY);
-Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/goodsChange.js", CClientScript::POS_END);
-Yii::app()->clientScript->registerCssFile(Yii::app()->baseUrl . "/css/goodsChange.css");
 ?>
 
 <?php $this->endWidget(); ?>

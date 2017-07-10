@@ -67,7 +67,7 @@ class DeliveryList extends CListPageModel
                 $this->attr[] = array(
                     'id'=>$record['id'],
                     'order_code'=>$record['order_code'],
-                    'goods_list'=>OrderForm::getGoodsListToId($record['id']),
+                    'goods_list'=>WarehouseForm::getGoodsListToId($record['id']),
                     'order_user'=>$record['order_user'],
                     'technician'=>$record['technician'],
                     'status'=>$record['status'],

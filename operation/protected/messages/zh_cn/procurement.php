@@ -131,5 +131,11 @@ return array(
     'Number Restrictions'=>'数量限制',
     ' Not Null'=>'不能为空',
     'Fast Form'=>'快速订单审核',
+
+    //倉庫信息
+    'Inventory'=>'库存',
+    'Shipments Info'=>'发货信息',
+    'Shipments Form'=>'发货表单',
+    'Cannot exceed the quantity of Inventory'=>'不能超过库存的数量'
 );
 ?>

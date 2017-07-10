@@ -26,7 +26,7 @@ function inputDownList(arr,fn,bool){
                 //類型是否一致
                 return true;
             }
-            if(bool  && ($.inArray(val["id"],repeatId))>=0){
+            if(($.inArray(val["id"],repeatId))>=0 && $that.next("input").val() != val["id"]){
                 //去除已經存在的物品
                 return true;
             }
@@ -68,7 +68,7 @@ function inputDownList(arr,fn,bool){
                         //類型是否一致
                         return true;
                     }
-                    if(bool  && ($.inArray(val["id"],repeatId))>=0){
+                    if(($.inArray(val["id"],repeatId))>=0 && $that.next("input").val() != val["id"]){
                         //去除已經存在的物品
                         return true;
                     }
@@ -100,6 +100,7 @@ function inputDownList(arr,fn,bool){
     //輸入框的驗證觸發事件
     $("body").delegate(".testInput","blur",function (e) {
         $("body").trigger("click");
+        changeRepeatId();
     });
 
     //輸入框的驗證
@@ -131,12 +132,24 @@ function tableGoodsChange($ele,$li,bool) {
         $tr.find("input.name").val($li.attr("dataname"));
         $tr.find("input.type").val($li.attr("datatype"));
         $tr.find("input.unit").val($li.attr("dataunit"));
-        $tr.find("input.price").val($li.attr("dataprice"));
+        var price = $li.attr("dataprice");
+        price = addStringToNum(price);
+        $tr.find("input.price").val(price);
         if(bool){
             goodsTotalPrice();
             changeRepeatId();
         }
     }
+}
+//
+function addStringToNum(str) {
+    if(str == "" || str == 0 || str == undefined ||isNaN(str)){
+        return "0.00";
+    }
+    str = Math.round(str*100).toString();
+    var one = str.slice(0,-2);
+    var two = str.slice(-2);
+    return one+"."+two;
 }
 
 //價格計算
@@ -161,13 +174,9 @@ function goodsTotalPrice() {
         }
 
         sum = (price*100000)*num/100000;
-        tem = sum.toString().split(".");
-        if(tem.length == 2){
-            if(tem[1].length >2){
-                sum = sum.toFixed(2);
-            }
-        }
+        sum = addStringToNum(sum);
         totalPrice=(sum*100000 +totalPrice*100000)/100000;
+        totalPrice = addStringToNum(totalPrice);
         $(this).find("input.sum").val(sum);
     });
     $("#table-change>tfoot>tr>td").eq(1).text(totalPrice);

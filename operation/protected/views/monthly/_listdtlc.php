@@ -1,5 +1,5 @@
-<tr class='clickable-row' data-href='<?php echo $this->getLink('YA02', 'monthly/view', 'monthly/view', array('index'=>$this->record['id'],'rtn'=>'indexc'));?>'>
-	<td><?php echo $this->drawEditButton('YA02', 'monthly/view', 'monthly/view', array('index'=>$this->record['id'],'rtn'=>'indexc')); ?></td>
+<tr class='clickable-row' data-href='<?php echo $this->getLink('YA03', 'monthly/view', 'monthly/view', array('index'=>$this->record['id'],'rtn'=>'indexc'));?>'>
+	<td><?php echo $this->drawEditButton('YA03', 'monthly/view', 'monthly/view', array('index'=>$this->record['id'],'rtn'=>'indexc')); ?></td>
 <?php if (!Yii::app()->user->isSingleCity()) : ?>
 	<td><?php echo $this->record['city_name']; ?></td>
 <?php endif ?>

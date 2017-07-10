@@ -1,33 +1,6 @@
 <?php
 
 return array(
-	'Data Entry'=>array(
-		'access'=>'YA',
-		'items'=>array(
-			'Sales Summary Entry'=>array(
-				'access'=>'YA01',
-				'url'=>'/monthly/index',
-			),
-            //物品管理
-			'Goods Summary Entry'=>array(
-				'access'=>'YA02',
-				'url'=>'/goods/index',
-			),
-		),
-	),
-	'Report'=>array(
-		'access'=>'YB',
-		'items'=>array(
-			'Sales Summary'=>array(
-				'access'=>'YB02',
-				'url'=>'/report/salessummary',
-			),
-			'Report Manager'=>array(
-				'access'=>'YB01',
-				'url'=>'/queue/index',
-			),
-		),
-	),
     //總部管理員採購
 	'Activity'=>array(
 		'access'=>'YS',
@@ -87,14 +60,36 @@ return array(
 		),
 	),
 
-//	'System Setting'=>array(
-//		'access'=>'YC',
-//		'items'=>array(
-//			'AAAA'=>array(
-//				'access'=>'YC01',
-//				'url'=>'/accttype/index',
-//				'tag'=>'@',
-//			),
-//		),
-//	),
+	'Misc'=>array(
+		'access'=>'YA',
+		'items'=>array(
+			'Sales Summary Entry'=>array(
+				'access'=>'YA01',
+				'url'=>'/monthly/index',
+			),
+			'Sales Summary Enquiry'=>array(
+				'access'=>'YA03',
+				'url'=>'/monthly/indexc',
+			),
+            //物品管理
+			'Goods Summary Entry'=>array(
+				'access'=>'YA02',
+				'url'=>'/goods/index',
+			),
+		),
+	),
+
+	'Report'=>array(
+		'access'=>'YB',
+		'items'=>array(
+			'Sales Summary'=>array(
+				'access'=>'YB02',
+				'url'=>'/report/salessummary',
+			),
+			'Report Manager'=>array(
+				'access'=>'YB01',
+				'url'=>'/queue/index',
+			),
+		),
+	),
 );

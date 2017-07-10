@@ -56,7 +56,7 @@ class MonthlyForm extends CFormModel
 	public function retrieveData($index) {
 		$suffix = Yii::app()->params['envSuffix'];
 		$citylist = Yii::app()->user->city_allow();
-		$sql = "select a.year_no, a.month_no, b.id, b.hdr_id, b.data_field, b.data_value, c.name, c.upd_type, c.field_type, b.manual_input, a.lcd, 
+		$sql = "select a.year_no, a.month_no, b.id, b.hdr_id, b.data_field, b.data_value, c.name, c.upd_type, c.field_type, c.function_name, b.manual_input, a.lcd, 
 				a.city, d.name as city_name, workflow$suffix.RequestStatus('OPRPT',a.id,a.lcd) as wfstatus,
 				workflow$suffix.RequestStatusDesc('OPRPT',a.id,a.lcd) as wfstatusdesc
 				from opr_monthly_hdr a, opr_monthly_dtl b, opr_monthly_field c, security$suffix.sec_city d  
@@ -83,13 +83,14 @@ class MonthlyForm extends CFormModel
 				$temp = array();
 				$temp['id'] = $row['id'];
 				$temp['code'] = $row['data_field'];
+				$temp['function_name'] = $row['function_name'];
 				$temp['name'] = $row['name'];
 				$temp['datavalue'] = $row['data_value'];
 				$temp['datavalueold'] = $row['data_value'];
 				$temp['updtype'] = $row['upd_type'];
 				$temp['fieldtype'] = $row['field_type'];
 				$temp['manualinput'] = $row['manual_input'];
-				$this->record[$row['data_field']] = $temp;
+				$this->record[$row['function_name']] = $temp;
 			}
 		}
 		return true;
@@ -199,13 +200,13 @@ class MonthlyForm extends CFormModel
 		$city = $this->city; //Yii::app()->user->city();
 		$uid = Yii::app()->user->id;
 		
-		$select = "select code from opr_monthly_field 
+		$select = "select function_name from opr_monthly_field 
 					where status = 'Y'
 					order by code
 				";
 		$rows = Yii::app()->db->createCommand($select)->queryAll();
 		foreach ($rows as $row) {
-			$code = $row['code'];
+			$code = $row['function_name'];
 			$command=$connection->createCommand($sql);
 			if (strpos($sql,':id')!==false)
 				$command->bindParam(':id',$this->record[$code]['id'],PDO::PARAM_INT);
@@ -217,7 +218,7 @@ class MonthlyForm extends CFormModel
 					$input = $this->record[$code]['manualinput'];
 				} else {
 					if ($this->record[$code]['updtype']!='M') {
-						$input = (empty($this->record[$code]['datavalue']) || $this->record[$code]['datavalue']=='0') ? 'N' : 'Y';
+						$input = ($this->record[$code]['datavalue'] || $this->record[$code]['datavalue']=='0') ? 'N' : 'Y';
 					}
 				}
 				$command->bindParam(':manual_input',$input,PDO::PARAM_STR);

@@ -68,7 +68,7 @@ class MonthlyConfList extends CListPageModel
 					$clause .= General::getSqlConditionClause('a.month_no', $svalue);
 					break;
 				case 'wfstatusdesc':
-					$clause .= General::getSqlConditionClause("workflow$suffix.RequestStatusDesc('OPRPT',a.id,a.req_dt)",$svalue);
+					$clause .= General::getSqlConditionClause("workflow$suffix.RequestStatusDesc('OPRPT',a.id,a.lcd)",$svalue);
 			}
 		}
 		

@@ -29,7 +29,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Activity Form';
             <div class="form-group">
                 <?php echo $form->labelEx($model,'activity_code',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
-                    <?php echo $form->numberField($model, 'activity_code',
+                    <?php echo $form->textField($model, 'activity_code',
                         array('min'=>0,'readonly'=>($model->scenario=='view'))
                     ); ?>
                 </div>

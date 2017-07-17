@@ -28,6 +28,9 @@ class TechnicianForm extends CFormModel
                 "unit"=>"",
                 "price"=>"",
                 "goods_num"=>"",
+                "note"=>"",
+                "remark"=>"",
+                "classify_id"=>"",
             )
         );
     }
@@ -266,6 +269,7 @@ class TechnicianForm extends CFormModel
                         'goods_id'=>$goods["goods_id"],
                         'order_id'=>$this->id,
                         'goods_num'=>$goods["goods_num"],
+                        'note'=>$goods["note"],
                         'lcu'=>$uid,
                         'lcd'=>date('Y-m-d H:i:s'),
                     ));
@@ -274,6 +278,7 @@ class TechnicianForm extends CFormModel
                     Yii::app()->db->createCommand()->update('opr_order_goods', array(
                         'goods_id'=>$goods["goods_id"],
                         'goods_num'=>$goods["goods_num"],
+                        'note'=>$goods["note"],
                         'luu'=>$uid,
                         'lud'=>date('Y-m-d H:i:s'),
                     ), 'id=:id', array(':id'=>$goods["id"]));

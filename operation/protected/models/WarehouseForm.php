@@ -8,6 +8,7 @@ class WarehouseForm extends CFormModel
 	public $type;
 	public $unit;
 	public $inventory;
+	public $classify_id;
 	public $luu;
 	public $lcu;
 
@@ -15,6 +16,7 @@ class WarehouseForm extends CFormModel
 	{
 		return array(
             'goods_code'=>Yii::t('procurement','Goods Code'),
+            'classify_id'=>Yii::t('procurement','Classify'),
             'name'=>Yii::t('procurement','Name'),
             'type'=>Yii::t('procurement','Type'),
             'unit'=>Yii::t('procurement','Unit'),
@@ -28,10 +30,10 @@ class WarehouseForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, goods_code, name, type, unit, inventory, lcu, luu','safe'),
+			array('id, goods_code, name, type, unit, inventory, classify_id, lcu, luu','safe'),
             array('goods_code','required'),
-            array('goods_code','numerical','allowEmpty'=>false,'integerOnly'=>true),
             array('name','required'),
+            array('classify_id','required'),
             array('type','required'),
             array('unit','required'),
             array('inventory','required'),
@@ -68,6 +70,16 @@ class WarehouseForm extends CFormModel
         }
 	}
 
+    //刪除驗證
+    public function deleteValidate(){
+        $rs = Yii::app()->db->createCommand()->select()->from("opr_order_goods")->where('goods_id=:goods_id',array(':goods_id'=>$this->id))->queryAll();
+        if($rs){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
 	public function retrieveData($index) {
 		$city = Yii::app()->user->city();
 		$rows = Yii::app()->db->createCommand()->select("*")
@@ -78,6 +90,7 @@ class WarehouseForm extends CFormModel
                 $this->name = $row['name'];
                 $this->type = $row['type'];
                 $this->unit = $row['unit'];
+                $this->classify_id = $row['classify_id'];
                 $this->goods_code = $row['goods_code'];
                 $this->inventory = $row['inventory'];
                 break;
@@ -109,7 +122,7 @@ class WarehouseForm extends CFormModel
 
     //根據訂單id查訂單所有物品
     public function getGoodsListToId($order_id){
-        $rs = Yii::app()->db->createCommand()->select("b.name,b.inventory,b.goods_code,b.unit,b.type,a.goods_num,a.confirm_num,a.id,a.goods_id")
+        $rs = Yii::app()->db->createCommand()->select("b.name,b.inventory,b.goods_code,b.classify_id,b.unit,b.type,a.goods_num,a.confirm_num,a.id,a.goods_id,a.remark,a.note")
             ->from("opr_order_goods a,opr_warehouse b")->where('a.order_id=:order_id and a.goods_id = b.id',array(':order_id'=>$order_id))->queryAll();
         return $rs;
     }
@@ -136,15 +149,16 @@ class WarehouseForm extends CFormModel
                 break;
             case 'new':
                 $sql = "insert into opr_warehouse(
-							name, type, unit, inventory, lcu, lcd, goods_code,city
+							name, type, unit, inventory, classify_id, lcu, lcd, goods_code,city
 						) values (
-							:name, :type, :unit, :inventory, :lcu, :lcd, :goods_code,:city
+							:name, :type, :unit, :inventory, :classify_id, :lcu, :lcd, :goods_code,:city
 						)";
                 break;
             case 'edit':
                 $sql = "update opr_warehouse set
 							name = :name, 
 							type = :type, 
+							classify_id = :classify_id, 
 							unit = :unit,
 							goods_code = :goods_code,
 							luu = :luu,
@@ -173,6 +187,8 @@ class WarehouseForm extends CFormModel
             $command->bindParam(':unit',$this->unit,PDO::PARAM_STR);
         if (strpos($sql,':inventory')!==false)
             $command->bindParam(':inventory',$this->inventory,PDO::PARAM_INT);
+        if (strpos($sql,':classify_id')!==false)
+            $command->bindParam(':classify_id',$this->classify_id,PDO::PARAM_INT);
 
         if (strpos($sql,':city')!==false)
             $command->bindParam(':city',$city,PDO::PARAM_STR);

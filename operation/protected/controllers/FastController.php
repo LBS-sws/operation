@@ -95,4 +95,19 @@ class FastController extends Controller
             $this->render('form',array('model'=>$model,));
         }
     }
+
+    public function actionBackward()
+    {
+        if (isset($_POST['FastForm'])) {
+            $model = new FastForm("backward");
+            $model->attributes = $_POST['FastForm'];
+            if($model->backward()){
+                Dialog::message(Yii::t('dialog','Information'), Yii::t('procurement','Backward Done'));
+            }else{
+                Dialog::message(Yii::t('dialog','Validation Message'), Yii::t('procurement','Backward Error'));
+            }
+            $model->scenario = "edit";
+            $this->redirect(Yii::app()->createUrl('fast/edit',array('index'=>$model->id)));
+        }
+    }
 }

@@ -12,18 +12,33 @@ return array(
     'Order Status List'=>'订货状态列表',
 	'Add Order'=>'添加订货',
 	'Headquarters Number'=>'总部数量限制',
-	'Area Number'=>'区域数量限制',
+	'Max Number'=>'最大数量限制',
+	'Min Number'=>'最小数量限制',
 	'Not Font Goods'=>'没有找到该货物',
 	'Max Number is'=>'最大数量是',
+	'Min Number is'=>'最小数量是',
 
 
 	'Type'=>'包装规格',
 	'Unit'=>'单位',
+	'Price（$）'=>'单价（$）',
 	'Price（RMB）'=>'单价（RMB）',
+	'Total（$）'=>'总价（$）',
 	'Total（RMB）'=>'总价（RMB）',
+    'expected to price（$）'=>'预计（$）',
     'expected to price（RMB）'=>'预计（RMB）',
 	'Goods Name'=>'物品名称',
 	'Name'=>'名称',
+	'Origin'=>'来源地',
+	'Gross Weight（kg）'=>'毛重（kg）',
+	'Total Gross Weight（kg）'=>'总毛重（kg）',
+	'Net Weight（kg）'=>'净重（kg）',
+	'Total Net Weight（kg）'=>'总净重（kg）',
+	'Length×Width×Height（cm）'=>'长×宽×高（cm）',
+    'Weight Class'=>'重量统计',
+    'Price Class'=>'价格统计',
+    'Volume Class'=>'体积统计',
+    'Total Volume'=>'总体积',
 
     'Order Class'=>'订单分类',
     'Order Number'=>'订单数量',
@@ -31,16 +46,20 @@ return array(
 	'Import'=>'进口货',
 	'Domestic'=>'国内货',
 	'Fast'=>'快速货',
-	'Fast Order'=>'快速訂單',
+	'Fast Order'=>'快速订单',
+	'Add Fast Order'=>'增加快速货订单',
 
 	'Goods Class'=>'物品分类',
 	'Goods Code'=>'物品编号',
-	'Goods Number'=>'物品数量',
+	'Goods Number'=>'要求数量',
 	'Confirm Number'=>'实际数量',
 	'Actual Number'=>'实际数量',
+	'Demand Note'=>'要求说明',
+	'Headquarters Note'=>'总部说明',
 	'Order User'=>'申请人',
-	'Technician'=>'技术员',
+	'Technician'=>'领料管理',
 	'Order Status'=>'订单状态',
+	'Status'=>'状态',
 	'pending'=>'等待',
 	'sent'=>'发送',
 	'approve'=>'批准',
@@ -49,11 +68,16 @@ return array(
     'read'=>'已查看',
     'finished'=>'已完成',
 
+    'Back Status'=>'退回',
+    'backward'=>'退回',
+    'Backward Error'=>'退回失败，地区已收货',
+    'Backward Done'=>'退回成功',
+
     'Finish'=>'确认收货',
 
     'Remark'=>'备注',
 
-	'the name of already exists'=>'物品名称已经存在',
+	'the name of already exists'=>'名称已经存在',
 	'the Goods Code of already exists'=>'物品编号已经存在',
 	'the Activity Title of already exists'=>'活动标题已经存在',
 	'the Activity Code of already exists'=>'活动编号已经存在',
@@ -64,9 +88,13 @@ return array(
     'Goods Number can only be numbered'=>'数量只能为数字',
     'Fill in at least one goods'=>'最少填写一个物品',
 
+    'This category has been used and cannot be deleted'=>'这个类别已经被使用，不能被删除',
+    'This goods has been used and cannot be deleted'=>'这个物品已经被使用，不能被删除',
+
     'Operator User'=>'操作人员',
     'Operator Time'=>'操作时间',
     'Operator Status'=>'操作状态',
+    'Down'=>'下载',
 
     //技術員模塊
     'Technician List'=>'技术员列表',
@@ -82,14 +110,15 @@ return array(
 
     ' Order for Over time'=>'订单超出时间范围',
     ' Order for Over time Or Order Number Quantity over limit'=>'订单超出时间范围或者订单数量超出限制',
+    'The end time cannot be less than the start time'=>'结束时间不能小于开始时间',
 
 
     //訂單活動模塊
     'Order Access'=>'订单限制',
-    'Order Activity List'=>'订单活动列表',
-    'Order Activity Form'=>'订单活动表单',
-    'Activity Code'=>'活动编号',
-    'Activity Title'=>'活动标题',
+    'Order Activity List'=>'中央采购列表',
+    'Order Activity Form'=>'中央采购表单',
+    'Activity Code'=>'中央采购编号',
+    'Activity Title'=>'中央采购标题',
     'Start Time'=>'开始时间',
     'End Time'=>'结束时间',
     'Import Start Time'=>'国外订单的开始时间',
@@ -118,6 +147,7 @@ return array(
     'Stop'=>'停止',
     'Run'=>'运行',
     'End'=>'结束',
+    'Wait'=>'等待',
     'Reject'=>'拒绝',
 
     'Shipments'=>'发货',
@@ -129,6 +159,7 @@ return array(
 
     'Delivery List'=>'订单采购',
     'Number Restrictions'=>'数量限制',
+    'Max Number Restrictions'=>'最多地方参与数目',
     ' Not Null'=>'不能为空',
     'Fast Form'=>'快速订单审核',
 
@@ -136,6 +167,18 @@ return array(
     'Inventory'=>'库存',
     'Shipments Info'=>'发货信息',
     'Shipments Form'=>'发货表单',
-    'Cannot exceed the quantity of Inventory'=>'不能超过库存的数量'
+    'Cannot exceed the quantity of Inventory'=>'不能超过库存的数量',
+
+    //標籤管理
+    'Stickies'=>'标签',
+    'Stickies List'=>'标签列表',
+    'Stickies Form'=>'标签表单',
+    'Content'=>'內容',
+    'Level'=>'层级',
+
+    //分類管理
+    'Classify'=>'分类',
+    'Classify List'=>'分类列表',
+    'Classify Form'=>'分类表单',
 );
 ?>

@@ -88,36 +88,61 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
 
             <div class="form-group">
                 <?php echo $form->labelEx($model,'goods_list',array('class'=>"col-sm-2 control-label")); ?>
-                <div class="col-sm-9">
+                <div class="col-sm-10">
                     <table class="table table-bordered table-striped disabled" id="table-change">
                         <thead>
                         <tr>
-                            <td width="12%"><?php echo Yii::t("procurement","Goods Code")?></td>
-                            <td><?php echo Yii::t("procurement","Goods Name")?></td>
+                            <td width="20%"><?php echo Yii::t("procurement","Goods Name")?></td>
                             <td width="11%"><?php echo Yii::t("procurement","Type")?></td>
-                            <td width="10%"><?php echo Yii::t("procurement","Unit")?></td>
-                            <td width="10%"><?php echo Yii::t("procurement","Goods Number")?></td>
+                            <td width="8%"><?php echo Yii::t("procurement","Unit")?></td>
+                            <td width="8%"><?php echo Yii::t("procurement","Goods Number")?></td>
+                            <td width="12%"><?php echo Yii::t("procurement","Demand Note")?></td>
                             <?php if ($model->scenario=='edit' && $model->status == "approve"): ?>
-                            <td width="10%"><?php echo Yii::t("procurement","Actual Number")?></td>
+                                <td width="8%"><?php echo Yii::t("procurement","Actual Number")?></td>
+                                <td width="12%"><?php echo Yii::t("procurement","Headquarters Note")?></td>
                             <?php endif ?>
-                            <td width="8%">&nbsp;</td>
+                            <td width="1%">&nbsp;</td>
                         </tr>
                         </thead>
                         <tbody>
 
                         <?php
+                        $classify = ClassifyForm::getClassifyList();
                             foreach ($model->goods_list as $key => $val){
                                 $con_num = empty($val['id'])?$key:$val['id'];
                                 $tableTr = "<tr datanum='$con_num'>";
 
-                                $tableTr.="<td><input type='text' autocomplete='off' class='form-control testInput' name='TechnicianForm[goods_list][$con_num][goods_code]' value='".$val['goods_code']."'>";
-                                $tableTr.="<input type='hidden' name='TechnicianForm[goods_list][$con_num][goods_id]' value='".$val['goods_id']."'></td>";
-                                $tableTr.="<td><input type='text' class='form-control name' readonly name='TechnicianForm[goods_list][$con_num][name]' value='".$val['name']."'></td>";
+
+                                $tableTr.="<td><div class='input-group'>";
+                                $tableTr.='<div class="input-group-btn">';
+                                $tableTr.="<input type='hidden' class='classify_id' name='TechnicianForm[goods_list][$con_num][classify_id]' value='".$val['classify_id']."'>";
+
+                                if($model->scenario=='new' || $model->status == "pending"){
+                                    $tableTr.='<button type="button" class="btn btn-default bg-fff dropdown-toggle" data-toggle="dropdown" data-id="'.$val["classify_id"].'">';
+                                    $testNBSP = $classify[$val["classify_id"]] == ""?"&nbsp;":$classify[$val["classify_id"]];
+                                    $tableTr.='<span>'.$testNBSP.'</span><span class="caret"></span></button><ul class="dropdown-menu goodsIfy">';
+                                    foreach ($classify as $classify_id =>$classify_name){
+                                        $classify_name=empty($classify_name)?"&nbsp;":$classify_name;
+                                        $tableTr.="<li data-id='$classify_id'><a>$classify_name</a></li>";
+                                    }
+                                    $tableTr.='</ul>';
+                                }
+
+                                $tableTr.='</div>';
+                                $tableTr.="<input type='text' class='form-control testInput' autocomplete='off' name='TechnicianForm[goods_list][$con_num][name]' value='".$val['name']."'>";
+                                $tableTr.="<input type='hidden' name='TechnicianForm[goods_list][$con_num][goods_id]' value='".$val['goods_id']."'>";
+                                if(!empty($val['stickies_id'])){
+                                    $tableTr.='<div class="input-group-btn changeHelp" content-id="'.$val['stickies_id'].'"><span class="fa fa-exclamation-circle"></span></div>';
+                                }
+                                $tableTr.="</div></td>";
+
                                 $tableTr.="<td><input type='text' class='form-control type' readonly name='TechnicianForm[goods_list][$con_num][type]' value='".$val['type']."'></td>";
                                 $tableTr.="<td><input type='text' class='form-control unit' readonly name='TechnicianForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
-                                $tableTr.="<td><input type='number' class='form-control numChange goods_num' name='TechnicianForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
+                                $tableTr.="<td><input type='number' class='form-control' name='TechnicianForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
+                                $tableTr.="<td><input type='text' class='form-control' name='TechnicianForm[goods_list][$con_num][note]' value='".$val['note']."'></td>";
                                 if($model->scenario=='edit' && $model->status == "approve"){
-                                    $tableTr.="<td><input type='number' class='form-control confirm_num' name='TechnicianForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
+                                    $tableTr.="<td><input type='number' class='form-control' name='TechnicianForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
+                                    $tableTr.="<td><input type='text' class='form-control' name='TechnicianForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
                                 }
                                 $tableTr.="<td><button type='button' class='btn btn-danger delGoods'>".Yii::t("misc","Delete")."</button>";
                                 if(!empty($val['id'])){
@@ -134,7 +159,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                         <tr>
                             <?php
                             if ($model->scenario=='edit' && $model->status == "approve"){
-                                echo '<td colspan="6"></td>';
+                                echo '<td colspan="7"></td>';
                             }else{
                                 echo '<td colspan="5"></td>';
                             }
@@ -159,6 +184,23 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
             <?php endif ?>
 		</div>
 	</div>
+
+    <div class="hide" id="classifyList">
+        <div class="input-group-btn">
+            <input type="hidden" class="stickies_id">
+            <input type="hidden" class="classify_id">
+            <button type="button" class="btn btn-default bg-fff dropdown-toggle" data-toggle="dropdown"><span>&nbsp;</span><span class="caret"></span></button>
+            <ul class="dropdown-menu goodsIfy">
+                <?php
+
+                foreach ($classify as $classify_id =>$classify_name){
+                    $classify_name=empty($classify_name)?"&nbsp;":$classify_name;
+                    echo "<li data-id='$classify_id'><a>$classify_name</a></li>";
+                }
+                ?>
+            </ul>
+        </div>
+    </div>
 </section>
 <?php
 if ($model->scenario!='new')
@@ -171,11 +213,12 @@ if($model->status == "pending" || $model->status == "cancelled"||$model->scenari
     $tableBool = 0;
 }
 $js = '
-inputDownList('.$goodList.',tableGoodsChange,false);
-$("#addGoods").on("click",{btnStr:"'.Yii::t("misc","Delete").'"},addGoodsTableTwo);
+inputDownList('.$goodList.',tableGoodsChange);
+$("#addGoods").on("click",{btnStr:"'.Yii::t("misc","Delete").'"},addGoodsTable);
 $("body").delegate(".delGoods","click","'.Yii::t("procurement","Are you sure you want to delete this data?").'",delGoodsTable);
 disabledTable('.$tableBool.');
 changeRepeatId();
+goodsIfyChange();
 ';
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 ?>

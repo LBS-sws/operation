@@ -51,7 +51,7 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
             <div class="form-group">
                 <?php echo $form->labelEx($model,'goods_code',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
-                    <?php echo $form->numberField($model, 'goods_code',
+                    <?php echo $form->textField($model, 'goods_code',
                         array('min'=>0,'readonly'=>($model->scenario=='view'))
                     ); ?>
                 </div>
@@ -61,6 +61,14 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                 <div class="col-sm-4">
                     <?php echo $form->textField($model, 'name',
                         array('size'=>40,'maxlength'=>250,'readonly'=>($model->scenario=='view'))
+                    ); ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'classify_id',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-4">
+                    <?php echo $form->dropDownList($model, 'classify_id',ClassifyForm::getClassifyList(),
+                        array('disabled'=>($model->scenario =='view'))
                     ); ?>
                 </div>
             </div>

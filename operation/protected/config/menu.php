@@ -1,6 +1,37 @@
 <?php
 
 return array(
+    //物品管理
+    'Goods'=>array(
+        'access'=>'YG',
+        'items'=>array(
+            //物品管理
+            'Import Summary Entry'=>array(
+                'access'=>'YG01',
+                'url'=>'/goodsim/index',
+            ),
+            //物品管理
+            'Domestic Summary Entry'=>array(
+                'access'=>'YG04',
+                'url'=>'/goodsdo/index',
+            ),
+            //物品管理
+            'Fast Summary Entry'=>array(
+                'access'=>'YG05',
+                'url'=>'/goodsfa/index',
+            ),
+            //標籤管理
+            'Stickies Summary Entry'=>array(
+                'access'=>'YG02',
+                'url'=>'/stickies/index',
+            ),
+            //分類管理
+            'Classify Summary Entry'=>array(
+                'access'=>'YG03',
+                'url'=>'/classify/index',
+            ),
+        ),
+    ),
     //總部管理員採購
 	'Activity'=>array(
 		'access'=>'YS',
@@ -53,43 +84,48 @@ return array(
 		'access'=>'YC',
 		'items'=>array(
             //訂貨列表(下訂單)
-			'Order List'=>array(
+			'Technician List'=>array(
 				'access'=>'YC02',
 				'url'=>'/technician/index',
 			),
 		),
 	),
 
-	'Misc'=>array(
-		'access'=>'YA',
-		'items'=>array(
-			'Sales Summary Entry'=>array(
-				'access'=>'YA01',
-				'url'=>'/monthly/index',
-			),
-			'Sales Summary Enquiry'=>array(
-				'access'=>'YA03',
-				'url'=>'/monthly/indexc',
-			),
-            //物品管理
-			'Goods Summary Entry'=>array(
-				'access'=>'YA02',
-				'url'=>'/goods/index',
-			),
-		),
-	),
+    'Misc'=>array(
+        'access'=>'YA',
+        'items'=>array(
+            'Sales Summary Entry'=>array(
+                'access'=>'YA01',
+                'url'=>'/monthly/index',
+            ),
+            'Sales Summary Enquiry'=>array(
+                'access'=>'YA03',
+                'url'=>'/monthly/indexc',
+            ),
+        ),
+    ),
 
-	'Report'=>array(
-		'access'=>'YB',
-		'items'=>array(
-			'Sales Summary'=>array(
-				'access'=>'YB02',
-				'url'=>'/report/salessummary',
-			),
-			'Report Manager'=>array(
-				'access'=>'YB01',
-				'url'=>'/queue/index',
-			),
-		),
-	),
+    'Report'=>array(
+        'access'=>'YB',
+        'items'=>array(
+            'Sales Summary'=>array(
+                'access'=>'YB02',
+                'url'=>'/report/salessummary',
+            ),
+            'Report Manager'=>array(
+                'access'=>'YB01',
+                'url'=>'/queue/index',
+            ),
+        ),
+    ),
+//	'System Setting'=>array(
+//		'access'=>'YC',
+//		'items'=>array(
+//			'AAAA'=>array(
+//				'access'=>'YC01',
+//				'url'=>'/accttype/index',
+//				'tag'=>'@',
+//			),
+//		),
+//	),
 );

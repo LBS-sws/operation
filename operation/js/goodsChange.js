@@ -9,7 +9,7 @@ function changeRepeatId() {
     })
 }
 
-function inputDownList(arr,fn,bool){
+function inputDownList(arr,fn){
 
     //獲取焦點后
     $("body").delegate(".testInput","focus",function (e) {
@@ -21,27 +21,8 @@ function inputDownList(arr,fn,bool){
             left:$that.offset().left
         });
         $(ul).addClass("dropdown-menu");
-        $.each( arr, function(key, val){
-            if(bool && val["goods_class"] != $("#OrderForm_order_class").val()){
-                //類型是否一致
-                return true;
-            }
-            if(($.inArray(val["id"],repeatId))>=0 && $that.next("input").val() != val["id"]){
-                //去除已經存在的物品
-                return true;
-            }
-            var li = document.createElement("li");
-            $(li).attr({
-                "dataid":val["id"],
-                "datacode":val["goods_code"],
-                "dataname":val["name"],
-                "dataunit":val["unit"],
-                "dataprice":val["price"],
-                "datatype":val["type"]
-            }).append("<a href='#'>"+val["goods_code"]+" -- "+val["name"]+"</a>");
-            $(ul).append(li);
-        });
         $(div).append(ul);
+        fillToUl(ul,$that);
         $("body").append(div);
         $("body").on("click.menu",function () {
             $(div).remove();
@@ -49,41 +30,20 @@ function inputDownList(arr,fn,bool){
             $that.off("keyup");
             $(".dropdown-div>.dropdown-menu a").undelegate("mousedown");
             validateGoods($that);
+            changeRepeatId();
         });
         //選擇菜單的某個元素
         $(".dropdown-div>.dropdown-menu").delegate("a","mousedown",function () {
-            $that.val($(this).parent("li").attr("datacode"));
+            $that.val($(this).parent("li").attr("dataname"));
             $that.next("input").val($(this).parent("li").attr("dataid"));
             if(fn != undefined){
-                fn($that,$(this).parent("li"),bool);
+                fn($that,$(this).parent("li"));
             }
         });
         //鍵盤事件下拉菜單發送變化
         $(this).on("keyup",function () {
             $(ul).html("");
-            $.each( arr, function(key, val){
-                var str = $that.val();
-                if(val["goods_code"].split(str).length > 1 ){
-                    if(bool && val["goods_class"] != $("#OrderForm_order_class").val()){
-                        //類型是否一致
-                        return true;
-                    }
-                    if(($.inArray(val["id"],repeatId))>=0 && $that.next("input").val() != val["id"]){
-                        //去除已經存在的物品
-                        return true;
-                    }
-                    var li = document.createElement("li");
-                    $(li).attr({
-                        "dataid":val["id"],
-                        "datacode":val["goods_code"],
-                        "dataname":val["name"],
-                        "dataunit":val["unit"],
-                        "dataprice":val["price"],
-                        "datatype":val["type"]
-                    }).append("<a href='#'>"+val["goods_code"]+" -- "+val["name"]+"</a>");
-                    $(ul).append(li);
-                }
-            });
+            fillToUl(ul,$that);
         });
 
         if($(this).val() != "" && $(this).val() != undefined){
@@ -97,12 +57,6 @@ function inputDownList(arr,fn,bool){
         return false;
     });
 
-    //輸入框的驗證觸發事件
-    $("body").delegate(".testInput","blur",function (e) {
-        $("body").trigger("click");
-        changeRepeatId();
-    });
-
     //輸入框的驗證
     function validateGoods($element) {
         var id = $element.next("input").val();
@@ -111,7 +65,7 @@ function inputDownList(arr,fn,bool){
         var lastname = "";
         $.each(arr,function (index, obj) {
             if(obj["id"] == id){
-                lastname = obj["goods_code"];
+                lastname = obj["name"];
                 if(lastname == name){
                     bool = false;
                     return false;
@@ -123,22 +77,60 @@ function inputDownList(arr,fn,bool){
         }
     }
 
+    //數據填充
+    function fillToUl(ul,$doc) {
+        $.each( arr, function(key, val){
+            var str = $doc.val();
+            var classify = $doc.parent().find(".btn:first").attr("data-id");
+            if(val["name"].split(str).length > 1 || str == ""){
+                if(classify != val["classify_id"] && classify != "" && classify != undefined){
+                    return true;
+                }
+                if(($.inArray(val["id"],repeatId))>=0 && $doc.next("input").val() != val["id"]){
+                    //去除已經存在的物品
+                    return true;
+                }
+                var li = document.createElement("li");
+                var content = typeof(val["stickies_id"])=="undefined"?"":val["stickies_id"];
+                $(li).attr({
+                    "dataid":val["id"],
+                    "datacode":val["goods_code"],
+                    "dataname":val["name"],
+                    "dataunit":val["unit"],
+                    "dataprice":val["price"],
+                    "classify":val["classify_id"],
+                    "content":content,
+                    "datatype":val["type"]
+                }).append("<a href='javascript:void(0);'>"+val["name"]+"</a>");
+                $(ul).append(li);
+            }
+        });
+    }
+
 }
-//表格內的物品發生變化，價格隨之變化
-function tableGoodsChange($ele,$li,bool) {
+//表格內的物品發生變化
+function tableGoodsChange($ele,$li) {
     var $tr = $ele.parents("tr");
+    var classify = $("#classifyList li[data-id='"+$li.attr("classify")+"']").text();
     if($tr.length > 0){
         var $tr = $ele.parents("tr");
         $tr.find("input.name").val($li.attr("dataname"));
         $tr.find("input.type").val($li.attr("datatype"));
         $tr.find("input.unit").val($li.attr("dataunit"));
-        var price = $li.attr("dataprice");
-        price = addStringToNum(price);
-        $tr.find("input.price").val(price);
-        if(bool){
-            goodsTotalPrice();
-            changeRepeatId();
+        $tr.find("input.classify_id").val($li.attr("classify"));
+        $tr.find("input.stickies_id").val($li.attr("content"));
+        $tr.find(".bg-fff.dropdown-toggle").attr("data-id",$li.attr("classify"));
+        $tr.find(".bg-fff.dropdown-toggle>span:first").text(classify);
+        if($li.attr("content")!=""&&$li.attr("content")!=undefined){
+            if($ele.parent().find("div.changeHelp").length>0){
+                $ele.parent().find("div.changeHelp").attr("content-id",$li.attr("content"));
+            }else{
+                $ele.parent().append('<div class="input-group-btn changeHelp" content-id="'+$li.attr("content")+'"><span class="fa fa-exclamation-circle"></span></div>');
+            }
+        }else{
+            $ele.parent().find("div.changeHelp").remove();
         }
+        changeRepeatId();
     }
 }
 //
@@ -152,35 +144,6 @@ function addStringToNum(str) {
     return one+"."+two;
 }
 
-//價格計算
-function goodsTotalPrice() {
-    var $table = $("#table-change>tbody");
-    var totalPrice = 0;
-    $table.find("tr").each(function () {
-        var price = $(this).find("input.price").val();
-        var num = $(this).find("input.goods_num").val();
-        var sum = 0;
-        var tem = "";
-
-        if(price == "" || isNaN(price)){
-            price = 0;
-        }else{
-            price = parseFloat(price);
-        }
-        if(num == "" || isNaN(num)){
-            num = 0;
-        }else{
-            num = parseFloat(num);
-        }
-
-        sum = (price*100000)*num/100000;
-        sum = addStringToNum(sum);
-        totalPrice=(sum*100000 +totalPrice*100000)/100000;
-        totalPrice = addStringToNum(totalPrice);
-        $(this).find("input.sum").val(sum);
-    });
-    $("#table-change>tfoot>tr>td").eq(1).text(totalPrice);
-}
 
 //向表格內添加物品
 function addGoodsTable(data) {
@@ -194,47 +157,23 @@ function addGoodsTable(data) {
         return false;
     }
     num = parseInt(num)+1;
+    $("#classifyList input.stickies_id").attr("name",'TechnicianForm[goods_list]['+num+'][stickies_id]');
+    $("#classifyList input.classify_id").attr("name",'TechnicianForm[goods_list]['+num+'][classify_id]');
     var html ='<tr datanum="'+num+'">'+
-        '<td>' +
-        '<input type="text" autocomplete="off" class="form-control testInput" name="OrderForm[goods_list]['+num+'][goods_code]" >' +
-        '<input type="hidden" name="OrderForm[goods_list]['+num+'][goods_id]"></td>'+
-    '<td><input type="text" class="form-control name" name="OrderForm[goods_list]['+num+'][name]" readonly></td>'+
-    '<td><input type="text" class="form-control type" name="OrderForm[goods_list]['+num+'][type]" readonly></td>'+
-    '<td><input type="text" class="form-control unit" name="OrderForm[goods_list]['+num+'][unit]" readonly></td>'+
-    '<td><input type="text" class="form-control price" name="OrderForm[goods_list]['+num+'][price]" readonly></td>'+
-    '<td><input type="number" min="0" class="form-control numChange goods_num" name="OrderForm[goods_list]['+num+'][goods_num]"></td>'+
-    '<td><input type="text" class="form-control sum" readonly></td>'+
-    '<td><button type="button" class="btn btn-danger delGoods">'+data.data.btnStr+'</button></td>'+
-    '</tr>';
+        '<td><div class="input-group">' +$("#classifyList").html()+
+        '<input type="text" class="form-control testInput" autocomplete="off" name="TechnicianForm[goods_list]['+num+'][name]" >' +
+        '<input type="hidden" name="TechnicianForm[goods_list]['+num+'][goods_id]"></div></td>'+
+        '<td><input type="text" class="form-control type" name="TechnicianForm[goods_list]['+num+'][type]" readonly></td>'+
+        '<td><input type="text" class="form-control unit" name="TechnicianForm[goods_list]['+num+'][unit]" readonly></td>'+
+        '<td><input type="number" min="0" class="form-control" name="TechnicianForm[goods_list]['+num+'][goods_num]"></td>'+
+        '<td><input type="text" class="form-control" name="TechnicianForm[goods_list]['+num+'][note]"></td>'+
+        '<td><button type="button" class="btn btn-danger delGoods">'+data.data.btnStr+'</button></td>'+
+        '</tr>';
 
+    $("#classifyList input.stickies_id").removeAttr("name");
+    $("#classifyList input.classify_id").removeAttr("name");
     $("#table-change>tbody").append(html);
     changeRepeatId();
-}
-
-//向表格內添加物品(技術員)
-function addGoodsTableTwo(data) {
-    if($(this).prop("disabled")){
-        return false;
-    }
-    var num = $("#table-change>tbody>tr:last").attr("datanum");
-    num = $("#table-change>tbody>tr").length < 1?0:num;
-    if(num == undefined && num == "" && num == undefined && isNaN(num)){
-        alert("添加異常，請刷新頁面");
-        return false;
-    }
-    num = parseInt(num)+1;
-    var html ='<tr datanum="'+num+'">'+
-        '<td>' +
-        '<input type="text" autocomplete="off" class="form-control testInput" name="TechnicianForm[goods_list]['+num+'][goods_code]" >' +
-        '<input type="hidden" name="TechnicianForm[goods_list]['+num+'][goods_id]"></td>'+
-    '<td><input type="text" class="form-control name" name="TechnicianForm[goods_list]['+num+'][name]" readonly></td>'+
-    '<td><input type="text" class="form-control type" name="TechnicianForm[goods_list]['+num+'][type]" readonly></td>'+
-    '<td><input type="text" class="form-control unit" name="TechnicianForm[goods_list]['+num+'][unit]" readonly></td>'+
-    '<td><input type="number" min="0" class="form-control numChange goods_num" name="TechnicianForm[goods_list]['+num+'][goods_num]"></td>'+
-    '<td><button type="button" class="btn btn-danger delGoods">'+data.data.btnStr+'</button></td>'+
-    '</tr>';
-
-    $("#table-change>tbody").append(html);
 }
 
 //刪除表格里的某條物品
@@ -278,38 +217,19 @@ function disabledTable(bool) {
 }
 
 
-function confirmTotalPrice() {
-    var $table = $("#confirm-change>tbody");
-    var totalPrice = 0;
-    $table.find("tr").each(function () {
-        var price = $(this).find("td.price").text();
-        var number = $(this).find("input.confirm_num").val();
-        var sum = 0;
-        var tem = "";
-
-        if(price == "" || isNaN(price)){
-            price = 0;
-        }else{
-            price = parseFloat(price);
+function goodsIfyChange() {
+    $("body").delegate(".goodsIfy>li","click",function () {
+        var dataId = $(this).data("id");
+        var $btn = $(this).parent(".goodsIfy").prev(".btn");
+        var oldDataId = $btn.attr("data-id");
+        if(oldDataId != "" && oldDataId!= undefined &&oldDataId != dataId){
+            $(this).parents("tr:first").find(".testInput").next("input").val("");
+            $(this).parents("tr:first").find(".testInput").val("").focus().blur();
+            $("body").trigger("click");
         }
-        if(number == "" || isNaN(number)){
-            number = 0;
-        }else{
-            number = parseFloat(number);
-        }
-
-        sum = (price*100000)*number/100000;
-        tem = sum.toString().split(".");
-        if(tem.length == 2){
-            if(tem[1].length >2){
-                sum = sum.toFixed(2);
-            }
-        }
-        totalPrice=(sum*100000 +totalPrice*100000)/100000;
-        $(this).find("td:last").text(sum);
+        $(this).parents("tr:first").find("input.classify_id").val(dataId);
+        $btn.find("span:first").text($(this).text());
+        $btn.attr("data-id",dataId);
     });
-    $("#confirm-change>tfoot>tr:last>td:last").text(totalPrice);
 }
-
-
 

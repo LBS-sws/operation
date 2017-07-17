@@ -3,7 +3,7 @@ $this->pageTitle=Yii::app()->name . ' - Goods List';
 ?>
 
 <?php $form=$this->beginWidget('TbActiveForm', array(
-'id'=>'goods-list',
+'id'=>'goodsdo-list',
 'enableClientValidation'=>true,
 'clientOptions'=>array('validateOnSubmit'=>true,),
 'layout'=>TbHtml::FORM_LAYOUT_INLINE,
@@ -11,7 +11,7 @@ $this->pageTitle=Yii::app()->name . ' - Goods List';
 
 <section class="content-header">
 	<h1>
-		<strong><?php echo Yii::t('app','Goods Summary Entry'); ?></strong>
+		<strong><?php echo Yii::t('app','Goods Summary Entry')." - ".Yii::t('procurement','Domestic'); ?></strong>
 	</h1>
 <!--
 	<ol class="breadcrumb">
@@ -25,23 +25,22 @@ $this->pageTitle=Yii::app()->name . ' - Goods List';
 <section class="content">
     <div class="box">
         <div class="box-body">
-            <div class="btn-group" role="group">
-                <?php
-                //var_dump(Yii::app()->session['rw_func']);
-                if (Yii::app()->user->validRWFunction('YA02'))
-                    echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('procurement','Add Goods'), array(
-                        'submit'=>Yii::app()->createUrl('goods/new'),
-                    ));
-                ?>
-            </div>
+            <?php
+            //var_dump(Yii::app()->session['rw_func']);
+            if (Yii::app()->user->validRWFunction('YG01'))
+                echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('misc','Add').Yii::t("procurement","Domestic"), array(
+                    'submit'=>Yii::app()->createUrl('goodsdo/new'),
+                ));
+            ?>
         </div>
     </div>
 	<?php $this->widget('ext.layout.ListPageWidget', array(
 			'title'=>Yii::t('procurement','Goods List'),
 			'model'=>$model,
-				'viewhdr'=>'//goods/_listhdr',
-				'viewdtl'=>'//goods/_listdtl',
+				'viewhdr'=>'//goodsdo/_listhdr',
+				'viewdtl'=>'//goodsdo/_listdtl',
 				'search'=>array(
+							'goods_code',
 							'name',
 							'type',
 							'unit',

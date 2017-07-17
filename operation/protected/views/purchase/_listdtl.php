@@ -1,6 +1,8 @@
 <?php
     if($this->record['activity_status'] == "Run"){
-        echo "<tr class='text-success'>";
+        echo "<tr class='text-primary'>";
+    }elseif($this->record['activity_status'] == "Wait"){
+        echo "<tr class='text-yellow'>";
     }else{
         echo "<tr class='text-warning'>";
     }

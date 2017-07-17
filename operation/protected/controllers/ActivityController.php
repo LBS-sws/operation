@@ -68,10 +68,18 @@ class ActivityController extends Controller
         $model = new ActivityForm('delete');
         if (isset($_POST['ActivityForm'])) {
             $model->attributes = $_POST['ActivityForm'];
-            $model->saveData();
-            Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Record Deleted'));
+            if($model->deleteValidate()){
+                $model->saveData();
+                Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Record Deleted'));
+                $this->redirect(Yii::app()->createUrl('activity/index'));
+            }else{
+                $model->scenario = "edit";
+                Dialog::message(Yii::t('dialog','Validation Message'), Yii::t("procurement","This category has been used and cannot be deleted"));
+                $this->render('form',array('model'=>$model,));
+            }
+        }else{
+            $this->redirect(Yii::app()->createUrl('activity/index'));
         }
-        $this->redirect(Yii::app()->createUrl('activity/index'));
     }
 
 }

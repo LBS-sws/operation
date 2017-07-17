@@ -41,6 +41,11 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                         echo TbHtml::button('<span class="fa fa-upload"></span> '.Yii::t('procurement','Shipments'), array(
                             'submit'=>Yii::app()->createUrl('delivery/audit')));
                     }
+                    if($model->status == "approve"){
+                        //退回
+                        echo TbHtml::button('<span class="fa fa-backward"></span> '.Yii::t('procurement','Back Status'), array(
+                            'submit'=>Yii::app()->createUrl('delivery/backward')));
+                    }
                     ?>
                 <?php endif ?>
             </div>
@@ -101,13 +106,14 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                     <table class="table table-bordered table-striped disabled" id="table-change">
                         <thead>
                         <tr>
-                            <td width="12%"><?php echo Yii::t("procurement","Goods Code")?></td>
-                            <td><?php echo Yii::t("procurement","Goods Name")?></td>
-                            <td width="11%"><?php echo Yii::t("procurement","Type")?></td>
-                            <td width="10%"><?php echo Yii::t("procurement","Unit")?></td>
-                            <td width="12%"><?php echo Yii::t("procurement","Inventory")?></td>
-                            <td width="10%"><?php echo Yii::t("procurement","Goods Number")?></td>
-                            <td width="10%"><?php echo Yii::t("procurement","Actual Number")?></td>
+                            <td width="15%"><?php echo Yii::t("procurement","Goods Name")?></td>
+                            <td width="8%"><?php echo Yii::t("procurement","Type")?></td>
+                            <td width="8%"><?php echo Yii::t("procurement","Unit")?></td>
+                            <td width="8%"><?php echo Yii::t("procurement","Inventory")?></td>
+                            <td width="8%"><?php echo Yii::t("procurement","Goods Number")?></td>
+                            <td width="12%"><?php echo Yii::t("procurement","Demand Note")?></td>
+                            <td width="8%"><?php echo Yii::t("procurement","Actual Number")?></td>
+                            <td width="12%"><?php echo Yii::t("procurement","Headquarters Note")?></td>
                         </tr>
                         </thead>
                         <tbody>
@@ -116,19 +122,21 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                         foreach ($model->goods_list as $key => $val){
                             $con_num = empty($val['id'])?$key:$val['id'];
                             $tableTr = "<tr datanum='$con_num'>";
-
-                            $tableTr.="<td><input type='text' class='form-control testInput' readonly name='DeliveryForm[goods_list][$con_num][goods_code]' value='".$val['goods_code']."'>";
+                            $val['confirm_num'] = empty($val['confirm_num'])?$val['goods_num']:$val['confirm_num'];
+                            $tableTr.="<td><input type='text' class='form-control testInput' readonly name='DeliveryForm[goods_list][$con_num][name]' value='".$val['name']."'>";
                             $tableTr.="<input type='hidden' name='DeliveryForm[goods_list][$con_num][goods_id]' value='".$val['goods_id']."'>";
                             $tableTr.="<input type='hidden' name='DeliveryForm[goods_list][$con_num][id]' value='".$val['id']."'></td>";
-                            $tableTr.="<td><input type='text' class='form-control name' readonly name='DeliveryForm[goods_list][$con_num][name]' value='".$val['name']."'></td>";
                             $tableTr.="<td><input type='text' class='form-control type' readonly name='DeliveryForm[goods_list][$con_num][type]' value='".$val['type']."'></td>";
                             $tableTr.="<td><input type='text' class='form-control unit' readonly name='DeliveryForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
                             $tableTr.="<td><input type='text' class='form-control unit' readonly name='DeliveryForm[goods_list][$con_num][inventory]' value='".$val['inventory']."'></td>";
                             $tableTr.="<td><input type='number' class='form-control' readonly name='DeliveryForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
+                            $tableTr.="<td><input type='text' class='form-control' readonly name='DeliveryForm[goods_list][$con_num][note]' value='".$val['note']."'></td>";
                             if($model->status == "sent" || $model->status == "read"){
                                 $tableTr.="<td><input type='number' class='form-control numChange goods_num' name='DeliveryForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
+                                $tableTr.="<td><input type='text' class='form-control' name='DeliveryForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
                             }else{
                                 $tableTr.="<td><input type='number' class='form-control numChange goods_num' readonly name='DeliveryForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
+                                $tableTr.="<td><input type='text' class='form-control' readonly name='DeliveryForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
                             }
 
                             $tableTr.="</tr>";

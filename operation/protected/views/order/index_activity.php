@@ -28,7 +28,7 @@ $this->pageTitle=Yii::app()->name . ' - Add Order';
             <div class="btn-group" role="group">
                 <?php
                 //var_dump(Yii::app()->session['rw_func']);
-                echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('procurement','Fast Order'), array(
+                echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('procurement','Add Fast Order'), array(
                     'submit'=>Yii::app()->createUrl('order/new?index=0'),
                 ));
                 ?>

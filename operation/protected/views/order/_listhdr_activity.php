@@ -30,4 +30,7 @@
         ;
         ?>
     </th>
+    <th class="text-primary">
+        <?php echo Yii::t("procurement","Status");?>
+    </th>
 </tr>

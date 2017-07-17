@@ -41,12 +41,18 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
                 echo TbHtml::button('<span class="fa fa-upload"></span> '.Yii::t('procurement','Shipments'), array(
                     'submit'=>Yii::app()->createUrl('Purchase/audit')));
             }
+            if($model->status == "approve"){
+                //退回
+                echo TbHtml::button('<span class="fa fa-backward"></span> '.Yii::t('procurement','Back Status'), array(
+                    'submit'=>Yii::app()->createUrl('Purchase/backward')));
+            }
 			?>
 <?php endif ?>
 	</div>
 
             <div class="btn-group pull-right" role="group">
-                <?php if ($model->scenario!='new'){
+                <?php
+                if ($model->scenario!='new'){
                     if($model->status == "sent" || $model->status == "read") {
                         //拒絕
                         echo TbHtml::button('<span class="fa fa-mail-reply-all"></span> ' . Yii::t('procurement', 'Reject'), array(
@@ -55,7 +61,10 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
                     //流程
                     echo TbHtml::button('<span class="fa fa-file-text-o"></span> '.Yii::t('misc','Flow'), array(
                         'name'=>'btnFlow','id'=>'btnFlow','data-toggle'=>'modal','data-target'=>'#flowinfodialog'));
-                } ?>
+                    echo TbHtml::button('<span class="fa fa-backward"></span> '.Yii::t('procurement','Down'), array(
+                        'submit'=>Yii::app()->createUrl('Purchase/downorder',array("index"=>$model->id))));
+                }
+                ?>
             </div>
 	</div></div>
 
@@ -94,35 +103,50 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
                     <table class="table table-bordered table-striped disabled" id="table-change">
                         <thead>
                         <tr>
-                            <td width="12%"><?php echo Yii::t("procurement","Goods Code")?></td>
-                            <td><?php echo Yii::t("procurement","Goods Name")?></td>
+                            <?php
+                                $currencyType = $model->order_class=="Domestic"?"RMB":"$";
+                            ?>
+                            <td width="20%"><?php echo Yii::t("procurement","Goods Name")?></td>
                             <td width="11%"><?php echo Yii::t("procurement","Type")?></td>
-                            <td width="10%"><?php echo Yii::t("procurement","Unit")?></td>
-                            <td width="12%"><?php echo Yii::t("procurement","Price（RMB）")?></td>
+                            <td width="8%"><?php echo Yii::t("procurement","Unit")?></td>
+                            <td width="10%"><?php echo Yii::t("procurement","Price（".$currencyType."）")?></td>
+                            <td width="10%"><?php echo Yii::t("procurement","Demand Note")?></td>
                             <td width="10%"><?php echo Yii::t("procurement","Goods Number")?></td>
                             <td width="10%"><?php echo Yii::t("procurement","Actual Number")?></td>
-                            <td width="12%"><?php echo Yii::t("procurement","Total（RMB）")?></td>
+                            <td width="10%"><?php echo Yii::t("procurement","Headquarters Note")?></td>
+                            <td width="10%"><?php echo Yii::t("procurement","Total（".$currencyType."）")?></td>
                         </tr>
                         </thead>
                         <tbody>
 
                         <?php
+                        $classify = ClassifyForm::getClassifyList();
+                        $stickiesContentList = StickiesForm::getStickiesContentList();
                             foreach ($model->goods_list as $key => $val){
                                 $con_num = empty($val['id'])?$key:$val['id'];
                                 $tableTr = "<tr datanum='$con_num'>";
 
-                                $tableTr.="<td><input type='text' class='form-control testInput' readonly name='PurchaseForm[goods_list][$con_num][goods_code]' value='".$val['goods_code']."'>";
+                                $tableTr.="<td><div class='input-group'>";
+                                $tableTr.="<input type='hidden' name='PurchaseForm[goods_list][$con_num][id]' value='".$val['id']."'>";
+                                $tableTr.="<input type='hidden' class='stickies_id' name='PurchaseForm[goods_list][$con_num][stickies_id]' value='".$val['stickies_id']."'>";
+                                $tableTr.="<input type='text' readonly class='form-control testInput' name='PurchaseForm[goods_list][$con_num][name]' value='".$val['name']."'>";
                                 $tableTr.="<input type='hidden' name='PurchaseForm[goods_list][$con_num][goods_id]' value='".$val['goods_id']."'>";
-                                $tableTr.="<input type='hidden' name='PurchaseForm[goods_list][$con_num][id]' value='".$val['id']."'></td>";
-                                $tableTr.="<td><input type='text' class='form-control name' readonly name='PurchaseForm[goods_list][$con_num][name]' value='".$val['name']."'></td>";
+                                if(!empty($val['stickies_id'])){
+                                    $tableTr.='<div class="input-group-btn changeHelp" content-id="'.$val['stickies_id'].'"><span class="fa fa-exclamation-circle"></span></div>';
+                                }
+                                $tableTr.="</div></td>";
+
                                 $tableTr.="<td><input type='text' class='form-control type' readonly name='PurchaseForm[goods_list][$con_num][type]' value='".$val['type']."'></td>";
                                 $tableTr.="<td><input type='text' class='form-control unit' readonly name='PurchaseForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
                                 $tableTr.="<td><input type='text' class='form-control price' readonly name='PurchaseForm[goods_list][$con_num][price]' value='".sprintf("%.2f", $val['price'])."'></td>";
+                                $tableTr.="<td><input type='text' class='form-control' readonly name='PurchaseForm[goods_list][$con_num][note]' value='".$val['note']."'></td>";
                                 $tableTr.="<td><input type='number' class='form-control' readonly name='PurchaseForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
                                 if($model->status == "sent" || $model->status == "read"){
                                     $tableTr.="<td><input type='number' class='form-control numChange goods_num' name='PurchaseForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
+                                    $tableTr.="<td><input type='text' class='form-control' name='PurchaseForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
                                 }else{
                                     $tableTr.="<td><input type='number' class='form-control numChange goods_num' readonly name='PurchaseForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
+                                    $tableTr.="<td><input type='text' class='form-control' readonly name='PurchaseForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
                                 }
                                 $tableTr.="<td><input type='text' class='form-control sum' readonly></td>";
 
@@ -133,7 +157,7 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
                         </tbody>
                         <tfoot>
                         <tr>
-                            <td colspan="7"></td>
+                            <td colspan="8"></td>
                             <td class="text-success fa-2x">0</td>
                         </tr>
                         </tfoot>
@@ -144,9 +168,7 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
             <div class="form-group">
                 <?php echo $form->labelEx($model,'activity_id',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
-                    <?php echo $form->dropDownList($model, 'activity_id',$model->getActivityToNow(),
-                        array('disabled'=>true)
-                    ); ?>
+                    <input class="form-control" type="text" readonly value="<?php echo OrderList::getActivityTitleToId($model->activity_id);?>">
                 </div>
             </div>
 
@@ -166,8 +188,15 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
     $this->renderPartial('//site/flowlist',array('model'=>$model));
 ?>
 <?php
+$stickiesList = json_encode(StickiesForm::getStickiesContentList());
 $js = '
 $("body").delegate(".numChange","input",goodsTotalPrice);
+$("body").delegate(".changeHelp","mouseover",function () {
+    addContentHelp($(this),'.$stickiesList.');
+  });
+$("body").delegate(".changeHelp","mouseout",function () {
+    $(this).find(".content-help").remove();
+  });
 goodsTotalPrice();
 ';
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
@@ -176,7 +205,7 @@ Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_R
 <?php
 $js = Script::genReadonlyField();
 Yii::app()->clientScript->registerScript('readonlyClass',$js,CClientScript::POS_READY);
-Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/goodsChange.js", CClientScript::POS_END);
+Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/goodsChangeTwo.js", CClientScript::POS_END);
 Yii::app()->clientScript->registerCssFile(Yii::app()->baseUrl . "/css/goodsChange.css");
 ?>
 

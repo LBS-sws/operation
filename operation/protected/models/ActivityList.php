@@ -51,29 +51,17 @@ class ActivityList extends CListPageModel
     }
 
 
-	public function retrieveDataByPage($pageNum=1,$type="active")
+	public function retrieveDataByPage($pageNum=1)
 	{
 		$city = Yii::app()->user->city();
-		$date = date("Y-m-d");
-		if($type === "active"){
-            $sql1 = "select *
+        $sql1 = "select *
 				from opr_order_activity
 				where id>0 
 			";
-            $sql2 = "select count(id)
+        $sql2 = "select count(id)
 				from opr_order_activity
 				where id>0 
 			";
-        }else{
-            $sql1 = "select *
-				from opr_order_activity
-				where start_time < '$date' AND end_time >'$date'
-			";
-            $sql2 = "select count(id)
-				from opr_order_activity
-				where start_time < '$date' AND end_time >'$date'
-			";
-        }
 		$clause = "";
 		if (!empty($this->searchField) && !empty($this->searchValue)) {
 			$svalue = str_replace("'","\'",$this->searchValue);
@@ -117,7 +105,8 @@ class ActivityList extends CListPageModel
 						'order_class'=>Yii::t("procurement",$record['order_class']),
 						'num'=>$record['num'],
 						'start_time'=>$record['start_time'],
-						'end_time'=>$record['end_time']
+						'end_time'=>$record['end_time'],
+                        'activity_status'=>PurchaseList::compareDate($record['start_time'],$record['end_time'])
 					);
 			}
 		}

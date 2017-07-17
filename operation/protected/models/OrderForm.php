@@ -24,7 +24,9 @@ class OrderForm extends CFormModel
             array(
             "id"=>"",
             "goods_id"=>"",
-            "goods_code"=>"",
+            "classify_id"=>"",
+            "stickies_id"=>"",
+            "note"=>"",
             "name"=>"",
             "type"=>"",
             "unit"=>"",
@@ -59,6 +61,7 @@ class OrderForm extends CFormModel
             array('goods_list','validateGoods'),
             //array('activity_id','required','on'=>'audit'),
             array('activity_id','validateActivity','on'=>'audit'),
+            array('remark','required','on'=>'reject'),
             //array('order_num','numerical','allowEmpty'=>true,'integerOnly'=>true),
             //array('order_num','in','range'=>range(0,600)),
 		);
@@ -88,13 +91,17 @@ class OrderForm extends CFormModel
                 $this->addError($attribute,$message);
                 return false;
             }else{
-                $list = PurchaseView::getGoodsToGoodsId($goods["goods_id"]);
+                $list = $this->getOneGoodsToId($goods["goods_id"],$this->order_class);
                 if (empty($list)){
-                    $message = Yii::t('procurement','Not Font Goods').$goods["goods_id"]."a";
+                    $message = Yii::t('procurement','Not Font Goods').$goods["name"];
                     $this->addError($attribute,$message);
                     return false;
                 }elseif (intval($list["big_num"])<intval($goods["goods_num"])){
                     $message = $list["name"]." ".Yii::t('procurement','Max Number is').$list["big_num"];
+                    $this->addError($attribute,$message);
+                    return false;
+                }elseif (intval($list["small_num"])>intval($goods["goods_num"])){
+                    $message = $list["name"]." ".Yii::t('procurement','Min Number is').$list["small_num"];
                     $this->addError($attribute,$message);
                     return false;
                 }
@@ -117,7 +124,7 @@ class OrderForm extends CFormModel
                         array(':activity_id'=>$this->activity_id,':city'=>$city,':order_class'=>$this->order_class))->queryAll();
                 $num = $rows?count($rows):0;
                 $rs = Yii::app()->db->createCommand()->select()->from("opr_order_activity")
-                    ->where('id=:id and start_time<:date and end_time>:date and num>:num and order_class=:order_class',
+                    ->where('id=:id and start_time<=:date and end_time>=:date and num>=:num and order_class=:order_class',
                         array(':id'=>$this->activity_id,':date'=>$nowDate,':num'=>$num,':order_class'=>$this->order_class))->queryAll();
                 if(!$rs){
                     $message = Yii::t('procurement',$this->order_class).Yii::t('procurement',' Order for Over time Or Order Number Quantity over limit');
@@ -141,7 +148,7 @@ class OrderForm extends CFormModel
         }
         if (is_numeric($this->activity_id)){
             $rs = Yii::app()->db->createCommand()->select("order_class")
-                ->from("opr_order_activity")->where('start_time < :date AND end_time >:date AND id =:id',
+                ->from("opr_order_activity")->where('start_time <= :date AND end_time >=:date AND id =:id',
                     array(':date'=>date("Y-m-d"),":id"=>$this->activity_id))->queryAll();
             if($rs){
                 $this->order_class = $rs[0]["order_class"];
@@ -159,22 +166,85 @@ class OrderForm extends CFormModel
 
     //根據訂單id查訂單所有物品
     public function getGoodsListToId($order_id){
-        $rs = Yii::app()->db->createCommand()->select("b.name,b.price,b.goods_code,b.unit,b.type,a.goods_num,a.confirm_num,a.id,a.goods_id")
-            ->from("opr_order_goods a,opr_goods b")->where('a.order_id=:order_id and a.goods_id = b.id',array(':order_id'=>$order_id))->queryAll();
+        $arr=array();
+        $order_class=Yii::app()->db->createCommand()->select("order_class")->from("opr_order")->where("id=:id",array(":id"=>$order_id))->queryAll();
+        $order_class=$order_class[0]["order_class"];
+        $rows=Yii::app()->db->createCommand()->select()->from("opr_order_goods")->where("order_id=:order_id",array(":order_id"=>$order_id))->queryAll();
+        foreach ($rows as $row){
+            $goods = OrderForm::getOneGoodsToId($row["goods_id"],$order_class);
+            $list = array(
+                "id"=>$row["id"],
+                "goods_id"=>$row["goods_id"],
+                "goods_code"=>$goods["goods_code"],
+                "name"=>$goods["name"],
+                "type"=>$goods["type"],
+                "unit"=>$goods["unit"],
+                "price"=>$goods["price"],
+                "classify_id"=>$goods["classify_id"],
+                "stickies_id"=>empty($goods["stickies_id"])?"":$goods["stickies_id"]
+            );
+            if(!empty($goods["net_weight"])){
+                $list["net_weight"] = $goods["net_weight"];
+            }
+            if(!empty($goods["gross_weight"])){
+                $list["gross_weight"] = $goods["gross_weight"];
+            }
+            if(!empty($goods["len"])){
+                $list["LWH"] = $goods["len"]."×".$goods["width"]."×".$goods["height"];
+            }
+            $list["goods_num"] = $row["goods_num"];
+            $list["confirm_num"] = empty($row["confirm_num"])?$row["goods_num"]:$row["confirm_num"];
+            $list["note"] = $row["note"];
+            $list["remark"] = $row["remark"];
+            array_push($arr,$list);
+        }
+        return $arr;
+    }
+
+
+    //獲取物品列表
+    public function getGoodsList($order_class=0){
+        switch ($order_class){
+            case "Import":
+                $from = "opr_goods_im";
+                break;
+            case "Domestic":
+                $from = "opr_goods_do";
+                break;
+            case "Fast":
+                $from = "opr_goods_fa";
+                break;
+        }
+        $rs = Yii::app()->db->createCommand()->select()->from($from)->queryAll();
         return $rs;
     }
 
-    //獲取物品列表
-    public function getGoodsList(){
-        $rs = Yii::app()->db->createCommand()->select()->from("opr_goods")->queryAll();
-        return $rs;
+    //獲取單個物品
+    public function getOneGoodsToId($goods_id,$order_class=0){
+        switch ($order_class){
+            case "Import":
+                $from = "opr_goods_im";
+                break;
+            case "Domestic":
+                $from = "opr_goods_do";
+                break;
+            case "Fast":
+                $from = "opr_goods_fa";
+                break;
+        }
+        $rs = Yii::app()->db->createCommand()->select()->from($from)->where("id=:id",array(":id"=>$goods_id))->queryAll();
+        if($rs){
+            return $rs[0];
+        }else{
+            return array();
+        }
     }
 
     //根據當前時間點輸出可用活動
     public function getActivityToNow(){
         $arr[$this->activity_id] = OrderList::getActivityTitleToId($this->activity_id);
         $rows = Yii::app()->db->createCommand()->select("id,activity_title")->from("opr_order_activity")
-            ->where('start_time <:date and end_time >:date and id != :id',
+            ->where('start_time <=:date and end_time >=:date and id != :id',
                 array(':date'=>date("Y-m-d"),':id'=>$this->activity_id))->queryAll();
         if($rows){
             foreach ($rows as $row){
@@ -233,6 +303,8 @@ class OrderForm extends CFormModel
 	}
 
 	protected function saveGoods(&$connection) {
+        $oldOrderStatus = Yii::app()->db->createCommand()->select()->from("opr_order")
+            ->where("id=:id",array(":id"=>$this->id))->queryAll();
 		$sql = '';
         $goodsBool = true;
         $insetBool = false;
@@ -367,6 +439,7 @@ class OrderForm extends CFormModel
                         'goods_id'=>$goods["goods_id"],
                         'order_id'=>$this->id,
                         'goods_num'=>$goods["goods_num"],
+                        'note'=>$goods["note"],
                         'lcu'=>$uid,
                         'lcd'=>date('Y-m-d H:i:s'),
                     ));
@@ -375,12 +448,25 @@ class OrderForm extends CFormModel
                     Yii::app()->db->createCommand()->update('opr_order_goods', array(
                         'goods_id'=>$goods["goods_id"],
                         'goods_num'=>$goods["goods_num"],
+                        'note'=>$goods["note"],
                         'luu'=>$uid,
                         'lud'=>date('Y-m-d H:i:s'),
                     ), 'id=:id', array(':id'=>$goods["id"]));
                 }
             }
         }
+
+        //發送郵件
+/*        if($oldOrderStatus){
+            if($oldOrderStatus[0]["status"] != $this->status){
+
+            }
+        }else{
+            if($this->scenario=='new'){
+                $html = "<p>採購活動：".PurchaseForm::."</p>";
+                OrderGoods::formEmail("營運系統：要求審核訂單（訂單編號：".$this->order_code."）",$html);
+            }
+        }*/
 		return true;
 	}
 }

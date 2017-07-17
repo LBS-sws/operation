@@ -66,18 +66,26 @@ return array(
 
     //沈超添加開始
     'Order'=>'訂單',
-    'Activity'=>'活動',
+    'Activity'=>'中央採購',
     'Add Order'=>'添加訂單',
     'Order Access'=>'訂單權限',
     'Order List'=>'訂單列表',
     'Order Purchase'=>'訂單採購',
 
-    'Technician'=>'技術員',
+    'Technician'=>'領料管理',
+    'Technician List'=>'技術員領料列表',
+    'Goods Entry'=>'物品輸入',
+    'Goods List'=>'物品列表',
     'Goods Summary Entry'=>'物品管理',
-    'Order Activity'=>'訂單活動',
-    'Fast Order'=>'快速訂單',
-    'Technician take Goods'=>'技術員拿貨',
+    'Import Summary Entry'=>'進口貨物品管理',
+    'Domestic Summary Entry'=>'國內貨物品管理',
+    'Fast Summary Entry'=>'快速貨物品管理',
+    'Order Activity'=>'採購週期明細',
+    'Fast Order'=>'快速貨訂單管理',
+    'Technician take Goods'=>'技術員領料審批',
     'Warehouse Info'=>'倉庫信息',
+    'Stickies Summary Entry'=>'標籤管理',
+    'Classify Summary Entry'=>'分類管理',
     //沈超添加結束
 );
 ?>

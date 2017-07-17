@@ -47,36 +47,24 @@ class PurchaseView extends CFormModel
 	}
 
 	public function getHeaderList() {
-		return array(
-		    //"order_class"=>"Order Class",
-		    "goods_class"=>"Goods Class",
-		    //"city_class"=>"City Class"
+		$arr = array(
+		    "price_class"=>"Price Class"
         );
+		if($this->order_class == "Import"){
+		    $arr["weight_class"]="Weight Class";
+		    $arr["volume_class"]="Volume Class";
+        }
+		return $arr;
 	}
 	public function getBodyList($str) {
 	    $html = "";
 	    switch ($str){
-            case "order_class":
-                $orderClass = PurchaseList::getOrderSumToId($this->id);
-                $sum = 0;
-                $html="<p>&nbsp;</p><div class='col-lg-offset-3 col-lg-6'><table class='table table-bordered table-striped'><thead><tr>
-                    <th>".Yii::t("procurement","Order Class")."</th>
-                    <th>".Yii::t("procurement","Order Sum")."</th>
-                    </tr></thead><tbody>";
-                foreach ($orderClass["list"] as $key => $num){
-                    $sum+=intval($num);
-                    $html.="<tr>
-                        <td>".Yii::t("procurement",$key)."</td>
-                        <td>".$num."</td>
-                        </tr>";
-                }
-                $html.="</tbody><tfoot><td>&nbsp;</td><td class='fa-2x'>$sum</td></tfoot></table></div>";
-                break;
-            case "goods_class":
+            case "price_class":
                 $goodsClass = $this->getGoodsToActivityId($this->id);
                 $html="<p>&nbsp;</p>";
                 foreach ($goodsClass as $key => $list){
-                    $html.="<legend>".Yii::t("procurement",$key)."</legend>";
+                    $classifyName = ClassifyForm::getClassifyToId($key);
+                    $html.="<legend>$classifyName</legend>";
                     $sum = 0;
                     $exSum = 0;
                     $html.="<table class='table table-bordered table-striped'><thead><tr>
@@ -89,60 +77,95 @@ class PurchaseView extends CFormModel
                             <th>".Yii::t("procurement","Total（RMB）")."</th>
                             </tr></thead><tbody>";
                     foreach ($list as $goods){
+                        //sprintf(".2%",$aaa);
                         $sum+=floatval($goods["price"])*intval($goods["confirm_num"]);
                         $exSum+=intval($goods["goods_num"])*floatval($goods["price"]);
                         $html.="<tr>
                         <td>".$goods["goods_code"]."</td>
                         <td>".$goods["name"]."</td>
-                        <td>".$goods["price"]."</td>
+                        <td>".sprintf("%.2f",$goods["price"])."</td>
                         <td>".$goods["goods_num"]."</td>
                         <td>".$goods["confirm_num"]."</td>
-                        <td>".(intval($goods["goods_num"])*floatval($goods["price"]))."</td>
-                        <td>".(floatval($goods["price"])*intval($goods["confirm_num"]))."</td>
+                        <td>".sprintf("%.2f",intval($goods["goods_num"])*floatval($goods["price"]))."</td>
+                        <td>".sprintf("%.2f",floatval($goods["price"])*intval($goods["confirm_num"]))."</td>
                         </tr>";
                     }
-                    $html.="</tbody><tfoot><tr><td colspan='5'></td><td class='fa-2x'>$exSum</td><td class='fa-2x'>$sum</td></tr></tfoot></table>";
+                    $html.="</tbody><tfoot><tr><td colspan='5'></td><td class='fa-2x'>".sprintf("%.2f",$exSum)."</td><td class='fa-2x'>".sprintf("%.2f",$sum)."</td></tr></tfoot></table>";
+                }
+                //$html.="<h3>&nbsp;</h3>";
+                break;
+            case "weight_class":
+                $goodsClass = $this->getGoodsToActivityId($this->id);
+                $html="<p>&nbsp;</p>";
+                foreach ($goodsClass as $key => $list){
+                    $classifyName = ClassifyForm::getClassifyToId($key);
+                    $html.="<legend>$classifyName</legend>";
+                    $sum = 0;
+                    $exSum = 0;
+                    $html.="<table class='table table-bordered table-striped'><thead><tr>
+                            <th>".Yii::t("procurement","Goods Code")."</th>
+                            <th>".Yii::t("procurement","Goods Name")."</th>
+                            <th>".Yii::t("procurement","Type")."</th>
+                            <th>".Yii::t("procurement","Unit")."</th>
+                            <th>".Yii::t("procurement","Gross Weight（kg）")."</th>
+                            <th>".Yii::t("procurement","Net Weight（kg）")."</th>
+                            <th>".Yii::t("procurement","Confirm Number")."</th>
+                            <th>".Yii::t("procurement","Total Gross Weight（kg）")."</th>
+                            <th>".Yii::t("procurement","Total Net Weight（kg）")."</th>
+                            </tr></thead><tbody>";
+                    foreach ($list as $goods){
+                        $sum+=floatval($goods["gross_weight"])*intval($goods["confirm_num"]);
+                        $exSum+=intval($goods["confirm_num"])*floatval($goods["net_weight"]);
+                        $html.="<tr>
+                        <td>".$goods["goods_code"]."</td>
+                        <td>".$goods["name"]."</td>
+                        <td>".$goods["type"]."</td>
+                        <td>".$goods["unit"]."</td>
+                        <td>".$goods["gross_weight"]."</td>
+                        <td>".$goods["net_weight"]."</td>
+                        <td>".$goods["confirm_num"]."</td>
+                        <td>".(floatval($goods["gross_weight"])*intval($goods["confirm_num"]))."</td>
+                        <td>".(floatval($goods["net_weight"])*intval($goods["confirm_num"]))."</td>
+                        </tr>";
+                    }
+                    $html.="</tbody><tfoot><tr><td colspan='7'></td><td class='fa-2x'>$sum</td><td class='fa-2x'>$exSum</td></tr></tfoot></table>";
                 }
                 break;
-            case "city_class":
-                $cityClass = $this->getCityClassToActivityId($this->id);
-                $sum = 0;
+            case "volume_class":
+                $goodsClass = $this->getGoodsToActivityId($this->id);
                 $html="<p>&nbsp;</p>";
-                $html.="<table class='table table-bordered table-striped'><thead><tr>
-                            <th>".Yii::t("procurement","City Class")."</th>
-                            <th>".Yii::t("procurement","Import").Yii::t("procurement","Order")."</th>
-                            <th>".Yii::t("procurement","Domestic").Yii::t("procurement","Order")."</th>
-                            <th>".Yii::t("procurement","Fast").Yii::t("procurement","Order")."</th>
-                            <th>".Yii::t("procurement","Order Sum")."</th>
+                foreach ($goodsClass as $key => $list){
+                    $classifyName = ClassifyForm::getClassifyToId($key);
+                    $html.="<legend>$classifyName</legend>";
+                    $sum = 0;
+                    $exSum = 0;
+                    $html.="<table class='table table-bordered table-striped'><thead><tr>
+                            <th>".Yii::t("procurement","Goods Code")."</th>
+                            <th>".Yii::t("procurement","Goods Name")."</th>
+                            <th>".Yii::t("procurement","Type")."</th>
+                            <th>".Yii::t("procurement","Unit")."</th>
+                            <th>".Yii::t("procurement","Length×Width×Height（cm）")."</th>
+                            <th>".Yii::t("procurement","Confirm Number")."</th>
+                            <th>".Yii::t("procurement","Total Volume")."</th>
                             </tr></thead><tbody>";
-                foreach ($cityClass as $key => $list){
-                    $sum +=$list["Import"]+$list["Domestic"]+$list["Fast"];
-                    $html.="<tr>
-                        <td>".Yii::t("procurement",$key)."</td>
-                        <td>".$list["Import"]."</td>
-                        <td>".$list["Domestic"]."</td>
-                        <td>".$list["Fast"]."</td>
-                        <td>".($list["Import"]+$list["Domestic"]+$list["Fast"])."</td>
+                    foreach ($list as $goods){
+                        //$exSum+=intval($goods["confirm_num"])*floatval($goods["net_weight"]);
+                        $html.="<tr>
+                        <td>".$goods["goods_code"]."</td>
+                        <td>".$goods["name"]."</td>
+                        <td>".$goods["type"]."</td>
+                        <td>".$goods["unit"]."</td>
+                        <td>".$goods["len"]."×".$goods["width"]."×".$goods["height"]."</td>
+                        <td>".$goods["confirm_num"]."</td>
+                        <td>"."沒有公式，無法計算"."</td>
                         </tr>";
+                    }
+                    $html.="</tbody><tfoot><tr><td colspan='6'></td><td class='fa-2x'>&nbsp;</td></tr></tfoot></table>";
                 }
-                $html.="</tbody><tfoot><tr><td colspan='4'></td><td class='fa-2x'>$sum</td></tr></tfoot></table>";
                 break;
         }
         return $html;
 	}
-
-	//根據物品id獲取物品信息
-    public function getGoodsToGoodsId($goods_id){
-        $rows = Yii::app()->db->createCommand()->select("*")
-            ->from("opr_goods")
-            ->where('id = :id',array(':id'=>$goods_id))
-            ->queryAll();
-        if($rows){
-            return $rows[0];
-        }else{
-            return array();
-        }
-    }
 
 	public function getGoodsToActivityId($activity_id){
         $arr=array();
@@ -155,25 +178,29 @@ class PurchaseView extends CFormModel
         // AND c.goods_id = d.id
         if($rows){
             foreach ($rows as $row){
-                if(empty($arr[$row["goods_class"]][$row["id"]])){
-                    $goods=$this->getGoodsToGoodsId($row["id"]);
-                    $arr[$row["goods_class"]][$row["id"]] = array(
+                $goods=OrderForm::getOneGoodsToId($row["id"],$row["goods_class"]);//$row["id"]
+                if(empty($arr[$goods["classify_id"]][$row["id"]])){
+                    $arr[$goods["classify_id"]][$row["id"]] = array(
                         "goods_code"=>$goods["goods_code"],
                         "price"=>$goods["price"],
-                        "goods_class"=>$goods["goods_class"],
                         "name"=>$goods["name"],
                         "type"=>$goods["type"],
                         "unit"=>$goods["unit"],
+                        "gross_weight"=>empty($goods["gross_weight"])?"":$goods["gross_weight"],
+                        "net_weight"=>empty($goods["net_weight"])?"":$goods["net_weight"],
+                        "len"=>empty($goods["len"])?"":$goods["len"],
+                        "width"=>empty($goods["width"])?"":$goods["width"],
+                        "height"=>empty($goods["height"])?"":$goods["height"],
                     );
                 }
-                if(empty($arr[$row["goods_class"]][$row["id"]]["goods_num"])){
-                    $arr[$row["goods_class"]][$row["id"]]["goods_num"] = 0;
+                if(empty($arr[$goods["classify_id"]][$row["id"]]["goods_num"])){
+                    $arr[$goods["classify_id"]][$row["id"]]["goods_num"] = 0;
                 }
-                if(empty($arr[$row["goods_class"]][$row["id"]]["confirm_num"])){
-                    $arr[$row["goods_class"]][$row["id"]]["confirm_num"] = 0;
+                if(empty($arr[$goods["classify_id"]][$row["id"]]["confirm_num"])){
+                    $arr[$goods["classify_id"]][$row["id"]]["confirm_num"] = 0;
                 }
-                $arr[$row["goods_class"]][$row["id"]]["goods_num"]+=intval($row["goods_num"]);
-                $arr[$row["goods_class"]][$row["id"]]["confirm_num"]+=intval($row["confirm_num"]);
+                $arr[$goods["classify_id"]][$row["id"]]["goods_num"]+=intval($row["goods_num"]);
+                $arr[$goods["classify_id"]][$row["id"]]["confirm_num"]+=intval($row["confirm_num"]);
             }
         }
         return $arr;

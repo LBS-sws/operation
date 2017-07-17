@@ -65,13 +65,21 @@ class WarehouseController extends Controller
 
     public function actionDelete()
     {
-        $model = new GoodsForm('delete');
-        if (isset($_POST['GoodsForm'])) {
-            $model->attributes = $_POST['GoodsForm'];
-            $model->saveData();
-            Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Record Deleted'));
+        $model = new WarehouseForm('delete');
+        if (isset($_POST['WarehouseForm'])) {
+            $model->attributes = $_POST['WarehouseForm'];
+            if($model->deleteValidate()){
+                $model->saveData();
+                Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Record Deleted'));
+                $this->redirect(Yii::app()->createUrl('warehouse/index'));
+            }else{
+                $model->scenario = "edit";
+                Dialog::message(Yii::t('dialog','Validation Message'), Yii::t("procurement","This goods has been used and cannot be deleted"));
+                $this->render('form',array('model'=>$model,));
+            }
+        }else{
+            $this->redirect(Yii::app()->createUrl('warehouse/index'));
         }
-        $this->redirect(Yii::app()->createUrl('goods/index'));
     }
 
 }

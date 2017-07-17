@@ -1,30 +1,32 @@
 <?php
 
-class GoodsForm extends CFormModel
+class GoodsDoForm extends CFormModel
 {
 	public $id;
 	public $goods_code;
 	public $name;
-	public $goods_class;
+	public $classify_id;
 	public $type;
 	public $unit;
 	public $price;
 	public $big_num;
 	public $small_num;
-	public $luu;
-	public $lcu;
+	public $origin;
+	public $stickies_id;
 
 	public function attributeLabels()
 	{
 		return array(
             'goods_code'=>Yii::t('procurement','Goods Code'),
             'name'=>Yii::t('procurement','Name'),
-            'goods_class'=>Yii::t('procurement','Goods Class'),
+            'classify_id'=>Yii::t('procurement','Classify'),
+            'stickies_id'=>Yii::t('procurement','Stickies'),
             'type'=>Yii::t('procurement','Type'),
             'unit'=>Yii::t('procurement','Unit'),
             'price'=>Yii::t('procurement','Price（RMB）'),
-            'big_num'=>Yii::t('procurement','Headquarters Number'),
-            'small_num'=>Yii::t('procurement','Area Number'),
+            'big_num'=>Yii::t('procurement','Max Number'),
+            'small_num'=>Yii::t('procurement','Min Number'),
+            'origin'=>Yii::t('procurement','Origin'),
 		);
 	}
 
@@ -34,17 +36,19 @@ class GoodsForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, goods_code, name, goods_class, type, unit, price, big_num, small_num, lcu, luu','safe'),
+			array('id, goods_code, name, classify_id, type, unit, price, big_num, small_num, stickies_id, origin','safe'),
             array('goods_code','required'),
-            array('goods_code','numerical','allowEmpty'=>false,'integerOnly'=>true),
             array('name','required'),
-            array('goods_class','required'),
-            array('big_num','numerical','allowEmpty'=>true,'integerOnly'=>true,'min'=>0),
-            array('small_num','numerical','allowEmpty'=>true,'integerOnly'=>true,'min'=>0),
             array('type','required'),
             array('unit','required'),
+            array('origin','required'),
             array('price','required'),
+            array('classify_id','required'),
             array('price','numerical','allowEmpty'=>false,'integerOnly'=>false),
+            array('classify_id','numerical','allowEmpty'=>true,'integerOnly'=>true),
+            array('stickies_id','numerical','allowEmpty'=>true,'integerOnly'=>true),
+            array('big_num','numerical','allowEmpty'=>false,'integerOnly'=>true,'min'=>0),
+            array('small_num','numerical','allowEmpty'=>false,'integerOnly'=>true,'min'=>0),
 			array('name','validateName'),
 			array('goods_code','validateCode'),
 		);
@@ -55,7 +59,7 @@ class GoodsForm extends CFormModel
         if(!empty($this->id)){
             $id = $this->id;
         }
-        $rows = Yii::app()->db->createCommand()->select("id")->from("opr_goods")->where('name=:name and id!=:id', array(':name'=>$this->name,':id'=>$id))->queryAll();
+        $rows = Yii::app()->db->createCommand()->select("id")->from("opr_goods_do")->where('name=:name and id!=:id', array(':name'=>$this->name,':id'=>$id))->queryAll();
         if(count($rows)>0){
             $message = Yii::t('procurement','the name of already exists');
             $this->addError($attribute,$message);
@@ -66,7 +70,7 @@ class GoodsForm extends CFormModel
         if(!empty($this->id)){
             $id = $this->id;
         }
-        $rows = Yii::app()->db->createCommand()->select("id")->from("opr_goods")->where('goods_code=:goods_code and id!=:id', array(':goods_code'=>$this->goods_code,':id'=>$id))->queryAll();
+        $rows = Yii::app()->db->createCommand()->select("id")->from("opr_goods_do")->where('goods_code=:goods_code and id!=:id', array(':goods_code'=>$this->goods_code,':id'=>$id))->queryAll();
         if(count($rows)>0){
             $message = Yii::t('procurement','the Goods Code of already exists');
             $this->addError($attribute,$message);
@@ -75,8 +79,8 @@ class GoodsForm extends CFormModel
 
 	public function retrieveData($index) {
 		$city = Yii::app()->user->city();
-		$rows = Yii::app()->db->createCommand()->select("id,name,type,unit,price,goods_code,goods_class,big_num,small_num")
-            ->from("opr_goods")->where("id=:id",array(":id"=>$index))->queryAll();
+		$rows = Yii::app()->db->createCommand()->select()
+            ->from("opr_goods_do")->where("id=:id",array(":id"=>$index))->queryAll();
 		if (count($rows) > 0) {
 			foreach ($rows as $row) {
                 $this->id = $row['id'];
@@ -85,7 +89,9 @@ class GoodsForm extends CFormModel
                 $this->unit = $row['unit'];
                 $this->price = sprintf("%.2f", $row['price']);
                 $this->goods_code = $row['goods_code'];
-                $this->goods_class = $row['goods_class'];
+                $this->classify_id = $row['classify_id'];
+                $this->stickies_id = $row['stickies_id'];
+                $this->origin = $row['origin'];
                 $this->big_num = $row['big_num'];
                 $this->small_num = $row['small_num'];
                 break;
@@ -93,7 +99,17 @@ class GoodsForm extends CFormModel
 		}
 		return true;
 	}
-	
+
+    //刪除驗證
+    public function deleteValidate(){
+        $rs = Yii::app()->db->createCommand()->select()->from("opr_order_goods")->where('goods_id=:goods_id',array(':goods_id'=>$this->id))->queryAll();
+        if($rs){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
 	public function saveData()
 	{
 		$connection = Yii::app()->db;
@@ -112,24 +128,28 @@ class GoodsForm extends CFormModel
 		$sql = '';
         switch ($this->scenario) {
             case 'delete':
-                $sql = "delete from opr_goods where id = :id";
+                $sql = "delete from opr_goods_do where id = :id";
                 break;
             case 'new':
-                $sql = "insert into opr_goods(
-							name, type, unit, price, goods_code, goods_class, big_num, small_num
+                $sql = "insert into opr_goods_do(
+							name, type, unit, price, goods_code, classify_id, stickies_id, origin, big_num, small_num,lcu,lcd
 						) values (
-							:name, :type, :unit, :price, :goods_code, :goods_class, :big_num, :small_num
+							:name, :type, :unit, :price, :goods_code, :classify_id, :stickies_id, :origin, :big_num, :small_num,:lcu,:lcd
 						)";
                 break;
             case 'edit':
-                $sql = "update opr_goods set
+                $sql = "update opr_goods_do set
 							name = :name, 
 							type = :type, 
 							unit = :unit,
-							goods_class = :goods_class,
+							classify_id = :classify_id,
+							stickies_id = :stickies_id,
+							origin = :origin,
 							goods_code = :goods_code,
 							big_num = :big_num,
 							small_num = :small_num,
+							luu = :luu,
+							lud = :lud,
 							price = :price
 						where id = :id
 						";
@@ -149,6 +169,10 @@ class GoodsForm extends CFormModel
         }
         if (strpos($sql,':id')!==false)
             $command->bindParam(':id',$this->id,PDO::PARAM_INT);
+        if (strpos($sql,':classify_id')!==false)
+            $command->bindParam(':classify_id',$this->classify_id,PDO::PARAM_INT);
+        if (strpos($sql,':stickies_id')!==false)
+            $command->bindParam(':stickies_id',$this->stickies_id,PDO::PARAM_INT);
         if (strpos($sql,':big_num')!==false)
             $command->bindParam(':big_num',$this->big_num,PDO::PARAM_INT);
         if (strpos($sql,':small_num')!==false)
@@ -157,8 +181,8 @@ class GoodsForm extends CFormModel
             $command->bindParam(':name',$this->name,PDO::PARAM_STR);
         if (strpos($sql,':goods_code')!==false)
             $command->bindParam(':goods_code',$this->goods_code,PDO::PARAM_STR);
-        if (strpos($sql,':goods_class')!==false)
-            $command->bindParam(':goods_class',$this->goods_class,PDO::PARAM_STR);
+        if (strpos($sql,':origin')!==false)
+            $command->bindParam(':origin',$this->origin,PDO::PARAM_STR);
         if (strpos($sql,':type')!==false)
             $command->bindParam(':type',$this->type,PDO::PARAM_STR);
         if (strpos($sql,':unit')!==false)
@@ -169,6 +193,10 @@ class GoodsForm extends CFormModel
             $command->bindParam(':luu',$uid,PDO::PARAM_STR);
         if (strpos($sql,':lcu')!==false)
             $command->bindParam(':lcu',$uid,PDO::PARAM_STR);
+        if (strpos($sql,':lud')!==false)
+            $command->bindParam(':lud',date("Y-m-d H:s:i"),PDO::PARAM_STR);
+        if (strpos($sql,':lcd')!==false)
+            $command->bindParam(':lcd',date("Y-m-d H:s:i"),PDO::PARAM_STR);
         $command->execute();
 
         if ($this->scenario=='new'){

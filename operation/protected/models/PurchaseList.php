@@ -65,7 +65,7 @@ class PurchaseList extends CListPageModel
                     'end_time'=>$record['end_time'],
                     'order_sum'=>$OrderSumArr["sum"],
                     'order_type_sum'=>$OrderSumArr["list"],
-                    'activity_status'=>$this->compareDate($record['end_time'])
+                    'activity_status'=>$this->compareDate($record['start_time'],$record['end_time'])
                 );
 			}
 		}
@@ -75,10 +75,12 @@ class PurchaseList extends CListPageModel
 	}
 
 	//對比時間有沒有到期
-	public function compareDate($date){
+	public function compareDate($startDate,$endDate){
         $nowDate = date("Y-m-d");
-        if (strtotime($nowDate)>strtotime($date)){
+        if (strtotime($nowDate)>strtotime($endDate)){
             return "End";
+        }elseif(strtotime($nowDate)<strtotime($startDate)){
+            return "Wait";
         }else{
             return "Run";
         }

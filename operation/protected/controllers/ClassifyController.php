@@ -1,12 +1,12 @@
 <?php
 
-class GoodsController extends Controller
+class ClassifyController extends Controller
 {
 	public function actionIndex($pageNum=0) 
 	{
-		$model = new GoodsList;
-		if (isset($_POST['GoodsList'])) {
-			$model->attributes = $_POST['GoodsList'];
+		$model = new ClassifyList;
+		if (isset($_POST['ClassifyList'])) {
+			$model->attributes = $_POST['ClassifyList'];
 		} else {
 			$session = Yii::app()->session;
 			if (isset($session['criteria_ya01']) && !empty($session['fcriteria_ya01'])) {
@@ -22,13 +22,13 @@ class GoodsController extends Controller
 
 	public function actionSave()
 	{
-		if (isset($_POST['GoodsForm'])) {
-			$model = new GoodsForm($_POST['GoodsForm']['scenario']);
-			$model->attributes = $_POST['GoodsForm'];
+		if (isset($_POST['ClassifyForm'])) {
+			$model = new ClassifyForm($_POST['ClassifyForm']['scenario']);
+			$model->attributes = $_POST['ClassifyForm'];
 			if ($model->validate()) {
 				$model->saveData();
 				Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
-				$this->redirect(Yii::app()->createUrl('goods/edit',array('index'=>$model->id)));
+				$this->redirect(Yii::app()->createUrl('classify/edit',array('index'=>$model->id)));
 			} else {
 				$message = CHtml::errorSummary($model);
 				Dialog::message(Yii::t('dialog','Validation Message'), $message);
@@ -39,7 +39,7 @@ class GoodsController extends Controller
 
 	public function actionView($index)
 	{
-		$model = new GoodsForm('view');
+		$model = new ClassifyForm('view');
 		if (!$model->retrieveData($index)) {
 			throw new CHttpException(404,'The requested page does not exist.');
 		} else {
@@ -49,13 +49,13 @@ class GoodsController extends Controller
 
     public function actionNew()
     {
-        $model = new GoodsForm('new');
+        $model = new ClassifyForm('new');
         $this->render('form',array('model'=>$model,));
     }
 
 	public function actionEdit($index)
 	{
-		$model = new GoodsForm('edit');
+		$model = new ClassifyForm('edit');
 		if (!$model->retrieveData($index)) {
 			throw new CHttpException(404,'The requested page does not exist.');
 		} else {
@@ -65,13 +65,21 @@ class GoodsController extends Controller
 
     public function actionDelete()
     {
-        $model = new GoodsForm('delete');
-        if (isset($_POST['GoodsForm'])) {
-            $model->attributes = $_POST['GoodsForm'];
-            $model->saveData();
-            Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Record Deleted'));
+        $model = new ClassifyForm('delete');
+        if (isset($_POST['ClassifyForm'])) {
+            $model->attributes = $_POST['ClassifyForm'];
+            if($model->deleteValidate()){
+                $model->saveData();
+                Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Record Deleted'));
+                $this->redirect(Yii::app()->createUrl('classify/index'));
+            }else{
+                $model->scenario = "edit";
+                Dialog::message(Yii::t('dialog','Validation Message'), Yii::t("procurement","This category has been used and cannot be deleted"));
+                $this->render('form',array('model'=>$model,));
+            }
+        }else{
+            $this->redirect(Yii::app()->createUrl('classify/index'));
         }
-        $this->redirect(Yii::app()->createUrl('goods/index'));
     }
 
 }

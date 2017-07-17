@@ -8,11 +8,15 @@ class ActivityForm extends CFormModel
 	public $start_time;
 	public $end_time;
 	public $order_class;
-	public $num;
+	public $num=100;
     public $luu;
     public $lcu;
     public $lud;
     public $lcd;
+
+    public function init(){
+        $this->start_time = date("Y/m/d");
+    }
 
 	public function attributeLabels()
 	{
@@ -21,7 +25,7 @@ class ActivityForm extends CFormModel
             'activity_title'=>Yii::t('procurement','Activity Title'),
             'start_time'=>Yii::t('procurement','Start Time'),
             'end_time'=>Yii::t('procurement','End Time'),
-            'num'=>Yii::t('procurement','Number Restrictions'),
+            'num'=>Yii::t('procurement','Max Number Restrictions'),
             'order_class'=>Yii::t('procurement','Order Class')
 		);
 	}
@@ -32,43 +36,22 @@ class ActivityForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, activity_code, activity_title, start_time, end_time, order_class, num','safe'),
-            array('activity_code','required'),
-            array('activity_title','required'),
+			array('id, start_time, end_time, order_class, num','safe'),
             array('start_time','required'),
             array('end_time','required'),
-            array('order_class','required'),
+            array('end_time','validateDate'),
+            array('order_class','required',"on"=>"new"),
             array('num','required'),
-			array('activity_code','validateCode'),
-			array('activity_title','validateTitle'),
             array('num','numerical','allowEmpty'=>false,'integerOnly'=>true,'min'=>1),
 		);
 	}
 
-	public function validateTitle($attribute, $params){
-        $id = -1;
-        if(!empty($this->id)){
-            $id = $this->id;
-        }
-        $rows = Yii::app()->db->createCommand()->select("id")->from("opr_order_activity")
-            ->where('activity_title=:activity_title and id!=:id', array(':activity_title'=>$this->activity_title,':id'=>$id))->queryAll();
-        if(count($rows)>0){
-            $message = Yii::t('procurement','the Activity Title of already exists');
+    public function validateDate($attribute, $params){
+        if(strtotime($this->start_time)>strtotime($this->end_time)){
+            $message = Yii::t('procurement','The end time cannot be less than the start time');
             $this->addError($attribute,$message);
         }
-	}
-	public function validateCode($attribute, $params){
-        $id = -1;
-        if(!empty($this->id)){
-            $id = $this->id;
-        }
-        $rows = Yii::app()->db->createCommand()->select("id")->from("opr_order_activity")
-            ->where('activity_code=:activity_code and id!=:id', array(':activity_code'=>$this->activity_code,':id'=>$id))->queryAll();
-        if(count($rows)>0){
-            $message = Yii::t('procurement','the Activity Code of already exists');
-            $this->addError($attribute,$message);
-        }
-	}
+    }
 
 	//刪除快速訂單
     public function getOrderClassNotFast(){
@@ -95,7 +78,17 @@ class ActivityForm extends CFormModel
 		}
 		return true;
 	}
-	
+
+    //刪除驗證
+    public function deleteValidate(){
+        $rs = Yii::app()->db->createCommand()->select()->from("opr_order")->where('activity_id=:activity_id',array(':activity_id'=>$this->id))->queryAll();
+        if($rs){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
 	public function saveData()
 	{
 		$connection = Yii::app()->db;
@@ -122,7 +115,19 @@ class ActivityForm extends CFormModel
         }
     }
 
+    //自動生成標題和編號
+    public function selfTitleAndCode(){
+        $day = date("Ymd");
+        $codeStr = $this->order_class == "Import"?"PHJK":"PHGN";
+        $titleStr = $this->order_class == "Import"?"进口货":"国内货";
+        $count = Yii::app()->db->createCommand()->select("count(id)")->from("opr_order_activity")->where(array('like', 'activity_code', "%$codeStr%"))->queryScalar();
+        $count = empty($count)?"":$count+1;
+        $this->activity_code = $codeStr.$day.$count;
+        $this->activity_title = $day.$titleStr."采购订单".$count;
+    }
+
 	protected function saveActivity(&$connection) {
+        $this->selfTitleAndCode();
 		$sql = '';
         switch ($this->scenario) {
             case 'delete':
@@ -138,11 +143,8 @@ class ActivityForm extends CFormModel
                 break;
             case 'edit':
                 $sql = "update opr_order_activity set
-							activity_code = :activity_code, 
-							activity_title = :activity_title, 
 							start_time = :start_time,
 							end_time = :end_time,
-							order_class = :order_class,
 							num = :num,
 							luu = :luu,
 							lud = :lud

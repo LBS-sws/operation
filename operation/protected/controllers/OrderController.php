@@ -138,7 +138,7 @@ class OrderController extends Controller
             }
         }
         $model->determinePageNum($pageNum);
-        $model->retrieveDataByPage($model->pageNum,"order");
+        $model->retrieveDataByPage($model->pageNum);
         $this->render('index_activity',array('model'=>$model));
     }
 }

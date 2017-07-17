@@ -35,8 +35,9 @@ class DeliveryForm extends CFormModel
 	{
 		return array(
 			array('id, order_code, order_user, order_class, activity_id, technician, status, remark, luu, lcu, lud, lcd','safe'),
-            array('goods_list','required','on'=>array('audit','edit')),
+            array('goods_list','required','on'=>array('audit','edit','reject')),
             array('goods_list','validateGoods','on'=>array('audit','edit')),
+            array('remark','required','on'=>'reject'),
             //array('order_num','numerical','allowEmpty'=>true,'integerOnly'=>true),
             //array('order_num','in','range'=>range(0,600)),
 		);
@@ -92,7 +93,7 @@ class DeliveryForm extends CFormModel
                 $this->order_user = $row['order_user'];
                 //$this->technician = $row['technician'];
                 $this->status = $row['status'];
-                $this->remark = $row['remark'];
+                $this->remark = "";
                 $this->lcu = $row['lcu'];
                 $this->lcd = date("Y-m-d",strtotime($row['lcd']));
                 $this->statusList = OrderForm::getStatusListToId($row['id']);
@@ -189,6 +190,7 @@ class DeliveryForm extends CFormModel
                 //修改
                 Yii::app()->db->createCommand()->update('opr_order_goods', array(
                     'confirm_num'=>$goods["confirm_num"],
+                    'remark'=>$goods["remark"],
                     'luu'=>$uid,
                     'lud'=>date('Y-m-d H:i:s'),
                 ), 'id=:id', array(':id'=>$goods["id"]));
@@ -210,5 +212,30 @@ class DeliveryForm extends CFormModel
             return false;
         }
         Yii::app()->db->createCommand("update opr_warehouse set inventory=inventory-$num where id=$goodsId")->execute();
+    }
+
+    //退回
+    function backward(){
+        $rows = Yii::app()->db->createCommand()->select("id")->from("opr_order")->where('status = "approve" and id = :id',array(':id'=>$this->id))->queryAll();
+        if(count($rows) > 0){
+            $uid = Yii::app()->user->id;
+            $this->status = "sent";
+            Yii::app()->db->createCommand()->update('opr_order', array(
+                'status'=>$this->status,
+                'remark'=>$this->remark,
+                'luu'=>$uid,
+                'lud'=>date('Y-m-d H:i:s'),
+            ), 'id=:id', array(':id'=>$this->id));
+
+            Yii::app()->db->createCommand()->insert('opr_order_status', array(
+                'order_id'=>$this->id,
+                'status'=>"backward",
+                'r_remark'=>$this->remark,
+                'lcu'=>$uid,
+                'time'=>date('Y-m-d H:i:s'),
+            ));
+            return true;
+        }
+        return false;
     }
 }

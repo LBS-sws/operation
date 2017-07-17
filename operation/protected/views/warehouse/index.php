@@ -28,7 +28,7 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
             <div class="btn-group" role="group">
                 <?php
                 //var_dump(Yii::app()->session['rw_func']);
-                if (Yii::app()->user->validRWFunction('YA02'))
+                if (Yii::app()->user->validRWFunction('YD01'))
                     echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('procurement','Add Goods'), array(
                         'submit'=>Yii::app()->createUrl('warehouse/new'),
                     ));

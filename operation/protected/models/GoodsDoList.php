@@ -1,16 +1,16 @@
 <?php
 
-class GoodsList extends CListPageModel
+class GoodsDoList extends CListPageModel
 {
 	public function attributeLabels()
 	{
 		return array(	
 			'goods_code'=>Yii::t('procurement','Goods Code'),
 			'name'=>Yii::t('procurement','Name'),
-			'goods_class'=>Yii::t('procurement','Goods Class'),
 			'type'=>Yii::t('procurement','Type'),
 			'unit'=>Yii::t('procurement','Unit'),
 			'price'=>Yii::t('procurement','Price（RMB）'),
+			'stickies_id'=>Yii::t('procurement','Stickies'),
 		);
 	}
 	
@@ -18,11 +18,11 @@ class GoodsList extends CListPageModel
 	{
 		$city = Yii::app()->user->city();
 		$sql1 = "select *
-				from opr_goods
+				from opr_goods_do
 				where id>0 
 			";
 		$sql2 = "select count(id)
-				from opr_goods
+				from opr_goods_do
 				where id>0 
 			";
 		$clause = "";
@@ -71,7 +71,7 @@ class GoodsList extends CListPageModel
 						'unit'=>$record['unit'],
 						'price'=>$record['price'],
 						'goods_code'=>$record['goods_code'],
-						'goods_class'=>Yii::t('procurement',$record['goods_class']),
+						'stickies_id'=>StickiesForm::getStickiesToId($record['stickies_id'])["name"],
 					);
 			}
 		}

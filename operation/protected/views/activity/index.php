@@ -28,7 +28,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Activity';
             <div class="btn-group" role="group">
                 <?php
                 //var_dump(Yii::app()->session['rw_func']);
-                echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('procurement','Add Activity'), array(
+                echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('misc','Add'), array(
                     'submit'=>Yii::app()->createUrl('activity/new'),
                 ));
                 ?>

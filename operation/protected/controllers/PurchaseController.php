@@ -114,4 +114,36 @@ class PurchaseController extends Controller
 		}
 	}
 
+    public function actionBackward()
+    {
+        if (isset($_POST['PurchaseForm'])) {
+            $model = new PurchaseForm("backward");
+            $model->attributes = $_POST['PurchaseForm'];
+            if($model->backward()){
+                Dialog::message(Yii::t('dialog','Information'), Yii::t('procurement','Backward Done'));
+            }else{
+                Dialog::message(Yii::t('dialog','Validation Message'), Yii::t('procurement','Backward Error'));
+            }
+            $model->scenario = "edit";
+            $this->redirect(Yii::app()->createUrl('purchase/edit',array('index'=>$model->id)));
+        }
+    }
+
+    //下載訂單
+    public function actionDownorder($index){
+        $model = new PurchaseForm('edit');
+        if (!$model->retrieveData($index)) {
+            throw new CHttpException(404,'The requested page does not exist.');
+        } else {
+            $title = OrderList::getActivityTitleToId($model->activity_id);
+            $myExcel = new MyExcelTwo();
+            $myExcel->setStartRow(5);
+            $myExcel->setRowContent("A1","订单编号：".$model->order_code,"F1");
+            $myExcel->setRowContent("A2","下单用户：".$model->lcu,"F2");
+            $myExcel->setRowContent("A3","订单采购标题：".$title,"F3");
+            $myExcel->setDataHeard($model->getTableHeard());
+            $myExcel->setDataBody($model->resetGoodsList());
+            $myExcel->outDownExcel($model->lcu."的订单.xls");
+        }
+    }
 }

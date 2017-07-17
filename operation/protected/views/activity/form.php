@@ -50,11 +50,12 @@ $this->pageTitle=Yii::app()->name . ' - Order Activity Form';
 			<?php echo $form->hiddenField($model, 'scenario'); ?>
 			<?php echo $form->hiddenField($model, 'id'); ?>
 
+            <?php if ($model->scenario!='new'): ?>
             <div class="form-group">
                 <?php echo $form->labelEx($model,'activity_code',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
-                    <?php echo $form->numberField($model, 'activity_code',
-                        array('min'=>0,'readonly'=>($model->scenario=='view'))
+                    <?php echo $form->textField($model, 'activity_code',
+                        array('readonly'=>true)
                     ); ?>
                 </div>
             </div>
@@ -62,16 +63,17 @@ $this->pageTitle=Yii::app()->name . ' - Order Activity Form';
                 <?php echo $form->labelEx($model,'activity_title',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
                     <?php echo $form->textField($model, 'activity_title',
-                        array('size'=>40,'maxlength'=>250,'readonly'=>($model->scenario=='view'))
+                        array('readonly'=>true)
                     ); ?>
                 </div>
             </div>
+            <?php endif ?>
 
             <div class="form-group">
                 <?php echo $form->labelEx($model,'order_class',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
                     <?php echo $form->dropDownList($model, 'order_class',$model->getOrderClassNotFast(),
-                        array('disabled'=>($model->scenario =='view'))
+                        array('disabled'=>($model->scenario !='new'))
                     ); ?>
                 </div>
             </div>

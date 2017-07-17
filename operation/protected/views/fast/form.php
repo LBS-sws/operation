@@ -41,6 +41,11 @@ $this->pageTitle=Yii::app()->name . ' - Fast Form';
                 echo TbHtml::button('<span class="fa fa-upload"></span> '.Yii::t('procurement','Shipments'), array(
                     'submit'=>Yii::app()->createUrl('fast/audit')));
             }
+            if($model->status == "approve"){
+                //退回
+                echo TbHtml::button('<span class="fa fa-backward"></span> '.Yii::t('procurement','Back Status'), array(
+                    'submit'=>Yii::app()->createUrl('fast/backward')));
+            }
 			?>
 <?php endif ?>
 	</div>
@@ -94,14 +99,15 @@ $this->pageTitle=Yii::app()->name . ' - Fast Form';
                     <table class="table table-bordered table-striped disabled" id="table-change">
                         <thead>
                         <tr>
-                            <td width="12%"><?php echo Yii::t("procurement","Goods Code")?></td>
-                            <td><?php echo Yii::t("procurement","Goods Name")?></td>
+                            <td width="20%"><?php echo Yii::t("procurement","Goods Name")?></td>
                             <td width="11%"><?php echo Yii::t("procurement","Type")?></td>
-                            <td width="10%"><?php echo Yii::t("procurement","Unit")?></td>
-                            <td width="12%"><?php echo Yii::t("procurement","Price（RMB）")?></td>
+                            <td width="8%"><?php echo Yii::t("procurement","Unit")?></td>
+                            <td width="10%"><?php echo Yii::t("procurement",'Price（$）')?></td>
+                            <td width="10%"><?php echo Yii::t("procurement","Demand Note")?></td>
                             <td width="10%"><?php echo Yii::t("procurement","Goods Number")?></td>
                             <td width="10%"><?php echo Yii::t("procurement","Actual Number")?></td>
-                            <td width="12%"><?php echo Yii::t("procurement","Total（RMB）")?></td>
+                            <td width="10%"><?php echo Yii::t("procurement","Headquarters Note")?></td>
+                            <td width="10%"><?php echo Yii::t("procurement",'Total（$）')?></td>
                         </tr>
                         </thead>
                         <tbody>
@@ -111,18 +117,25 @@ $this->pageTitle=Yii::app()->name . ' - Fast Form';
                                 $con_num = empty($val['id'])?$key:$val['id'];
                                 $tableTr = "<tr datanum='$con_num'>";
 
-                                $tableTr.="<td><input type='text' class='form-control testInput' readonly name='FastForm[goods_list][$con_num][goods_code]' value='".$val['goods_code']."'>";
+
+                                $tableTr.="<td><div class='input-group'>";
+                                $tableTr.="<input type='hidden' name='FastForm[goods_list][$con_num][id]' value='".$val['id']."'>";
+                                $tableTr.="<input type='hidden' class='stickies_id' name='FastForm[goods_list][$con_num][stickies_id]' value='".$val['stickies_id']."'>";
+                                $tableTr.="<input type='text' readonly class='form-control testInput' name='FastForm[goods_list][$con_num][name]' value='".$val['name']."'>";
                                 $tableTr.="<input type='hidden' name='FastForm[goods_list][$con_num][goods_id]' value='".$val['goods_id']."'>";
-                                $tableTr.="<input type='hidden' name='FastForm[goods_list][$con_num][id]' value='".$val['id']."'></td>";
-                                $tableTr.="<td><input type='text' class='form-control name' readonly name='FastForm[goods_list][$con_num][name]' value='".$val['name']."'></td>";
+                                $tableTr.="</div></td>";
+
                                 $tableTr.="<td><input type='text' class='form-control type' readonly name='FastForm[goods_list][$con_num][type]' value='".$val['type']."'></td>";
                                 $tableTr.="<td><input type='text' class='form-control unit' readonly name='FastForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
                                 $tableTr.="<td><input type='text' class='form-control price' readonly name='FastForm[goods_list][$con_num][price]' value='".sprintf("%.2f", $val['price'])."'></td>";
+                                $tableTr.="<td><input type='text' class='form-control' readonly name='FastForm[goods_list][$con_num][note]' value='".$val['note']."'></td>";
                                 $tableTr.="<td><input type='number' class='form-control' readonly name='FastForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
                                 if($model->status == "sent" || $model->status == "read"){
                                     $tableTr.="<td><input type='number' class='form-control numChange goods_num' name='FastForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
+                                    $tableTr.="<td><input type='text' class='form-control' name='FastForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
                                 }else{
                                     $tableTr.="<td><input type='number' class='form-control numChange goods_num' readonly name='FastForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
+                                    $tableTr.="<td><input type='text' class='form-control' readonly name='FastForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
                                 }
                                 $tableTr.="<td><input type='text' class='form-control sum' readonly></td>";
 
@@ -133,7 +146,7 @@ $this->pageTitle=Yii::app()->name . ' - Fast Form';
                         </tbody>
                         <tfoot>
                         <tr>
-                            <td colspan="7"></td>
+                            <td colspan="8"></td>
                             <td class="text-success fa-2x">0</td>
                         </tr>
                         </tfoot>
@@ -167,7 +180,7 @@ Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_R
 <?php
 $js = Script::genReadonlyField();
 Yii::app()->clientScript->registerScript('readonlyClass',$js,CClientScript::POS_READY);
-Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/goodsChange.js", CClientScript::POS_END);
+Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/goodsChangeTwo.js", CClientScript::POS_END);
 Yii::app()->clientScript->registerCssFile(Yii::app()->baseUrl . "/css/goodsChange.css");
 ?>
 

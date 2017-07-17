@@ -1,2 +1,12 @@
 .dropdown-div{position: absolute;z-index: 99999;height:auto;overflow-x: hidden;overflow-y: scroll;max-height: 150px;}
 .dropdown-div>.dropdown-menu{position: static;display: block;}
+.bg-fff{background: #fff !important;}
+.goodsIfy>li>a{cursor: pointer;}
+.changeHelp{z-index: 111}
+.changeHelp>.fa{font-size: 16px;text-align: right;width: 20px;cursor: pointer;color:#3C8DBC;}
+.changeHelp>.content-help{position: absolute;bottom: 100%;left: 50%;width: 200px;margin-left: -100px;padding: 10px;border-radius: 10px;box-shadow: 3px 3px 3px #ccc;border: 1px solid #ccc;font-size: 16px;background: #fff;}
+.content-help:before{content: " ";position: absolute;top: 100%;left: 50%;
+    border-top: 5px solid #fff;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+}

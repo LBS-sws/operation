@@ -116,35 +116,61 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                     <table class="table table-bordered table-striped disabled" id="table-change">
                         <thead>
                         <tr>
-                            <td width="12%"><?php echo Yii::t("procurement","Goods Code")?></td>
-                            <td><?php echo Yii::t("procurement","Goods Name")?></td>
+                            <?php
+                            $currencyType = $model->order_class=="Domestic"?"RMB":'$';
+                            ?>
+                            <td width="20%"><?php echo Yii::t("procurement","Goods Name")?></td>
                             <td width="11%"><?php echo Yii::t("procurement","Type")?></td>
-                            <td width="10%"><?php echo Yii::t("procurement","Unit")?></td>
-                            <td width="15%"><?php echo Yii::t("procurement","Price（RMB）")?></td>
+                            <td width="8%"><?php echo Yii::t("procurement","Unit")?></td>
+                            <td width="10%"><?php echo Yii::t("procurement","Price（".$currencyType."）")?></td>
                             <td width="10%"><?php echo Yii::t("procurement","Goods Number")?></td>
+                            <td width="12%"><?php echo Yii::t("procurement","Demand Note")?></td>
                             <?php if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished")): ?>
                             <td width="10%"><?php echo Yii::t("procurement","Actual Number")?></td>
+                            <td width="12%"><?php echo Yii::t("procurement","Headquarters Note")?></td>
                             <?php endif ?>
-                            <td width="15%"><?php echo Yii::t("procurement","Total（RMB）")?></td>
+                            <td width="10%"><?php echo Yii::t("procurement","Total（".$currencyType."）")?></td>
                             <td width="8%">&nbsp;</td>
                         </tr>
                         </thead>
                         <tbody>
-
                         <?php
+                        $classify = ClassifyForm::getClassifyList();
+                        $stickiesContentList = StickiesForm::getStickiesContentList();
                             foreach ($model->goods_list as $key => $val){
                                 $con_num = empty($val['id'])?$key:$val['id'];
                                 $tableTr = "<tr datanum='$con_num'>";
+                                $tableTr.="<td><div class='input-group'>";
+                                $tableTr.='<div class="input-group-btn">';
+                                $tableTr.="<input type='hidden' class='stickies_id' name='OrderForm[goods_list][$con_num][stickies_id]' value='".$val['stickies_id']."'>";
+                                $tableTr.="<input type='hidden' class='classify_id' name='OrderForm[goods_list][$con_num][classify_id]' value='".$val['classify_id']."'>";
 
-                                $tableTr.="<td><input type='text' autocomplete='off' class='form-control testInput' name='OrderForm[goods_list][$con_num][goods_code]' value='".$val['goods_code']."'>";
-                                $tableTr.="<input type='hidden' name='OrderForm[goods_list][$con_num][goods_id]' value='".$val['goods_id']."'></td>";
-                                $tableTr.="<td><input type='text' class='form-control name' readonly name='OrderForm[goods_list][$con_num][name]' value='".$val['name']."'></td>";
+                                if($model->scenario=='new' || $model->status == "pending"){
+                                    $tableTr.='<button type="button" class="btn btn-default bg-fff dropdown-toggle" data-toggle="dropdown" data-id="'.$val["classify_id"].'">';
+                                    $testNBSP = $classify[$val["classify_id"]] == ""?"&nbsp;":$classify[$val["classify_id"]];
+                                    $tableTr.='<span>'.$testNBSP.'</span><span class="caret"></span></button><ul class="dropdown-menu goodsIfy">';
+                                    foreach ($classify as $classify_id =>$classify_name){
+                                        $classify_name=empty($classify_name)?"&nbsp;":$classify_name;
+                                        $tableTr.="<li data-id='$classify_id'><a>$classify_name</a></li>";
+                                    }
+                                    $tableTr.='</ul>';
+                                }
+
+                                $tableTr.='</div>';
+                                $tableTr.="<input type='text' class='form-control testInput' autocomplete='off' name='OrderForm[goods_list][$con_num][name]' value='".$val['name']."'>";
+                                $tableTr.="<input type='hidden' name='OrderForm[goods_list][$con_num][goods_id]' value='".$val['goods_id']."'>";
+                                if(!empty($val['stickies_id'])){
+                                    $tableTr.='<div class="input-group-btn changeHelp" content-id="'.$val['stickies_id'].'"><span class="fa fa-exclamation-circle"></span></div>';
+                                }
+                                $tableTr.="</div></td>";
                                 $tableTr.="<td><input type='text' class='form-control type' readonly name='OrderForm[goods_list][$con_num][type]' value='".$val['type']."'></td>";
                                 $tableTr.="<td><input type='text' class='form-control unit' readonly name='OrderForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
                                 $tableTr.="<td><input type='text' class='form-control price' readonly name='OrderForm[goods_list][$con_num][price]' value='".sprintf("%.2f", $val['price'])."'></td>";
                                 $tableTr.="<td><input type='number' class='form-control numChange goods_num' name='OrderForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
+                                $tableTr.="<td><input type='text' class='form-control' name='OrderForm[goods_list][$con_num][note]' value='".$val['note']."'></td>";
                                 if($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished")){
-                                    $tableTr.="<td><input type='number' class='form-control confirm_num' name='OrderForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
+                                    $tableTr.="<td><input type='number' class='form-control goods_num' name='OrderForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
+                                    $tableTr.="<td><input type='text' class='form-control' name='OrderForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
                                 }
                                 $tableTr.="<td><input type='text' class='form-control sum' readonly></td>";
                                 $tableTr.="<td><button type='button' class='btn btn-danger delGoods'>".Yii::t("misc","Delete")."</button>";
@@ -162,7 +188,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                         <tr>
                             <?php
                             if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished")){
-                                echo '<td colspan="7"></td>';
+                                echo '<td colspan="8"></td>';
                             }else{
                                 echo '<td colspan="6"></td>';
                             }
@@ -188,6 +214,23 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
             <?php endif ?>
 		</div>
 	</div>
+
+    <div class="hide" id="classifyList">
+        <div class="input-group-btn">
+            <input type="hidden" class="stickies_id">
+            <input type="hidden" class="classify_id">
+            <button type="button" class="btn btn-default bg-fff dropdown-toggle" data-toggle="dropdown"><span>&nbsp;</span><span class="caret"></span></button>
+            <ul class="dropdown-menu goodsIfy">
+                <?php
+
+                foreach ($classify as $classify_id =>$classify_name){
+                    $classify_name=empty($classify_name)?"&nbsp;":$classify_name;
+                    echo "<li data-id='$classify_id'><a>$classify_name</a></li>";
+                }
+                ?>
+            </ul>
+        </div>
+    </div>
 </section>
 <?php
 if ($model->scenario!='new')
@@ -195,29 +238,28 @@ if ($model->scenario!='new')
 ?>
 <?php
 //OrderForm_activity_id
-$goodList = json_encode($model->getGoodsList());
+$goodList = json_encode($model->getGoodsList($model->order_class));
+$stickiesList = json_encode(StickiesForm::getStickiesContentList());
 $tableBool = 1;//表格內的輸入框能否輸入
 if($model->status == "pending" || $model->status == "cancelled"||$model->scenario=='new'){
     $tableBool = 0;
 }
 $js = '
+var orderClass = "'.$model->order_class.'";
 inputDownList('.$goodList.',tableGoodsChange,true);
 $("#addGoods").on("click",{btnStr:"'.Yii::t("misc","Delete").'"},addGoodsTable);
 $("body").delegate(".delGoods","click","'.Yii::t("procurement","Are you sure you want to delete this data?").'",delGoodsTable);
 $("body").delegate(".numChange","input",goodsTotalPrice);
+$("body").delegate(".changeHelp","mouseover",function () {
+    addContentHelp($(this),'.$stickiesList.');
+  });
+$("body").delegate(".changeHelp","mouseout",function () {
+    $(this).find(".content-help").remove();
+  });
 goodsTotalPrice();
+goodsIfyChange();
 disabledTable('.$tableBool.');
 
-var orderClass = "'.$model->order_class.'";
-$("#OrderForm_order_class").on("change",function(){
-    if(orderClass != ""){
-        if($("#table-change input").length >0){
-            alert("'.Yii::t("procurement","goods in the list do not match the type of order. Please delete the goods first").'");
-            $(this).val(orderClass);
-        }
-    }
-    orderClass = $(this).val();
-});
 ';
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 ?>
@@ -225,7 +267,7 @@ Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_R
 <?php
 $js = Script::genReadonlyField();
 Yii::app()->clientScript->registerScript('readonlyClass',$js,CClientScript::POS_READY);
-Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/goodsChange.js", CClientScript::POS_END);
+Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/goodsChangeTwo.js", CClientScript::POS_END);
 Yii::app()->clientScript->registerCssFile(Yii::app()->baseUrl . "/css/goodsChange.css");
 ?>
 

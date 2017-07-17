@@ -96,4 +96,18 @@ class DeliveryController extends Controller
 		}
 	}
 
+    public function actionBackward()
+    {
+        if (isset($_POST['DeliveryForm'])) {
+            $model = new DeliveryForm("backward");
+            $model->attributes = $_POST['DeliveryForm'];
+            if($model->backward()){
+                Dialog::message(Yii::t('dialog','Information'), Yii::t('procurement','Backward Done'));
+            }else{
+                Dialog::message(Yii::t('dialog','Validation Message'), Yii::t('procurement','Backward Error'));
+            }
+            $model->scenario = "edit";
+            $this->redirect(Yii::app()->createUrl('delivery/edit',array('index'=>$model->id)));
+        }
+    }
 }

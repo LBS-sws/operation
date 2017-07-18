@@ -16,6 +16,7 @@ return array(
     'Min Number'=>'最小數量限制',
     'Not Font Goods'=>'沒有找到該貨物',
     'Max Number is'=>'最大數量是',
+    'Multiple is'=>'的倍數是',
     'Min Number is'=>'最小數量是',
 
 
@@ -178,5 +179,13 @@ return array(
     'Classify'=>'分類',
     'Classify List'=>'分類列表',
     'Classify Form'=>'分類表單',
+
+    //混合規則管理
+    'Independent Rules'=>'獨立規則',
+    'Hybrid Rules'=>'混合規則',
+    'Hybrid Rules List'=>'混合規則列表',
+    'Hybrid Rules Form'=>'混合規則表單',
+    'Rules Name'=>'規則名字',
+    'Multiple'=>'數量倍率',
 );
 ?>

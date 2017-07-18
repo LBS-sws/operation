@@ -30,6 +30,11 @@ return array(
                 'access'=>'YG03',
                 'url'=>'/classify/index',
             ),
+            //分類管理
+            'Goods Hybrid Rules'=>array(
+                'access'=>'YG06',
+                'url'=>'/rules/index',
+            ),
         ),
     ),
     //總部管理員採購

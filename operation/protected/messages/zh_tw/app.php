@@ -86,6 +86,7 @@ return array(
     'Warehouse Info'=>'倉庫信息',
     'Stickies Summary Entry'=>'標籤管理',
     'Classify Summary Entry'=>'分類管理',
+    'Goods Hybrid Rules'=>'混合規則管理',
     //沈超添加結束
 );
 ?>

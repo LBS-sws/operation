@@ -102,26 +102,54 @@ $this->pageTitle=Yii::app()->name . ' - Goods Summary Form';
                 </div>
             </div>
             <div class="form-group">
-                <?php echo $form->labelEx($model,'big_num',array('class'=>"col-sm-2 control-label")); ?>
+                <?php echo $form->labelEx($model,'stickies_id',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
-                    <?php echo $form->numberField($model, 'big_num',
-                        array('min'=>0,'readonly'=>($model->scenario=='view'))
-                    ); ?>
-                </div>
-            </div>
-            <div class="form-group">
-                <?php echo $form->labelEx($model,'small_num',array('class'=>"col-sm-2 control-label")); ?>
-                <div class="col-sm-4">
-                    <?php echo $form->numberField($model, 'small_num',
-                        array('min'=>0,'readonly'=>($model->scenario=='view'))
+                    <?php echo $form->dropDownList($model, 'stickies_id',StickiesForm::getStickiesList(),
+                        array('disabled'=>($model->scenario =='view'))
                     ); ?>
                 </div>
             </div>
 
             <div class="form-group">
-                <?php echo $form->labelEx($model,'stickies_id',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-offset-2 col-sm-4 radio-change" id="radio-change">
+                    <label class="radio-inline">
+                        <input type="radio" name="inlineRadioOptions" checked id="inlineRadio1" value="option1"> <?php echo Yii::t("procurement","Independent Rules"); ?>
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2"> <?php echo Yii::t("procurement","Hybrid Rules"); ?>
+                    </label>
+                </div>
+            </div>
+            <div id="row0">
+                <div class="form-group">
+                    <?php echo $form->labelEx($model,'multiple',array('class'=>"col-sm-2 control-label")); ?>
+                    <div class="col-sm-4">
+                        <?php echo $form->numberField($model, 'multiple',
+                            array('min'=>1,'readonly'=>($model->scenario=='view'))
+                        ); ?>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <?php echo $form->labelEx($model,'big_num',array('class'=>"col-sm-2 control-label")); ?>
+                    <div class="col-sm-4">
+                        <?php echo $form->numberField($model, 'big_num',
+                            array('min'=>1,'readonly'=>($model->scenario=='view'))
+                        ); ?>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <?php echo $form->labelEx($model,'small_num',array('class'=>"col-sm-2 control-label")); ?>
+                    <div class="col-sm-4">
+                        <?php echo $form->numberField($model, 'small_num',
+                            array('min'=>1,'readonly'=>($model->scenario=='view'))
+                        ); ?>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" id="row1">
+                <?php echo $form->labelEx($model,'rules_id',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
-                    <?php echo $form->dropDownList($model, 'stickies_id',StickiesForm::getStickiesList(),
+                    <?php echo $form->dropDownList($model, 'rules_id',RulesForm::getRulesList(),
                         array('disabled'=>($model->scenario =='view'))
                     ); ?>
                 </div>
@@ -132,6 +160,31 @@ $this->pageTitle=Yii::app()->name . ' - Goods Summary Form';
 
 
 <?php
+$rulesType = empty($model->rules_id)?0:1;
+$js='
+$("#radio-change input").on("change",function(){
+    $(this).prop("checked",true);
+    var num = $(this).parent("label").index();
+    if(num == 0 || num == 1){
+        $("#row"+num).show();
+        $("#row"+(1-num)).hide();
+        if(num == 0){
+            $("#GoodsImForm_rules_id").val(0);
+        }
+        if($("#GoodsImForm_small_num").val() < 1){
+            $("#GoodsImForm_small_num").val(1);
+        }
+        if($("#GoodsImForm_big_num").val() < 1){
+            $("#GoodsImForm_big_num").val(1);
+        }
+        if($("#GoodsImForm_multiple").val() < 1){
+            $("#GoodsImForm_multiple").val(1);
+        }
+    }
+});
+$("#radio-change input").eq('.$rulesType.').trigger("change");
+';
+Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 $js = Script::genReadonlyField();
 Yii::app()->clientScript->registerScript('readonlyClass',$js,CClientScript::POS_READY);
 ?>

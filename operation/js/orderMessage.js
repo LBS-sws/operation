@@ -1,6 +1,6 @@
 
 function waitingMessageHeader(url,str) {
-    console.log(str);
+    //console.log(str);
     var $message = $("#navbar-collapse a[href='"+str+"/index.php/purchase/index']");
     if($message.length == 1){
         $.ajax({
@@ -9,7 +9,7 @@ function waitingMessageHeader(url,str) {
             data: {id:""},
             dataType: "json",
             success: function(data){
-                console.log(data);
+                //console.log(data);
                 if(data["fast_num"] != 0){
                     $("#navbar-collapse a[href='"+str+"/index.php/fast/index']").append("<span class='badge'>"+data["fast_num"]+"</span>");
                 }

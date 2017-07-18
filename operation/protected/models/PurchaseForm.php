@@ -75,6 +75,7 @@ class PurchaseForm extends CFormModel
             $this->addError($attribute,$message);
             return false;
         }
+        $validateList = array();
         foreach ($goods_list as $key =>$goods){
             if(empty($goods["goods_id"]) && empty($goods["confirm_num"])){
                 unset($this->goods_list[$key]);
@@ -84,6 +85,58 @@ class PurchaseForm extends CFormModel
                 return false;
             }else if(!is_numeric($goods["confirm_num"]) || floor($goods["confirm_num"])!=$goods["confirm_num"]){
                 $message = Yii::t('procurement','Actual Number can only be numbered');
+                $this->addError($attribute,$message);
+                return false;
+            }else{
+                $list = OrderForm::getOneGoodsToId($goods["goods_id"],$this->order_class);
+                if (empty($list)){
+                    $message = Yii::t('procurement','Not Font Goods').$goods["name"];
+                    $this->addError($attribute,$message);
+                    return false;
+                }else{
+                    if(empty($list["rules_id"])){
+                        //常規驗證
+                        if (intval($goods["confirm_num"])%intval($list["multiple"]) != 0){
+                            $message = $list["name"]." ".Yii::t('procurement','Multiple is').$list["multiple"];
+                            $this->addError($attribute,$message);
+                            return false;
+                        }elseif (intval($list["big_num"])<intval($goods["confirm_num"])){
+                            $message = $list["name"]." ".Yii::t('procurement','Max Number is').$list["big_num"];
+                            $this->addError($attribute,$message);
+                            return false;
+                        }elseif (intval($list["small_num"])>intval($goods["confirm_num"])){
+                            $message = $list["name"]." ".Yii::t('procurement','Min Number is').$list["small_num"];
+                            $this->addError($attribute,$message);
+                            return false;
+                        }
+                    }else{
+                        //混合驗證
+                        if(empty($validateList[$list["rules_id"]])){
+                            $rules = RulesForm::getRulesToId($list["rules_id"]);
+                            $validateList[$list["rules_id"]] = array(
+                                "rulesName"=>$rules["name"],
+                                "rulesMultiple"=>$rules["multiple"],
+                                "rulesMin"=>$rules["min"],
+                                "rulesMax"=>$rules["max"],
+                                "goodsNum"=>0,
+                            );
+                        }
+                        $validateList[$list["rules_id"]]["goodsNum"]+=intval($goods["confirm_num"]);
+                    }
+                }
+            }
+        }
+        foreach ($validateList as $hybrid){
+            if (intval($hybrid["goodsNum"])%intval($hybrid["rulesMultiple"]) != 0){
+                $message = $hybrid["rulesName"]." ".Yii::t('procurement','Multiple is').$hybrid["rulesMultiple"];
+                $this->addError($attribute,$message);
+                return false;
+            }elseif (intval($hybrid["rulesMax"])<intval($hybrid["goodsNum"])){
+                $message = $hybrid["rulesName"]." ".Yii::t('procurement','Max Number is').$hybrid["rulesMax"];
+                $this->addError($attribute,$message);
+                return false;
+            }elseif (intval($hybrid["rulesMin"])>intval($hybrid["goodsNum"])){
+                $message = $hybrid["rulesName"]." ".Yii::t('procurement','Min Number is').$hybrid["rulesMin"];
                 $this->addError($attribute,$message);
                 return false;
             }

@@ -10,7 +10,9 @@ class GoodsFaForm extends CFormModel
 	public $unit;
 	public $price;
     public $big_num = 99999;
-    public $small_num = 0;
+    public $small_num = 1;
+    public $multiple = 1;
+    public $rules_id = 0;
 	public $origin;
 
 	public function attributeLabels()
@@ -18,6 +20,8 @@ class GoodsFaForm extends CFormModel
 		return array(
             'goods_code'=>Yii::t('procurement','Goods Code'),
             'name'=>Yii::t('procurement','Name'),
+            'multiple'=>Yii::t('procurement','Multiple'),
+            'rules_id'=>Yii::t('procurement','Hybrid Rules'),
             'classify_id'=>Yii::t('procurement','Classify'),
             'type'=>Yii::t('procurement','Type'),
             'unit'=>Yii::t('procurement','Unit'),
@@ -34,7 +38,7 @@ class GoodsFaForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, goods_code, name, classify_id, type, unit, price, big_num, small_num, origin','safe'),
+			array('id, goods_code, name, classify_id, type, unit, price, rules_id, multiple, big_num, small_num, origin','safe'),
             array('goods_code','required'),
             array('name','required'),
             array('type','required'),
@@ -44,8 +48,10 @@ class GoodsFaForm extends CFormModel
             array('classify_id','required'),
             array('price','numerical','allowEmpty'=>false,'integerOnly'=>false),
             array('classify_id','numerical','allowEmpty'=>true,'integerOnly'=>true),
-            array('big_num','numerical','allowEmpty'=>false,'integerOnly'=>true,'min'=>0),
-            array('small_num','numerical','allowEmpty'=>false,'integerOnly'=>true,'min'=>0),
+            array('big_num','numerical','allowEmpty'=>false,'integerOnly'=>true,'min'=>1),
+            array('small_num','numerical','allowEmpty'=>false,'integerOnly'=>true,'min'=>1),
+            array('multiple','numerical','allowEmpty'=>true,'integerOnly'=>true,'min'=>1),
+            array('rules_id','numerical','allowEmpty'=>true,'integerOnly'=>true,'min'=>0),
 			array('name','validateName'),
 			array('goods_code','validateCode'),
 		);
@@ -90,6 +96,8 @@ class GoodsFaForm extends CFormModel
                 $this->origin = $row['origin'];
                 $this->big_num = $row['big_num'];
                 $this->small_num = $row['small_num'];
+                $this->rules_id = $row['rules_id'];
+                $this->multiple = $row['multiple'];
                 break;
 			}
 		}
@@ -127,15 +135,17 @@ class GoodsFaForm extends CFormModel
                 break;
             case 'new':
                 $sql = "insert into opr_goods_fa(
-							name, type, unit, price, goods_code, classify_id, origin, big_num, small_num,lcu,lcd
+							name, type, unit, price, goods_code, classify_id, origin, rules_id, multiple, big_num, small_num,lcu,lcd
 						) values (
-							:name, :type, :unit, :price, :goods_code, :classify_id, :origin, :big_num, :small_num,:lcu,:lcd
+							:name, :type, :unit, :price, :goods_code, :classify_id, :origin, :rules_id, :multiple, :big_num, :small_num,:lcu,:lcd
 						)";
                 break;
             case 'edit':
                 $sql = "update opr_goods_fa set
 							name = :name, 
 							type = :type, 
+							multiple = :multiple, 
+							rules_id = :rules_id, 
 							unit = :unit,
 							classify_id = :classify_id,
 							origin = :origin,
@@ -169,6 +179,10 @@ class GoodsFaForm extends CFormModel
             $command->bindParam(':big_num',$this->big_num,PDO::PARAM_INT);
         if (strpos($sql,':small_num')!==false)
             $command->bindParam(':small_num',$this->small_num,PDO::PARAM_INT);
+        if (strpos($sql,':multiple')!==false)
+            $command->bindParam(':multiple',$this->multiple,PDO::PARAM_INT);
+        if (strpos($sql,':rules_id')!==false)
+            $command->bindParam(':rules_id',$this->rules_id,PDO::PARAM_INT);
         if (strpos($sql,':name')!==false)
             $command->bindParam(':name',$this->name,PDO::PARAM_STR);
         if (strpos($sql,':goods_code')!==false)

@@ -9,8 +9,8 @@ class GoodsImForm extends CFormModel
 	public $type;
 	public $unit;
 	public $price;
-	public $big_num;
-	public $small_num;
+    public $big_num = 99999;
+    public $small_num = 0;
 	public $origin;
 	public $len;
 	public $width;

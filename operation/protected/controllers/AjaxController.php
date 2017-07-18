@@ -22,7 +22,7 @@ class AjaxController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('dummy',),
+				'actions'=>array('dummy','waitingmessage'),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -53,6 +53,16 @@ class AjaxController extends Controller
 		echo '{"loggedin":'.($rtn?'true':'false').'}';
 		Yii::app()->end();
 	}
+
+	public function actionWaitingmessage(){
+        if(Yii::app()->request->isAjaxRequest) {//是否ajax请求
+            $arr = OrderList::waitingMessage();
+            echo CJSON::encode($arr);
+        }else{
+            echo "Error:404";
+        }
+        Yii::app()->end();
+    }
 
 //	public function actionSystemDate()
 //	{

@@ -198,4 +198,27 @@ class OrderList extends CListPageModel
         }
 	    return $activityIdSql;
     }
+
+    //獲取訂單需要處理的數據
+    public function waitingMessage(){
+        $city = Yii::app()->user->city();
+        $uid = Yii::app()->user->id;
+        $fast_num = Yii::app()->db->createCommand()->select("count(id)")
+            ->from("opr_order")->where('status="sent" and order_class="Fast" and judge=1')->queryScalar();
+        $imDo_num = Yii::app()->db->createCommand()->select("count(id)")
+            ->from("opr_order")->where('status="sent" and order_class!="Fast" and judge=1')->queryScalar();
+        $take_num = Yii::app()->db->createCommand()->select("count(id)")
+            ->from("opr_order")->where('status="approve" and judge=1 and city=:city',array(":city"=>$city))->queryScalar();
+        $deli_num = Yii::app()->db->createCommand()->select("count(id)")
+            ->from("opr_order")->where('status="sent" and judge=0 and city=:city',array(":city"=>$city))->queryScalar();
+        $goods_num = Yii::app()->db->createCommand()->select("count(id)")
+            ->from("opr_order")->where('status="approve" and judge=0 and city=:city and lcu=:lcu',array(":city"=>$city,":lcu"=>$uid))->queryScalar();
+        return array(
+            "fast_num"=>$fast_num,//快速訂單的數量
+            "imDo_num"=>$imDo_num,//採購活動的數量
+            "take_num"=>$take_num,//地區收貨的數量
+            "deli_num"=>$deli_num,//地區發貨的數量
+            "goods_num"=>$goods_num,//技術員收貨的數量
+        );
+    }
 }

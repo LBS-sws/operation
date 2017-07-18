@@ -89,6 +89,7 @@
 <?php
 if (!Yii::app()->user->isGuest) {
 	$checkurl = Yii::app()->createUrl("ajax/checksession");
+    $waitingMessageUrl = Yii::app()->createUrl("ajax/waitingmessage");
 	$loginurl = Yii::app()->createUrl("site/logout");
 	$js = "
 var checkLogin = function() {
@@ -110,6 +111,7 @@ var checkLogin = function() {
 	});
 };
 var logincheckinterval = setInterval(checkLogin, 30000);
+waitingMessageHeader('$waitingMessageUrl','".Yii::app()->baseUrl."');
 	";
 	Yii::app()->clientScript->registerScript('checksession',$js,CClientScript::POS_READY);
 	$js = "
@@ -132,7 +134,8 @@ $("#'.$oid.'").on("click",function(){$("#syschangedialog").modal("hide");window.
 		}
 	}
 	Yii::app()->clientScript->registerScript('systemchange',$js,CClientScript::POS_READY);
+
+Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/orderMessage.js", CClientScript::POS_END);
 }
 ?>
-</script>
 </html>

@@ -109,13 +109,14 @@ class PurchaseView extends CFormModel
                             <th>".Yii::t("procurement","Unit")."</th>
                             <th>".Yii::t("procurement","Gross Weight（kg）")."</th>
                             <th>".Yii::t("procurement","Net Weight（kg）")."</th>
+                            <th>".Yii::t("procurement","Multiple")."</th>
                             <th>".Yii::t("procurement","Confirm Number")."</th>
                             <th>".Yii::t("procurement","Total Gross Weight（kg）")."</th>
                             <th>".Yii::t("procurement","Total Net Weight（kg）")."</th>
                             </tr></thead><tbody>";
                     foreach ($list as $goods){
-                        $sum+=floatval($goods["gross_weight"])*intval($goods["confirm_num"]);
-                        $exSum+=intval($goods["confirm_num"])*floatval($goods["net_weight"]);
+                        $sum+=floatval($goods["gross_weight"])*intval($goods["confirm_num"])/intval($goods["multiple"]);
+                        $exSum+=intval($goods["confirm_num"])*floatval($goods["net_weight"])/intval($goods["multiple"]);
                         $html.="<tr>
                         <td>".$goods["goods_code"]."</td>
                         <td>".$goods["name"]."</td>
@@ -123,12 +124,13 @@ class PurchaseView extends CFormModel
                         <td>".$goods["unit"]."</td>
                         <td>".$goods["gross_weight"]."</td>
                         <td>".$goods["net_weight"]."</td>
+                        <td>".$goods["multiple"]."</td>
                         <td>".$goods["confirm_num"]."</td>
-                        <td>".(floatval($goods["gross_weight"])*intval($goods["confirm_num"]))."</td>
-                        <td>".(floatval($goods["net_weight"])*intval($goods["confirm_num"]))."</td>
+                        <td>".(floatval($goods["gross_weight"])*(intval($goods["confirm_num"])/intval($goods["multiple"])))."</td>
+                        <td>".(floatval($goods["net_weight"])*intval($goods["confirm_num"])/intval($goods["multiple"]))."</td>
                         </tr>";
                     }
-                    $html.="</tbody><tfoot><tr><td colspan='7'></td><td class='fa-2x'>$sum</td><td class='fa-2x'>$exSum</td></tr></tfoot></table>";
+                    $html.="</tbody><tfoot><tr><td colspan='8'></td><td class='fa-2x'>$sum</td><td class='fa-2x'>$exSum</td></tr></tfoot></table>";
                 }
                 break;
             case "volume_class":

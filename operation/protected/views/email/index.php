@@ -1,9 +1,9 @@
 <?php
-$this->pageTitle=Yii::app()->name . ' - Rules Info';
+$this->pageTitle=Yii::app()->name . ' - Head Email';
 ?>
 
 <?php $form=$this->beginWidget('TbActiveForm', array(
-'id'=>'rules-list',
+'id'=>'email-list',
 'enableClientValidation'=>true,
 'clientOptions'=>array('validateOnSubmit'=>true,),
 'layout'=>TbHtml::FORM_LAYOUT_INLINE,
@@ -11,7 +11,7 @@ $this->pageTitle=Yii::app()->name . ' - Rules Info';
 
 <section class="content-header">
 	<h1>
-		<strong><?php echo Yii::t('app','Goods Hybrid Rules'); ?></strong>
+		<strong><?php echo Yii::t('app','Head Email'); ?></strong>
 	</h1>
 <!--
 	<ol class="breadcrumb">
@@ -28,24 +28,22 @@ $this->pageTitle=Yii::app()->name . ' - Rules Info';
             <div class="btn-group" role="group">
                 <?php
                 //var_dump(Yii::app()->session['rw_func']);
-                if (Yii::app()->user->validRWFunction('YG06'))
+                if (Yii::app()->user->validRWFunction('YS05'))
                     echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('misc','Add'), array(
-                        'submit'=>Yii::app()->createUrl('rules/new'),
+                        'submit'=>Yii::app()->createUrl('email/new'),
                     ));
                 ?>
             </div>
         </div>
     </div>
 	<?php $this->widget('ext.layout.ListPageWidget', array(
-			'title'=>Yii::t('procurement','Hybrid Rules List'),
+			'title'=>Yii::t('procurement','Head Email List'),
 			'model'=>$model,
-				'viewhdr'=>'//rules/_listhdr',
-				'viewdtl'=>'//rules/_listdtl',
+				'viewhdr'=>'//email/_listhdr',
+				'viewdtl'=>'//email/_listdtl',
 				'search'=>array(
 							'name',
-							'multiple',
-							'max',
-							'min',
+							'email',
 						),
 		));
 	?>

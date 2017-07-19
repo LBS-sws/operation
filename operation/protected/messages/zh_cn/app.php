@@ -71,6 +71,7 @@ return array(
     'Order List'=>'订单列表',
     'Order Purchase'=>'采购订单明细',
     'Fast Order'=>'快速货订单管理',
+    'Head Email'=>'中央邮件',
 
     'Technician'=>'领料管理',
     'Technician List'=>'技术员领料列表',

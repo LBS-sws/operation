@@ -138,29 +138,37 @@ class PurchaseView extends CFormModel
                     $classifyName = ClassifyForm::getClassifyToId($key);
                     $html.="<legend>$classifyName</legend>";
                     $sum = 0;
-                    $exSum = 0;
                     $html.="<table class='table table-bordered table-striped'><thead><tr>
                             <th>".Yii::t("procurement","Goods Code")."</th>
                             <th>".Yii::t("procurement","Goods Name")."</th>
                             <th>".Yii::t("procurement","Type")."</th>
                             <th>".Yii::t("procurement","Unit")."</th>
                             <th>".Yii::t("procurement","Length×Width×Height（cm）")."</th>
+                            <th>".Yii::t("procurement","Volume")."（m³）</th>
+                            <th>".Yii::t("procurement","Multiple")."</th>
                             <th>".Yii::t("procurement","Confirm Number")."</th>
-                            <th>".Yii::t("procurement","Total Volume")."</th>
+                            <th>".Yii::t("procurement","Total Volume")."（m³）</th>
                             </tr></thead><tbody>";
                     foreach ($list as $goods){
                         //$exSum+=intval($goods["confirm_num"])*floatval($goods["net_weight"]);
+                        $volume = floatval($goods["len"])*floatval($goods["width"])*floatval($goods["height"])/1000000;
+                        $multiple = empty($goods["rules_id"])?$goods["multiple"]:RulesForm::getRulesToId($goods["rules_id"])["multiple"];
+                        $multiple = empty($multiple)?1:intval($multiple);
+                        $total_multiple = $volume*(intval($goods["confirm_num"])/$multiple);
+                        $sum+=$total_multiple;
                         $html.="<tr>
                         <td>".$goods["goods_code"]."</td>
                         <td>".$goods["name"]."</td>
                         <td>".$goods["type"]."</td>
                         <td>".$goods["unit"]."</td>
                         <td>".$goods["len"]."×".$goods["width"]."×".$goods["height"]."</td>
+                        <td>".sprintf("%.2f",$volume)."</td>
+                        <td>".$multiple."</td>
                         <td>".$goods["confirm_num"]."</td>
-                        <td>"."沒有公式，無法計算"."</td>
+                        <td>".sprintf("%.2f",$total_multiple)."</td>
                         </tr>";
                     }
-                    $html.="</tbody><tfoot><tr><td colspan='6'></td><td class='fa-2x'>&nbsp;</td></tr></tfoot></table>";
+                    $html.="</tbody><tfoot><tr><td colspan='8'></td><td class='fa-2x'>".sprintf("%.2f",$sum)."</td></tr></tfoot></table>";
                 }
                 break;
         }
@@ -186,6 +194,8 @@ class PurchaseView extends CFormModel
                         "name"=>$goods["name"],
                         "type"=>$goods["type"],
                         "unit"=>$goods["unit"],
+                        "multiple"=>$goods["multiple"],
+                        "rules_id"=>$goods["rules_id"],
                         "gross_weight"=>empty($goods["gross_weight"])?"":$goods["gross_weight"],
                         "net_weight"=>empty($goods["net_weight"])?"":$goods["net_weight"],
                         "len"=>empty($goods["len"])?"":$goods["len"],

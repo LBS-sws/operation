@@ -38,6 +38,7 @@ return array(
     'Length×Width×Height（cm）'=>'長×寬×高（cm）',
     'Weight Class'=>'重量統計',
     'Price Class'=>'價格統計',
+    'Volume'=>'體積',
     'Volume Class'=>'體積統計',
     'Total Volume'=>'總體積',
 
@@ -79,6 +80,7 @@ return array(
     'Remark'=>'備註',
 
     'the name of already exists'=>'名稱已存在',
+    'the email of already exists'=>'郵箱已存在',
     'the Goods Code of already exists'=>'物品編號已存在',
     'the Activity Title of already exists'=>'活動標題已存在',
     'the Activity Code of already exists'=>'活動編號已经存在',
@@ -187,5 +189,11 @@ return array(
     'Hybrid Rules Form'=>'混合規則表單',
     'Rules Name'=>'規則名字',
     'Multiple'=>'數量倍率',
+
+    //中央郵件
+    'Head Email List'=>'中央郵件列表',
+    'Head Email Form'=>'中央郵件表單',
+    'Email'=>'郵件',
+    'Keep at least one email'=>'至少保留一個郵箱',
 );
 ?>

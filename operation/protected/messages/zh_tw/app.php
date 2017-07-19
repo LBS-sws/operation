@@ -71,6 +71,7 @@ return array(
     'Order Access'=>'訂單權限',
     'Order List'=>'訂單列表',
     'Order Purchase'=>'訂單採購',
+    'Head Email'=>'中央郵件',
 
     'Technician'=>'領料管理',
     'Technician List'=>'技術員領料列表',

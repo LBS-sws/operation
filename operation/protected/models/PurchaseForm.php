@@ -237,6 +237,8 @@ class PurchaseForm extends CFormModel
 	}
 
 	protected function saveGoods(&$connection) {
+        $oldOrderStatus = Yii::app()->db->createCommand()->select()->from("opr_order")
+            ->where("id=:id",array(":id"=>$this->id))->queryAll();
 		$sql = '';
         switch ($this->scenario) {
             case 'edit':
@@ -311,6 +313,10 @@ class PurchaseForm extends CFormModel
                 ), 'id=:id', array(':id'=>$goods["id"]));
             }
         }
+
+
+        //發送郵件
+        OrderGoods::sendEmail($oldOrderStatus,$this->status,$this->order_code,$this->activity_id);
 		return true;
 	}
 	//退回

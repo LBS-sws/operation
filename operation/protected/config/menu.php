@@ -56,6 +56,11 @@ return array(
 				'access'=>'YS04',
 				'url'=>'/fast/index',
 			),
+            //快速訂單
+			'Head Email'=>array(
+				'access'=>'YS05',
+				'url'=>'/email/index',
+			),
 		),
 	),
     //區域管理員下單

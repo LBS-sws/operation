@@ -1,20 +1,16 @@
 <?php
 
-class RulesForm extends CFormModel
+class EmailForm extends CFormModel
 {
 	public $id;
 	public $name;
-	public $multiple = 1;
-	public $max = 99999;
-	public $min = 1;
+	public $email;
 
 	public function attributeLabels()
 	{
 		return array(
             'name'=>Yii::t('procurement','Name'),
-            'multiple'=>Yii::t('procurement','Multiple'),
-            'max'=>Yii::t('procurement','Max Number'),
-            'min'=>Yii::t('procurement','Min Number'),
+            'email'=>Yii::t('procurement','Email'),
 		);
 	}
 
@@ -24,25 +20,22 @@ class RulesForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, name,multiple,max,min','safe'),
+			array('id, name,email','safe'),
             array('name','required'),
-            array('multiple','required'),
-            array('max','required'),
-            array('min','required'),
+            array('email','required'),
+            array('email', 'email'),
 			array('name','validateName'),
-            array('multiple','numerical','allowEmpty'=>true,'integerOnly'=>true,'min'=>1),
-            array('max','numerical','allowEmpty'=>true,'integerOnly'=>true,'min'=>1),
-            array('min','numerical','allowEmpty'=>true,'integerOnly'=>true,'min'=>1),
+			array('email','validateEmail'),
+            //, 'message'=>'必须为电子邮箱', 'pattern'=>'/[a-z]/i'
 		);
 	}
 
 	public function validateName($attribute, $params){
-        $city = Yii::app()->user->city();
         $id = -1;
         if(!empty($this->id)){
             $id = $this->id;
         }
-        $rows = Yii::app()->db->createCommand()->select("id")->from("opr_goods_rules")
+        $rows = Yii::app()->db->createCommand()->select("id")->from("opr_email")
             ->where('name=:name and id!=:id', array(':name'=>$this->name,':id'=>$id))->queryAll();
         if(count($rows)>0){
             $message = Yii::t('procurement','the name of already exists');
@@ -50,50 +43,49 @@ class RulesForm extends CFormModel
         }
 	}
 
+	public function validateEmail($attribute, $params){
+        $id = -1;
+        if(!empty($this->id)){
+            $id = $this->id;
+        }
+        $rows = Yii::app()->db->createCommand()->select("id")->from("opr_email")
+            ->where('email=:email and id!=:id', array(':email'=>$this->email,':id'=>$id))->queryAll();
+        if(count($rows)>0){
+            $message = Yii::t('procurement','the email of already exists');
+            $this->addError($attribute,$message);
+        }
+	}
+
 	public function retrieveData($index) {
 		$rows = Yii::app()->db->createCommand()->select("*")
-            ->from("opr_goods_rules")->where("id=:id",array(":id"=>$index))->queryAll();
+            ->from("opr_email")->where("id=:id",array(":id"=>$index))->queryAll();
 		if (count($rows) > 0) {
 			foreach ($rows as $row) {
                 $this->id = $row['id'];
                 $this->name = $row['name'];
-                $this->multiple = $row['multiple'];
-                $this->max = $row['max'];
-                $this->min = $row['min'];
+                $this->email = $row['email'];
                 break;
 			}
 		}
 		return true;
 	}
 
-    //獲取規則列表
-    public function getRulesList(){
-	    $arr = array(0=>"");
-        $rs = Yii::app()->db->createCommand()->select()->from("opr_goods_rules")->queryAll();
+    //獲取郵箱列表
+    public function getEmailList(){
+	    $arr = array();
+        $rs = Yii::app()->db->createCommand()->select()->from("opr_email")->queryAll();
         if($rs){
             foreach ($rs as $row){
-                $arr[$row["id"]] = $row["name"];
+                array_push($arr,$row["email"]);
             }
         }
         return $arr;
     }
 
-    //根據規則id查規則列表
-    public function getRulesToId($rules_id){
-        $rs = Yii::app()->db->createCommand()->select()
-            ->from("opr_goods_rules")->where('id=:id',array(':id'=>$rules_id))->queryAll();
-        if($rs){
-            return $rs[0];
-        }
-        return array();
-    }
-
     //刪除驗證
     public function deleteValidate(){
-        $rs0 = Yii::app()->db->createCommand()->select()->from("opr_goods_do")->where('rules_id=:rules_id',array(':rules_id'=>$this->id))->queryAll();
-        $rs1 = Yii::app()->db->createCommand()->select()->from("opr_goods_fa")->where('rules_id=:rules_id',array(':rules_id'=>$this->id))->queryAll();
-        $rs2 = Yii::app()->db->createCommand()->select()->from("opr_goods_im")->where('rules_id=:rules_id',array(':rules_id'=>$this->id))->queryAll();
-        if($rs0 || $rs1 || $rs2){
+        $rs0 = Yii::app()->db->createCommand()->select()->from("opr_email")->queryAll();
+        if(count($rs0)<2){
             return false;
         }else{
             return true;
@@ -118,21 +110,19 @@ class RulesForm extends CFormModel
 		$sql = '';
         switch ($this->scenario) {
             case 'delete':
-                $sql = "delete from opr_goods_rules where id = :id";
+                $sql = "delete from opr_email where id = :id";
                 break;
             case 'new':
-                $sql = "insert into opr_goods_rules(
-							name,multiple,max,min, lcu, lcd
+                $sql = "insert into opr_email(
+							name,email, lcu, lcd
 						) values (
-							:name,:multiple,:max,:min, :lcu, :lcd
+							:name,:email, :lcu, :lcd
 						)";
                 break;
             case 'edit':
-                $sql = "update opr_goods_rules set
+                $sql = "update opr_email set
 							name = :name, 
-							multiple = :multiple, 
-							max = :max, 
-							min = :min, 
+							email = :email, 
 							luu = :luu,
 							lud = :lud
 						where id = :id
@@ -150,12 +140,8 @@ class RulesForm extends CFormModel
             $command->bindParam(':id',$this->id,PDO::PARAM_INT);
         if (strpos($sql,':name')!==false)
             $command->bindParam(':name',$this->name,PDO::PARAM_STR);
-        if (strpos($sql,':multiple')!==false)
-            $command->bindParam(':multiple',$this->multiple,PDO::PARAM_INT);
-        if (strpos($sql,':max')!==false)
-            $command->bindParam(':max',$this->max,PDO::PARAM_INT);
-        if (strpos($sql,':min')!==false)
-            $command->bindParam(':min',$this->min,PDO::PARAM_INT);
+        if (strpos($sql,':email')!==false)
+            $command->bindParam(':email',$this->email,PDO::PARAM_INT);
 
         if (strpos($sql,':luu')!==false)
             $command->bindParam(':luu',$uid,PDO::PARAM_STR);

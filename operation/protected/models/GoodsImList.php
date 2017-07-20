@@ -9,7 +9,7 @@ class GoodsImList extends CListPageModel
 			'name'=>Yii::t('procurement','Name'),
 			'type'=>Yii::t('procurement','Type'),
 			'unit'=>Yii::t('procurement','Unit'),
-			'price'=>Yii::t('procurement','Price（$）'),
+			'price'=>Yii::t('procurement','Price（US$）'),
 			'stickies_id'=>Yii::t('procurement','Stickies'),
 			'net_weight'=>Yii::t('procurement','Net Weight（kg）'),
 			'gross_weight'=>Yii::t('procurement','Gross Weight（kg）'),

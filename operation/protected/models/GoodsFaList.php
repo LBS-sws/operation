@@ -9,7 +9,7 @@ class GoodsFaList extends CListPageModel
 			'name'=>Yii::t('procurement','Name'),
 			'type'=>Yii::t('procurement','Type'),
 			'unit'=>Yii::t('procurement','Unit'),
-			'price'=>Yii::t('procurement','Price（$）'),
+			'price'=>Yii::t('procurement','Price（US$）'),
 		);
 	}
 	

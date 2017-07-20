@@ -30,7 +30,7 @@ class GoodsImForm extends CFormModel
             'classify_id'=>Yii::t('procurement','Classify'),
             'type'=>Yii::t('procurement','Type'),
             'unit'=>Yii::t('procurement','Unit'),
-            'price'=>Yii::t('procurement','Price（RMB）'),
+            'price'=>Yii::t('procurement','Price（US$）'),
             'big_num'=>Yii::t('procurement','Max Number'),
             'small_num'=>Yii::t('procurement','Min Number'),
             'origin'=>Yii::t('procurement','Origin'),

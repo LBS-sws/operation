@@ -8,7 +8,7 @@ class ActivityForm extends CFormModel
 	public $start_time;
 	public $end_time;
 	public $order_class;
-	public $num=100;
+	public $num=1;
     public $luu;
     public $lcu;
     public $lud;

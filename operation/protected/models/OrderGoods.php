@@ -57,14 +57,19 @@ class OrderGoods extends CActiveRecord{
         ));
     }
 
-    //訂單發郵件
+    //訂單發郵件(總部)
     public function sendEmail($oldOrderStatus,$stauts,$order_code=0,$activity_id = 0){
         $city = Yii::app()->user->city();
         $uid = Yii::app()->user->id;
-        $activity_id = empty($activity_id)?$oldOrderStatus[0]["activity_id"]:$activity_id;
         $activityList = new ActivityForm();
-        if(!$activityList->retrieveData($activity_id)){
-            return false;
+        if(empty($oldOrderStatus[0]["activity_id"])){
+            $activityList->activity_code = "快速訂單";
+            $activityList->activity_title = "快速訂單";
+        }else{
+            $activity_id = empty($activity_id)?$oldOrderStatus[0]["activity_id"]:$activity_id;
+            if(!$activityList->retrieveData($activity_id)){
+                return false;
+            }
         }
         $html = "<p>採購編號：".$activityList->activity_code."</p>";
         $html .= "<p>採購標題：".$activityList->activity_title."</p>";
@@ -94,6 +99,44 @@ class OrderGoods extends CActiveRecord{
                 $html .= "<p>下單時間：".date('Y-m-d H:i:s')."</p>";
                 $html .= "<p>訂單編號：".$order_code."</p>";
                 OrderGoods::formEmail("營運系統：要求審核訂單（訂單編號：".$order_code."）",$html);
+            }
+        }
+    }
+    //訂單發郵件(倉庫)
+    public function sendEmailTwo($oldOrderStatus,$stauts,$order_code=0){
+        $city = Yii::app()->user->city();
+        $uid = Yii::app()->user->id;
+        $email = ActivityForm::getEmailToCity($city);
+        if(empty($email)){
+            return false;
+        }
+        $html = "";
+        //發送郵件
+        if($oldOrderStatus){
+            if($oldOrderStatus[0]["status"] != $stauts){
+                $html .= "<p>下單城市：".$oldOrderStatus[0]["city"]."</p>";
+                $html .= "<p>下單用戶：".$oldOrderStatus[0]["lcu"]."</p>";
+                $html .= "<p>下單時間：".$oldOrderStatus[0]["lcd"]."</p>";
+                $html .= "<p>訂單編號：".$oldOrderStatus[0]["order_code"]."</p>";
+                if($stauts == "sent"){
+                    OrderGoods::formEmail("營運系統：要求倉庫發貨（訂單編號：".$oldOrderStatus[0]["order_code"]."）",$html,$email);
+                }elseif ($stauts == "finished"){ //收貨
+                    OrderGoods::formEmail("營運系統：倉庫已發貨，領料員已收貨（訂單編號：".$oldOrderStatus[0]["order_code"]."）",$html,$email);
+                }elseif ($stauts == "approve"){ //批准
+                    OrderGoods::formEmail("營運系統：倉庫已發貨，等待領料員收貨（訂單編號：".$oldOrderStatus[0]["order_code"]."）",$html,$oldOrderStatus[0]["lcu_email"]);
+                }elseif ($stauts == "reject"){  //拒絕
+                    OrderGoods::formEmail("營運系統：訂單已拒絕，請查看詳情（訂單編號：".$oldOrderStatus[0]["order_code"]."）",$html,$oldOrderStatus[0]["lcu_email"]);
+                }elseif ($stauts == "read"){  //查看
+                    OrderGoods::formEmail("營運系統：訂單已查看，等待倉庫發貨（訂單編號：".$oldOrderStatus[0]["order_code"]."）",$html,$oldOrderStatus[0]["lcu_email"]);
+                }
+            }
+        }else{
+            if($stauts == "sent"){
+                $html .= "<p>下單城市：".$city."</p>";
+                $html .= "<p>下單用戶：".$uid."</p>";
+                $html .= "<p>下單時間：".date('Y-m-d H:i:s')."</p>";
+                $html .= "<p>訂單編號：".$order_code."</p>";
+                OrderGoods::formEmail("營運系統：要求倉庫發貨（訂單編號：".$order_code."）",$html,$email);
             }
         }
     }

@@ -143,6 +143,8 @@ class TechnicianForm extends CFormModel
     }
 
     protected function saveGoods(&$connection) {
+        $oldOrderStatus = Yii::app()->db->createCommand()->select()->from("opr_order")
+            ->where("id=:id",array(":id"=>$this->id))->queryAll();
         $sql = '';
         $goodsBool = true;
         $insetBool = false;
@@ -244,6 +246,7 @@ class TechnicianForm extends CFormModel
                 'order_code'=>$this->order_code,
                 'judge'=>0,
                 'city'=>$city,
+                'lcu_email'=>Yii::app()->user->email(),
             ), 'id=:id', array(':id'=>$this->id));
         }
         if ($this->scenario=='delete'){
@@ -285,6 +288,9 @@ class TechnicianForm extends CFormModel
                 }
             }
         }
+
+        //發送郵件
+        OrderGoods::sendEmailTwo($oldOrderStatus,$this->status,$this->order_code);
         return true;
     }
 }

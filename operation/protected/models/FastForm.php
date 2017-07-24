@@ -74,7 +74,7 @@ class FastForm extends CFormModel
         foreach ($goods_list as $key =>$goods){
             if(empty($goods["goods_id"]) && empty($goods["confirm_num"])){
                 unset($this->goods_list[$key]);
-            }else if (empty($goods["confirm_num"])){
+            }else if (empty($goods["confirm_num"]) && $goods["confirm_num"] != 0){
                 $message = Yii::t('procurement','Actual Number cannot be empty');
                 $this->addError($attribute,$message);
                 return false;

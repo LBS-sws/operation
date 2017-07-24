@@ -217,7 +217,8 @@ class OrderForm extends CFormModel
                 "name"=>$goods["name"],
                 "type"=>$goods["type"],
                 "unit"=>$goods["unit"],
-                "price"=>$goods["price"],
+                "price"=>$goods["price"],//rules_id
+                "multiple"=>empty($goods["rules_id"])?$goods["multiple"]:RulesForm::getRulesToId($goods["rules_id"])["multiple"],
                 "classify_id"=>$goods["classify_id"],
                 "stickies_id"=>empty($goods["stickies_id"])?"":$goods["stickies_id"]
             );
@@ -231,7 +232,8 @@ class OrderForm extends CFormModel
                 $list["LWH"] = $goods["len"]."×".$goods["width"]."×".$goods["height"];
             }
             $list["goods_num"] = $row["goods_num"];
-            $list["confirm_num"] = empty($row["confirm_num"])?$row["goods_num"]:$row["confirm_num"];
+
+            $list["confirm_num"] = (empty($row["confirm_num"]) && $row['confirm_num'] !== "0")?$row["goods_num"]:$row["confirm_num"];
             $list["note"] = $row["note"];
             $list["remark"] = $row["remark"];
             array_push($arr,$list);

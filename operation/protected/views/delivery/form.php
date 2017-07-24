@@ -122,7 +122,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                         foreach ($model->goods_list as $key => $val){
                             $con_num = empty($val['id'])?$key:$val['id'];
                             $tableTr = "<tr datanum='$con_num'>";
-                            $val['confirm_num'] = empty($val['confirm_num'])?$val['goods_num']:$val['confirm_num'];
+                            $val['confirm_num'] = (empty($val['confirm_num']) && $val['confirm_num'] !== "0")?$val['goods_num']:$val['confirm_num'];
                             $tableTr.="<td><input type='text' class='form-control testInput' readonly name='DeliveryForm[goods_list][$con_num][name]' value='".$val['name']."'>";
                             $tableTr.="<input type='hidden' name='DeliveryForm[goods_list][$con_num][goods_id]' value='".$val['goods_id']."'>";
                             $tableTr.="<input type='hidden' name='DeliveryForm[goods_list][$con_num][id]' value='".$val['id']."'></td>";

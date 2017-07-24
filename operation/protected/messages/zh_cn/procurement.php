@@ -19,7 +19,6 @@ return array(
     'Multiple is'=>'的倍數是',
 	'Min Number is'=>'最小数量是',
 
-
 	'Type'=>'包装规格',
 	'Unit'=>'单位',
 	'Price（US$）'=>'单价（US$）',
@@ -197,5 +196,9 @@ return array(
     'Head Email Form'=>'中央邮件表单',
     'Email'=>'邮件',
     'Keep at least one email'=>'至少保留一个邮箱',
+
+    //後期修改
+    'Warehouse'=>'领料分类',
+    'Class Type'=>'分类类型',
 );
 ?>

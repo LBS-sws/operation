@@ -6,6 +6,11 @@
         ?>
     </th>
     <th>
+        <?php echo TbHtml::link($this->getLabelName('class_type').$this->drawOrderArrow('class_type'),'#',$this->createOrderLink('classify-list','class_type'))
+        ;
+        ?>
+    </th>
+    <th>
         <?php echo TbHtml::link($this->getLabelName('level').$this->drawOrderArrow('level'),'#',$this->createOrderLink('classify-list','level'))
         ;
         ?>

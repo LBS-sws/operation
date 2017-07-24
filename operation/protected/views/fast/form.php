@@ -102,12 +102,12 @@ $this->pageTitle=Yii::app()->name . ' - Fast Form';
                             <td width="20%"><?php echo Yii::t("procurement","Goods Name")?></td>
                             <td width="11%"><?php echo Yii::t("procurement","Type")?></td>
                             <td width="8%"><?php echo Yii::t("procurement","Unit")?></td>
-                            <td width="10%"><?php echo Yii::t("procurement",'Price（$）')?></td>
+                            <td width="10%"><?php echo Yii::t("procurement",'Price（US$）')?></td>
                             <td width="10%"><?php echo Yii::t("procurement","Demand Note")?></td>
                             <td width="10%"><?php echo Yii::t("procurement","Goods Number")?></td>
                             <td width="10%"><?php echo Yii::t("procurement","Actual Number")?></td>
                             <td width="10%"><?php echo Yii::t("procurement","Headquarters Note")?></td>
-                            <td width="10%"><?php echo Yii::t("procurement",'Total（$）')?></td>
+                            <td width="10%"><?php echo Yii::t("procurement",'Total（US$）')?></td>
                         </tr>
                         </thead>
                         <tbody>

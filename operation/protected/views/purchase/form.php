@@ -61,7 +61,9 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
                     //流程
                     echo TbHtml::button('<span class="fa fa-file-text-o"></span> '.Yii::t('misc','Flow'), array(
                         'name'=>'btnFlow','id'=>'btnFlow','data-toggle'=>'modal','data-target'=>'#flowinfodialog'));
-                    echo TbHtml::button('<span class="fa fa-backward"></span> '.Yii::t('procurement','Down'), array(
+
+                    //下載
+                    echo TbHtml::button('<span class="fa fa-cloud-download"></span> '.Yii::t('procurement','Down'), array(
                         'submit'=>Yii::app()->createUrl('Purchase/downorder',array("index"=>$model->id))));
                 }
                 ?>
@@ -104,7 +106,7 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
                         <thead>
                         <tr>
                             <?php
-                                $currencyType = $model->order_class=="Domestic"?"RMB":"$";
+                                $currencyType = $model->order_class=="Domestic"?"RMB":"US$";
                             ?>
                             <td width="20%"><?php echo Yii::t("procurement","Goods Name")?></td>
                             <td width="11%"><?php echo Yii::t("procurement","Type")?></td>

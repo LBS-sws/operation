@@ -6,6 +6,7 @@ class ClassifyList extends CListPageModel
 	{
 		return array(
 			'name'=>Yii::t('procurement','Name'),
+            'class_type'=>Yii::t('procurement','Class Type'),
             'level'=>Yii::t('procurement','Level'),
 		);
 	}
@@ -51,6 +52,7 @@ class ClassifyList extends CListPageModel
 					$this->attr[] = array(
 						'id'=>$record['id'],
 						'name'=>$record['name'],
+						'class_type'=>$record['class_type'],
 						'level'=>$record['level'],
 					);
 			}

@@ -79,7 +79,7 @@ class PurchaseForm extends CFormModel
         foreach ($goods_list as $key =>$goods){
             if(empty($goods["goods_id"]) && empty($goods["confirm_num"])){
                 unset($this->goods_list[$key]);
-            }else if (empty($goods["confirm_num"])){
+            }else if (empty($goods["confirm_num"]) && $goods["confirm_num"] != 0){
                 $message = Yii::t('procurement','Actual Number cannot be empty');
                 $this->addError($attribute,$message);
                 return false;
@@ -174,15 +174,27 @@ class PurchaseForm extends CFormModel
     public function resetGoodsList(){
         $goodsList = $this->goods_list;
         foreach ($goodsList as $key=>$goods){
+            $multiple = $goodsList[$key]["multiple"];
+            $multiple = intval($multiple);
             unset($goodsList[$key]["id"]);
             unset($goodsList[$key]["goods_id"]);
             unset($goodsList[$key]["classify_id"]);
             if($this->order_class != "Domestic"){
                 unset($goodsList[$key]["stickies_id"]);
+                $goodsList[$key]["total"] = sprintf("%.2f",floatval($goodsList[$key]["price"])*intval($goodsList[$key]["confirm_num"]));
+                $sum = floatval($goodsList[$key]["net_weight"])*intval($goodsList[$key]["confirm_num"])/$multiple;
+                $goodsList[$key]["total2"] = round($sum,2);
+                $sum = floatval($goodsList[$key]["gross_weight"])*intval($goodsList[$key]["confirm_num"])/$multiple;
+                $goodsList[$key]["total3"] = round($sum,2);
+                $volume = explode('×',$goodsList[$key]["LWH"]);
+                $volume = floatval($volume[0])*floatval($volume[1])*floatval($volume[2])/1000000;
+                $sum = $volume*intval($goodsList[$key]["confirm_num"])/$multiple;
+                $goodsList[$key]["total4"] = round($sum,2);
             }else{
                 $goodsList[$key]["stickies_id"] = $this->getStickiesToId($goodsList[$key]["stickies_id"]);
+                $goodsList[$key]["total"] = sprintf("%.2f",floatval($goodsList[$key]["price"])*intval($goodsList[$key]["confirm_num"]));
             }
-            $goodsList[$key]["total"] = sprintf("%.2f",floatval($goodsList[$key]["price"])*intval($goodsList[$key]["confirm_num"]));
+            unset($goodsList[$key]["multiple"]);
         }
         return $goodsList;
     }
@@ -203,7 +215,7 @@ class PurchaseForm extends CFormModel
             array_push($arr,"物品單價（RMB）");
             array_push($arr,"物品標籤");
         }else{
-            array_push($arr,'物品單價（$）');
+            array_push($arr,'物品單價（US$）');
         }
         if($this->order_class == "Import"){
             array_push($arr,"净重（kg）");
@@ -217,7 +229,10 @@ class PurchaseForm extends CFormModel
         if($this->order_class == "Domestic"){
             array_push($arr,"總價（RMB）");
         }else{
-            array_push($arr,'總價（$）');
+            array_push($arr,'總價（US$）');
+            array_push($arr,'總淨重（kg）');
+            array_push($arr,'總毛重（kg）');
+            array_push($arr,'總體積（m³）');
         }
         return $arr;
     }

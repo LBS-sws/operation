@@ -54,7 +54,7 @@ class DeliveryForm extends CFormModel
         foreach ($goods_list as $key =>$goods){
             if(empty($goods["goods_id"]) && empty($goods["confirm_num"])){
                 unset($this->goods_list[$key]);
-            }else if (empty($goods["confirm_num"])){
+            }else if (empty($goods["confirm_num"]) && $goods["confirm_num"] != 0){
                 $message = Yii::t('procurement','Actual Number cannot be empty');
                 $this->addError($attribute,$message);
                 return false;
@@ -118,6 +118,8 @@ class DeliveryForm extends CFormModel
 	}
 
 	protected function saveGoods(&$connection) {
+        $oldOrderStatus = Yii::app()->db->createCommand()->select()->from("opr_order")
+            ->where("id=:id",array(":id"=>$this->id))->queryAll();
 		$sql = '';
         switch ($this->scenario) {
             case 'edit':
@@ -200,6 +202,9 @@ class DeliveryForm extends CFormModel
                 }
             }
         }
+
+        //發送郵件
+        OrderGoods::sendEmailTwo($oldOrderStatus,$this->status,$this->order_code);
 		return true;
 	}
 

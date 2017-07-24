@@ -107,7 +107,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                         <tbody>
 
                         <?php
-                        $classify = ClassifyForm::getClassifyList();
+                        $classify = ClassifyForm::getClassifyList("Warehouse");
                             foreach ($model->goods_list as $key => $val){
                                 $con_num = empty($val['id'])?$key:$val['id'];
                                 $tableTr = "<tr datanum='$con_num'>";

@@ -1,8 +1,8 @@
-.dropdown-div{position: absolute;z-index: 99999;height:auto;overflow-x: hidden;overflow-y: scroll;max-height: 150px;}
+.dropdown-div{position: absolute;z-index: 99999;height:auto;overflow-x: hidden;overflow-y: scroll;max-height: 220px;}
 .dropdown-div>.dropdown-menu{position: static;display: block;}
-.bg-fff{background: #fff !important;}
 
-.bg-fff.dropdown-toggle{max-width: 70px;overflow: hidden;}
+.bg-fff{background: #fff !important;}
+.bg-fff.dropdown-toggle{float: left;width: 100%;overflow: hidden;}
 .goodsIfy>li>a{cursor: pointer;}
 .changeHelp{z-index: 111}
 .changeHelp>.fa{font-size: 16px;text-align: right;width: 20px;cursor: pointer;color:#3C8DBC;}
@@ -12,3 +12,7 @@
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
 }
+
+#table-change .input-group-btn{float: left;width: 100%;margin-bottom: 5px;}
+#table-change .dropdown-menu{overflow-x: hidden;overflow-y: scroll;max-height: 220px;}
+#table-change tbody>tr>td{vertical-align: middle;}

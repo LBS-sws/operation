@@ -117,7 +117,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                         <thead>
                         <tr>
                             <?php
-                            $currencyType = $model->order_class=="Domestic"?"RMB":'$';
+                            $currencyType = $model->order_class=="Domestic"?"RMB":'US$';
                             ?>
                             <td width="20%"><?php echo Yii::t("procurement","Goods Name")?></td>
                             <td width="11%"><?php echo Yii::t("procurement","Type")?></td>
@@ -125,7 +125,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                             <td width="10%"><?php echo Yii::t("procurement","Price（".$currencyType."）")?></td>
                             <td width="10%"><?php echo Yii::t("procurement","Goods Number")?></td>
                             <td width="12%"><?php echo Yii::t("procurement","Demand Note")?></td>
-                            <?php if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished")): ?>
+                            <?php if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished" || $model->status == "read")): ?>
                             <td width="10%"><?php echo Yii::t("procurement","Actual Number")?></td>
                             <td width="12%"><?php echo Yii::t("procurement","Headquarters Note")?></td>
                             <?php endif ?>
@@ -135,7 +135,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                         </thead>
                         <tbody>
                         <?php
-                        $classify = ClassifyForm::getClassifyList();
+                        $classify = ClassifyForm::getClassifyList($model->order_class);
                         $stickiesContentList = StickiesForm::getStickiesContentList();
                             foreach ($model->goods_list as $key => $val){
                                 $con_num = empty($val['id'])?$key:$val['id'];
@@ -168,7 +168,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                                 $tableTr.="<td><input type='text' class='form-control price' readonly name='OrderForm[goods_list][$con_num][price]' value='".sprintf("%.2f", $val['price'])."'></td>";
                                 $tableTr.="<td><input type='number' class='form-control numChange goods_num' name='OrderForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
                                 $tableTr.="<td><input type='text' class='form-control' name='OrderForm[goods_list][$con_num][note]' value='".$val['note']."'></td>";
-                                if($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished")){
+                                if($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished" || $model->status == "read")){
                                     $tableTr.="<td><input type='number' class='form-control goods_num' name='OrderForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
                                     $tableTr.="<td><input type='text' class='form-control' name='OrderForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
                                 }
@@ -187,7 +187,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                         <tfoot>
                         <tr>
                             <?php
-                            if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished")){
+                            if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished" || $model->status == "read")){
                                 echo '<td colspan="8"></td>';
                             }else{
                                 echo '<td colspan="6"></td>';

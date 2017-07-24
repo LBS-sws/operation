@@ -22,11 +22,11 @@ return array(
 
     'Type'=>'包裝規格',
     'Unit'=>'單位',
-    'Price（$）'=>'單價（$）',
+    'Price（US$）'=>'單價（US$）',
     'Price（RMB）'=>'單價（RMB）',
-    'Total（$）'=>'總價（$）',
+    'Total（US$）'=>'總價（US$）',
     'Total（RMB）'=>'總價（RMB）',
-    'expected to price（$）'=>'預計（$）',
+    'expected to price（US$）'=>'預計（US$）',
     'expected to price（RMB）'=>'預計（RMB）',
     'Goods Name'=>'物品名稱',
     'Name'=>'名稱',
@@ -195,5 +195,9 @@ return array(
     'Head Email Form'=>'中央郵件表單',
     'Email'=>'郵件',
     'Keep at least one email'=>'至少保留一個郵箱',
+
+    //後期修改
+    'Warehouse'=>'領料分類',
+    'Class Type'=>'分類類型',
 );
 ?>

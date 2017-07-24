@@ -187,7 +187,66 @@ class ActivityForm extends CFormModel
         if ($this->scenario=='new'){
             $this->id = Yii::app()->db->getLastInsertID();
             $this->scenario = "edit";
+            $this->setEmail();
+        }elseif ($this->scenario=='edit'){
+            if(strtotime(date("Y-m-d"))<strtotime($this->start_time)){
+                $message = "<p>總部採購編號：".$this->activity_code."</p>";
+                $message .= "<p>總部採購標題：".$this->activity_title."</p>";
+                $message .= "<p>總部採購類型：".Yii::t("procurement",$this->order_class)."</p>";
+                $message .= "<p>總部採購開始時間：".$this->start_time."</p>";
+                $message .= "<p>總部採購結束時間：".$this->end_time."</p>";
+                Yii::app()->db->createCommand()->update('swoper.swo_email_queue', array(
+                    'request_dt'=>$this->start_time,
+                    'message'=>$message,
+                ),"lcu=:lcu",array(":lcu"=>$this->id));
+             }
         }
 		return true;
 	}
+
+	//發送郵件
+	private function setEmail(){
+        $from_addr = Yii::app()->params['adminEmail'];
+        $cityList = General ::getCityListWithNoDescendant();
+        foreach ($cityList as $city=>$cityName){
+            $email = $this->getEmailToCity($city);
+            if(!empty($email)){
+                //發送郵件
+                $message = "<p>總部採購編號：".$this->activity_code."</p>";
+                $message .= "<p>總部採購標題：".$this->activity_title."</p>";
+                $message .= "<p>總部採購類型：".Yii::t("procurement",$this->order_class)."</p>";
+                $message .= "<p>總部採購開始時間：".$this->start_time."</p>";
+                $message .= "<p>總部採購結束時間：".$this->end_time."</p>";
+                Yii::app()->db->createCommand()->insert('swoper.swo_email_queue', array(
+                    'request_dt'=>$this->start_time,
+                    'from_addr'=>$from_addr,
+                    'to_addr'=>$email,
+                    'subject'=>"總部受理訂單:".$this->activity_title,//郵件主題
+                    'description'=>"總部受理訂單",//郵件副題
+                    'message'=>$message,//郵件內容（html）
+                    'status'=>"P",
+                    'lcu'=>$this->id,
+                    'lcd'=>date('Y-m-d H:i:s'),
+                ));
+            }
+        }
+    }
+
+    //根據城市獲取地區管理員郵件
+    public function getEmailToCity($city){
+        $suffix = Yii::app()->params['envSuffix'];
+        $suffix = "security".$suffix;
+        if (!empty($city)){
+            $rs = Yii::app()->db->createCommand()->select("incharge")->from($suffix.".sec_city")->where("code=:code",array(":code"=>$city))->queryAll();
+            if($rs){
+                $rs = $rs[0]["incharge"];
+                $email = Yii::app()->db->createCommand()->select("email")->from($suffix.".sec_user")->where("username=:username",array(":username"=>$rs))->queryAll();
+                if($email){
+                    return $email[0]["email"];
+                }
+            }
+        }
+
+        return "";
+    }
 }

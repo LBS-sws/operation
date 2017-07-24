@@ -56,6 +56,16 @@ $this->pageTitle=Yii::app()->name . ' - Classify Info';
                     ); ?>
                 </div>
             </div>
+
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'class_type',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-4">
+                    <?php echo $form->dropDownList($model, 'class_type',$model->getArrTypeClass(),
+                        array('disabled'=>($model->scenario =='view'))
+                    ); ?>
+                </div>
+            </div>
+
             <div class="form-group">
                 <?php echo $form->labelEx($model,'level',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">

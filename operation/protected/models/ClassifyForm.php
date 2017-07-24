@@ -4,12 +4,14 @@ class ClassifyForm extends CFormModel
 {
 	public $id;
 	public $name;
+	public $class_type;
 	public $level;
 
 	public function attributeLabels()
 	{
 		return array(
             'name'=>Yii::t('procurement','Name'),
+            'class_type'=>Yii::t('procurement','Class Type'),
             'level'=>Yii::t('procurement','Level'),
 		);
 	}
@@ -20,8 +22,9 @@ class ClassifyForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, name,level','safe'),
+			array('id, name,class_type,level','safe'),
             array('name','required'),
+            array('class_type','required'),
 			array('name','validateName'),
             array('level','numerical','allowEmpty'=>true,'integerOnly'=>true,'min'=>0),
 		);
@@ -34,7 +37,8 @@ class ClassifyForm extends CFormModel
             $id = $this->id;
         }
         $rows = Yii::app()->db->createCommand()->select("id")->from("opr_classify")
-            ->where('name=:name and id!=:id', array(':name'=>$this->name,':id'=>$id))->queryAll();
+            ->where('name=:name and id!=:id and class_type=:class_type',
+                array(':name'=>$this->name,':id'=>$id,':class_type'=>$this->class_type))->queryAll();
         if(count($rows)>0){
             $message = Yii::t('procurement','the name of already exists');
             $this->addError($attribute,$message);
@@ -48,6 +52,7 @@ class ClassifyForm extends CFormModel
 			foreach ($rows as $row) {
                 $this->id = $row['id'];
                 $this->name = $row['name'];
+                $this->class_type = $row['class_type'];
                 $this->level = $row['level'];
                 break;
 			}
@@ -56,9 +61,9 @@ class ClassifyForm extends CFormModel
 	}
 
     //獲取分類列表
-    public function getClassifyList(){
+    public function getClassifyList($str="Import"){
 	    $arr = array(""=>"");
-        $rs = Yii::app()->db->createCommand()->select()->from("opr_classify")->order('level desc')->queryAll();
+        $rs = Yii::app()->db->createCommand()->select()->from("opr_classify")->where("class_type=:class_type",array(":class_type"=>$str))->order('level desc')->queryAll();
         if($rs){
             foreach ($rs as $row){
                 $arr[$row["id"]] = $row["name"];
@@ -75,6 +80,12 @@ class ClassifyForm extends CFormModel
             return $rs[0]["name"];
         }
         return "";
+    }
+    //獲取小分類的類型
+    public function getArrTypeClass(){
+        $arr = OrderGoods::getArrGoodsClass();
+        $arr["Warehouse"] = Yii::t("procurement","Warehouse");
+        return $arr;
     }
 
     //刪除驗證
@@ -112,15 +123,16 @@ class ClassifyForm extends CFormModel
                 break;
             case 'new':
                 $sql = "insert into opr_classify(
-							name,level, lcu, lcd
+							name,level,class_type, lcu, lcd
 						) values (
-							:name,:level, :lcu, :lcd
+							:name,:level,:class_type, :lcu, :lcd
 						)";
                 break;
             case 'edit':
                 $sql = "update opr_classify set
 							name = :name, 
 							level = :level, 
+							class_type = :class_type, 
 							luu = :luu,
 							lud = :lud
 						where id = :id
@@ -140,6 +152,8 @@ class ClassifyForm extends CFormModel
             $command->bindParam(':name',$this->name,PDO::PARAM_STR);
         if (strpos($sql,':level')!==false)
             $command->bindParam(':level',$this->level,PDO::PARAM_INT);
+        if (strpos($sql,':class_type')!==false)
+            $command->bindParam(':class_type',$this->class_type,PDO::PARAM_STR);
 
         if (strpos($sql,':luu')!==false)
             $command->bindParam(':luu',$uid,PDO::PARAM_STR);

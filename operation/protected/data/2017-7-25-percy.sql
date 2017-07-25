@@ -1,0 +1,1 @@
+alter table swo_email_queue add column request_dt datetime default now() after id;

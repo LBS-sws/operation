@@ -5,8 +5,8 @@ return array(
 	'approval'=>'审核',
 	'You have 1 new reimbursement for ' => '您有一个新的报销单需要',
 	'confirmation'=>'确认',
-	"Please click <a href=\"{url}\" onClick=\"return popup(this,'Account');\">here</a> to carry out your job."
-	=>"请点击<a href=\"{url}\" onClick=\"return popup(this,'Account');\">这里</a>来执行你的工作。",
+	"Please click <a href=\"{url}\" onClick=\"return popup(this,'Operation');\">here</a> to carry out your job."
+	=>"请点击<a href=\"{url}\" onClick=\"return popup(this,'Operation');\">这里</a>来执行你的工作。",
 	'Payment request has been approved'=>'付款申请已批准',
 	'Payment request has been denied'=>'付款申请已被拒绝',
 	'Payment request has been cancelled'=>'付款申请已被取消',
@@ -23,5 +23,15 @@ return array(
 	'[Action]'=>'[待执行]',
 	'[Notice]'=>'[通知]',
 	'Flow Status'=>'流程状态',
+	'Reject Reason'=>'拒絕原因',
+	'You have 1 request for report approval' => '您有一个报表审核請求需要处理',
+	'Sales report has been approved by HQ'=>'总部已批准营业报表审核請求',
+	'Sales report has been approved by Manager'=>'经理已批准营业报表审核請求',
+	'Sales report has been denied by HQ'=>'总部已拒绝营业报表审核請求',
+	'Sales report has been denied by Manager'=>'经理已拒绝营业报表审核請求',
+	'Year/Month'=>'年/月',
+	'Report Approval'=>'营业报表审核',
+	'Sales Report Approved'=>'营业报表已批准',
+	'Sales Report Denied'=>'营业报表已被拒绝',
 );
 ?>

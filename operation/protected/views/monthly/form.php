@@ -49,9 +49,37 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 			'submit'=>Yii::app()->createUrl('monthly/accept')));
 		?>
 		<?php echo TbHtml::button('<span class="fa fa-remove"></span> '.Yii::t('misc','Deny'), array(
-			'submit'=>Yii::app()->createUrl('monthly/reject')));
+			'id'=>'btnDeny'));
 		?>
 <?php endif ?>
+<?php if ($model->wfstatus=='PH' && $model->validUserInCurrentAction()): ?>
+		<?php echo TbHtml::button('<span class="fa fa-check"></span> '.Yii::t('misc','Approve'), array(
+			'submit'=>Yii::app()->createUrl('monthly/acceptm')));
+		?>
+		<?php echo TbHtml::button('<span class="fa fa-remove"></span> '.Yii::t('misc','Deny'), array(
+			'id'=>'btnDenyM'));
+		?>
+<?php endif ?>
+	</div>
+	<div class="btn-group pull-right" role="group">
+	<?php 
+		$counter = ($model->no_of_attm['oper1'] > 0) ? ' <span id="docoper1" class="label label-info">'.$model->no_of_attm['oper1'].'</span>' : ' <span id="docoper1"></span>';
+		echo TbHtml::button('<span class="fa  fa-file-text-o"></span> '.Yii::t('monthly','System Report').$counter, array(
+			'name'=>'btnOper1','id'=>'btnOper1','data-toggle'=>'modal','data-target'=>'#fileuploadoper1',)
+		);
+	?>
+	<?php 
+		$counter = ($model->no_of_attm['oper2'] > 0) ? ' <span id="docoper2" class="label label-info">'.$model->no_of_attm['oper2'].'</span>' : ' <span id="docoper2"></span>';
+		echo TbHtml::button('<span class="fa  fa-file-text-o"></span> '.Yii::t('monthly','Puriscent Report').$counter, array(
+			'name'=>'btnOper2','id'=>'btnOper2','data-toggle'=>'modal','data-target'=>'#fileuploadoper2',)
+		);
+	?>
+	<?php 
+		$counter = ($model->no_of_attm['oper3'] > 0) ? ' <span id="docoper3" class="label label-info">'.$model->no_of_attm['oper3'].'</span>' : ' <span id="docoper3"></span>';
+		echo TbHtml::button('<span class="fa  fa-file-text-o"></span> '.Yii::t('monthly','Purification Report').$counter, array(
+			'name'=>'btnOper3','id'=>'btnOper3','data-toggle'=>'modal','data-target'=>'#fileuploadoper3',)
+		);
+	?>
 	</div>
 	</div></div>
 
@@ -88,12 +116,22 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 				</div>
 				<?php echo $form->labelEx($model,'wfstatusdesc',array('class'=>"col-sm-2 control-label")); ?>
 				<div class="col-sm-3">
-					<?php echo $form->textField($model, 'wfstatusdesc', 
-						array('size'=>10,'readonly'=>true)
-					); ?>
+					<?php 
+						echo $form->textField($model, 'wfstatusdesc', array('readonly'=>true)); 
+					?>
 				</div>
 			</div>
 
+<?php if (!empty($model->reason)) : ?>
+			<div class="form-group">
+				<?php echo $form->labelEx($model,'reason',array('class'=>"col-sm-2 control-label")); ?>
+				<div class="col-sm-7">
+					<?php echo $form->textArea($model, 'reason', 
+					array('rows'=>2,'cols'=>60,'readonly'=>true)
+					); ?>
+				</div>
+			</div>
+<?php endif ?>
 			<legend>&nbsp;</legend>
 	
 <?php
@@ -126,6 +164,29 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 	</div>
 </section>
 
+<?php $this->renderPartial('//site/fileupload',array('model'=>$model,
+													'form'=>$form,
+													'doctype'=>'OPER1',
+													'header'=>Yii::t('monthly','System Report'),
+													'ronly'=>($model->scenario=='view' || $model->isReadOnly()),
+													)); 
+?>
+<?php $this->renderPartial('//site/fileupload',array('model'=>$model,
+													'form'=>$form,
+													'doctype'=>'OPER2',
+													'header'=>Yii::t('monhtly','Puriscent Report'),
+													'ronly'=>($model->scenario=='view' || $model->isReadOnly()),
+													)); 
+?>
+<?php $this->renderPartial('//site/fileupload',array('model'=>$model,
+													'form'=>$form,
+													'doctype'=>'OPER3',
+													'header'=>Yii::t('monthly','Purification Report'),
+													'ronly'=>($model->scenario=='view' || $model->isReadOnly()),
+													)); 
+?>
+<?php $this->renderPartial('//monthly/reason',array('model'=>$model,'form'=>$form)); ?>
+
 <script>
 		
 		$('#MonthlyForm_record_1_datavalue, #MonthlyForm_record_2_datavalue, #MonthlyForm_record_3_datavalue, #MonthlyForm_record_4_datavalue, #MonthlyForm_record_5_datavalue, #MonthlyForm_record_6_datavalue').focusout(function() {
@@ -145,6 +206,24 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 </script>
 
 <?php
+Script::genFileUpload($model,$form->id,'OPER1');
+Script::genFileUpload($model,$form->id,'OPER2');
+Script::genFileUpload($model,$form->id,'OPER3');
+
+$js=<<<EOF
+$('#btnDeny').on('click',function(){
+	$('#btnRmkOk').show();
+	$('#btnRmkOkMgr').hide();
+	$('#rmkdialog').modal('show');
+});
+$('#btnDenyM').on('click',function(){
+	$('#btnRmkOk').hide();
+	$('#btnRmkOkMgr').show();
+	$('#rmkdialog').modal('show');
+});
+EOF;
+Yii::app()->clientScript->registerScript('denyPopup',$js,CClientScript::POS_READY);
+
 $js = Script::genReadonlyField();
 Yii::app()->clientScript->registerScript('readonlyClass',$js,CClientScript::POS_READY);
 ?>

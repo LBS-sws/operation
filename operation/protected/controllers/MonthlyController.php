@@ -22,20 +22,28 @@ class MonthlyController extends Controller
 	{
 		return array(
 			array('allow', 
-				'actions'=>array('edit','save','submit','resubmit'),
+				'actions'=>array('edit','save','submit','resubmit','fileupload','fileremove'),
 				'expression'=>array('MonthlyController','allowReadWrite'),
 			),
 			array('allow', 
-				'actions'=>array('edit','accept','reject'),
+				'actions'=>array('edit','filedownload'),
 				'expression'=>array('MonthlyController','allowReadWriteC'),
 			),
 			array('allow', 
-				'actions'=>array('index','view'),
+				'actions'=>array('index','view','filedownload'),
 				'expression'=>array('MonthlyController','allowReadOnly'),
 			),
 			array('allow', 
-				'actions'=>array('indexc','view'),
+				'actions'=>array('indexc','view','accept','reject','acceptm','rejectm','filedownload'),
 				'expression'=>array('MonthlyController','allowReadOnlyC'),
+			),
+			array('allow', 
+				'actions'=>array('indexm','view','acceptm','rejectm','filedownload'),
+				'expression'=>array('MonthlyController','allowReadOnlyM'),
+			),
+			array('allow', 
+				'actions'=>array('indexh','view','accept','reject','filedownload'),
+				'expression'=>array('MonthlyController','allowReadOnlyH'),
 			),
 			array('deny',  // deny all users
 				'users'=>array('*'),
@@ -77,6 +85,23 @@ class MonthlyController extends Controller
 		$this->render('indexc',array('model'=>$model));
 	}
 
+	public function actionIndexa($pageNum=0) 
+	{
+		$model = new MonthlyApprList;
+		if (isset($_POST['MonthlyApprList'])) {
+			$model->attributes = $_POST['MonthlyApprList'];
+		} else {
+			$session = Yii::app()->session;
+			if (isset($session['criteria_ya03']) && !empty($session['criteria_ya03'])) {
+				$criteria = $session['criteria_ya03'];
+				$model->setCriteria($criteria);
+			}
+		}
+		$model->determinePageNum($pageNum);
+		$model->retrieveDataByPage($model->pageNum);
+		$this->render('indexa',array('model'=>$model));
+	}
+
 	public function actionAccept()
 	{
 		if (isset($_POST['MonthlyForm'])) {
@@ -94,6 +119,23 @@ class MonthlyController extends Controller
 		}
 	}
 
+	public function actionAcceptm()
+	{
+		if (isset($_POST['MonthlyForm'])) {
+			$model = new MonthlyForm($_POST['MonthlyForm']['scenario']);
+			$model->attributes = $_POST['MonthlyForm'];
+			if ($model->validate()) {
+				$model->acceptm();
+				Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Acceptance Done'));
+				$this->redirect(Yii::app()->createUrl('monthly/view',array('index'=>$model->id,'rtn'=>$model->listform)));
+			} else {
+				$message = CHtml::errorSummary($model);
+				Dialog::message(Yii::t('dialog','Validation Message'), $message);
+				$this->render('form',array('model'=>$model,'rtn'=>$model->listform));
+			}
+		}
+	}
+
 	public function actionReject()
 	{
 		if (isset($_POST['MonthlyForm'])) {
@@ -101,6 +143,23 @@ class MonthlyController extends Controller
 			$model->attributes = $_POST['MonthlyForm'];
 			if ($model->validate()) {
 				$model->reject();
+				Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Rejection Done'));
+				$this->redirect(Yii::app()->createUrl('monthly/view',array('index'=>$model->id,'rtn'=>$model->listform)));
+			} else {
+				$message = CHtml::errorSummary($model);
+				Dialog::message(Yii::t('dialog','Validation Message'), $message);
+				$this->render('form',array('model'=>$model,));
+			}
+		}
+	}
+
+	public function actionRejectm()
+	{
+		if (isset($_POST['MonthlyForm'])) {
+			$model = new MonthlyForm($_POST['MonthlyForm']['scenario']);
+			$model->attributes = $_POST['MonthlyForm'];
+			if ($model->validate()) {
+				$model->rejectm();
 				Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Rejection Done'));
 				$this->redirect(Yii::app()->createUrl('monthly/view',array('index'=>$model->id,'rtn'=>$model->listform)));
 			} else {
@@ -185,6 +244,52 @@ class MonthlyController extends Controller
 		}
 	}
 	
+	public function actionFileupload($doctype) {
+		$model = new MonthlyForm();
+		if (isset($_POST['MonthlyForm'])) {
+			$model->attributes = $_POST['MonthlyForm'];
+			
+			$id = $model->id;
+			$docman = new DocMan($doctype,$id,get_class($model));
+			$docman->masterId = $model->docMasterId[strtolower($doctype)];
+			if (isset($_FILES[$docman->inputName])) $docman->files = $_FILES[$docman->inputName];
+			$docman->fileUpload();
+			echo $docman->genTableFileList(false);
+		} else {
+			echo "NIL";
+		}
+	}
+	
+	public function actionFileRemove($doctype) {
+		$model = new MonthlyForm();
+		if (isset($_POST['MonthlyForm'])) {
+			$model->attributes = $_POST['MonthlyForm'];
+			$docman = new DocMan($doctype,$model->id,get_class($model));
+			$docman->masterId = $model->docMasterId[strtolower($doctype)];
+			$docman->fileRemove($model->removeFileId[strtolower($doctype)]);
+			echo $docman->genTableFileList(false);
+		} else {
+			echo "NIL";
+		}
+	}
+	
+	public function actionFileDownload($mastId, $docId, $fileId, $doctype) {
+		$sql = "select city from opr_monthly_hdr where id = $docId";
+		$row = Yii::app()->db->createCommand($sql)->queryRow();
+		if ($row!==false) {
+			$citylist = Yii::app()->user->city_allow();
+			if (strpos($citylist, $row['city']) !== false) {
+				$docman = new DocMan($doctype,$docId,'MonthlyForm');
+				$docman->masterId = $mastId;
+				$docman->fileDownload($fileId);
+			} else {
+				throw new CHttpException(404,'Access right not match.');
+			}
+		} else {
+				throw new CHttpException(404,'Record not found.');
+		}
+	}
+
 	protected function performAjaxValidation($model)
 	{
 		if(isset($_POST['ajax']) && $_POST['ajax']==='monthly-form')
@@ -203,10 +308,18 @@ class MonthlyController extends Controller
 	}
 
 	public static function allowReadWriteC() {
-		return Yii::app()->user->validRWFunction('YA03');
+		return Yii::app()->user->validRWFunction('YA02');
 	}
 	
 	public static function allowReadOnlyC() {
+		return Yii::app()->user->validFunction('YA02');
+	}
+
+	public static function allowReadWriteA() {
+		return Yii::app()->user->validRWFunction('YA03');
+	}
+	
+	public static function allowReadOnlyA() {
 		return Yii::app()->user->validFunction('YA03');
 	}
 

@@ -101,15 +101,19 @@ return array(
 		),
 	),
 
-    'Misc'=>array(
+    'Sales Summary'=>array(
         'access'=>'YA',
         'items'=>array(
             'Sales Summary Entry'=>array(
                 'access'=>'YA01',
                 'url'=>'/monthly/index',
             ),
-            'Sales Summary Enquiry'=>array(
+            'Sales Summary Approval'=>array(
                 'access'=>'YA03',
+                'url'=>'/monthly/indexa',
+            ),
+            'Sales Summary Enquiry'=>array(
+                'access'=>'YA02',
                 'url'=>'/monthly/indexc',
             ),
         ),

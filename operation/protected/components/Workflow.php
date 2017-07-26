@@ -218,7 +218,7 @@ class Workflow {
 			$func = array($this, $name);
 			$params = call_user_func_array($func, array());
 			
-			$sql = "insert into swoper_w.swo_email_queue
+			$sql = "insert into swoper$suffix.swo_email_queue
 						(from_addr, to_addr, cc_addr, subject, description, message, status, lcu)
 					values
 						(:from_addr, :to_addr, :cc_addr, :subject, :description, :message, 'P', 'admin')

@@ -54,7 +54,8 @@ class MonthlyForm extends CFormModel
 		return array(
 			array('id, year_no, month_no, lcd, city, city_name, wfstatus, wfstatusdesc, listform, reason, wfactionuser','safe'),
 			array('record','validateRecord'),
-			array('files, removeFileId, docMasterId, no_of_attm','safe'), 
+			array('files, removeFileId, docMasterId','safe'), 
+			array ('no_of_attm','validateAttachment'),
 		);
 	}
 
@@ -73,6 +74,21 @@ class MonthlyForm extends CFormModel
 					}
 				}
 			}
+		}
+	}
+
+	public function validateAttachment($attribute, $params) {
+		$count1 = $this->no_of_attm['oper1'];
+		$count2 = $this->no_of_attm['oper2'];
+		$count3 = $this->no_of_attm['oper3'];
+		if (($this->scenario=='submit' || $this->scenario=='resubmit') && (empty($count1) || $count1==0)) {
+			$this->addError($attribute, Yii::t('monthly','Please upload').' '.Yii::t('monthly','System Report'));
+		}
+		if (($this->scenario=='submit' || $this->scenario=='resubmit') && (empty($count2) || $count2==0)) {
+			$this->addError($attribute, Yii::t('monthly','Please upload').' '.Yii::t('monthly','Puriscent Report'));
+		}
+		if (($this->scenario=='submit' || $this->scenario=='resubmit') && (empty($count3) || $count3==0)) {
+			$this->addError($attribute, Yii::t('monthly','Please upload').' '.Yii::t('monthly','Purification Report'));
 		}
 	}
 

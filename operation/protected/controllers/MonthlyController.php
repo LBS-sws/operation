@@ -175,6 +175,7 @@ class MonthlyController extends Controller
 		if (isset($_POST['MonthlyForm'])) {
 			$model = new MonthlyForm($_POST['MonthlyForm']['scenario']);
 			$model->attributes = $_POST['MonthlyForm'];
+			$model->scenario = 'resubmit';
 			if ($model->validate()) {
 				$model->resubmit();
 				Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Submission Done'));
@@ -192,6 +193,7 @@ class MonthlyController extends Controller
 		if (isset($_POST['MonthlyForm'])) {
 			$model = new MonthlyForm($_POST['MonthlyForm']['scenario']);
 			$model->attributes = $_POST['MonthlyForm'];
+			$model->scenario = 'submit';
 			if ($model->validate()) {
 				$model->saveData();
 				$model->submit();

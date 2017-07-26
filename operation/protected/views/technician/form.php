@@ -119,7 +119,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
 
                                 if($model->scenario=='new' || $model->status == "pending"){
                                     $tableTr.='<button type="button" class="btn btn-default bg-fff dropdown-toggle" data-toggle="dropdown" data-id="'.$val["classify_id"].'">';
-                                    $testNBSP = $classify[$val["classify_id"]] == ""?"&nbsp;":$classify[$val["classify_id"]];
+                                    $testNBSP = empty($classify[$val["classify_id"]])?"&nbsp;":$classify[$val["classify_id"]];
                                     $tableTr.='<span>'.$testNBSP.'</span><span class="caret"></span></button><ul class="dropdown-menu goodsIfy">';
                                     foreach ($classify as $classify_id =>$classify_name){
                                         $classify_name=empty($classify_name)?"&nbsp;":$classify_name;

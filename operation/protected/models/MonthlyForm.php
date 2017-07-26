@@ -12,7 +12,28 @@ class MonthlyForm extends CFormModel
 	public $city;
 	public $city_name;
 	public $listform;
+	public $reason;
+	
+	public $wfactionuser;
 
+	public $files;
+
+	public $docMasterId = array(
+							'oper1'=>0,
+							'oper2'=>0,
+							'oper3'=>0
+						);
+	public $removeFileId = array(
+							'oper1'=>0,
+							'oper2'=>0,
+							'oper3'=>0
+						);
+	public $no_of_attm = array(
+							'oper1'=>0,
+							'oper2'=>0,
+							'oper3'=>0
+						);
+	
 	public function attributeLabels()
 	{
 		return array(
@@ -21,6 +42,7 @@ class MonthlyForm extends CFormModel
 			'year_no'=>Yii::t('report','Year'),
 			'month_no'=>Yii::t('report','Month'),
 			'wfstatusdesc'=>Yii::t('workflow','Flow Status'),
+			'reason'=>Yii::t('workflow','Reject Reason'),
 		);
 	}
 
@@ -30,8 +52,9 @@ class MonthlyForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, year_no, month_no, lcd, city, city_name, wfstatus, wfstatusdesc, listform','safe'),
+			array('id, year_no, month_no, lcd, city, city_name, wfstatus, wfstatusdesc, listform, reason, wfactionuser','safe'),
 			array('record','validateRecord'),
+			array('files, removeFileId, docMasterId, no_of_attm','safe'), 
 		);
 	}
 
@@ -58,7 +81,10 @@ class MonthlyForm extends CFormModel
 		$citylist = Yii::app()->user->city_allow();
 		$sql = "select a.year_no, a.month_no, b.id, b.hdr_id, b.data_field, b.data_value, c.name, c.upd_type, c.field_type, c.function_name, b.manual_input, a.lcd, 
 				a.city, d.name as city_name, workflow$suffix.RequestStatus('OPRPT',a.id,a.lcd) as wfstatus,
-				workflow$suffix.RequestStatusDesc('OPRPT',a.id,a.lcd) as wfstatusdesc
+				workflow$suffix.RequestStatusDesc('OPRPT',a.id,a.lcd) as wfstatusdesc,
+				docman$suffix.countdoc('OPER1',a.id) as oper1countdoc,
+				docman$suffix.countdoc('OPER2',a.id) as oper2countdoc,
+				docman$suffix.countdoc('OPER3',a.id) as oper3countdoc
 				from opr_monthly_hdr a, opr_monthly_dtl b, opr_monthly_field c, security$suffix.sec_city d  
 				where a.id=$index and a.city in ($citylist)
 				and a.id=b.hdr_id and b.data_field=c.code
@@ -79,6 +105,9 @@ class MonthlyForm extends CFormModel
 					$this->lcd = $row['lcd'];
 					$this->wfstatus = $row['wfstatus'];
 					$this->wfstatusdesc = $row['wfstatusdesc'];
+					$this->no_of_attm['oper1'] = $row['oper1countdoc'];
+					$this->no_of_attm['oper2'] = $row['oper2countdoc'];
+					$this->no_of_attm['oper3'] = $row['oper3countdoc'];
 				}
 				$temp = array();
 				$temp['id'] = $row['id'];
@@ -93,6 +122,30 @@ class MonthlyForm extends CFormModel
 				$this->record[$row['function_name']] = $temp;
 			}
 		}
+
+		if ($this->wfstatus=='PA' || $this->wfstatus=='PH') {
+			$wf = new WorkflowOprpt;
+			$connection = $wf->openConnection();
+			if ($wf->initReadOnlyProcess('OPRPT',$this->id,$this->lcd)) {
+				$actionusers = $wf->getCurrentStateRespUser();
+				$this->wfactionuser = empty($actionusers) ? '' : implode('/',$actionusers);
+			}
+		}
+		
+		if ($this->wfstatus=='PS') {
+			$wf = new WorkflowOprpt;
+			$connection = $wf->openConnection();
+			if ($wf->initReadOnlyProcess('OPRPT',$this->id,$this->lcd)) {
+				$reasons1 = $wf->getLastStateActionRemarks('DENY');
+				$reasons2 = $wf->getLastStateActionRemarks('HDDENY');
+				$reasons = array_merge($reasons1, $reasons2);
+				if (!empty($reasons)) {
+					foreach ($reasons as $userid=>$reason) {
+						$this->reason = empty($this->reason) ? $reason : $this->reason."<br>".$reason;
+					}
+				}
+			}
+		}
 		return true;
 	}
 	
@@ -102,6 +155,9 @@ class MonthlyForm extends CFormModel
 		$connection = $wf->openConnection();
 		try {
 			$this->saveMonthly($connection);
+			$this->updateDocman($connection,'OPER1');
+			$this->updateDocman($connection,'OPER2');
+			$this->updateDocman($connection,'OPER3');
 			if ($wf->startProcess('OPRPT',$this->id,$this->lcd)) {
 				$wf->saveRequestData('CITY',$this->city);
 				$wf->saveRequestData('CITYNAME',$this->city_name);
@@ -124,6 +180,9 @@ class MonthlyForm extends CFormModel
 		$connection = $wf->openConnection();
 		try {
 			$this->saveMonthly($connection);
+			$this->updateDocman($connection,'OPER1');
+			$this->updateDocman($connection,'OPER2');
+			$this->updateDocman($connection,'OPER3');
 			if ($wf->startProcess('OPRPT',$this->id,$this->lcd)) {
 				$wf->takeAction('RESUBMIT');
 			}
@@ -140,9 +199,26 @@ class MonthlyForm extends CFormModel
 		$wf = new WorkflowOprpt;
 		$connection = $wf->openConnection();
 		try {
-			$this->saveMonthly($connection);
+//			$this->saveMonthly($connection);
 			if ($wf->startProcess('OPRPT',$this->id,$this->lcd)) {
 				$wf->takeAction('APPROVE');
+			}
+			$wf->transaction->commit();
+		}
+		catch(Exception $e) {
+			$wf->transaction->rollback();
+			throw new CHttpException(404,'Cannot update.'.$e->getMessage());
+		}
+	}
+
+	public function acceptm()
+	{
+		$wf = new WorkflowOprpt;
+		$connection = $wf->openConnection();
+		try {
+//			$this->saveMonthly($connection);
+			if ($wf->startProcess('OPRPT',$this->id,$this->lcd)) {
+				$wf->takeAction('HDAPPROVE');
 			}
 			$wf->transaction->commit();
 		}
@@ -157,9 +233,26 @@ class MonthlyForm extends CFormModel
 		$wf = new WorkflowOprpt;
 		$connection = $wf->openConnection();
 		try {
-			$this->saveMonthly($connection);
+//			$this->saveMonthly($connection);
 			if ($wf->startProcess('OPRPT',$this->id,$this->lcd)) {
-				$wf->takeAction('DENY');
+				$wf->takeAction('DENY',$this->reason);
+			}
+			$wf->transaction->commit();
+		}
+		catch(Exception $e) {
+			$wf->transaction->rollback();
+			throw new CHttpException(404,'Cannot update.'.$e->getMessage());
+		}
+	}
+
+	public function rejectm()
+	{
+		$wf = new WorkflowOprpt;
+		$connection = $wf->openConnection();
+		try {
+//			$this->saveMonthly($connection);
+			if ($wf->startProcess('OPRPT',$this->id,$this->lcd)) {
+				$wf->takeAction('HDDENY',$this->reason);
 			}
 			$wf->transaction->commit();
 		}
@@ -175,6 +268,9 @@ class MonthlyForm extends CFormModel
 		$transaction=$connection->beginTransaction();
 		try {
 			$this->saveMonthly($connection);
+			$this->updateDocman($connection,'OPER1');
+			$this->updateDocman($connection,'OPER2');
+			$this->updateDocman($connection,'OPER3');
 			$transaction->commit();
 		}
 		catch(Exception $e) {
@@ -228,6 +324,22 @@ class MonthlyForm extends CFormModel
 			$command->execute();
 		}
 		return true;
+	}
+	
+	protected function updateDocman(&$connection, $doctype) {
+		if ($this->scenario=='new') {
+			$docidx = strtolower($doctype);
+			if ($this->docMasterId[$docidx] > 0) {
+				$docman = new DocMan($doctype,$this->id,get_class($this));
+				$docman->masterId = $this->docMasterId[$docidx];
+				$docman->updateDocId($connection, $this->docMasterId[$docidx]);
+			}
+		}
+	}
+
+	public function validUserInCurrentAction() {
+		$uid = Yii::app()->user->id;
+		return (strpos('/'.$this->wfactionuser.'/', '/'.$uid.'/')!==false);
 	}
 	
 	public function isReadOnly() {

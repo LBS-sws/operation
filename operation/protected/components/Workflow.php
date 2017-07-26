@@ -44,6 +44,25 @@ class Workflow {
 		return $rtn;
 	}
 	
+	public function initReadOnlyProcess($procCode, $docId, $reqDate) {
+		$rtn = true;
+		$suffix = Yii::app()->params['envSuffix'];
+		$this->proc_id = $this->getProcessId($procCode, $reqDate);
+		$procId = $this->proc_id;
+		$sql = "select id, current_state from workflow$suffix.wf_request
+				where proc_ver_id=$procId and doc_id=$docId
+			";
+		$row = $this->connection->createCommand($sql)->queryRow();
+		if ($row!==false) {
+			$this->request_id = $row['id'];
+			$this->current_state = $row['current_state'];
+			$this->transit_log_id = $this->getTransitLogId($this->request_id, $this->current_state);
+		} else {
+			$rtn = false;
+		}
+		return $rtn;
+	}
+	
 	public function genTableStateList() {
 		$rtn = "";
 		$suffix = Yii::app()->params['envSuffix'];
@@ -89,7 +108,7 @@ class Workflow {
 		return $rtn;
 	}
 	
-	public function takeAction($actionCode) {
+	public function takeAction($actionCode, $respMesg='') {
 		$suffix = Yii::app()->params['envSuffix'];
 		$actionId = $this->getActionId($this->proc_id, $actionCode);
 
@@ -98,13 +117,20 @@ class Workflow {
 		$state = $this->current_state;
 		$logId = $this->transit_log_id;
 		$sql = "update workflow$suffix.wf_request_resp_user
-				set status='C', action_id=$actionId 
-				where request_id=$reqId
-				and log_id=$logId
-				and current_state=$state
-				and username='$user'
+				set status='C', action_id=:actionid, remarks=:remarks 
+				where request_id=:reqid
+				and log_id=:logid
+				and current_state=:state
+				and username=:user
 			";
-		$this->connection->createCommand($sql)->execute();
+		$command=$this->connection->createCommand($sql);
+		$command->bindParam(':reqid',$reqId,PDO::PARAM_INT);
+		$command->bindParam(':logid',$logId,PDO::PARAM_INT);
+		$command->bindParam(':state',$state,PDO::PARAM_INT);
+		$command->bindParam(':user',$user,PDO::PARAM_STR);
+		$command->bindParam(':actionid',$actionId,PDO::PARAM_INT);
+		$command->bindParam(':remarks',$respMesg,PDO::PARAM_STR);
+		$command->execute();
 
 		$sql = "select b.name, b.function_call, b.param, b.proc_ver_id 
 				from workflow$suffix.wf_action_task a, workflow$suffix.wf_task b 
@@ -281,7 +307,7 @@ class Workflow {
 		return $rtn;
 	}
 
-	protected function getCurrentStateRespUser() {
+	public function getCurrentStateRespUser() {
 		return $this->getCurrentStateRespUserByType('P');
 	}
 	
@@ -398,6 +424,26 @@ class Workflow {
 		}
 	}
 	
+	protected function getCurrentStateRemarks($userid) {
+		$suffix = Yii::app()->params['envSuffix'];
+		$reqId = $this->request_id;
+		$state = $this->current_state;
+		$logId = $this->transit_log_id;
+		$sql = "select a.remarks
+				from workflow$suffix.wf_request_resp_user a
+				where a.request_id=$reqId
+				and a.status='C'
+				and a.username='$userid'
+				order by id desc limit 1
+			";
+		$row = $this->connection->createCommand($sql)->queryRow();
+		if ($row===false) {
+			return '';
+		} else {
+			return $row['remarks'];
+		}
+	}
+
 	protected function getLastStateActionRespUser($action) {
 		$suffix = Yii::app()->params['envSuffix'];
 		$reqId = $this->request_id;
@@ -425,6 +471,36 @@ class Workflow {
 				if ($l==0) $l = $row['log_id'];
 				if ($l!=$row['log_id']) break;
 				$rtn[] = $row['username'];
+			}
+			return $rtn;
+		}
+	}
+
+	public function getLastStateActionRemarks($action) {
+		$suffix = Yii::app()->params['envSuffix'];
+		$reqId = $this->request_id;
+		$state = $this->current_state;
+		$logId = $this->transit_log_id;
+		$sql = "select b.log_id, b.username, b.remarks 
+				from workflow$suffix.wf_request_resp_user b, 
+					workflow$suffix.wf_action c
+				where b.request_id=$reqId
+				and b.current_state<>$logId   
+				and b.status='C'
+				and b.action_id=c.id
+				and c.code='$action'
+				order by b.log_id desc
+			";
+		$rows = $this->connection->createCommand($sql)->queryAll();
+		if (empty($rows)) {
+			return array();
+		} else {
+			$rtn = array();
+			$l = 0;
+			foreach($rows as $row) {
+				if ($l==0) $l = $row['log_id'];
+				if ($l!=$row['log_id']) break;
+				$rtn[$row['username']] = $row['remarks'];
 			}
 			return $rtn;
 		}

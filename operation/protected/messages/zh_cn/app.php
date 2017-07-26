@@ -9,13 +9,18 @@ return array(
     'Daily Report'=>'日报表系统',
     'Accounting'=>'会计系统',
     'Operation'=>'营运系统',
+	'Personnel'=>'人事系统',
 
     'Data Entry'=>'数据输入',
     'Misc'=>'其他',
 
+	'Sales Summary'=>'营业报告',
     'Sales Summary Entry'=>'营业报告输入',
     'Sales Summary Enquiry'=>'营业报告查询',
-    'Report Approval'=>'营业报告审核',
+    'Report Approval (HQ)'=>'营业报告审核(总部)',
+	'Sales Summary Approval - HQ'=>'营业报告审核(总部)',
+	'Sales Summary Approval - Manager'=>'营业报告审核(经理)',
+	'Sales Summary Approval'=>'营业报告审核',
 
     'Report'=>'报表',
     'Sales Summary'=>'营业报告',

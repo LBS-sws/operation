@@ -98,7 +98,7 @@ class DocMan {
 			$code = $this->docType;
 			$id = $this->docId;
 			$sql = "select id from docman$suffix.dm_master 
-						where doc_type_code='$code' and doc_id=$id
+						where doc_type_code='$code' and doc_id=$id and remove<>'Y' 
 					";
 			$mid = Yii::app()->db->createCommand($sql)->queryScalar();
 		} else {

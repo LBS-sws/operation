@@ -1,5 +1,5 @@
 <?php
 
 return array(
-	'Report Approval'=>array('access'=>'YN01',),
+	'Report Approval (HQ)'=>array('access'=>'YN01',),
 );

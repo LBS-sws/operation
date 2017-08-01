@@ -80,6 +80,12 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 			'name'=>'btnOper3','id'=>'btnOper3','data-toggle'=>'modal','data-target'=>'#fileuploadoper3',)
 		);
 	?>
+	<?php 
+		$counter = ($model->no_of_attm['oper4'] > 0) ? ' <span id="docoper3" class="label label-info">'.$model->no_of_attm['oper4'].'</span>' : ' <span id="docoper4"></span>';
+		echo TbHtml::button('<span class="fa  fa-file-text-o"></span> '.Yii::t('monthly','Report Detail').$counter, array(
+			'name'=>'btnOper4','id'=>'btnOper4','data-toggle'=>'modal','data-target'=>'#fileuploadoper4',)
+		);
+	?>
 	</div>
 	</div></div>
 
@@ -174,7 +180,7 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 <?php $this->renderPartial('//site/fileupload',array('model'=>$model,
 													'form'=>$form,
 													'doctype'=>'OPER2',
-													'header'=>Yii::t('monhtly','Puriscent Report'),
+													'header'=>Yii::t('monthly','Puriscent Report'),
 													'ronly'=>($model->scenario=='view' || $model->isReadOnly()),
 													)); 
 ?>
@@ -183,6 +189,13 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 													'doctype'=>'OPER3',
 													'header'=>Yii::t('monthly','Purification Report'),
 													'ronly'=>($model->scenario=='view' || $model->isReadOnly()),
+													)); 
+?>
+<?php $this->renderPartial('//site/fileupload',array('model'=>$model,
+													'form'=>$form,
+													'doctype'=>'OPER4',
+													'header'=>Yii::t('monthly','Report Detail'),
+													'ronly'=>(!($model->wfstatus=='PA' && Yii::app()->user->validFunction('YN01'))),
 													)); 
 ?>
 <?php $this->renderPartial('//monthly/reason',array('model'=>$model,'form'=>$form)); ?>
@@ -209,6 +222,7 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 Script::genFileUpload($model,$form->id,'OPER1');
 Script::genFileUpload($model,$form->id,'OPER2');
 Script::genFileUpload($model,$form->id,'OPER3');
+Script::genFileUpload($model,$form->id,'OPER4');
 
 $js=<<<EOF
 $('#btnDeny').on('click',function(){

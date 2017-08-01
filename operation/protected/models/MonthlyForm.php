@@ -21,17 +21,20 @@ class MonthlyForm extends CFormModel
 	public $docMasterId = array(
 							'oper1'=>0,
 							'oper2'=>0,
-							'oper3'=>0
+							'oper3'=>0,
+							'oper4'=>0
 						);
 	public $removeFileId = array(
 							'oper1'=>0,
 							'oper2'=>0,
-							'oper3'=>0
+							'oper3'=>0,
+							'oper4'=>0
 						);
 	public $no_of_attm = array(
 							'oper1'=>0,
 							'oper2'=>0,
-							'oper3'=>0
+							'oper3'=>0,
+							'oper4'=>0
 						);
 	
 	public function attributeLabels()
@@ -100,7 +103,8 @@ class MonthlyForm extends CFormModel
 				workflow$suffix.RequestStatusDesc('OPRPT',a.id,a.lcd) as wfstatusdesc,
 				docman$suffix.countdoc('OPER1',a.id) as oper1countdoc,
 				docman$suffix.countdoc('OPER2',a.id) as oper2countdoc,
-				docman$suffix.countdoc('OPER3',a.id) as oper3countdoc
+				docman$suffix.countdoc('OPER3',a.id) as oper3countdoc,
+				docman$suffix.countdoc('OPER4',a.id) as oper4countdoc
 				from opr_monthly_hdr a, opr_monthly_dtl b, opr_monthly_field c, security$suffix.sec_city d  
 				where a.id=$index and a.city in ($citylist)
 				and a.id=b.hdr_id and b.data_field=c.code
@@ -124,6 +128,7 @@ class MonthlyForm extends CFormModel
 					$this->no_of_attm['oper1'] = $row['oper1countdoc'];
 					$this->no_of_attm['oper2'] = $row['oper2countdoc'];
 					$this->no_of_attm['oper3'] = $row['oper3countdoc'];
+					$this->no_of_attm['oper4'] = $row['oper4countdoc'];
 				}
 				$temp = array();
 				$temp['id'] = $row['id'];
@@ -174,6 +179,7 @@ class MonthlyForm extends CFormModel
 			$this->updateDocman($connection,'OPER1');
 			$this->updateDocman($connection,'OPER2');
 			$this->updateDocman($connection,'OPER3');
+			$this->updateDocman($connection,'OPER4');
 			if ($wf->startProcess('OPRPT',$this->id,$this->lcd)) {
 				$wf->saveRequestData('CITY',$this->city);
 				$wf->saveRequestData('CITYNAME',$this->city_name);
@@ -199,6 +205,7 @@ class MonthlyForm extends CFormModel
 			$this->updateDocman($connection,'OPER1');
 			$this->updateDocman($connection,'OPER2');
 			$this->updateDocman($connection,'OPER3');
+			$this->updateDocman($connection,'OPER4');
 			if ($wf->startProcess('OPRPT',$this->id,$this->lcd)) {
 				$wf->takeAction('RESUBMIT');
 			}
@@ -287,6 +294,7 @@ class MonthlyForm extends CFormModel
 			$this->updateDocman($connection,'OPER1');
 			$this->updateDocman($connection,'OPER2');
 			$this->updateDocman($connection,'OPER3');
+			$this->updateDocman($connection,'OPER4');
 			$transaction->commit();
 		}
 		catch(Exception $e) {

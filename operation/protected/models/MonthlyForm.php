@@ -306,7 +306,7 @@ class MonthlyForm extends CFormModel
 	protected function saveMonthly(&$connection) {
 		$sql = '';
 		switch ($this->scenario) {
-			case 'edit':
+			case 'edit' || 'submit' || 'resubmit':
 				$sql = "update opr_monthly_dtl set
 							data_value = :data_value,
 							manual_input = :manual_input,

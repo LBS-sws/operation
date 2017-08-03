@@ -13,6 +13,7 @@ return array(
 	'System Report'=>'系統營業摘要', 
 	'Puriscent Report'=>'飄盈香營業報表',
 	'Purification Report'=>'甲醛營業報表',
+	'Report Detail'=>'明細', 
 	'Please upload'=>'请上传',
 );
 ?>

@@ -191,7 +191,6 @@ class MonthlyController extends Controller
 			$model->attributes = $_POST['MonthlyForm'];
 			$model->scenario = 'submit';
 			if ($model->validate()) {
-				$model->saveData();
 				$model->submit();
 				Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Submission Done'));
 				$this->redirect(Yii::app()->createUrl('monthly/edit',array('index'=>$model->id,'rtn'=>$model->listform)));

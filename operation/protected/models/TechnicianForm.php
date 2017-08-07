@@ -82,7 +82,7 @@ class TechnicianForm extends CFormModel
                 $message = Yii::t('procurement','goods does not exist');
                 $this->addError($attribute,$message);
                 return false;
-            }else if(!is_numeric($goods["goods_num"])|| floor($goods["goods_num"])!=$goods["goods_num"]){
+            }else if(!is_numeric($goods["goods_num"])){
                 $message = Yii::t('procurement','Goods Number can only be numbered');
                 $this->addError($attribute,$message);
                 return false;

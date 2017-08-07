@@ -9,6 +9,7 @@ class WarehouseForm extends CFormModel
 	public $unit;
 	public $inventory;
 	public $classify_id;
+	public $price;
 	public $luu;
 	public $lcu;
 
@@ -21,6 +22,7 @@ class WarehouseForm extends CFormModel
             'type'=>Yii::t('procurement','Type'),
             'unit'=>Yii::t('procurement','Unit'),
             'inventory'=>Yii::t('procurement','Inventory'),
+            'price'=>Yii::t('procurement','Price（RMB）'),
 		);
 	}
 
@@ -30,7 +32,7 @@ class WarehouseForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, goods_code, name, type, unit, inventory, classify_id, lcu, luu','safe'),
+			array('id, goods_code, name, type, unit, inventory, classify_id, price, lcu, luu','safe'),
             array('goods_code','required'),
             array('name','required'),
             array('classify_id','required'),
@@ -40,6 +42,7 @@ class WarehouseForm extends CFormModel
             array('inventory','numerical','allowEmpty'=>false,'integerOnly'=>false),
 			array('name','validateName'),
 			array('goods_code','validateCode'),
+			array('price','required'),
 		);
 	}
 
@@ -93,6 +96,7 @@ class WarehouseForm extends CFormModel
                 $this->classify_id = $row['classify_id'];
                 $this->goods_code = $row['goods_code'];
                 $this->inventory = $row['inventory'];
+                $this->price = $row['price'];
                 break;
 			}
 		}
@@ -149,9 +153,9 @@ class WarehouseForm extends CFormModel
                 break;
             case 'new':
                 $sql = "insert into opr_warehouse(
-							name, type, unit, inventory, classify_id, lcu, lcd, goods_code,city
+							name, type, unit, inventory, classify_id, lcu, lcd, goods_code,city,price
 						) values (
-							:name, :type, :unit, :inventory, :classify_id, :lcu, :lcd, :goods_code,:city
+							:name, :type, :unit, :inventory, :classify_id, :lcu, :lcd, :goods_code,:city,:price
 						)";
                 break;
             case 'edit':
@@ -160,6 +164,7 @@ class WarehouseForm extends CFormModel
 							type = :type, 
 							classify_id = :classify_id, 
 							unit = :unit,
+							price = :price,
 							goods_code = :goods_code,
 							luu = :luu,
 							lud = :lud,
@@ -185,6 +190,8 @@ class WarehouseForm extends CFormModel
             $command->bindParam(':type',$this->type,PDO::PARAM_STR);
         if (strpos($sql,':unit')!==false)
             $command->bindParam(':unit',$this->unit,PDO::PARAM_STR);
+        if (strpos($sql,':price')!==false)
+            $command->bindParam(':price',$this->price,PDO::PARAM_STR);
         if (strpos($sql,':inventory')!==false)
             $command->bindParam(':inventory',$this->inventory,PDO::PARAM_INT);
         if (strpos($sql,':classify_id')!==false)

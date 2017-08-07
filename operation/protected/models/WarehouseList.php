@@ -10,6 +10,7 @@ class WarehouseList extends CListPageModel
 			'type'=>Yii::t('procurement','Type'),
 			'unit'=>Yii::t('procurement','Unit'),
 			'inventory'=>Yii::t('procurement','Inventory'),
+			'price'=>Yii::t('procurement','Price（RMB）'),
 		);
 	}
 	
@@ -40,6 +41,9 @@ class WarehouseList extends CListPageModel
 				case 'unit':
 					$clause .= General::getSqlConditionClause('unit', $svalue);
 					break;
+				case 'price':
+					$clause .= General::getSqlConditionClause('price', $svalue);
+					break;
 				case 'inventory':
 					$clause .= General::getSqlConditionClause('inventory', $svalue);
 					break;
@@ -68,6 +72,7 @@ class WarehouseList extends CListPageModel
 						'name'=>$record['name'],
 						'type'=>$record['type'],
 						'unit'=>$record['unit'],
+						'price'=>$record['price'],
 						'inventory'=>$record['inventory'],
 						'goods_code'=>$record['goods_code'],
 					);

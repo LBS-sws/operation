@@ -4,5 +4,6 @@
 	<td><?php echo $this->record['name']; ?></td>
 	<td><?php echo $this->record['type']; ?></td>
 	<td><?php echo $this->record['unit']; ?></td>
+	<td><?php echo $this->record['price']; ?></td>
 	<td><?php echo $this->record['inventory']; ?></td>
 </tr>

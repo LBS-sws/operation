@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50620
 File Encoding         : 65001
 
-Date: 2017-08-07 15:39:28
+Date: 2017-08-07 16:47:40
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -45,6 +45,7 @@ CREATE TABLE `opr_warehouse` (
   `name` varchar(30) NOT NULL COMMENT '物品名字',
   `type` varchar(30) NOT NULL COMMENT '物品規格',
   `unit` varchar(30) NOT NULL COMMENT '物品單位',
+  `price` float(30,2) NOT NULL DEFAULT '0.00' COMMENT '單價',
   `inventory` varchar(10) DEFAULT '0' COMMENT '庫存',
   `city` varchar(30) DEFAULT NULL COMMENT '地區',
   `lcu` varchar(30) CHARACTER SET utf32 DEFAULT NULL,

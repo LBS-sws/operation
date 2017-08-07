@@ -89,6 +89,14 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                 </div>
             </div>
             <div class="form-group">
+                <?php echo $form->labelEx($model,'price',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-4">
+                    <?php echo $form->numberField($model, 'price',
+                        array('min'=>0,'readonly'=>($model->scenario=='view'))
+                    ); ?>
+                </div>
+            </div>
+            <div class="form-group">
                 <?php echo $form->labelEx($model,'inventory',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
                     <?php echo $form->numberField($model, 'inventory',

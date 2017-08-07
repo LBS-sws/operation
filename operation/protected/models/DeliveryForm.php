@@ -58,7 +58,7 @@ class DeliveryForm extends CFormModel
                 $message = Yii::t('procurement','Actual Number cannot be empty');
                 $this->addError($attribute,$message);
                 return false;
-            }else if(!is_numeric($goods["confirm_num"]) || floor($goods["confirm_num"])!=$goods["confirm_num"]){
+            }else if(!is_numeric($goods["confirm_num"])){
                 $message = Yii::t('procurement','Actual Number can only be numbered');
                 $this->addError($attribute,$message);
                 return false;
@@ -213,7 +213,7 @@ class DeliveryForm extends CFormModel
         if(empty($goodsId)||!is_numeric($goodsId) || floor($goodsId)!=$goodsId){
             return false;
         }
-        if(empty($num)||!is_numeric($num) || floor($num)!=$num){
+        if(empty($num)||!is_numeric($num)){
             return false;
         }
         Yii::app()->db->createCommand("update opr_warehouse set inventory=inventory-$num where id=$goodsId")->execute();

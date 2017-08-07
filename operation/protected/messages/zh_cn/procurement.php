@@ -200,5 +200,8 @@ return array(
     //後期修改
     'Warehouse'=>'领料分类',
     'Class Type'=>'分类类型',
+    'Visibility'=>'可见度',
+    'All'=>'全部',
+    'Local'=>'本地',
 );
 ?>

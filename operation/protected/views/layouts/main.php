@@ -136,6 +136,7 @@ $("#'.$oid.'").on("click",function(){$("#syschangedialog").modal("hide");window.
 	Yii::app()->clientScript->registerScript('systemchange',$js,CClientScript::POS_READY);
 
 Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/orderMessage.js", CClientScript::POS_END);
+Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/message.js", CClientScript::POS_END);
 }
 ?>
 </html>

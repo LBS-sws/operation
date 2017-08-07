@@ -37,7 +37,7 @@ class WarehouseForm extends CFormModel
             array('type','required'),
             array('unit','required'),
             array('inventory','required'),
-            array('inventory','numerical','allowEmpty'=>false,'integerOnly'=>true),
+            array('inventory','numerical','allowEmpty'=>false,'integerOnly'=>false),
 			array('name','validateName'),
 			array('goods_code','validateCode'),
 		);

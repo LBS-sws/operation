@@ -244,6 +244,7 @@ class OrderForm extends CFormModel
 
     //獲取物品列表
     public function getGoodsList($order_class=0){
+        $city = Yii::app()->user->city();
         switch ($order_class){
             case "Import":
                 $from = "opr_goods_im";
@@ -255,7 +256,7 @@ class OrderForm extends CFormModel
                 $from = "opr_goods_fa";
                 break;
         }
-        $rs = Yii::app()->db->createCommand()->select()->from($from)->queryAll();
+        $rs = Yii::app()->db->createCommand()->select()->from($from)->where("city=:city or status = 1",array(":city"=>$city))->queryAll();
         return $rs;
     }
 

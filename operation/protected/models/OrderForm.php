@@ -256,7 +256,7 @@ class OrderForm extends CFormModel
                 $from = "opr_goods_fa";
                 break;
         }
-        $rs = Yii::app()->db->createCommand()->select()->from($from)->where("city=:city or status = 1",array(":city"=>$city))->queryAll();
+        $rs = Yii::app()->db->createCommand()->select()->from($from)->queryAll();
         return $rs;
     }
 

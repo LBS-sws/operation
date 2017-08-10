@@ -93,5 +93,6 @@ return array(
     'Classify Summary Entry'=>'分类管理',
     'Goods Hybrid Rules'=>'混合规则管理',
     //沈超添加結束
+	
 );
 ?>

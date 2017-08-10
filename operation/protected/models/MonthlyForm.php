@@ -84,14 +84,19 @@ class MonthlyForm extends CFormModel
 		$count1 = $this->no_of_attm['oper1'];
 		$count2 = $this->no_of_attm['oper2'];
 		$count3 = $this->no_of_attm['oper3'];
+		$count4 = $this->no_of_attm['oper4'];
+		$val_5 = $this->record[5]['datavalue'];
 		if (($this->scenario=='submit' || $this->scenario=='resubmit') && (empty($count1) || $count1==0)) {
 			$this->addError($attribute, Yii::t('monthly','Please upload').' '.Yii::t('monthly','System Report'));
 		}
 		if (($this->scenario=='submit' || $this->scenario=='resubmit') && (empty($count2) || $count2==0)) {
 			$this->addError($attribute, Yii::t('monthly','Please upload').' '.Yii::t('monthly','Puriscent Report'));
 		}
-		if (($this->scenario=='submit' || $this->scenario=='resubmit') && (empty($count3) || $count3==0)) {
+		if (($this->scenario=='submit' || $this->scenario=='resubmit') && (!empty($val_5) && $val_5 > 0) && (empty($count3) || $count3==0)) {
 			$this->addError($attribute, Yii::t('monthly','Please upload').' '.Yii::t('monthly','Purification Report'));
+		}
+		if (($this->scenario=='accept') && (empty($count4) || $count4==0)) {
+			$this->addError($attribute, Yii::t('monthly','Please upload').' '.Yii::t('monthly','Statement'));
 		}
 	}
 
@@ -361,6 +366,16 @@ class MonthlyForm extends CFormModel
 		}
 	}
 
+//	public function exportExcel() {
+//		$file = "oprpt".date("YmdHi").".xls";
+//		header("Content-type: application/vnd.ms-excel");
+//		header("Content-Disposition: attachment; filename=$file");
+//		$export = "<table>";
+//		
+//		$export .= "</table>";
+//		echo $export;
+//	}
+	
 	public function validUserInCurrentAction() {
 		$uid = Yii::app()->user->id;
 		return (strpos('/'.$this->wfactionuser.'/', '/'.$uid.'/')!==false);

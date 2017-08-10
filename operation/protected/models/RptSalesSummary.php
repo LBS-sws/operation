@@ -33,12 +33,12 @@ class RptSalesSummary extends CReport {
 		
 		$suffix = Yii::app()->params['envSuffix'];
 
-		$allowcities = City::model()->getDescendantList($city);
+		$allowcities = ($this->region==0)
+						? City::model()->getDescendantList($city)
+						: City::model()->getDescendantList(($this->region==2 ? 'A1' : 'CN'));
 		$allowcities = "'$city'".(empty($allowcities) ? "" : ",").$allowcities;
 		
-		$cities = City::model()->getDescendantList(($this->region==2 ? 'A1' : 'CN'));
-		$cities = "'$city'".(empty($cities) ? "" : ",").$cities;
-		$citylist = General::getCityListWithNoDescendant($cities);
+		$citylist = General::getCityListWithNoDescendant($allowcities);
 		$list = '';
 		foreach ($citylist as $key=>$value) {
 			$list .= (empty($list) ? '' : ',')."'".$key."'";
@@ -103,7 +103,11 @@ class RptSalesSummary extends CReport {
 	public function printReport() {
 		$title = ($this->region==2) 
 			? $this->labels['rptname'].' - '.$this->labels['sea_region']
-			: $this->labels['rptname'].' - '.$this->labels['china_region'];
+			: (($this->region==1) 
+				? $this->labels['rptname'].' - '.$this->labels['china_region']
+				: $this->labels['rptname'].' - '.General::getCityName($this->criteria['CITY'])
+				)
+			;
 		$subtitle = $this->labels['date'].': '.$this->year.'/'.substr('00'.$this->month,-2);
 			
 		$this->excel = new ExcelTool();

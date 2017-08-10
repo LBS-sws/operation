@@ -14,7 +14,7 @@
 			);
 	$this->beginWidget('bootstrap.widgets.TbModal', array(
 					'id'=>'rmkdialog',
-					'header'=>Yii::t('trans','Please enter reason'),
+					'header'=>Yii::t('monthly','Please enter reason'),
 					'footer'=>$ftrbtn,
 					'show'=>false,
 				));

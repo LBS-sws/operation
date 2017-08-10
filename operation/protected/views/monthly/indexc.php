@@ -53,7 +53,7 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Enquiry';
 	<?php $this->widget('ext.layout.ListPageWidget', array(
 			'title'=>Yii::t('monthly','Sales Summary List'),
 			'model'=>$model,
-				'viewhdr'=>'//monthly/_listhdr',
+				'viewhdr'=>'//monthly/_listhdrc',
 				'viewdtl'=>'//monthly/_listdtlc',
 				'search'=>array(
 							'city_name',

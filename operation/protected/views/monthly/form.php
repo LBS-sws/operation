@@ -82,7 +82,7 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 	?>
 	<?php 
 		$counter = ($model->no_of_attm['oper4'] > 0) ? ' <span id="docoper3" class="label label-info">'.$model->no_of_attm['oper4'].'</span>' : ' <span id="docoper4"></span>';
-		echo TbHtml::button('<span class="fa  fa-file-text-o"></span> '.Yii::t('monthly','Report Detail').$counter, array(
+		echo TbHtml::button('<span class="fa  fa-file-text-o"></span> '.Yii::t('monthly','Statement').$counter, array(
 			'name'=>'btnOper4','id'=>'btnOper4','data-toggle'=>'modal','data-target'=>'#fileuploadoper4',)
 		);
 	?>

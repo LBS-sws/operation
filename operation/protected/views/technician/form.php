@@ -93,13 +93,14 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                         <thead>
                         <tr>
                             <td width="20%"><?php echo Yii::t("procurement","Goods Name")?></td>
-                            <td width="11%"><?php echo Yii::t("procurement","Type")?></td>
-                            <td width="8%"><?php echo Yii::t("procurement","Unit")?></td>
-                            <td width="8%"><?php echo Yii::t("procurement","Goods Number")?></td>
+                            <td width="11%"><?php echo Yii::t("procurement","Unit")?></td>
                             <td width="12%"><?php echo Yii::t("procurement","Demand Note")?></td>
                             <?php if ($model->scenario=='edit' && $model->status == "approve"): ?>
-                                <td width="8%"><?php echo Yii::t("procurement","Actual Number")?></td>
                                 <td width="12%"><?php echo Yii::t("procurement","Headquarters Note")?></td>
+                            <?php endif ?>
+                            <td width="8%"><?php echo Yii::t("procurement","Goods Number")?></td>
+                            <?php if ($model->scenario=='edit' && $model->status == "approve"): ?>
+                                <td width="8%"><?php echo Yii::t("procurement","Actual Number")?></td>
                             <?php endif ?>
                             <td width="1%">&nbsp;</td>
                         </tr>
@@ -136,13 +137,14 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                                 }
                                 $tableTr.="</div></td>";
 
-                                $tableTr.="<td><input type='text' class='form-control type' readonly name='TechnicianForm[goods_list][$con_num][type]' value='".$val['type']."'></td>";
                                 $tableTr.="<td><input type='text' class='form-control unit' readonly name='TechnicianForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
-                                $tableTr.="<td><input type='number' class='form-control' name='TechnicianForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
                                 $tableTr.="<td><input type='text' class='form-control' name='TechnicianForm[goods_list][$con_num][note]' value='".$val['note']."'></td>";
                                 if($model->scenario=='edit' && $model->status == "approve"){
-                                    $tableTr.="<td><input type='number' class='form-control' name='TechnicianForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
                                     $tableTr.="<td><input type='text' class='form-control' name='TechnicianForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
+                                }
+                                $tableTr.="<td><input type='number' class='form-control' name='TechnicianForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
+                                if($model->scenario=='edit' && $model->status == "approve"){
+                                    $tableTr.="<td><input type='number' class='form-control' name='TechnicianForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
                                 }
                                 $tableTr.="<td><button type='button' class='btn btn-danger delGoods'>".Yii::t("misc","Delete")."</button>";
                                 if(!empty($val['id'])){
@@ -159,9 +161,9 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                         <tr>
                             <?php
                             if ($model->scenario=='edit' && $model->status == "approve"){
-                                echo '<td colspan="7"></td>';
+                                echo '<td colspan="6"></td>';
                             }else{
-                                echo '<td colspan="5"></td>';
+                                echo '<td colspan="4"></td>';
                             }
                             ?>
                             <td class="text-center"><button type="button" class="btn btn-primary" id="addGoods"><?php echo Yii::t("misc","Add")?></button></td>

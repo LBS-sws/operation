@@ -66,6 +66,9 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                     //流程
                     echo TbHtml::button('<span class="fa fa-file-text-o"></span> '.Yii::t('misc','Flow'), array(
                         'name'=>'btnFlow','id'=>'btnFlow','data-toggle'=>'modal','data-target'=>'#flowinfodialog'));
+                    //下載
+                    echo TbHtml::button('<span class="fa fa-cloud-download"></span> '.Yii::t('procurement','Down'), array(
+                        'submit'=>Yii::app()->createUrl('Purchase/downorder',array("index"=>$model->id))));
                 } ?>
             </div>
 	</div></div>
@@ -78,6 +81,9 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
 			<?php echo $form->hiddenField($model, 'order_class'); ?>
 			<?php echo $form->hiddenField($model, 'activity_id'); ?>
 
+            <div class="form-group">
+                <div class="col-sm-10 col-sm-offset-1"><?php echo $model->getHeadHtml();?></div>
+            </div>
 
             <?php if ($model->scenario!='new'): ?>
                 <div class="form-group">
@@ -122,13 +128,19 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                             <td width="20%"><?php echo Yii::t("procurement","Goods Name")?></td>
                             <td width="11%"><?php echo Yii::t("procurement","Type")?></td>
                             <td width="8%"><?php echo Yii::t("procurement","Unit")?></td>
-                            <td width="10%"><?php echo Yii::t("procurement","Price（".$currencyType."）")?></td>
-                            <td width="10%"><?php echo Yii::t("procurement","Goods Number")?></td>
+
                             <td width="12%"><?php echo Yii::t("procurement","Demand Note")?></td>
                             <?php if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished" || $model->status == "read")): ?>
-                            <td width="10%"><?php echo Yii::t("procurement","Actual Number")?></td>
-                            <td width="12%"><?php echo Yii::t("procurement","Headquarters Note")?></td>
+                                <td width="12%"><?php echo Yii::t("procurement","Headquarters Note")?></td>
                             <?php endif ?>
+
+                            <td width="10%"><?php echo Yii::t("procurement","Price（".$currencyType."）")?></td>
+                            <td width="10%"><?php echo Yii::t("procurement","Goods Number")?></td>
+
+                            <?php if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished" || $model->status == "read")): ?>
+                            <td width="10%"><?php echo Yii::t("procurement","Actual Number")?></td>
+                            <?php endif ?>
+
                             <td width="10%"><?php echo Yii::t("procurement","Total（".$currencyType."）")?></td>
                             <td width="8%">&nbsp;</td>
                         </tr>
@@ -165,12 +177,14 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                                 $tableTr.="</div></td>";
                                 $tableTr.="<td><input type='text' class='form-control type' readonly name='OrderForm[goods_list][$con_num][type]' value='".$val['type']."'></td>";
                                 $tableTr.="<td><input type='text' class='form-control unit' readonly name='OrderForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
-                                $tableTr.="<td><input type='text' class='form-control price' readonly name='OrderForm[goods_list][$con_num][price]' value='".sprintf("%.2f", $val['price'])."'></td>";
-                                $tableTr.="<td><input type='number' class='form-control numChange goods_num' name='OrderForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
                                 $tableTr.="<td><input type='text' class='form-control' name='OrderForm[goods_list][$con_num][note]' value='".$val['note']."'></td>";
                                 if($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished" || $model->status == "read")){
-                                    $tableTr.="<td><input type='number' class='form-control goods_num' name='OrderForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
                                     $tableTr.="<td><input type='text' class='form-control' name='OrderForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
+                                }
+                                $tableTr.="<td><input type='text' class='form-control price' readonly name='OrderForm[goods_list][$con_num][price]' value='".sprintf("%.2f", $val['price'])."'></td>";
+                                $tableTr.="<td><input type='number' class='form-control numChange goods_num' name='OrderForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
+                                if($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished" || $model->status == "read")) {
+                                    $tableTr .= "<td><input type='number' class='form-control goods_num' name='OrderForm[goods_list][$con_num][confirm_num]' value='" . $val['confirm_num'] . "'></td>";
                                 }
                                 $tableTr.="<td><input type='text' class='form-control sum' readonly></td>";
                                 $tableTr.="<td><button type='button' class='btn btn-danger delGoods'>".Yii::t("misc","Delete")."</button>";

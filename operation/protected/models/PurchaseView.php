@@ -220,21 +220,75 @@ class PurchaseView extends CFormModel
 
 	public function getCityClassToActivityId($activity_id){
         $arr=array();
-        $rows = Yii::app()->db->createCommand()->select("order_class,city")
+        $rows = Yii::app()->db->createCommand()->select("id,order_class,city")
             ->from("opr_order")
             ->where("activity_id = :activity_id AND judge=1 AND status != 'pending' AND status != 'cancelled'", array(':activity_id'=>$activity_id))->queryAll();
         if($rows){
             foreach ($rows as $row){
-                if(empty($arr[$row["city"]])){
-                    $arr[$row["city"]] = array(
-                        "Import"=>0,
-                        "Domestic"=>0,
-                        "Fast"=>0
-                    );
+                if(empty($arr[$row['city']])){
+                    $arr[$row['city']]=array();
                 }
-                $arr[$row["city"]][$row["order_class"]]++;
+                $goodList = array();
+                $idList = Yii::app()->db->createCommand()->select("goods_id,goods_num,confirm_num")->from("opr_order_goods")->where("order_id=:order_id",array(":order_id"=>$row["id"]))->queryAll();
+                foreach ($idList as $goods_id){
+                    $goodId=$goods_id["goods_id"];
+                    $goods=OrderForm::getOneGoodsToId($goodId,$row["order_class"]);//$row["id"]
+                    if(empty($goodList[$goodId])){
+                        $goodList[$goodId] = $goods;
+                        $goodList[$goodId]["goods_num"] = intval($goods_id["goods_num"]);
+                        $goodList[$goodId]["confirm_num"] = intval($goods_id["confirm_num"]);
+                    }else{
+                        $goodList[$goodId]["goods_num"] += intval($goods_id["goods_num"]);
+                        $goodList[$goodId]["confirm_num"] += intval($goods_id["confirm_num"]);
+                    }
+                    if(!empty($goods["rules_id"])){
+                        $rules = RulesForm::getRulesToId($goods["rules_id"]);
+                        $goodList[$goodId]["multiple"] = $rules["multiple"];
+                    }
+                }
+                $company = PurchaseView::getCompanyToCity($row['city']);
+                $arr[$row['city']]["cityCode"]=$row['city'];
+                $arr[$row['city']]["city"]=$company["city"];
+                $arr[$row['city']]["cityName"]=$company["cityName"];
+                $arr[$row['city']]["cityTel"]=$company["cityTel"];
+                $arr[$row['city']]["cityAdr"]=$company["cityAdr"];
+                $arr[$row['city']]["cityUser"]=array("name"=>$company["userName"],"email"=>$company["email"]);
+                $arr[$row['city']]["goodList"]=$goodList;
             }
         }
         return $arr;
+    }
+
+
+    //根據城市獲取公司信息
+    public function getCompanyToCity($city){
+        $suffix = Yii::app()->params['envSuffix'];
+        $suffix = "security".$suffix;
+        if (!empty($city)){
+            $rs = Yii::app()->db->createCommand()->select("name,incharge")->from($suffix.".sec_city")->where("code=:code",array(":code"=>$city))->queryAll();
+            if($rs){
+                $incharge = $rs[0]["incharge"];
+                $email = Yii::app()->db->createCommand()->select("email,disp_name")->from($suffix.".sec_user")->where("username=:username",array(":username"=>$incharge))->queryAll();
+                if($email){
+                    return array(
+                        "city"=>$rs[0]["name"],//地區名字
+                        "cityName"=>"暫時無法獲取公司名字",//公司名字
+                        "cityTel"=>"暫時無法獲取公司電話",//公司電話
+                        "cityAdr"=>"暫時無法獲取公司地址",//公司地址
+                        "userName"=>$email[0]["disp_name"],
+                        "email"=>$email[0]["email"],
+                    );
+                }
+            }
+        }
+
+        return array(
+            "city"=>"",
+            "cityName"=>"",
+            "cityTel"=>"",
+            "cityAdr"=>"",
+            "userName"=>"",
+            "email"=>""
+            );
     }
 }

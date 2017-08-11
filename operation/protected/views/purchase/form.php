@@ -111,11 +111,11 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
                             <td width="20%"><?php echo Yii::t("procurement","Goods Name")?></td>
                             <td width="11%"><?php echo Yii::t("procurement","Type")?></td>
                             <td width="8%"><?php echo Yii::t("procurement","Unit")?></td>
-                            <td width="10%"><?php echo Yii::t("procurement","Price（".$currencyType."）")?></td>
                             <td width="10%"><?php echo Yii::t("procurement","Demand Note")?></td>
+                            <td width="10%"><?php echo Yii::t("procurement","Headquarters Note")?></td>
+                            <td width="10%"><?php echo Yii::t("procurement","Price（".$currencyType."）")?></td>
                             <td width="10%"><?php echo Yii::t("procurement","Goods Number")?></td>
                             <td width="10%"><?php echo Yii::t("procurement","Actual Number")?></td>
-                            <td width="10%"><?php echo Yii::t("procurement","Headquarters Note")?></td>
                             <td width="10%"><?php echo Yii::t("procurement","Total（".$currencyType."）")?></td>
                         </tr>
                         </thead>
@@ -140,15 +140,18 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
 
                                 $tableTr.="<td><input type='text' class='form-control type' readonly name='PurchaseForm[goods_list][$con_num][type]' value='".$val['type']."'></td>";
                                 $tableTr.="<td><input type='text' class='form-control unit' readonly name='PurchaseForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
-                                $tableTr.="<td><input type='text' class='form-control price' readonly name='PurchaseForm[goods_list][$con_num][price]' value='".sprintf("%.2f", $val['price'])."'></td>";
                                 $tableTr.="<td><input type='text' class='form-control' readonly name='PurchaseForm[goods_list][$con_num][note]' value='".$val['note']."'></td>";
+                                if($model->status == "sent" || $model->status == "read"){
+                                    $tableTr.="<td><input type='text' class='form-control' name='PurchaseForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
+                                }else{
+                                    $tableTr.="<td><input type='text' class='form-control' readonly name='PurchaseForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
+                                }
+                                $tableTr.="<td><input type='text' class='form-control price' readonly name='PurchaseForm[goods_list][$con_num][price]' value='".sprintf("%.2f", $val['price'])."'></td>";
                                 $tableTr.="<td><input type='number' class='form-control' readonly name='PurchaseForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
                                 if($model->status == "sent" || $model->status == "read"){
                                     $tableTr.="<td><input type='number' class='form-control numChange goods_num' name='PurchaseForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
-                                    $tableTr.="<td><input type='text' class='form-control' name='PurchaseForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
                                 }else{
                                     $tableTr.="<td><input type='number' class='form-control numChange goods_num' readonly name='PurchaseForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
-                                    $tableTr.="<td><input type='text' class='form-control' readonly name='PurchaseForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
                                 }
                                 $tableTr.="<td><input type='text' class='form-control sum' readonly></td>";
 

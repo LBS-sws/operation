@@ -146,4 +146,31 @@ class PurchaseController extends Controller
             $myExcel->outDownExcel($model->lcu."的订单.xls");
         }
     }
+
+    //下載訂單
+    public function actionDownactive($index){
+        $model = new ActivityForm('edit');
+        if (!$model->retrieveData($index)) {
+            throw new CHttpException(404,'The requested page does not exist.');
+        } else {
+            $cityList = PurchaseView::getCityClassToActivityId($index);
+            $myExcel = new MyExcelTwo();
+            foreach ($cityList as $cityCode => $goodsList){
+                $myExcel->addNewSheet($cityCode);
+                $myExcel->setRowContent("A1","城市編號：".$goodsList["cityCode"],"F1");
+                $myExcel->setRowContent("A2","公司名稱：".$goodsList["cityName"],"F2");
+                $myExcel->setRowContent("A3","公司電話：".$goodsList["cityTel"],"F3");
+                $myExcel->setRowContent("A4","公司地址：".$goodsList["cityAdr"],"F4");
+                $myExcel->setRowContent("A5","公司負責人：".$goodsList["cityUser"]["name"].$goodsList["cityUser"]["email"],"F5");
+                $myExcel->setStartRow(9);
+                $myExcel->fillDownExcel($goodsList["goodList"],$model->order_class);
+                $myExcel->setProtoValue($cityCode,"cityName",$goodsList["cityName"]);
+                $myExcel->setProtoValue($cityCode,"city",$goodsList["city"]);
+            }
+            $myExcel->addNewSheet("分區統計");
+            $myExcel->setStartRow(3);
+            $myExcel->countOrderToCity($model->order_class);
+            $myExcel->outDownExcel($model->activity_title.".xls");
+        }
+    }
 }

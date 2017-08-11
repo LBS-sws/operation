@@ -43,7 +43,6 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
 				'viewdtl'=>'//warehouse/_listdtl',
 				'search'=>array(
 							'name',
-							'type',
 							'unit',
 							'inventory',
 						),

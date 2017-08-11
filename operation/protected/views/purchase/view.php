@@ -16,10 +16,16 @@ $this->pageTitle=Yii::app()->name . ' - Order Activity Form';
 
 <section class="content">
 
-    <div class="box"><div class="box-body">
+    <div class="box">
+        <div class="box-body">
             <div class="btn-group" role="group">
                 <?php echo TbHtml::button('<span class="fa fa-reply"></span> '.Yii::t('misc','Back'), array(
                     'submit'=>Yii::app()->createUrl('purchase/index')));
+                ?>
+            </div>
+            <div class="btn-group pull-right" role="group">
+                <?php echo TbHtml::button('<span class="fa fa-cloud-download"></span> '.Yii::t('procurement','Down'), array(
+                    'submit'=>Yii::app()->createUrl('purchase/downactive',array("index"=>$model->id))));
                 ?>
             </div>
         </div>

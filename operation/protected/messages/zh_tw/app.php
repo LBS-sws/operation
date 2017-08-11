@@ -74,7 +74,8 @@ return array(
     'Head Email'=>'中央郵件',
 
     'Technician'=>'領料管理',
-    'Technician List'=>'技術員領料列表',
+    'Technician List'=>'外勤領料列表',
+    'Goods'=>'物品設置',
     'Goods Entry'=>'物品輸入',
     'Goods List'=>'物品列表',
     'Goods Summary Entry'=>'物品管理',
@@ -83,7 +84,7 @@ return array(
     'Fast Summary Entry'=>'快速貨物品管理',
     'Order Activity'=>'採購週期明細',
     'Fast Order'=>'快速貨訂單管理',
-    'Technician take Goods'=>'技術員領料審批',
+    'Technician take Goods'=>'外勤領料審批',
     'Warehouse Info'=>'倉庫信息',
     'Stickies Summary Entry'=>'標籤管理',
     'Classify Summary Entry'=>'分類管理',

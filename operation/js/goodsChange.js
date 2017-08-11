@@ -99,8 +99,7 @@ function inputDownList(arr,fn){
                     "dataunit":val["unit"],
                     "dataprice":val["price"],
                     "classify":val["classify_id"],
-                    "content":content,
-                    "datatype":val["type"]
+                    "content":content
                 }).append("<a href='javascript:void(0);'>"+val["name"]+"</a>");
                 $(ul).append(li);
             }
@@ -115,7 +114,7 @@ function tableGoodsChange($ele,$li) {
     if($tr.length > 0){
         var $tr = $ele.parents("tr");
         $tr.find("input.name").val($li.attr("dataname"));
-        $tr.find("input.type").val($li.attr("datatype"));
+        //$tr.find("input.type").val($li.attr("datatype"));
         $tr.find("input.unit").val($li.attr("dataunit"));
         $tr.find("input.classify_id").val($li.attr("classify"));
         $tr.find("input.stickies_id").val($li.attr("content"));
@@ -163,10 +162,9 @@ function addGoodsTable(data) {
         '<td><div class="input-group">' +$("#classifyList").html()+
         '<input type="text" class="form-control testInput" autocomplete="off" name="TechnicianForm[goods_list]['+num+'][name]" >' +
         '<input type="hidden" name="TechnicianForm[goods_list]['+num+'][goods_id]"></div></td>'+
-        '<td><input type="text" class="form-control type" name="TechnicianForm[goods_list]['+num+'][type]" readonly></td>'+
         '<td><input type="text" class="form-control unit" name="TechnicianForm[goods_list]['+num+'][unit]" readonly></td>'+
-        '<td><input type="number" min="0" class="form-control" name="TechnicianForm[goods_list]['+num+'][goods_num]"></td>'+
         '<td><input type="text" class="form-control" name="TechnicianForm[goods_list]['+num+'][note]"></td>'+
+        '<td><input type="number" min="0" class="form-control" name="TechnicianForm[goods_list]['+num+'][goods_num]"></td>'+
         '<td><button type="button" class="btn btn-danger delGoods">'+data.data.btnStr+'</button></td>'+
         '</tr>';
 

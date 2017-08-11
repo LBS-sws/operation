@@ -207,9 +207,9 @@ function addGoodsTable(data) {
         '<input type="hidden" name="OrderForm[goods_list]['+num+'][goods_id]"></div></td>'+
         '<td><input type="text" class="form-control type" name="OrderForm[goods_list]['+num+'][type]" readonly></td>'+
         '<td><input type="text" class="form-control unit" name="OrderForm[goods_list]['+num+'][unit]" readonly></td>'+
+        '<td><input type="text" class="form-control" name="OrderForm[goods_list]['+num+'][note]"></td>'+
         '<td><input type="text" class="form-control price" name="OrderForm[goods_list]['+num+'][price]" readonly></td>'+
         '<td><input type="number" min="0" class="form-control numChange goods_num" name="OrderForm[goods_list]['+num+'][goods_num]"></td>'+
-        '<td><input type="text" class="form-control" name="OrderForm[goods_list]['+num+'][note]"></td>'+
         '<td><input type="text" class="form-control sum" readonly></td>'+
         '<td><button type="button" class="btn btn-danger delGoods">'+data.data.btnStr+'</button></td>'+
     '</tr>';

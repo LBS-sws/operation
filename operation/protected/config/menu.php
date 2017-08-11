@@ -1,42 +1,6 @@
 <?php
 
 return array(
-    //物品管理
-    'Goods'=>array(
-        'access'=>'YG',
-        'items'=>array(
-            //物品管理
-            'Import Summary Entry'=>array(
-                'access'=>'YG01',
-                'url'=>'/goodsim/index',
-            ),
-            //物品管理
-            'Domestic Summary Entry'=>array(
-                'access'=>'YG04',
-                'url'=>'/goodsdo/index',
-            ),
-            //物品管理
-            'Fast Summary Entry'=>array(
-                'access'=>'YG05',
-                'url'=>'/goodsfa/index',
-            ),
-            //標籤管理
-            'Stickies Summary Entry'=>array(
-                'access'=>'YG02',
-                'url'=>'/stickies/index',
-            ),
-            //分類管理
-            'Classify Summary Entry'=>array(
-                'access'=>'YG03',
-                'url'=>'/classify/index',
-            ),
-            //分類管理
-            'Goods Hybrid Rules'=>array(
-                'access'=>'YG06',
-                'url'=>'/rules/index',
-            ),
-        ),
-    ),
     //總部管理員採購
 	'Activity'=>array(
 		'access'=>'YS',
@@ -101,19 +65,15 @@ return array(
 		),
 	),
 
-    'Sales Summary'=>array(
+    'Misc'=>array(
         'access'=>'YA',
         'items'=>array(
             'Sales Summary Entry'=>array(
                 'access'=>'YA01',
                 'url'=>'/monthly/index',
             ),
-            'Sales Summary Approval'=>array(
-                'access'=>'YA03',
-                'url'=>'/monthly/indexa',
-            ),
             'Sales Summary Enquiry'=>array(
-                'access'=>'YA02',
+                'access'=>'YA03',
                 'url'=>'/monthly/indexc',
             ),
         ),
@@ -129,6 +89,43 @@ return array(
             'Report Manager'=>array(
                 'access'=>'YB01',
                 'url'=>'/queue/index',
+            ),
+        ),
+    ),
+
+    //物品管理
+    'Goods'=>array(
+        'access'=>'YG',
+        'items'=>array(
+            //物品管理
+            'Import Summary Entry'=>array(
+                'access'=>'YG01',
+                'url'=>'/goodsim/index',
+            ),
+            //物品管理
+            'Domestic Summary Entry'=>array(
+                'access'=>'YG04',
+                'url'=>'/goodsdo/index',
+            ),
+            //物品管理
+            'Fast Summary Entry'=>array(
+                'access'=>'YG05',
+                'url'=>'/goodsfa/index',
+            ),
+            //標籤管理
+            'Stickies Summary Entry'=>array(
+                'access'=>'YG02',
+                'url'=>'/stickies/index',
+            ),
+            //分類管理
+            'Classify Summary Entry'=>array(
+                'access'=>'YG03',
+                'url'=>'/classify/index',
+            ),
+            //分類管理
+            'Goods Hybrid Rules'=>array(
+                'access'=>'YG06',
+                'url'=>'/rules/index',
             ),
         ),
     ),

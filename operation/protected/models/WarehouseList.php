@@ -7,7 +7,6 @@ class WarehouseList extends CListPageModel
 		return array(	
 			'goods_code'=>Yii::t('procurement','Goods Code'),
 			'name'=>Yii::t('procurement','Name'),
-			'type'=>Yii::t('procurement','Type'),
 			'unit'=>Yii::t('procurement','Unit'),
 			'inventory'=>Yii::t('procurement','Inventory'),
 			'price'=>Yii::t('procurement','Price（RMB）'),
@@ -70,7 +69,6 @@ class WarehouseList extends CListPageModel
 					$this->attr[] = array(
 						'id'=>$record['id'],
 						'name'=>$record['name'],
-						'type'=>$record['type'],
 						'unit'=>$record['unit'],
 						'price'=>$record['price'],
 						'inventory'=>$record['inventory'],

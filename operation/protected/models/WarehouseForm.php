@@ -5,7 +5,6 @@ class WarehouseForm extends CFormModel
 	public $id;
 	public $goods_code;
 	public $name;
-	public $type;
 	public $unit;
 	public $inventory;
 	public $classify_id;
@@ -19,7 +18,6 @@ class WarehouseForm extends CFormModel
             'goods_code'=>Yii::t('procurement','Goods Code'),
             'classify_id'=>Yii::t('procurement','Classify'),
             'name'=>Yii::t('procurement','Name'),
-            'type'=>Yii::t('procurement','Type'),
             'unit'=>Yii::t('procurement','Unit'),
             'inventory'=>Yii::t('procurement','Inventory'),
             'price'=>Yii::t('procurement','Price（RMB）'),
@@ -32,11 +30,10 @@ class WarehouseForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, goods_code, name, type, unit, inventory, classify_id, price, lcu, luu','safe'),
+			array('id, goods_code, name, unit, inventory, classify_id, price, lcu, luu','safe'),
             array('goods_code','required'),
             array('name','required'),
             array('classify_id','required'),
-            array('type','required'),
             array('unit','required'),
             array('inventory','required'),
             array('inventory','numerical','allowEmpty'=>false,'integerOnly'=>false),
@@ -91,7 +88,6 @@ class WarehouseForm extends CFormModel
 			foreach ($rows as $row) {
                 $this->id = $row['id'];
                 $this->name = $row['name'];
-                $this->type = $row['type'];
                 $this->unit = $row['unit'];
                 $this->classify_id = $row['classify_id'];
                 $this->goods_code = $row['goods_code'];
@@ -126,7 +122,7 @@ class WarehouseForm extends CFormModel
 
     //根據訂單id查訂單所有物品
     public function getGoodsListToId($order_id){
-        $rs = Yii::app()->db->createCommand()->select("b.name,b.inventory,b.goods_code,b.classify_id,b.unit,b.type,a.goods_num,a.confirm_num,a.id,a.goods_id,a.remark,a.note")
+        $rs = Yii::app()->db->createCommand()->select("b.name,b.inventory,b.goods_code,b.classify_id,b.unit,a.goods_num,a.confirm_num,a.id,a.goods_id,a.remark,a.note")
             ->from("opr_order_goods a,opr_warehouse b")->where('a.order_id=:order_id and a.goods_id = b.id',array(':order_id'=>$order_id))->queryAll();
         return $rs;
     }
@@ -153,15 +149,14 @@ class WarehouseForm extends CFormModel
                 break;
             case 'new':
                 $sql = "insert into opr_warehouse(
-							name, type, unit, inventory, classify_id, lcu, lcd, goods_code,city,price
+							name, unit, inventory, classify_id, lcu, lcd, goods_code,city,price
 						) values (
-							:name, :type, :unit, :inventory, :classify_id, :lcu, :lcd, :goods_code,:city,:price
+							:name, :unit, :inventory, :classify_id, :lcu, :lcd, :goods_code,:city,:price
 						)";
                 break;
             case 'edit':
                 $sql = "update opr_warehouse set
 							name = :name, 
-							type = :type, 
 							classify_id = :classify_id, 
 							unit = :unit,
 							price = :price,
@@ -186,8 +181,6 @@ class WarehouseForm extends CFormModel
             $command->bindParam(':name',$this->name,PDO::PARAM_STR);
         if (strpos($sql,':goods_code')!==false)
             $command->bindParam(':goods_code',$this->goods_code,PDO::PARAM_STR);
-        if (strpos($sql,':type')!==false)
-            $command->bindParam(':type',$this->type,PDO::PARAM_STR);
         if (strpos($sql,':unit')!==false)
             $command->bindParam(':unit',$this->unit,PDO::PARAM_STR);
         if (strpos($sql,':price')!==false)

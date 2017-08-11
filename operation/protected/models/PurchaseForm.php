@@ -179,20 +179,27 @@ class PurchaseForm extends CFormModel
             unset($goodsList[$key]["id"]);
             unset($goodsList[$key]["goods_id"]);
             unset($goodsList[$key]["classify_id"]);
-            if($this->order_class != "Domestic"){
-                unset($goodsList[$key]["stickies_id"]);
-                $goodsList[$key]["total"] = sprintf("%.2f",floatval($goodsList[$key]["price"])*intval($goodsList[$key]["confirm_num"]));
-                $sum = floatval($goodsList[$key]["net_weight"])*intval($goodsList[$key]["confirm_num"])/$multiple;
-                $goodsList[$key]["total2"] = round($sum,2);
-                $sum = floatval($goodsList[$key]["gross_weight"])*intval($goodsList[$key]["confirm_num"])/$multiple;
-                $goodsList[$key]["total3"] = round($sum,2);
-                $volume = explode('×',$goodsList[$key]["LWH"]);
-                $volume = floatval($volume[0])*floatval($volume[1])*floatval($volume[2])/1000000;
-                $sum = $volume*intval($goodsList[$key]["confirm_num"])/$multiple;
-                $goodsList[$key]["total4"] = round($sum,2);
-            }else{
-                $goodsList[$key]["stickies_id"] = $this->getStickiesToId($goodsList[$key]["stickies_id"]);
-                $goodsList[$key]["total"] = sprintf("%.2f",floatval($goodsList[$key]["price"])*intval($goodsList[$key]["confirm_num"]));
+            switch ($this->order_class){
+                case "Domestic":
+                    $goodsList[$key]["stickies_id"] = $this->getStickiesToId($goodsList[$key]["stickies_id"]);
+                    $goodsList[$key]["total"] = sprintf("%.2f",floatval($goodsList[$key]["price"])*intval($goodsList[$key]["confirm_num"]));
+                    break;
+                case "Import":
+                    unset($goodsList[$key]["stickies_id"]);
+                    $goodsList[$key]["total"] = sprintf("%.2f",floatval($goodsList[$key]["price"])*intval($goodsList[$key]["confirm_num"]));
+                    $sum = floatval($goodsList[$key]["net_weight"])*intval($goodsList[$key]["confirm_num"])/$multiple;
+                    $goodsList[$key]["total2"] = round($sum,2);
+                    $sum = floatval($goodsList[$key]["gross_weight"])*intval($goodsList[$key]["confirm_num"])/$multiple;
+                    $goodsList[$key]["total3"] = round($sum,2);
+                    $volume = explode('×',$goodsList[$key]["LWH"]);
+                    $volume = floatval($volume[0])*floatval($volume[1])*floatval($volume[2])/1000000;
+                    $sum = $volume*intval($goodsList[$key]["confirm_num"])/$multiple;
+                    $goodsList[$key]["total4"] = round($sum,2);
+                    break;
+                case "Fast":
+                    unset($goodsList[$key]["stickies_id"]);
+                    $goodsList[$key]["total"] = sprintf("%.2f",floatval($goodsList[$key]["price"])*intval($goodsList[$key]["confirm_num"]));
+                    break;
             }
             unset($goodsList[$key]["multiple"]);
         }
@@ -211,28 +218,39 @@ class PurchaseForm extends CFormModel
     //獲取表格的头
     public function getTableHeard(){
         $arr = array("物品編號","物品名称","物品規格","物品單位");
-        if($this->order_class == "Domestic"){
-            array_push($arr,"物品單價（RMB）");
-            array_push($arr,"物品標籤");
-        }else{
-            array_push($arr,'物品單價（US$）');
-        }
-        if($this->order_class == "Import"){
-            array_push($arr,"净重（kg）");
-            array_push($arr,"毛重（kg）");
-            array_push($arr,"長×寬×高（cm）");
-        }
-        array_push($arr,"要求數量");
-        array_push($arr,"實際數量");
-        array_push($arr,"要求備註");
-        array_push($arr,"總部備註");
-        if($this->order_class == "Domestic"){
-            array_push($arr,"總價（RMB）");
-        }else{
-            array_push($arr,'總價（US$）');
-            array_push($arr,'總淨重（kg）');
-            array_push($arr,'總毛重（kg）');
-            array_push($arr,'總體積（m³）');
+        switch ($this->order_class){
+            case "Import":
+                array_push($arr,'物品單價（US$）');
+                array_push($arr,"净重（kg）");
+                array_push($arr,"毛重（kg）");
+                array_push($arr,"長×寬×高（cm）");
+                array_push($arr,"要求數量");
+                array_push($arr,"實際數量");
+                array_push($arr,"要求備註");
+                array_push($arr,"總部備註");
+                array_push($arr,'總價（US$）');
+                array_push($arr,'總淨重（kg）');
+                array_push($arr,'總毛重（kg）');
+                array_push($arr,'總體積（m³）');
+                break;
+            case "Domestic":
+                array_push($arr,"物品單價（RMB）");
+                array_push($arr,"物品標籤");
+                array_push($arr,"要求數量");
+                array_push($arr,"實際數量");
+                array_push($arr,"要求備註");
+                array_push($arr,"總部備註");
+                array_push($arr,"總價（RMB）");
+                break;
+            case "Fast":
+                array_push($arr,'物品單價（US$）');
+                array_push($arr,"要求數量");
+                array_push($arr,"實際數量");
+                array_push($arr,"要求備註");
+                array_push($arr,"總部備註");
+                array_push($arr,'總價（US$）');
+                break;
+
         }
         return $arr;
     }

@@ -39,13 +39,24 @@ class MonthlyConfList extends CListPageModel
 
 		$sql1 = "select a.*, b.name as city_name, 
 					(select case workflow$suffix.RequestStatus('OPRPT',a.id,a.lcd)
-							when '' then '3DF' 
-							when 'PA' then '0PA' 
-							when 'PS' then '2PS' 
-							when 'ED' then '1ED' 
+							when '' then '4DF' 
+							when 'PH' then '1PH' 
+							when 'PA' then '2PA' 
+							when 'PS' then '0PS' 
+							when 'ED' then '3ED' 
 					end) as wfstatus,
+					c.data_value as val_1,
+					d.data_value as val_2,
+					e.data_value as val_3,
+					f.data_value as val_4,
+					g.data_value as val_5,
 					workflow$suffix.RequestStatusDesc('OPRPT',a.id,a.lcd) as wfstatusdesc
-				from opr_monthly_hdr a, security$suffix.sec_city b
+				from opr_monthly_hdr a inner join security$suffix.sec_city b on a.city=b.code 
+					left outer join opr_monthly_dtl c on a.id=c.hdr_id and c.data_field='10001' 
+					left outer join opr_monthly_dtl d on a.id=d.hdr_id and d.data_field='10002' 
+					left outer join opr_monthly_dtl e on a.id=e.hdr_id and e.data_field='10003' 
+					left outer join opr_monthly_dtl f on a.id=f.hdr_id and f.data_field='10004' 
+					left outer join opr_monthly_dtl g on a.id=g.hdr_id and g.data_field='10005' 
 				where a.city in ($citylist) and a.city=b.code
 				and a.year_no=$year and a.month_no=$month
 			";
@@ -97,6 +108,11 @@ class MonthlyConfList extends CListPageModel
 						'month_no'=>$record['month_no'],
 						'wfstatus'=>$record['wfstatus'],
 						'wfstatusdesc'=>$record['wfstatusdesc'],
+						'val_1'=>$record['val_1'],
+						'val_2'=>$record['val_2'],
+						'val_3'=>$record['val_3'],
+						'val_4'=>$record['val_4'],
+						'val_5'=>$record['val_5'],
 					);
 			}
 		}

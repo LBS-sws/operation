@@ -31,6 +31,6 @@ class ReportY01Form extends CReportForm
 		$this->fields = 'year_no,month_no,region';
 		$this->year = date("Y");
 		$this->month = date("m");
-		$this->region = 1;
+		$this->region = Yii::app()->user->validFunction('YN01') ? 1 : 0;
 	}
 }

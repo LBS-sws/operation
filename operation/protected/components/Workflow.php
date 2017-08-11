@@ -14,15 +14,20 @@ class Workflow {
 		return $this->connection;
 	}
 	
-	public function startProcess($procCode, $docId, $reqDate) {
+	public function startProcess($procCode, $docId, $reqDate, $new=false) {
 		$rtn = true;
 		$suffix = Yii::app()->params['envSuffix'];
 		$this->proc_id = $this->getProcessId($procCode, $reqDate);
 		$procId = $this->proc_id;
-		$sql = "select id, current_state from workflow$suffix.wf_request
-				where proc_ver_id=$procId and doc_id=$docId
-			";
-		$row = $this->connection->createCommand($sql)->queryRow();
+		
+		if (!$new) {
+			$row = false;
+		} else {
+			$sql = "select id, current_state from workflow$suffix.wf_request
+					where proc_ver_id=$procId and doc_id=$docId
+				";
+			$row = $this->connection->createCommand($sql)->queryRow();
+		}
 		if ($row===false) {
 			$stateId = $this->getStateId($procId,'ST');
 			if ($stateId!=0) {

@@ -59,19 +59,22 @@ $this->pageTitle=Yii::app()->name . ' - Report';
 					?>
 				</div>
 			</div>
-
+<?php if (Yii::app()->user->validFunction('YN01')) :?>
 			<div class="form-group">
 				<?php echo $form->labelEx($model,'region',array('class'=>"col-sm-2 control-label")); ?>
 				<div class="col-sm-3">
 					<?php 
 						$item = array(
 								1=>Yii::t('report','China & Franchise'),
-								2=>Yii::t('report','South East Asia'),
+//								2=>Yii::t('report','South East Asia'),
 							);
 						echo $form->dropDownList($model, 'region', $item); 
 					?>
 				</div>
 			</div>
+<?php else : ?>
+			<?php echo $form->hiddenField($model, 'region'); ?>
+<?php endif ?>
 
 		</div>
 	</div>

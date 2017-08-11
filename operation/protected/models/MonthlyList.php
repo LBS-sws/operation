@@ -19,14 +19,15 @@ class MonthlyList extends CListPageModel
 		$citylist = Yii::app()->user->city_allow();
 		$sql1 = "select a.*, b.name as city_name, 
 					(select case workflow$suffix.RequestStatus('OPRPT',a.id,a.lcd)
-							when '' then '0DF' 
-							when 'PA' then '1PA' 
-							when 'PS' then '2PS' 
+							when '' then '4DF' 
+							when 'PH' then '1PH' 
+							when 'PA' then '2PA' 
+							when 'PS' then '0PS' 
 							when 'ED' then '3ED' 
 					end) as wfstatus,
 					workflow$suffix.RequestStatusDesc('OPRPT',a.id,a.lcd) as wfstatusdesc
-				from opr_monthly_hdr a, security$suffix.sec_city b 
-				where a.city in ($citylist) and a.city=b.code 
+				from opr_monthly_hdr a inner join security$suffix.sec_city b on a.city=b.code 
+				where a.city in ($citylist)
 			";
 		$sql2 = "select count(a.id)
 				from opr_monthly_hdr a, security$suffix.sec_city b 

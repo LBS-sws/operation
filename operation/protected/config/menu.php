@@ -77,7 +77,7 @@ return array(
                 'url'=>'/monthly/indexa',
            ),
            'Sales Summary Enquiry'=>array(
-                'access'=>'YA03',
+                'access'=>'YA02',
                 'url'=>'/monthly/indexc',
             ),
         ),

@@ -218,7 +218,8 @@ class ActivityForm extends CFormModel
                 $message .= "<p>總部採購類型：".Yii::t("procurement",$this->order_class)."</p>";
                 $message .= "<p>總部採購開始時間：".$this->start_time."</p>";
                 $message .= "<p>總部採購結束時間：".$this->end_time."</p>";
-                Yii::app()->db->createCommand()->insert('swoper.swo_email_queue', array(
+				$suffix = Yii::app()->params['envSuffix'];
+                Yii::app()->db->createCommand()->insert("swoper$suffix.swo_email_queue", array(
                     'request_dt'=>$this->start_time,
                     'from_addr'=>$from_addr,
                     'to_addr'=>$email,

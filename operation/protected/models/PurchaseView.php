@@ -263,32 +263,35 @@ class PurchaseView extends CFormModel
     //根據城市獲取公司信息
     public function getCompanyToCity($city){
         $suffix = Yii::app()->params['envSuffix'];
+        $from = "hr".$suffix.".hr_company";
         $suffix = "security".$suffix;
+        $arr = array(
+            "city"=>"",//地區名字
+            "cityName"=>"",//公司名字
+            "cityTel"=>"",//公司電話
+            "cityAdr"=>"",//公司地址
+            "userName"=>"",//負責人姓名
+            "email"=>""//負責人郵箱
+        );
         if (!empty($city)){
             $rs = Yii::app()->db->createCommand()->select("name,incharge")->from($suffix.".sec_city")->where("code=:code",array(":code"=>$city))->queryAll();
             if($rs){
-                $incharge = $rs[0]["incharge"];
+                $arr["city"] = $rs[0]["name"];
+            }
+            $company = Yii::app()->db->createCommand()->select()->from($from)->where("city=:city",array(":city"=>$city))->order('tacitly desc')->queryAll();
+            if($company){
+                $arr["cityName"] = $company[0]["name"];
+                $arr["cityTel"] = $company[0]["phone"];
+                $arr["cityAdr"] = $company[0]["address"];
+                $incharge = $company[0]["head"];//負責人id
                 $email = Yii::app()->db->createCommand()->select("email,disp_name")->from($suffix.".sec_user")->where("username=:username",array(":username"=>$incharge))->queryAll();
                 if($email){
-                    return array(
-                        "city"=>$rs[0]["name"],//地區名字
-                        "cityName"=>"暫時無法獲取公司名字",//公司名字
-                        "cityTel"=>"暫時無法獲取公司電話",//公司電話
-                        "cityAdr"=>"暫時無法獲取公司地址",//公司地址
-                        "userName"=>$email[0]["disp_name"],
-                        "email"=>$email[0]["email"],
-                    );
+                    $arr["userName"] = $email[0]["disp_name"];
+                    $arr["email"] = $email[0]["email"];
                 }
             }
         }
 
-        return array(
-            "city"=>"",
-            "cityName"=>"",
-            "cityTel"=>"",
-            "cityAdr"=>"",
-            "userName"=>"",
-            "email"=>""
-            );
+        return $arr;
     }
 }

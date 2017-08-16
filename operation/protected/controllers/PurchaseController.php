@@ -147,7 +147,7 @@ class PurchaseController extends Controller
         }
     }
 
-    //下載訂單
+    //下載訂單(統計)
     public function actionDownactive($index){
         $model = new ActivityForm('edit');
         if (!$model->retrieveData($index)) {

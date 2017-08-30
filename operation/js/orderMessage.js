@@ -6,7 +6,7 @@ function waitingMessageHeader(url,str) {
         $.ajax({
             type: "post",
             url: url,
-            data: {id:""},
+            data: {id:"",time:new Date()},
             dataType: "json",
             success: function(data){
                 //console.log(data);

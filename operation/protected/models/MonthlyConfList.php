@@ -34,8 +34,8 @@ class MonthlyConfList extends CListPageModel
 	{
 		$suffix = Yii::app()->params['envSuffix'];
 		$citylist = Yii::app()->user->city_allow();
-		$year = $this->year_no;
-		$month = $this->month_no;
+//		$year = $this->year_no;
+//		$month = $this->month_no;
 
 		$sql1 = "select a.*, b.name as city_name, 
 					(select case workflow$suffix.RequestStatus('OPRPT',a.id,a.lcd)
@@ -58,12 +58,10 @@ class MonthlyConfList extends CListPageModel
 					left outer join opr_monthly_dtl f on a.id=f.hdr_id and f.data_field='10004' 
 					left outer join opr_monthly_dtl g on a.id=g.hdr_id and g.data_field='10005' 
 				where a.city in ($citylist) and a.city=b.code
-				and a.year_no=$year and a.month_no=$month
 			";
 		$sql2 = "select count(a.id)
 				from opr_monthly_hdr a, security$suffix.sec_city b
 				where a.city in ($citylist) and a.city=b.code
-				and a.year_no=$year and a.month_no=$month
 			";
 		$clause = "";
 		if (!empty($this->searchField) && !empty($this->searchValue)) {
@@ -88,7 +86,7 @@ class MonthlyConfList extends CListPageModel
 			$order .= " order by ".$this->orderField." ";
 			if ($this->orderType=='D') $order .= "desc ";
 		} else
-			$order = " order by wfstatus desc";
+			$order = " order by a.year_no desc, a.month_no desc, a.city";
 
 		$sql = $sql2.$clause;
 		$this->totalRow = Yii::app()->db->createCommand($sql)->queryScalar();

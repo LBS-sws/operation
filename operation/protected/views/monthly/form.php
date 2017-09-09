@@ -60,6 +60,9 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 			'id'=>'btnDenyM'));
 		?>
 <?php endif ?>
+		<?php echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('misc','Export'), array(
+			'id'=>'btnExcel'));
+		?>
 	</div>
 	<div class="btn-group pull-right" role="group">
 	<?php 
@@ -202,20 +205,38 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 
 <script>
 		
-		$('#MonthlyForm_record_1_datavalue, #MonthlyForm_record_2_datavalue, #MonthlyForm_record_3_datavalue, #MonthlyForm_record_4_datavalue, #MonthlyForm_record_5_datavalue, #MonthlyForm_record_6_datavalue').focusout(function() {
+		$('#MonthlyForm_record_1_datavalue, #MonthlyForm_record_2_datavalue, #MonthlyForm_record_3_datavalue, #MonthlyForm_record_4_datavalue, #MonthlyForm_record_5_datavalue, #MonthlyForm_record_6_datavalue, #MonthlyForm_record_12_datavalue').focusout(function() {
 			$('#MonthlyForm_record_1_datavalue').val((+$('#MonthlyForm_record_1_datavalue').val() || 0 ));
 			$('#MonthlyForm_record_2_datavalue').val((+$('#MonthlyForm_record_2_datavalue').val() || 0 ));
 			$('#MonthlyForm_record_3_datavalue').val((+$('#MonthlyForm_record_3_datavalue').val() || 0 ));
 			$('#MonthlyForm_record_4_datavalue').val((+$('#MonthlyForm_record_4_datavalue').val() || 0 ));
 			$('#MonthlyForm_record_5_datavalue').val((+$('#MonthlyForm_record_5_datavalue').val() || 0 ));
 			$('#MonthlyForm_record_6_datavalue').val((+$('#MonthlyForm_record_6_datavalue').val() || 0 ));
+			$('#MonthlyForm_record_12_datavalue').val((+$('#MonthlyForm_record_12_datavalue').val() || 0 ));
 			$('#MonthlyForm_record_7_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_1_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_2_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_3_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_4_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_5_datavalue').value)).toFixed(2));
-			$('#MonthlyForm_record_8_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_7_datavalue').value) * 8.5 / 100).toFixed(2));
+			$('#MonthlyForm_record_8_datavalue').val(((parseFloat(document.getElementById('MonthlyForm_record_7_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_12_datavalue').value)) * 8.5 / 100).toFixed(2));
 			$('#MonthlyForm_record_9_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) * 3.5 / 100).toFixed(2));
 			$('#MonthlyForm_record_10_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_8_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_9_datavalue').value)).toFixed(2));
 			$('#MonthlyForm_record_11_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_7_datavalue').value)).toFixed(2));
 		});
 		
+</script>
+
+<script>
+	$('#btnExcel').on('click',function(){
+		var output = '<table><tr><td>史伟莎营业报告</td><td>地区:'+$('#MonthlyForm_city_name').val()+'</td></tr>';
+		output += '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
+		output += '<tr><td>日期：'+$('#MonthlyForm_year_no').val()+'年'+$('#MonthlyForm_year_no').val()+'月份</td><td>人民币（元）</td></tr>';
+		$("[id^='MonthlyForm_record_'][id$='_datavalue']").each(function(){
+			var id = $(this).attr('id');
+			output += '<tr>';
+			output += '<td>'+$("label[for='"+id+"']").text()+'</td>';
+			output += '<td>'+$(this).val()+'</td>';
+			output += '</tr>';
+		});
+		output += '</table>';
+		window.open('data:application/vnd.ms-excel,'+output);
+	});
 </script>
 
 <?php

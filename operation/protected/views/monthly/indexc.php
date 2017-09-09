@@ -23,6 +23,7 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Enquiry';
 </section>
 
 <section class="content">
+<!--
 	<div class="box"><div class="box-body">
 		<div class="form-group">
 			<?php echo $form->labelEx($model,'year_no',array('class'=>"col-sm-1 control-label")); ?>
@@ -49,18 +50,18 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Enquiry';
 			</div>
 		</div>
 	</div></div>
-
-	<?php $this->widget('ext.layout.ListPageWidget', array(
+-->
+	<?php 
+		$search = Yii::app()->user->isSingleCity()
+				? array('year_no', 'month_no', 'wfstatusdesc', )
+				: array('city_name','year_no', 'month_no', 'wfstatusdesc', )
+				;
+		$this->widget('ext.layout.ListPageWidget', array(
 			'title'=>Yii::t('monthly','Sales Summary List'),
 			'model'=>$model,
 				'viewhdr'=>'//monthly/_listhdrc',
 				'viewdtl'=>'//monthly/_listdtlc',
-				'search'=>array(
-							'city_name',
-							'year_no',
-							'month_no',
-							'wfstatusdesc',
-						),
+				'search'=>$search,
 		));
 	?>
 </section>

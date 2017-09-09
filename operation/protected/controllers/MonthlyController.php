@@ -26,7 +26,7 @@ class MonthlyController extends Controller
 				'expression'=>array('MonthlyController','allowReadWrite'),
 			),
 			array('allow', 
-				'actions'=>array('edit','filedownload'),
+				'actions'=>array('edit','filedownload','fileupload','fileremove'),
 				'expression'=>array('MonthlyController','allowReadWriteC'),
 			),
 			array('allow', 
@@ -38,7 +38,7 @@ class MonthlyController extends Controller
 				'expression'=>array('MonthlyController','allowReadOnlyC'),
 			),
 			array('allow', 
-				'actions'=>array('indexa','view','accept','reject','acceptm','rejectm','filedownload'),
+				'actions'=>array('indexa','view','accept','reject','acceptm','rejectm','filedownload','fileupload','fileremove'),
 				'expression'=>array('MonthlyController','allowReadOnlyA'),
 			),
 			array('deny',  // deny all users

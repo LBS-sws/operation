@@ -85,11 +85,12 @@ class MonthlyForm extends CFormModel
 		$count2 = $this->no_of_attm['oper2'];
 		$count3 = $this->no_of_attm['oper3'];
 		$count4 = $this->no_of_attm['oper4'];
+		$val_4 = $this->record[4]['datavalue'];
 		$val_5 = $this->record[5]['datavalue'];
 		if (($this->scenario=='submit' || $this->scenario=='resubmit') && (empty($count1) || $count1==0)) {
 			$this->addError($attribute, Yii::t('monthly','Please upload').' '.Yii::t('monthly','System Report'));
 		}
-		if (($this->scenario=='submit' || $this->scenario=='resubmit') && (empty($count2) || $count2==0)) {
+		if (($this->scenario=='submit' || $this->scenario=='resubmit') && (!empty($val_4) && $val_4 > 0) && (empty($count2) || $count2==0)) {
 			$this->addError($attribute, Yii::t('monthly','Please upload').' '.Yii::t('monthly','Puriscent Report'));
 		}
 		if (($this->scenario=='submit' || $this->scenario=='resubmit') && (!empty($val_5) && $val_5 > 0) && (empty($count3) || $count3==0)) {
@@ -115,6 +116,7 @@ class MonthlyForm extends CFormModel
 				and a.id=b.hdr_id and b.data_field=c.code
 				and a.city=d.code 
 				and c.status='Y'
+				order by a.year_no, a.month_no, b.data_field
 			";
 		$rows = Yii::app()->db->createCommand($sql)->queryAll();
 		if (count($rows) > 0) {

@@ -65,7 +65,7 @@ return array(
 	'Copyright'=>'版权',
 	'**Please use Firefox web browser in order to use LBS Daily Management System for best result'
 	=>'**为求使用史伟莎日常管理系统达至最佳效果，请使用火狐浏览器',
-
+	'Export'=>'导出',
 
 );
 

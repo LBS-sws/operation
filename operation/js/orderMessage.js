@@ -1,8 +1,9 @@
 
 function waitingMessageHeader(url,str) {
     //console.log(str);
-    var $message = $("#navbar-collapse a[href='"+str+"/index.php/purchase/index']");
-    if($message.length == 1){
+	// Percy - 因营业报告审核的數量, jquery加了條件
+    var $message = $("#navbar-collapse a[href='"+str+"/index.php/purchase/index'],#navbar-collapse a[href='"+str+"/index.php/monthly/indexa']");
+    if($message.length >= 1){
         $.ajax({
             type: "post",
             url: url,
@@ -34,6 +35,12 @@ function waitingMessageHeader(url,str) {
                 if(data["take_num"] != 0 || data["deli_num"] != 0){
                     $message = $("#navbar-collapse a[href='"+str+"/index.php/order/index']");
                     $message.parents("li.dropdown").find("a:first>span:first").before("<span class='badge'>"+(parseInt(data["take_num"],10)+parseInt(data["deli_num"],10))+"</span>");
+                }
+//营业报告审核的數量				
+                if(data["rep_num"] != 0){
+                    $message = $("#navbar-collapse a[href='"+str+"/index.php/monthly/indexa']");
+                    $message.append("<span class='badge'>"+data["rep_num"]+"</span>");
+                    $message.parents("li.dropdown").find("a:first>span:first").before("<span class='badge'>"+data["rep_num"]+"</span>");
                 }
             }
         });

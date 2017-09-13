@@ -110,4 +110,21 @@ class DeliveryController extends Controller
             $this->redirect(Yii::app()->createUrl('delivery/edit',array('index'=>$model->id)));
         }
     }
+
+
+    //下載領料訂單
+    public function actionDownorder($index){
+        $model = new DeliveryForm('edit');
+        if (!$model->retrieveData($index)) {
+            throw new CHttpException(404,'The requested page does not exist.');
+        } else {
+            $myExcel = new MyExcelTwo();
+            $myExcel->setStartRow(5);
+            $myExcel->setRowContent("A1","订单编号：".$model->order_code,"F1");
+            $myExcel->setRowContent("A2","下单用户：".$model->lcu,"F2");
+            $myExcel->setDataHeard($model->getTableHeard());
+            $myExcel->setDataBody($model->resetGoodsList());
+            $myExcel->outDownExcel($model->lcu."的订单.xls");
+        }
+    }
 }

@@ -12,6 +12,7 @@ class TechnicianForm extends CFormModel
     public $statusList;
     public $order_code;
     public $goods_list;
+    public $ject_remark;
 
     public function init()
     {
@@ -46,6 +47,7 @@ class TechnicianForm extends CFormModel
             //'technician'=>Yii::t('procurement','Technician'),
             'status'=>Yii::t('procurement','Order Status'),
             'remark'=>Yii::t('procurement','Remark'),
+            'ject_remark'=>Yii::t('procurement','reject remark'),
         );
     }
 
@@ -92,7 +94,7 @@ class TechnicianForm extends CFormModel
                     $message = Yii::t('procurement','Not Font Goods').$goods["goods_id"]."a";
                     $this->addError($attribute,$message);
                     return false;
-                }elseif (intval($list["inventory"])<intval($goods["goods_num"])){
+                }elseif (floatval($list["inventory"])<floatval($goods["goods_num"])){
                     $message = $list["name"]."：".Yii::t('procurement','Cannot exceed the quantity of Inventory')."（".$list["inventory"]."）";
                     $this->addError($attribute,$message);
                     return false;
@@ -109,7 +111,7 @@ class TechnicianForm extends CFormModel
     public function retrieveData($index) {
         $city = Yii::app()->user->city();
         $uid = Yii::app()->user->id;
-        $rows = Yii::app()->db->createCommand()->select("id, order_code, order_class, order_user, technician, status, remark, activity_id")
+        $rows = Yii::app()->db->createCommand()->select("*")
             ->from("opr_order")->where("id=:id and city=:city and judge=0 and lcu=:lcu",
                 array(":id"=>$index,":city"=>$city,":lcu"=>$uid))->queryAll();
         if (count($rows) > 0) {
@@ -121,6 +123,7 @@ class TechnicianForm extends CFormModel
                 //$this->technician = $row['technician'];
                 $this->status = $row['status'];
                 $this->remark = $row['remark'];
+                $this->ject_remark = $row['ject_remark'];
                 $this->statusList = OrderForm::getStatusListToId($row['id']);
                 break;
             }
@@ -257,7 +260,7 @@ class TechnicianForm extends CFormModel
                 'order_id'=>$this->id,
                 'status'=>$this->status,
                 'r_remark'=>$this->remark,
-                'lcu'=>$order_username,
+                'lcu'=>Yii::app()->user->user_display_name(),
                 'time'=>date('Y-m-d H:i:s'),
             ));
         }

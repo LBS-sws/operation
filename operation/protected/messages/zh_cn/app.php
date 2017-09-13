@@ -91,6 +91,7 @@ return array(
     'Stickies Summary Entry'=>'标签管理',
     'Classify Summary Entry'=>'分类管理',
     'Goods Hybrid Rules'=>'混合规则管理',
+    'OrderAcc Info'=>'多订单限制',
     //沈超添加結束
 	
 );

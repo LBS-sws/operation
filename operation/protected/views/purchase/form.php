@@ -55,8 +55,10 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
                 if ($model->scenario!='new'){
                     if($model->status == "sent" || $model->status == "read") {
                         //拒絕
-                        echo TbHtml::button('<span class="fa fa-mail-reply-all"></span> ' . Yii::t('procurement', 'Reject'), array(
-                            'submit' => Yii::app()->createUrl('Purchase/reject')));
+/*                        echo TbHtml::button('<span class="fa fa-mail-reply-all"></span> ' . Yii::t('procurement', 'Reject'), array(
+                            'submit' => Yii::app()->createUrl('Purchase/reject')));*/
+                        echo TbHtml::button('<span class="fa fa-mail-reply-all"></span> '.Yii::t('procurement','Reject'), array(
+                            'name'=>'btnJect','id'=>'btnJect','data-toggle'=>'modal','data-target'=>'#jectdialog'));
                     }
                     //流程
                     echo TbHtml::button('<span class="fa fa-file-text-o"></span> '.Yii::t('misc','Flow'), array(
@@ -79,6 +81,16 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
             <?php echo $form->hiddenField($model, 'order_class'); ?>
 
 
+            <?php if (!empty($model->ject_remark)): ?>
+                <div class="form-group has-error">
+                    <?php echo $form->labelEx($model,'ject_remark',array('class'=>"col-sm-2 control-label")); ?>
+                    <div class="col-sm-6">
+                        <?php echo $form->textArea($model, 'ject_remark',
+                            array('readonly'=>true)
+                        ); ?>
+                    </div>
+                </div>
+            <?php endif; ?>
             <?php if ($model->scenario!='new'): ?>
                 <div class="form-group">
                     <?php echo $form->labelEx($model,'order_code',array('class'=>"col-sm-2 control-label")); ?>
@@ -191,6 +203,9 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
 </section>
 <?php
     $this->renderPartial('//site/flowlist',array('model'=>$model));
+?>
+<?php
+$this->renderPartial('//site/ject',array('model'=>$model,'form'=>$form,'submit'=>Yii::app()->createUrl('Purchase/reject')));
 ?>
 <?php
 $stickiesList = json_encode(StickiesForm::getStickiesContentList());

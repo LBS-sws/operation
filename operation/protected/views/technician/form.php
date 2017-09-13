@@ -64,6 +64,9 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                     //流程
                     echo TbHtml::button('<span class="fa fa-file-text-o"></span> '.Yii::t('misc','Flow'), array(
                         'name'=>'btnFlow','id'=>'btnFlow','data-toggle'=>'modal','data-target'=>'#flowinfodialog'));
+                    //下載
+                    echo TbHtml::button('<span class="fa fa-cloud-download"></span> '.Yii::t('procurement','Down'), array(
+                        'submit'=>Yii::app()->createUrl('delivery/downorder',array("index"=>$model->id))));
                 } ?>
             </div>
 	</div></div>
@@ -74,6 +77,16 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
 			<?php echo $form->hiddenField($model, 'id'); ?>
 			<?php echo $form->hiddenField($model, 'status'); ?>
 
+            <?php if (!empty($model->ject_remark)): ?>
+                <div class="form-group has-error">
+                    <?php echo $form->labelEx($model,'ject_remark',array('class'=>"col-sm-2 control-label")); ?>
+                    <div class="col-sm-6">
+                        <?php echo $form->textArea($model, 'ject_remark',
+                            array('readonly'=>true)
+                        ); ?>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <?php if ($model->scenario!='new'): ?>
                 <div class="form-group">

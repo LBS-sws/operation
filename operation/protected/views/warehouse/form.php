@@ -31,15 +31,20 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
 				'submit'=>Yii::app()->createUrl('Warehouse/index')));
 		?>
 <?php if ($model->scenario!='view'): ?>
+            <?php if ($model->scenario=='edit'): ?>
+                <?php echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('misc','Add'), array(
+                    'submit'=>Yii::app()->createUrl('warehouse/new')));
+                ?>
+            <?php endif ?>
 			<?php echo TbHtml::button('<span class="fa fa-upload"></span> '.Yii::t('misc','Save'), array(
 				'submit'=>Yii::app()->createUrl('Warehouse/save')));
 			?>
-<?php endif ?>
         <?php if ($model->scenario=='edit'): ?>
-            <?php echo TbHtml::button('<span class="fa fa-remove"></span> '.Yii::t('misc','Delete'), array(
-                'submit'=>Yii::app()->createUrl('Warehouse/delete')));
-            ?>
+                <?php echo TbHtml::button('<span class="fa fa-remove"></span> '.Yii::t('misc','Delete'), array(
+                    'submit'=>Yii::app()->createUrl('Warehouse/delete')));
+                ?>
         <?php endif ?>
+<?php endif ?>
 	</div>
 	</div></div>
 
@@ -48,14 +53,17 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
 			<?php echo $form->hiddenField($model, 'scenario'); ?>
 			<?php echo $form->hiddenField($model, 'id'); ?>
 
-            <div class="form-group">
-                <?php echo $form->labelEx($model,'goods_code',array('class'=>"col-sm-2 control-label")); ?>
-                <div class="col-sm-4">
-                    <?php echo $form->textField($model, 'goods_code',
-                        array('min'=>0,'readonly'=>($model->scenario=='view'))
-                    ); ?>
+
+            <?php if ($model->scenario!='new'): ?>
+                <div class="form-group">
+                    <?php echo $form->labelEx($model,'goods_code',array('class'=>"col-sm-2 control-label")); ?>
+                    <div class="col-sm-4">
+                        <?php echo $form->textField($model, 'goods_code',
+                            array('min'=>0,'readonly'=>true)
+                        ); ?>
+                    </div>
                 </div>
-            </div>
+            <?php endif ?>
             <div class="form-group">
                 <?php echo $form->labelEx($model,'name',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">

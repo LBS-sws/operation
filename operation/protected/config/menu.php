@@ -51,6 +51,11 @@ return array(
                 'access'=>'YD01',
                 'url'=>'/warehouse/index',
             ),
+            //倉庫管理
+            'OrderAcc Info'=>array(
+                'access'=>'YD05',
+                'url'=>'/orderAcc/form',
+            ),
 		),
 	),
     //技術員入口

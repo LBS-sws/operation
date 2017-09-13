@@ -31,7 +31,6 @@ class WarehouseForm extends CFormModel
 	{
 		return array(
 			array('id, goods_code, name, unit, inventory, classify_id, price, lcu, luu','safe'),
-            array('goods_code','required'),
             array('name','required'),
             array('classify_id','required'),
             array('unit','required'),
@@ -160,7 +159,6 @@ class WarehouseForm extends CFormModel
 							classify_id = :classify_id, 
 							unit = :unit,
 							price = :price,
-							goods_code = :goods_code,
 							luu = :luu,
 							lud = :lud,
 							inventory = :inventory
@@ -174,6 +172,7 @@ class WarehouseForm extends CFormModel
         $city = Yii::app()->user->city();
         $uid = Yii::app()->user->id;
 
+        $this->goods_code = 1;//後續因為自動生成物品編號，數據庫原因固定為1
         $command=$connection->createCommand($sql);
         if (strpos($sql,':id')!==false)
             $command->bindParam(':id',$this->id,PDO::PARAM_INT);
@@ -205,7 +204,20 @@ class WarehouseForm extends CFormModel
         if ($this->scenario=='new'){
             $this->id = Yii::app()->db->getLastInsertID();
             $this->scenario = "edit";
+            $this->setGoodsCode();
         }
 		return true;
 	}
+
+    private function setGoodsCode(){
+        $code = strval($this->id);
+        $this->goods_code = "W";
+        for($i = 0;$i < 5-strlen($code);$i++){
+            $this->goods_code.="0";
+        }
+        $this->goods_code .= $code;
+        Yii::app()->db->createCommand()->update('opr_warehouse', array(
+            'goods_code'=>$this->goods_code
+        ), 'id=:id', array(':id'=>$this->id));
+    }
 }

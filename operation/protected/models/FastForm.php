@@ -14,6 +14,7 @@ class FastForm extends CFormModel
 	public $order_class;
 	public $activity_id;
 	public $goods_list;
+	public $ject_remark;
 
 	public function init()
     {
@@ -45,6 +46,7 @@ class FastForm extends CFormModel
             //'technician'=>Yii::t('procurement','Technician'),
             'status'=>Yii::t('procurement','Order Status'),
             'remark'=>Yii::t('procurement','Remark'),
+            'ject_remark'=>Yii::t('procurement','reject remark'),
 		);
 	}
 
@@ -54,10 +56,10 @@ class FastForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, order_code, order_user, order_class, activity_id, technician, status, remark, luu, lcu, lud, lcd','safe'),
+			array('id, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, luu, lcu, lud, lcd','safe'),
             array('goods_list','required','on'=>array('audit','edit','reject')),
             array('goods_list','validateGoods','on'=>array('audit','edit')),
-            array('remark','required','on'=>'reject'),
+            array('ject_remark','required','on'=>'reject'),
             //array('order_num','numerical','allowEmpty'=>true,'integerOnly'=>true),
             //array('order_num','in','range'=>range(0,600)),
 		);
@@ -106,7 +108,7 @@ class FastForm extends CFormModel
 
 	public function retrieveData($index) {
 		$city = Yii::app()->user->city();
-		$rows = Yii::app()->db->createCommand()->select("id, order_code, order_class, order_user, technician, status, remark, activity_id")
+		$rows = Yii::app()->db->createCommand()->select("*")
             ->from("opr_order")->where("id=:id AND judge=1",array(":id"=>$index))->queryAll();
 		if (count($rows) > 0) {
 			foreach ($rows as $row) {
@@ -118,6 +120,7 @@ class FastForm extends CFormModel
                 $this->order_user = $row['order_user'];
                 //$this->technician = $row['technician'];
                 $this->status = $row['status'];
+                $this->ject_remark = $row['ject_remark'];
                 $this->remark = "";
                 $this->statusList = OrderForm::getStatusListToId($row['id']);
                 break;
@@ -167,7 +170,7 @@ class FastForm extends CFormModel
                 break;
             case 'reject':
                 $sql = "update opr_order set
-							remark = :remark,
+							ject_remark = :ject_remark,
 							luu = :luu,
 							lud = :lud,
 							status = :status
@@ -175,6 +178,7 @@ class FastForm extends CFormModel
 						";
                 $this->goods_list = array();
                 $this->status = "reject";
+                $this->remark = $this->ject_remark;
                 break;
         }
 		if (empty($sql)) return false;
@@ -191,6 +195,8 @@ class FastForm extends CFormModel
 
         if (strpos($sql,':remark')!==false)
             $command->bindParam(':remark',$this->remark,PDO::PARAM_STR);
+        if (strpos($sql,':ject_remark')!==false)
+            $command->bindParam(':ject_remark',$this->ject_remark,PDO::PARAM_STR);
         if (strpos($sql,':lud')!==false)
             $command->bindParam(':lud',date('Y-m-d H:i:s'),PDO::PARAM_STR);
         if (strpos($sql,':luu')!==false)
@@ -201,7 +207,7 @@ class FastForm extends CFormModel
             'order_id'=>$this->id,
             'status'=>$this->status,
             'r_remark'=>$this->remark,
-            'lcu'=>$order_username,
+            'lcu'=>Yii::app()->user->user_display_name(),
             'time'=>date('Y-m-d H:i:s'),
         ));
 
@@ -241,7 +247,7 @@ class FastForm extends CFormModel
                 'order_id'=>$this->id,
                 'status'=>"backward",
                 'r_remark'=>$this->remark,
-                'lcu'=>$uid,
+                'lcu'=>Yii::app()->user->user_display_name(),
                 'time'=>date('Y-m-d H:i:s'),
             ));
             return true;

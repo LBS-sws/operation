@@ -56,8 +56,9 @@ class OrderController extends Controller
 	{
 		if (isset($_POST['OrderForm'])) {
 		    $scenario =$_POST['OrderForm']['scenario'];
-			$model = new OrderForm("audit");
+			$model = new OrderForm();
 			$model->attributes = $_POST['OrderForm'];
+			$model->scenario = "audit";
 			if ($model->validate()) {
 				$model->saveData();
                 $model->scenario = "edit";

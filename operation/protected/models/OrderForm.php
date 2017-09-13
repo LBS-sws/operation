@@ -14,6 +14,7 @@ class OrderForm extends CFormModel
 	public $order_class;
 	public $activity_id;
 	public $goods_list;
+	public $ject_remark;
 
 	public function init()
     {
@@ -47,6 +48,7 @@ class OrderForm extends CFormModel
             //'technician'=>Yii::t('procurement','Technician'),
             'status'=>Yii::t('procurement','Order Status'),
             'remark'=>Yii::t('procurement','Remark'),
+            'ject_remark'=>Yii::t('procurement','reject remark'),
 		);
 	}
 
@@ -56,7 +58,7 @@ class OrderForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, order_code, order_user, order_class, activity_id, technician, status, remark, luu, lcu, lud, lcd','safe'),
+			array('id, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, luu, lcu, lud, lcd','safe'),
             array('goods_list','required'),
             array('goods_list','validateGoods'),
             //array('activity_id','required','on'=>'audit'),
@@ -151,6 +153,22 @@ class OrderForm extends CFormModel
         }
     }
     public function validateActivity($attribute, $params){
+        if($this->scenario == "audit" && $this->order_class != "Fast"){
+            $arrBool = OrderAccForm::getNowOrderAcc();
+            //不允許多個訂單同時進行
+            if(empty($arrBool[$this->order_class])){
+                $city = Yii::app()->user->city();
+                $rows = Yii::app()->db->createCommand()->select("count(id)")
+                    ->from("opr_order")->where("order_class=:order_class and city=:city and status != 'finished' and status != 'cancelled' and status != 'pending' and status != 'reject'",
+                        array(":order_class"=>$this->order_class,":city"=>$city))->queryScalar();
+                if($rows > 0){
+                    $message = Yii::t('procurement',"Multiple orders are not allowed simultaneously");
+                    $this->addError($attribute,$message);
+                    return false;
+                }
+            }
+        }
+
         if(!empty($this->activity_id) &&!empty($this->order_class) && $this->order_class != "Fast"){
             $nowDate = date("Y-m-d");
             $activityList = true;
@@ -339,7 +357,7 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
 
 	public function retrieveData($index) {
 		$city = Yii::app()->user->city();
-		$rows = Yii::app()->db->createCommand()->select("id, order_code, order_class, order_user, technician, status, remark, activity_id")
+		$rows = Yii::app()->db->createCommand()->select("*")
             ->from("opr_order")->where("id=:id and judge=1",array(":id"=>$index))->queryAll();
 		if (count($rows) > 0) {
 			foreach ($rows as $row) {
@@ -352,6 +370,7 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
                 //$this->technician = $row['technician'];
                 $this->status = $row['status'];
                 $this->remark = $row['remark'];
+                $this->ject_remark = $row['ject_remark'];
                 $this->statusList = $this->getStatusListToId($row['id']);
                 break;
 			}
@@ -496,7 +515,7 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
                 'order_id'=>$this->id,
                 'status'=>$this->status,
                 'r_remark'=>$this->remark,
-                'lcu'=>$order_username,
+                'lcu'=>Yii::app()->user->user_display_name(),
                 'time'=>date('Y-m-d H:i:s'),
             ));
         }

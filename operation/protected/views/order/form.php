@@ -85,6 +85,16 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                 <div class="col-sm-10 col-sm-offset-1"><?php echo $model->getHeadHtml();?></div>
             </div>
 
+            <?php if (!empty($model->ject_remark)): ?>
+                <div class="form-group has-error">
+                    <?php echo $form->labelEx($model,'ject_remark',array('class'=>"col-sm-2 control-label")); ?>
+                    <div class="col-sm-6">
+                        <?php echo $form->textArea($model, 'ject_remark',
+                            array('readonly'=>true)
+                        ); ?>
+                    </div>
+                </div>
+            <?php endif; ?>
             <?php if ($model->scenario!='new'): ?>
                 <div class="form-group">
                     <?php echo $form->labelEx($model,'order_code',array('class'=>"col-sm-2 control-label")); ?>

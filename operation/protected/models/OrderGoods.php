@@ -45,7 +45,7 @@ class OrderGoods extends CActiveRecord{
         $to_addr = empty($to_addr)?json_encode(array("it@lbsgroup.com.hk")):json_encode($to_addr);
         $description = empty($description)?"訂單通知":$description;
 		$suffix = Yii::app()->params['envSuffix'];
-        Yii::app()->db->createCommand()->insert("swoper$suffix.swo_email_queue", array(
+        $aaa = Yii::app()->db->createCommand()->insert("swoper$suffix.swo_email_queue", array(
             'request_dt'=>date('Y-m-d H:i:s'),
             'from_addr'=>$from_addr,
             'to_addr'=>$to_addr,

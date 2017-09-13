@@ -65,6 +65,7 @@ return array(
 	'sent'=>'发送',
 	'approve'=>'批准',
 	'reject'=>'拒绝',
+    'reject remark'=>'拒绝原因',
 	'cancelled'=>'取消',
     'read'=>'已查看',
     'finished'=>'已完成',
@@ -97,6 +98,7 @@ return array(
     'Operator Time'=>'操作时间',
     'Operator Status'=>'操作状态',
     'Down'=>'下载',
+    'Submit'=>'提交',
 
     //技術員模塊
     'Technician List'=>'技术员列表',
@@ -203,5 +205,11 @@ return array(
     'Visibility'=>'可见度',
     'All'=>'全部',
     'Local'=>'本地',
+
+    //2017-09-12
+    'Whether multiple orders are allowed simultaneously ?'=>'是否允许多个订单同时进行？',
+    'Multiple orders are not allowed simultaneously'=>'不允许同时进行多个订单',
+    'Allow'=>'允许',
+    'No Allow'=>'不允许',
 );
 ?>

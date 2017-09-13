@@ -13,6 +13,7 @@ class DeliveryForm extends CFormModel
 	public $statusList;
 	public $order_code;
 	public $goods_list;
+	public $ject_remark;
 
     public function attributeLabels()
 	{
@@ -25,6 +26,7 @@ class DeliveryForm extends CFormModel
             'remark'=>Yii::t('procurement','Remark'),
             'lcu'=>Yii::t('procurement','Apply for user'),
             'lcd'=>Yii::t('procurement','Apply for time'),
+            'ject_remark'=>Yii::t('procurement','reject remark'),
 		);
 	}
 
@@ -34,10 +36,10 @@ class DeliveryForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, order_code, order_user, order_class, activity_id, technician, status, remark, luu, lcu, lud, lcd','safe'),
+			array('id, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, luu, lcu, lud, lcd','safe'),
             array('goods_list','required','on'=>array('audit','edit','reject')),
             array('goods_list','validateGoods','on'=>array('audit','edit')),
-            array('remark','required','on'=>'reject'),
+            array('ject_remark','required','on'=>'reject'),
             //array('order_num','numerical','allowEmpty'=>true,'integerOnly'=>true),
             //array('order_num','in','range'=>range(0,600)),
 		);
@@ -83,7 +85,7 @@ class DeliveryForm extends CFormModel
 
 	public function retrieveData($index) {
 		$city = Yii::app()->user->city();
-		$rows = Yii::app()->db->createCommand()->select("id, order_code, lcd, order_user, technician, status, remark, lcu")
+		$rows = Yii::app()->db->createCommand()->select("*")
             ->from("opr_order")->where("id=:id AND judge=0 AND city=:city",array(":id"=>$index,":city"=>$city))->queryAll();
 		if (count($rows) > 0) {
 			foreach ($rows as $row) {
@@ -95,6 +97,7 @@ class DeliveryForm extends CFormModel
                 $this->status = $row['status'];
                 $this->remark = "";
                 $this->lcu = $row['lcu'];
+                $this->ject_remark = $row['ject_remark'];
                 $this->lcd = date("Y-m-d",strtotime($row['lcd']));
                 $this->statusList = OrderForm::getStatusListToId($row['id']);
                 break;
@@ -142,13 +145,14 @@ class DeliveryForm extends CFormModel
                 break;
             case 'reject':
                 $sql = "update opr_order set
-							remark = :remark,
+							ject_remark = :ject_remark,
 							luu = :luu,
 							lud = :lud,
 							status = :status
 						where id = :id AND judge=0
 						";
                 $this->goods_list = array();
+                $this->remark = $this->ject_remark;
                 break;
         }
 		if (empty($sql)) return false;
@@ -172,6 +176,8 @@ class DeliveryForm extends CFormModel
 
         if (strpos($sql,':remark')!==false)
             $command->bindParam(':remark',$this->remark,PDO::PARAM_STR);
+        if (strpos($sql,':ject_remark')!==false)
+            $command->bindParam(':ject_remark',$this->ject_remark,PDO::PARAM_STR);
         if (strpos($sql,':lud')!==false)
             $command->bindParam(':lud',date('Y-m-d H:i:s'),PDO::PARAM_STR);
         if (strpos($sql,':luu')!==false)
@@ -182,7 +188,7 @@ class DeliveryForm extends CFormModel
             'order_id'=>$this->id,
             'status'=>$this->status,
             'r_remark'=>$this->remark,
-            'lcu'=>$order_username,
+            'lcu'=>Yii::app()->user->user_display_name(),
             'time'=>date('Y-m-d H:i:s'),
         ));
 
@@ -236,11 +242,26 @@ class DeliveryForm extends CFormModel
                 'order_id'=>$this->id,
                 'status'=>"backward",
                 'r_remark'=>$this->remark,
-                'lcu'=>$uid,
+                'lcu'=>Yii::app()->user->user_display_name(),
                 'time'=>date('Y-m-d H:i:s'),
             ));
             return true;
         }
         return false;
+    }
+
+
+    public function getTableHeard(){
+        $arr = array("物品編號","物品名称","要求備註","總部備註","要求數量","實際數量");
+        return $arr;
+    }
+    //整理出下載的物品列表
+    public function resetGoodsList(){
+        $goodsList = $this->goods_list;
+        $arr = array();
+        foreach ($goodsList as $goods){
+            array_push($arr,array($goods["goods_code"],$goods["name"],$goods["note"],$goods["remark"],$goods["goods_num"],$goods["confirm_num"]));
+        }
+        return $arr;
     }
 }

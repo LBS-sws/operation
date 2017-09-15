@@ -19,6 +19,7 @@ class GoodsImForm extends CFormModel
 	public $height;
 	public $net_weight;
 	public $gross_weight;
+    public $orderClass = "Import";
 
 	public function attributeLabels()
 	{

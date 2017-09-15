@@ -15,6 +15,7 @@ class GoodsDoForm extends CFormModel
     public $rules_id = 0;
 	public $origin;
 	public $stickies_id;
+    public $orderClass = "Document";
 
 	public function attributeLabels()
 	{

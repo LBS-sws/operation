@@ -359,7 +359,7 @@ class PurchaseForm extends CFormModel
 		return true;
 	}
 	//退回
-	function backward(){
+	public function backward(){
         $rows = Yii::app()->db->createCommand()->select("id")->from("opr_order")->where('status = "approve" and id = :id',array(':id'=>$this->id))->queryAll();
         if(count($rows) > 0){
             $uid = Yii::app()->user->id;
@@ -383,4 +383,32 @@ class PurchaseForm extends CFormModel
         return false;
     }
 
+    //獲取規則條款
+    public function getRulesText(){
+	    $arr = array();
+        switch ($this->order_class){
+            case "Import":
+                array_push($arr,"注意事項：");
+                array_push($arr,"甲：	特許經營商知悉因特許經營商並無責任必須定期購貨，故此供應商不可能每天備存大量存貨等待不一定出現的訂單，因而需要時間備貨。亦知悉自己須保持合理庫存及定期盤點存貨的重要性，以便及早發現存貨不足，提早訂貨");
+                array_push($arr,"乙：	備貨貨期：	由嘉富貨倉提取之貨物	 7天（由收到訂貨申請表後計）。只能以自提或速遞送貨，運費昂貴，亦沒有發票	需報關上貨之貨物 	 25天到達深圳（收到訂貨申請表後計，含報關及運貨時間），未包括由深圳到目的地之運貨時間。國內交貨之貨物	 14天（收到貨款後計），未包運貨時間。");
+                array_push($arr,"丙：	貨品來源自美國或/台灣或/馬來西亞，單價含來源地至香港運費。");
+                array_push($arr,"丁：	不論來源地，單價為嘉富貨倉提取價（不包括嘉富到目的地運費）、或國內出廠價（不包括國內運費）。");
+                break;
+            case "Domestic":
+                array_push($arr,"注意事項：");
+                array_push($arr,"訂貨週期：每月一次");
+                array_push($arr,"訂貨時間：每月20號 (請於20號前向總公司提供訂貨單，如遇假日將順延一個工作天)");
+                break;
+            case "Fast":
+                array_push($arr,"注意事項：");
+                array_push($arr,"甲：	特許經營商知悉因特許經營商並無責任必須定期購貨，故此供應商不可能每天備存大量存貨等待不一定出現的訂單，因而需要時間備貨。亦知悉自己須保持合理庫存及定期盤點存貨的重要性，以便及早發現存貨不足，提早訂貨");
+                array_push($arr,"乙：	備貨貨期：	由嘉富貨倉提取之貨物	 7天（由收到訂貨申請表後計）。只能以自提或速遞送貨，運費昂貴，亦沒有發票							
+		需報關上貨之貨物 	 20天到達深圳（收到訂貨申請表後計，含報關及運貨時間），未包括由深圳到目的地之運貨時間。							
+		國內交貨之貨物	 14天（收到貨款後計），未包運貨時間。");
+                array_push($arr,"丙：	貨品來源自美國或/台灣或/馬來西亞，單價含來源地至香港運費。");
+                array_push($arr,"丁：	不論來源地，單價為嘉富貨倉提取價（不包括嘉富到目的地運費）、或國內出廠價（不包括國內運費）。");
+                break;
+        }
+        return $arr;
+    }
 }

@@ -44,10 +44,15 @@ class OrderController extends Controller
 		if (isset($_POST['OrderForm'])) {
 			$model = new OrderForm("finish");
             $model->attributes = $_POST['OrderForm'];
-            $model->saveData();
-            $model->scenario = "edit";
-            Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
-            $this->redirect(Yii::app()->createUrl('order/edit',array('index'=>$model->id)));
+            if ($model->validate()) {
+                $model->saveData();
+                Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
+                $this->redirect(Yii::app()->createUrl('order/edit',array('index'=>$model->id)));
+            } else {
+                $message = CHtml::errorSummary($model);
+                Dialog::message(Yii::t('dialog','Validation Message'), $message);
+                $this->redirect(Yii::app()->createUrl('order/edit',array('index'=>$model->id)));
+            }
 		}
 	}
 

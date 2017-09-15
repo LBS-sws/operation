@@ -210,6 +210,13 @@ return array(
     'Whether multiple orders are allowed simultaneously ?'=>'是否允许多个订单同时进行？',
     'Multiple orders are not allowed simultaneously'=>'不允许同时进行多个订单',
     'Allow'=>'允许',
+    'file'=>'文件',
+    'Import File'=>'导入',
     'No Allow'=>'不允许',
+    ' Not Find'=>'沒有找到',
+    'Success Num：'=>'成功数量：',
+    'Error Num：'=>'失败数量：',
+    'finish remark'=>'T3确认收货信息',
+
 );
 ?>

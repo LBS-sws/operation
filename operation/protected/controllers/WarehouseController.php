@@ -82,4 +82,36 @@ class WarehouseController extends Controller
         }
     }
 
+    public function actionImportGoods(){
+        $model = new UploadExcelForm();
+        $model->attributes = $_POST['UploadExcelForm'];
+        $img = CUploadedFile::getInstance($model,'file');
+        $city = Yii::app()->user->city();
+        $path =Yii::app()->basePath."/../upload/";
+        if (!file_exists($path)){
+            mkdir($path);
+        }
+        $path =Yii::app()->basePath."/../upload/excel/";
+        if (!file_exists($path)){
+            mkdir($path);
+        }
+        $path.=$city."/";
+        if (!file_exists($path)){
+            mkdir($path);
+        }
+        $url = "upload/excel/".$city."/".date("YmdHis").".".$img->getExtensionName();
+        $model->file = $img->getName();
+        if ($model->file && $model->validate()) {
+            $img->saveAs($url);
+            $loadExcel = new LoadExcel($url);
+            $list = $loadExcel->getExcelList();
+            $model->loadGoods($list);
+            $this->redirect(Yii::app()->createUrl($_POST['prevUrl']));
+        }else{
+            $message = CHtml::errorSummary($model);
+            Dialog::message(Yii::t('dialog','Validation Message'), $message);
+            $this->redirect(Yii::app()->createUrl($_POST['prevUrl']));
+        }
+    }
+
 }

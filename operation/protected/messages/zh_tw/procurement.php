@@ -209,6 +209,12 @@ return array(
     'Whether multiple orders are allowed simultaneously ?'=>'是否允許多個訂單同時進行？',
     'Multiple orders are not allowed simultaneously'=>'不允許同時進行多個訂單',
     'Allow'=>'允許',
+    'file'=>'文件',
+    'Import File'=>'導入',
     'No Allow'=>'不允許',
+    ' Not Find'=>'沒有找到',
+    'Success Num：'=>'成功數量：',
+    'Error Num：'=>'失敗數量：',
+    'finish remark：'=>'T3確認收貨信息',
 );
 ?>

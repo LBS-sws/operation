@@ -6,6 +6,7 @@ class WarehouseForm extends CFormModel
 	public $goods_code;
 	public $name;
 	public $unit;
+	public $orderClass = "Warehouse";
 	public $inventory;
 	public $classify_id;
 	public $price;

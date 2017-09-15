@@ -33,6 +33,14 @@ class MyExcelTwo {
         }
     }
 
+    //設置規則提示
+    public function setRulesArr($arr){
+        for ($i = 0;$i<count($arr);$i++){
+            $this->objActSheet->setCellValue("A".($i+1),$arr[$i]);
+            $this->objActSheet->getStyle( "A".($i+1))->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_RED);;
+        }
+    }
+
 	//設置表頭
 	public function setDataHeard($heardArr,$title="訂單表"){
         $this->objPHPExcel->getActiveSheet()->setTitle($title);

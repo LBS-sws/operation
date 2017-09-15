@@ -15,6 +15,7 @@ class OrderForm extends CFormModel
 	public $activity_id;
 	public $goods_list;
 	public $ject_remark;
+	public $fish_remark;
 
 	public function init()
     {
@@ -49,6 +50,7 @@ class OrderForm extends CFormModel
             'status'=>Yii::t('procurement','Order Status'),
             'remark'=>Yii::t('procurement','Remark'),
             'ject_remark'=>Yii::t('procurement','reject remark'),
+            'fish_remark'=>Yii::t('procurement','finish remark'),
 		);
 	}
 
@@ -58,12 +60,13 @@ class OrderForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, luu, lcu, lud, lcd','safe'),
-            array('goods_list','required'),
-            array('goods_list','validateGoods'),
+			array('id, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, fish_remark, luu, lcu, lud, lcd','safe'),
+            array('goods_list','required','on'=>array("new","edit","audit")),
+            array('goods_list','validateGoods','on'=>array("new","edit","audit")),
             //array('activity_id','required','on'=>'audit'),
             array('activity_id','validateActivity','on'=>'audit'),
             array('remark','required','on'=>'reject'),
+            array('fish_remark','required','on'=>'finish'),
             //array('order_num','numerical','allowEmpty'=>true,'integerOnly'=>true),
             //array('order_num','in','range'=>range(0,600)),
 		);
@@ -371,6 +374,7 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
                 $this->status = $row['status'];
                 $this->remark = $row['remark'];
                 $this->ject_remark = $row['ject_remark'];
+                $this->fish_remark = $row['fish_remark'];
                 $this->statusList = $this->getStatusListToId($row['id']);
                 break;
 			}
@@ -444,6 +448,7 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
             case 'finish':
                 $sql = "update opr_order set
 							remark = :remark,
+							fish_remark = :fish_remark,
 							luu = :luu,
 							lud = :lud,
 							status = :status
@@ -481,6 +486,8 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
 
         if (strpos($sql,':remark')!==false)
             $command->bindParam(':remark',$this->remark,PDO::PARAM_STR);
+        if (strpos($sql,':fish_remark')!==false)
+            $command->bindParam(':fish_remark',$this->fish_remark,PDO::PARAM_STR);
         if (strpos($sql,':lud')!==false)
             $command->bindParam(':lud',date('Y-m-d H:i:s'),PDO::PARAM_STR);
         if (strpos($sql,':luu')!==false)

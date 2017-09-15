@@ -137,10 +137,13 @@ class PurchaseController extends Controller
         } else {
             $title = OrderList::getActivityTitleToId($model->activity_id);
             $myExcel = new MyExcelTwo();
-            $myExcel->setStartRow(5);
-            $myExcel->setRowContent("A1","订单编号：".$model->order_code,"F1");
-            $myExcel->setRowContent("A2","下单用户：".$model->lcu,"F2");
-            $myExcel->setRowContent("A3","订单采购标题：".$title,"F3");
+            $arr = $model->getRulesText();
+            $num = count($arr)+ 2;
+            $myExcel->setStartRow($num+5);
+            $myExcel->setRulesArr($arr);
+            $myExcel->setRowContent("A".$num,"订单编号：".$model->order_code,"F".$num);
+            $myExcel->setRowContent("A".($num+1),"下单用户：".$model->lcu,"F".($num+1));
+            $myExcel->setRowContent("A".($num+2),"订单采购标题：".$title,"F".($num+2));
             $myExcel->setDataHeard($model->getTableHeard());
             $myExcel->setDataBody($model->resetGoodsList());
             $myExcel->outDownExcel($model->lcu."的订单.xls");

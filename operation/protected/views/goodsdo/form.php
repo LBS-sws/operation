@@ -1,4 +1,7 @@
 <?php
+if (empty($model->id)&&$model->scenario == "edit"){
+    $this->redirect(Yii::app()->createUrl('goodsdo/new'));
+}
 $this->pageTitle=Yii::app()->name . ' - Goods Summary Form';
 ?>
 <?php $form=$this->beginWidget('TbActiveForm', array(
@@ -37,6 +40,14 @@ $this->pageTitle=Yii::app()->name . ' - Goods Summary Form';
                         'submit'=>Yii::app()->createUrl('goodsdo/delete')));
                     ?>
                 <?php endif ?>
+            </div>
+
+            <div class="btn-group pull-right" role="group">
+                <?php if ($model->scenario!='view'){
+                    //導入
+                    echo TbHtml::button('<span class="fa fa-file-text-o"></span> '.Yii::t('procurement','Import File'), array(
+                        'name'=>'btnFlow','id'=>'btnFlow','data-toggle'=>'modal','data-target'=>'#importGoods'));
+                } ?>
             </div>
         </div></div>
 
@@ -191,4 +202,12 @@ Yii::app()->clientScript->registerScript('readonlyClass',$js,CClientScript::POS_
 
 <?php $this->endWidget(); ?>
 
+<?php
+if ($model->scenario!='view')
+    $this->renderPartial('//site/importGoods',array(
+            'model'=>$model,
+            'prevUrl'=>'goodsdo/new',
+            'name'=>"UploadExcelForm")
+    );
+?>
 

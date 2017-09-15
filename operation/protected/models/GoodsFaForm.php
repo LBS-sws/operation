@@ -14,6 +14,7 @@ class GoodsFaForm extends CFormModel
     public $multiple = 1;
     public $rules_id = 0;
 	public $origin;
+    public $orderClass = "Fast";
 
 	public function attributeLabels()
 	{

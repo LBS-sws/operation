@@ -85,7 +85,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                 <div class="col-sm-10 col-sm-offset-1"><?php echo $model->getHeadHtml();?></div>
             </div>
 
-            <?php if (!empty($model->status == "approve"||$model->status == "finished")): ?>
+            <?php if ($model->status == "approve"||$model->status == "finished"): ?>
                 <div class="form-group">
                     <?php echo $form->labelEx($model,'fish_remark',array('class'=>"col-sm-2 control-label")); ?>
                     <div class="col-sm-6">

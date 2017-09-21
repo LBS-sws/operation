@@ -15,6 +15,8 @@ class UploadExcelForm extends CFormModel
 	public $add_num;
 	public $update_id = 0;
 	public $bool = true;
+	public $error_list=array();
+	public $start_title="";
 
 	/**
      *
@@ -43,14 +45,16 @@ class UploadExcelForm extends CFormModel
         foreach ($arr["listBody"] as $list){
             $arrList = array();
             $continue = true;
+            $this->start_title = current($list);
             foreach ($validateArr as $vaList){
                 $key = array_search($vaList["name"],$arr["listHeader"]);
                 $value = $this->validateStr($list[$key],$vaList,$bool);
-                if(!$value){
-                    $continue = false;
-                    break;
+                if($value['status'] == 1){
+                    $arrList[$vaList["sqlName"]] = $value["data"];
                 }else{
-                    $arrList[$vaList["sqlName"]] = $value;
+                    $continue = false;
+                    array_push($this->error_list,$value["error"]);
+                    break;
                 }
             }
             if($continue){
@@ -64,7 +68,9 @@ class UploadExcelForm extends CFormModel
                 }else{
                     //新增
                     $arrList["lcu"] = $uid;
-                    $arrList["city"] = $city;
+                    if($this->dbName == "Warehouse"){
+                        $arrList["city"] = $city;
+                    }
                     Yii::app()->db->createCommand()->insert($this->dbName, $arrList);
                 }
                 $successNum++;
@@ -72,42 +78,86 @@ class UploadExcelForm extends CFormModel
                 $errNum++;
             }
         }
-        Dialog::message(Yii::t('dialog','Information'), Yii::t('procurement','Success Num：').$successNum."<br>".Yii::t('procurement','Error Num：').$errNum);
+        $error = implode("<br>",$this->error_list);
+        Dialog::message(Yii::t('dialog','Information'), Yii::t('procurement','Success Num：').$successNum."<br>".Yii::t('procurement','Error Num：').$errNum."<br>".$error);
     }
 
     private function validateStr($value,$list,$bool){
         if(empty($value)&&empty($list["value"])){
-            return false;
+            return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."不能为空");
         }
         if(!empty($list["sql"])){
-            $rows = Yii::app()->db->createCommand()->select("*")->from($this->dbName)
-                ->where($list["value"], array(':name'=>$value))->queryRow();
-            if($list["sql"] == 2){
-                if($rows){
-                    return $value;
-                }else{
-                    return false;
-                }
-            }else{
-                if(!$bool){
-                    if($rows){
-                        $this->add_num = $rows["inventory"];
-                        $this->update_id = $rows["id"];
+            switch ($list["sql"]){
+                case 1:
+                    if(empty($value)){
+                        return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."不能为空");
                     }
-                    return $value;
-                }else{
+                    //物品id及名稱驗證(不包括倉庫)
+                    $rows = Yii::app()->db->createCommand()->select("*")->from($this->dbName)
+                        ->where($list["value"], array(':name'=>$value))->queryRow();
                     if($rows){
-                        return false;
+                        return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."已經存在");
                     }else{
-                        return $value;
+                        return array("status"=>1,"data"=>$value);
                     }
-                }
+                    break;
+                case 2:
+                    //物品分類
+                    $rows = Yii::app()->db->createCommand()->select("*")->from('opr_classify')
+                        ->where($list["value"], array(':name'=>$value))->queryRow();
+                    if ($rows) {
+                        return array("status"=>1,"data"=>$value);
+                    } else {
+                        return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."沒有找到");
+                    }
+                    break;
+                case 3:
+                    if(empty($value)){
+                        return array("status"=>1,"data"=>"");
+                    }
+                    //國內貨標籤
+                    $rows = Yii::app()->db->createCommand()->select("*")->from('opr_stickies')
+                        ->where($list["value"], array(':name'=>$value))->queryRow();
+                    if ($rows) {
+                        return array("status"=>1,"data"=>$value);
+                    } else {
+                        return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."沒有找到");
+                    }
+                    break;
+                case 4:
+                    if(empty($value)){
+                        return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."不能为空");
+                    }
+                    //倉庫物品驗證
+                    $rows = Yii::app()->db->createCommand()->select("*")->from($this->dbName)
+                        ->where($list["value"], array(':name'=>$value))->queryRow();
+                    if($list["sqlName"] == "name"){
+                        if(empty($this->update_id)&&!$rows){
+                            return array("status"=>1,"data"=>$value);
+                        }
+                        if(!empty($this->update_id)&&$rows){
+                            return array("status"=>1,"data"=>$value);
+                        }
+                        return array("status"=>0,"error"=>$this->start_title."："."存货编码与存货名称不一致");
+                    }else{
+                        if($rows){
+                            $this->add_num = $rows["inventory"];
+                            $this->update_id = $rows["id"];
+                        }else{
+                            $this->add_num = 0;
+                            $this->update_id = 0;
+                        }
+                        return array("status"=>1,"data"=>$value);
+                    }
+                    break;
+                default:
+                    return array("status"=>0,"error"=>$this->start_title."："."404");
             }
         }else{
             if(empty($value)){
-                return $list["value"];
+                return array("status"=>1,"data"=>$list["value"]);
             }else{
-                return $value;
+                return array("status"=>1,"data"=>$value);
             }
         }
     }
@@ -120,10 +170,10 @@ class UploadExcelForm extends CFormModel
                 $this->bool = false;
                 $this->dbName="opr_warehouse";
                 $arr = array(
-                    array("name"=>"存货编码","sqlName"=>"goods_code","value"=>"city='$city' and goods_code=:name","sql"=>"1"),
-                    array("name"=>"存货名称","sqlName"=>"name","value"=>"city='$city' and name=:name","sql"=>"1"),
+                    array("name"=>"存货编码","sqlName"=>"goods_code","value"=>"city='$city' and goods_code=:name","sql"=>"4"),
+                    array("name"=>"存货名称","sqlName"=>"name","value"=>"city='$city' and name=:name","sql"=>"4"),
                     array("name"=>"主计量单位","sqlName"=>"unit","value"=>""),
-                    array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"classify_id=:name","sql"=>"2"),
+                    array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Warehouse' and id=:name","sql"=>"2"),
                     array("name"=>"参考售价","sqlName"=>"price","value"=>""),
                     array("name"=>"安全库存","sqlName"=>"inventory","value"=>""),
                 );
@@ -135,7 +185,8 @@ class UploadExcelForm extends CFormModel
                     array("name"=>"存货名称","sqlName"=>"name","value"=>"name=:name","sql"=>"1"),
                     array("name"=>"规格型号","sqlName"=>"type","value"=>""),
                     array("name"=>"主计量单位","sqlName"=>"unit","value"=>""),
-                    array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"classify_id=:name","sql"=>"2"),
+                    array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Domestic' and id=:name","sql"=>"2"),
+                    array("name"=>"标签","sqlName"=>"stickies_id","value"=>"id=:name","sql"=>"3"),
                     array("name"=>"参考售价","sqlName"=>"price","value"=>""),
                     array("name"=>"来源地","sqlName"=>"origin","value"=>""),
                     array("name"=>"数量倍率","sqlName"=>"multiple","value"=>"1"),
@@ -150,7 +201,7 @@ class UploadExcelForm extends CFormModel
                     array("name"=>"存货名称","sqlName"=>"name","value"=>"name=:name","sql"=>"1"),
                     array("name"=>"规格型号","sqlName"=>"type","value"=>""),
                     array("name"=>"主计量单位","sqlName"=>"unit","value"=>""),
-                    array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"classify_id=:name","sql"=>"2"),
+                    array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Import' and id=:name","sql"=>"2"),
                     array("name"=>"参考售价","sqlName"=>"price","value"=>""),
                     array("name"=>"来源地","sqlName"=>"origin","value"=>""),
                     array("name"=>"长","sqlName"=>"len","value"=>""),
@@ -170,7 +221,7 @@ class UploadExcelForm extends CFormModel
                     array("name"=>"存货名称","sqlName"=>"name","value"=>"name=:name","sql"=>"1"),
                     array("name"=>"规格型号","sqlName"=>"type","value"=>""),
                     array("name"=>"主计量单位","sqlName"=>"unit","value"=>""),
-                    array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"classify_id=:name","sql"=>"2"),
+                    array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Fast' and id=:name","sql"=>"2"),
                     array("name"=>"参考售价","sqlName"=>"price","value"=>""),
                     array("name"=>"来源地","sqlName"=>"origin","value"=>""),
                     array("name"=>"数量倍率","sqlName"=>"multiple","value"=>"1"),

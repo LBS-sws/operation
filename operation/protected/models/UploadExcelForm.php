@@ -96,7 +96,7 @@ class UploadExcelForm extends CFormModel
                     $rows = Yii::app()->db->createCommand()->select("*")->from($this->dbName)
                         ->where($list["value"], array(':name'=>$value))->queryRow();
                     if($rows){
-                        return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."已經存在");
+                        return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."已經存在($value)");
                     }else{
                         return array("status"=>1,"data"=>$value);
                     }
@@ -106,9 +106,9 @@ class UploadExcelForm extends CFormModel
                     $rows = Yii::app()->db->createCommand()->select("*")->from('opr_classify')
                         ->where($list["value"], array(':name'=>$value))->queryRow();
                     if ($rows) {
-                        return array("status"=>1,"data"=>$value);
+                        return array("status"=>1,"data"=>$rows["id"]);
                     } else {
-                        return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."沒有找到");
+                        return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."沒有找到($value)");
                     }
                     break;
                 case 3:
@@ -121,7 +121,7 @@ class UploadExcelForm extends CFormModel
                     if ($rows) {
                         return array("status"=>1,"data"=>$value);
                     } else {
-                        return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."沒有找到");
+                        return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."沒有找到($value)");
                     }
                     break;
                 case 4:
@@ -138,7 +138,7 @@ class UploadExcelForm extends CFormModel
                         if(!empty($this->update_id)&&$rows){
                             return array("status"=>1,"data"=>$value);
                         }
-                        return array("status"=>0,"error"=>$this->start_title."："."存货编码与存货名称不一致");
+                        return array("status"=>0,"error"=>$this->start_title."："."存货编码与存货名称不對應");
                     }else{
                         if($rows){
                             $this->add_num = $rows["inventory"];
@@ -173,7 +173,7 @@ class UploadExcelForm extends CFormModel
                     array("name"=>"存货编码","sqlName"=>"goods_code","value"=>"city='$city' and goods_code=:name","sql"=>"4"),
                     array("name"=>"存货名称","sqlName"=>"name","value"=>"city='$city' and name=:name","sql"=>"4"),
                     array("name"=>"主计量单位","sqlName"=>"unit","value"=>""),
-                    array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Warehouse' and id=:name","sql"=>"2"),
+                    array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Warehouse' and name=:name","sql"=>"2"),
                     array("name"=>"参考售价","sqlName"=>"price","value"=>""),
                     array("name"=>"安全库存","sqlName"=>"inventory","value"=>""),
                 );
@@ -183,9 +183,9 @@ class UploadExcelForm extends CFormModel
                 $arr = array(
                     array("name"=>"存货编码","sqlName"=>"goods_code","value"=>"goods_code=:name","sql"=>"1"),
                     array("name"=>"存货名称","sqlName"=>"name","value"=>"name=:name","sql"=>"1"),
-                    array("name"=>"规格型号","sqlName"=>"type","value"=>""),
+                    array("name"=>"规格型号","sqlName"=>"type","value"=>"无"),
                     array("name"=>"主计量单位","sqlName"=>"unit","value"=>""),
-                    array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Domestic' and id=:name","sql"=>"2"),
+                    array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Domestic' and name=:name","sql"=>"2"),
                     array("name"=>"标签","sqlName"=>"stickies_id","value"=>"id=:name","sql"=>"3"),
                     array("name"=>"参考售价","sqlName"=>"price","value"=>""),
                     array("name"=>"来源地","sqlName"=>"origin","value"=>""),
@@ -199,9 +199,9 @@ class UploadExcelForm extends CFormModel
                 $arr = array(
                     array("name"=>"存货编码","sqlName"=>"goods_code","value"=>"goods_code=:name","sql"=>"1"),
                     array("name"=>"存货名称","sqlName"=>"name","value"=>"name=:name","sql"=>"1"),
-                    array("name"=>"规格型号","sqlName"=>"type","value"=>""),
+                    array("name"=>"规格型号","sqlName"=>"type","value"=>"无"),
                     array("name"=>"主计量单位","sqlName"=>"unit","value"=>""),
-                    array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Import' and id=:name","sql"=>"2"),
+                    array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Import' and name=:name","sql"=>"2"),
                     array("name"=>"参考售价","sqlName"=>"price","value"=>""),
                     array("name"=>"来源地","sqlName"=>"origin","value"=>""),
                     array("name"=>"长","sqlName"=>"len","value"=>""),
@@ -219,9 +219,9 @@ class UploadExcelForm extends CFormModel
                 $arr = array(
                     array("name"=>"存货编码","sqlName"=>"goods_code","value"=>"goods_code=:name","sql"=>"1"),
                     array("name"=>"存货名称","sqlName"=>"name","value"=>"name=:name","sql"=>"1"),
-                    array("name"=>"规格型号","sqlName"=>"type","value"=>""),
+                    array("name"=>"规格型号","sqlName"=>"type","value"=>"无"),
                     array("name"=>"主计量单位","sqlName"=>"unit","value"=>""),
-                    array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Fast' and id=:name","sql"=>"2"),
+                    array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Fast' and name=:name","sql"=>"2"),
                     array("name"=>"参考售价","sqlName"=>"price","value"=>""),
                     array("name"=>"来源地","sqlName"=>"origin","value"=>""),
                     array("name"=>"数量倍率","sqlName"=>"multiple","value"=>"1"),

@@ -216,7 +216,7 @@ return array(
     ' Not Find'=>'沒有找到',
     'Success Num：'=>'成功数量：',
     'Error Num：'=>'失败数量：',
-    'finish remark'=>'T3确认收货信息',
+    'finish remark'=>'T3入库单号',
 
 );
 ?>

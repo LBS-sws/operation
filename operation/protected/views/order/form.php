@@ -89,7 +89,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                 <div class="form-group">
                     <?php echo $form->labelEx($model,'fish_remark',array('class'=>"col-sm-2 control-label")); ?>
                     <div class="col-sm-6">
-                        <?php echo $form->textArea($model, 'fish_remark',
+                        <?php echo $form->textField($model, 'fish_remark',
                             array('readonly'=>($model->status == "finished"||$model->scenario=='view'))
                         ); ?>
                     </div>

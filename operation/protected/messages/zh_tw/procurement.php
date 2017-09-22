@@ -215,6 +215,6 @@ return array(
     ' Not Find'=>'沒有找到',
     'Success Num：'=>'成功數量：',
     'Error Num：'=>'失敗數量：',
-    'finish remark：'=>'T3確認收貨信息',
+    'finish remark：'=>'T3入庫單號',
 );
 ?>

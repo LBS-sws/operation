@@ -83,7 +83,7 @@ class UploadExcelForm extends CFormModel
     }
 
     private function validateStr($value,$list,$bool){
-        if(empty($value)&&empty($list["value"])){
+        if(($value === "")&&($list["value"] === "")){
             return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."不能为空");
         }
         if(!empty($list["sql"])){
@@ -204,11 +204,11 @@ class UploadExcelForm extends CFormModel
                     array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Import' and name=:name","sql"=>"2"),
                     array("name"=>"参考售价","sqlName"=>"price","value"=>""),
                     array("name"=>"来源地","sqlName"=>"origin","value"=>""),
-                    array("name"=>"长","sqlName"=>"len","value"=>""),
-                    array("name"=>"宽","sqlName"=>"width","value"=>""),
-                    array("name"=>"高","sqlName"=>"height","value"=>""),
-                    array("name"=>"净重","sqlName"=>"net_weight","value"=>""),
-                    array("name"=>"毛重","sqlName"=>"gross_weight","value"=>""),
+                    array("name"=>"长","sqlName"=>"len","value"=>"0.00"),
+                    array("name"=>"宽","sqlName"=>"width","value"=>"0.00"),
+                    array("name"=>"高","sqlName"=>"height","value"=>"0.00"),
+                    array("name"=>"净重","sqlName"=>"net_weight","value"=>"0.00"),
+                    array("name"=>"毛重","sqlName"=>"gross_weight","value"=>"0.00"),
                     array("name"=>"数量倍率","sqlName"=>"multiple","value"=>"1"),
                     array("name"=>"最大数量","sqlName"=>"big_num","value"=>"9999"),
                     array("name"=>"最小数量","sqlName"=>"small_num","value"=>"1"),

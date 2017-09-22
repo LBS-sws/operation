@@ -60,7 +60,7 @@ class OrderForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, fish_remark, luu, lcu, lud, lcd','safe'),
+			array('id, order_code, goods_list, order_user, order_class, activity_id, technician, status, remark, ject_remark, fish_remark, luu, lcu, lud, lcd','safe'),
             array('goods_list','required','on'=>array("new","edit","audit")),
             array('goods_list','validateGoods','on'=>array("new","edit","audit")),
             //array('activity_id','required','on'=>'audit'),

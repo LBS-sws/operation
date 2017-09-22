@@ -150,6 +150,19 @@ class UploadExcelForm extends CFormModel
                         return array("status"=>1,"data"=>$value);
                     }
                     break;
+                case 5:
+                    //混合規則驗證
+                    if(empty($value)){
+                        return array("status"=>1,"data"=>0);
+                    }
+                    $rows = Yii::app()->db->createCommand()->select("*")->from("opr_goods_rules")
+                        ->where($list["value"], array(':name'=>$value))->queryRow();
+                    if($rows){
+                        return array("status"=>1,"data"=>$rows["id"]);
+                    }else{
+                        return array("status"=>0,"error"=>$this->start_title."："."没找到对应的混合规则（$value）");
+                    }
+                    break;
                 default:
                     return array("status"=>0,"error"=>$this->start_title."："."404");
             }
@@ -189,6 +202,7 @@ class UploadExcelForm extends CFormModel
                     array("name"=>"标签","sqlName"=>"stickies_id","value"=>"id=:name","sql"=>"3"),
                     array("name"=>"参考售价","sqlName"=>"price","value"=>""),
                     array("name"=>"来源地","sqlName"=>"origin","value"=>""),
+                    array("name"=>"混合規則","sqlName"=>"rules_id","value"=>"id=:name","sql"=>"5"),
                     array("name"=>"数量倍率","sqlName"=>"multiple","value"=>"1"),
                     array("name"=>"最大数量","sqlName"=>"big_num","value"=>"9999"),
                     array("name"=>"最小数量","sqlName"=>"small_num","value"=>"1"),
@@ -204,6 +218,7 @@ class UploadExcelForm extends CFormModel
                     array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Import' and name=:name","sql"=>"2"),
                     array("name"=>"参考售价","sqlName"=>"price","value"=>""),
                     array("name"=>"来源地","sqlName"=>"origin","value"=>""),
+                    array("name"=>"混合規則","sqlName"=>"rules_id","value"=>"id=:name","sql"=>"5"),
                     array("name"=>"长","sqlName"=>"len","value"=>"0.00"),
                     array("name"=>"宽","sqlName"=>"width","value"=>"0.00"),
                     array("name"=>"高","sqlName"=>"height","value"=>"0.00"),
@@ -224,6 +239,7 @@ class UploadExcelForm extends CFormModel
                     array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Fast' and name=:name","sql"=>"2"),
                     array("name"=>"参考售价","sqlName"=>"price","value"=>""),
                     array("name"=>"来源地","sqlName"=>"origin","value"=>""),
+                    array("name"=>"混合規則","sqlName"=>"rules_id","value"=>"id=:name","sql"=>"5"),
                     array("name"=>"数量倍率","sqlName"=>"multiple","value"=>"1"),
                     array("name"=>"最大数量","sqlName"=>"big_num","value"=>"9999"),
                     array("name"=>"最小数量","sqlName"=>"small_num","value"=>"1"),

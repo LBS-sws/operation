@@ -16,6 +16,7 @@ class OrderForm extends CFormModel
 	public $goods_list;
 	public $ject_remark;
 	public $fish_remark;
+	public $acc_bool=false;
 
 	public function init()
     {
@@ -64,9 +65,9 @@ class OrderForm extends CFormModel
             array('goods_list','required','on'=>array("new","edit","audit")),
             array('goods_list','validateGoods','on'=>array("new","edit","audit")),
             //array('activity_id','required','on'=>'audit'),
-            array('activity_id','validateActivity','on'=>'audit'),
             array('remark','required','on'=>'reject'),
             array('fish_remark','required','on'=>'finish'),
+            array('activity_id','validateActivity','on'=>'audit'),
             //array('order_num','numerical','allowEmpty'=>true,'integerOnly'=>true),
             //array('order_num','in','range'=>range(0,600)),
 		);
@@ -156,19 +157,21 @@ class OrderForm extends CFormModel
         }
     }
     public function validateActivity($attribute, $params){
+        $city = Yii::app()->user->city();
         if($this->scenario == "audit" && $this->order_class != "Fast"){
             $arrBool = OrderAccForm::getNowOrderAcc();
             //不允許多個訂單同時進行
             if(empty($arrBool[$this->order_class])){
-                $city = Yii::app()->user->city();
                 $rows = Yii::app()->db->createCommand()->select("count(id)")
                     ->from("opr_order")->where("order_class=:order_class and city=:city and status = 'approve'",
                         array(":order_class"=>$this->order_class,":city"=>$city))->queryScalar();
                 if($rows > 0){
-                    $message = Yii::t('procurement',"Multiple orders are not allowed simultaneously");
+                    $message = Yii::t('procurement',"Multiple orders are not allowed simultaneously")."，请联系老总放行";
                     $this->addError($attribute,$message);
                     return false;
                 }
+            }else{
+                $this->acc_bool = true;
             }
         }
 
@@ -551,6 +554,17 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
                         'lud'=>date('Y-m-d H:i:s'),
                     ), 'id=:id', array(':id'=>$goods["id"]));
                 }
+            }
+        }
+        if($this->acc_bool){ //終止一次性放行
+            if($this->order_class == "Domestic"){
+                Yii::app()->db->createCommand()->update('opr_order_acc', array(
+                    'acc_do'=>0
+                ), 'city=:city', array(':city'=>$city));
+            }elseif ($this->order_class == "Import"){
+                Yii::app()->db->createCommand()->update('opr_order_acc', array(
+                    'acc_im'=>0
+                ), 'city=:city', array(':city'=>$city));
             }
         }
 

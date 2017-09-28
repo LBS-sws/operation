@@ -277,3 +277,41 @@ function goodsIfyChange() {
     });
 }
 
+
+
+function validateGoods(url) {
+    var bool = false;
+    $(".numChange").each(function () {
+        if($(this).val() == ""){
+            bool = true;
+            return false;
+        }
+    });
+    if(bool){
+        return false;
+    }
+    $.ajax({
+        type: "post",
+        url: url,
+        data: $("form:first").serialize(),
+        dataType: "json",
+        success: function(data){
+            if(data.status == 0){
+                if($("#shenValidate").length > 0){
+                    $("#shenValidate").remove();
+                }
+                var html = '<div id="shenValidate" role="dialog" tabindex="-1" class="modal fade" style="display: block; padding-right: 17px;">';
+                html+='<div class="modal-dialog">';
+                html+='<div class="modal-content">';
+                html+='<div class="modal-header"><button class="close" data-dismiss="modal" type="button">×</button><h4 class="modal-title">验证信息</h4></div><div class="modal-body"><p></p>';
+                html+=data.error;
+                html+='<p></p></div><div class="modal-footer"><button data-dismiss="modal" class="btn btn-primary" type="button">确定</button></div></div>';
+                html+='</div>';
+                html+='</div>';
+                $("body").append(html);
+                $("#shenValidate").addClass("in");
+            }
+        }
+    });
+}
+

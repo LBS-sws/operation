@@ -162,7 +162,7 @@ return array(
     'Have read,Drop shipping'=>'已查看，待发货',
 
     'Delivery List'=>'订单采购',
-    'Number Restrictions'=>'数量限制',
+    'Number Restrictions'=>'最多订单申请数量',
     'Max Number Restrictions'=>'最多地方参与数目',
     ' Not Null'=>'不能为空',
     'Fast Form'=>'快速订单审核',

@@ -161,7 +161,7 @@ return array(
     'Have read,Drop shipping'=>'已查看，待發貨',
 
     'Delivery List'=>'訂單採購',
-    'Number Restrictions'=>'數量限制',
+    'Number Restrictions'=>'最多訂單申請數量',
     'Max Number Restrictions'=>'最多地方參與數量',
     ' Not Null'=>'不能為空',
     'Fast Form'=>'快速訂單審核',

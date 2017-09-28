@@ -509,7 +509,7 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
             for($i = 0;$i < 5-strlen($code);$i++){
                 $this->order_code.="0";
             }
-            $this->order_code .= $code;
+            $this->order_code = date("Ym").$this->order_code.$code;
             Yii::app()->db->createCommand()->update('opr_order', array(
                 'order_code'=>$this->order_code,
                 'judge'=>1,

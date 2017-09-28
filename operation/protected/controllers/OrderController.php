@@ -147,4 +147,20 @@ class OrderController extends Controller
         $model->retrieveDataByPage($model->pageNum);
         $this->render('index_activity',array('model'=>$model));
     }
+
+    //物品列表的即時驗證
+    public function actionValidateAjax(){
+        if(Yii::app()->request->isAjaxRequest) {//是否ajax请求
+            $model = new OrderForm($_POST['OrderForm']['scenario']);
+            $model->attributes = $_POST['OrderForm'];
+            if ($model->validate()) {
+                echo CJSON::encode(array('status'=>1));//Yii 的方法将数组处理成json数据
+            } else {
+                $message = CHtml::errorSummary($model);
+                echo CJSON::encode(array('status'=>0,'error'=>$message));//Yii 的方法将数组处理成json数据
+            }
+        }else{
+            $this->redirect(Yii::app()->createUrl('order/index'));
+        }
+    }
 }

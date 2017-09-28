@@ -207,30 +207,47 @@ class ActivityForm extends CFormModel
 
 	//發送郵件
 	private function setEmail(){
-        $from_addr = Yii::app()->params['adminEmail'];
-        $cityList = General ::getCityListWithNoDescendant();
+        $cityList = General::getCityListWithNoDescendant();//城市列表
+        $userList = $this->getUserListToAddOrder();//有添加權限的用戶
         foreach ($cityList as $city=>$cityName){
             $email = $this->getEmailToCity($city);
             if(!empty($email)){
                 //發送郵件
-                $message = "<p>總部採購編號：".$this->activity_code."</p>";
-                $message .= "<p>總部採購標題：".$this->activity_title."</p>";
-                $message .= "<p>總部採購類型：".Yii::t("procurement",$this->order_class)."</p>";
-                $message .= "<p>總部採購開始時間：".$this->start_time."</p>";
-                $message .= "<p>總部採購結束時間：".$this->end_time."</p>";
-				$suffix = Yii::app()->params['envSuffix'];
-                Yii::app()->db->createCommand()->insert("swoper$suffix.swo_email_queue", array(
-                    'request_dt'=>$this->start_time,
-                    'from_addr'=>$from_addr,
-                    'to_addr'=>$email,
-                    'subject'=>"總部受理訂單:".$this->activity_title,//郵件主題
-                    'description'=>"總部受理訂單",//郵件副題
-                    'message'=>$message,//郵件內容（html）
-                    'status'=>"P",
-                    'lcu'=>$this->id,
-                    'lcd'=>date('Y-m-d H:i:s'),
-                ));
+                $this->sendEmail($email);
             }
+        }
+        if(!empty($userList)){
+            foreach ($userList as $user){
+                $email = $this->getEmailToUsername($user);
+                if(!empty($email)){
+                    //發送郵件
+                    $this->sendEmail($email);
+                }
+            }
+        }
+    }
+
+    private function sendEmail($to_addr){
+        $from_addr = Yii::app()->params['adminEmail'];
+        if(!empty($to_addr)){
+            //發送郵件
+            $message = "<p>總部採購編號：".$this->activity_code."</p>";
+            $message .= "<p>總部採購標題：".$this->activity_title."</p>";
+            $message .= "<p>總部採購類型：".Yii::t("procurement",$this->order_class)."</p>";
+            $message .= "<p>總部採購開始時間：".$this->start_time."</p>";
+            $message .= "<p>總部採購結束時間：".$this->end_time."</p>";
+            $suffix = Yii::app()->params['envSuffix'];
+            Yii::app()->db->createCommand()->insert("swoper$suffix.swo_email_queue", array(
+                'request_dt'=>$this->start_time,
+                'from_addr'=>$from_addr,
+                'to_addr'=>$to_addr,
+                'subject'=>"總部受理訂單:".$this->activity_title,//郵件主題
+                'description'=>"總部受理訂單",//郵件副題
+                'message'=>$message,//郵件內容（html）
+                'status'=>"P",
+                'lcu'=>$this->id,
+                'lcd'=>date('Y-m-d H:i:s'),
+            ));
         }
     }
 
@@ -250,5 +267,27 @@ class ActivityForm extends CFormModel
         }
 
         return "";
+    }
+
+    //根據用戶username獲取郵箱
+    public function getEmailToUsername($username){
+        $suffix = Yii::app()->params['envSuffix'];
+        $suffix = "security".$suffix;
+        $email = Yii::app()->db->createCommand()->select("email")->from($suffix.".sec_user")->where("username=:username",array(":username"=>$username))->queryRow();
+        if($email){
+            return $email["email"];
+        }else{
+            return "";
+        }
+    }
+
+    //獲取有添加訂單權限的用戶
+    public function getUserListToAddOrder(){
+        $systemId = Yii::app()->params['systemId'];
+        $suffix = Yii::app()->params['envSuffix'];
+        $suffix = "security".$suffix;
+        $userList = Yii::app()->db->createCommand()->select("username")->from($suffix.".sec_user_access")
+            ->where("system_id=:system_id and a_read_write like '%YD04%'",array(":system_id"=>$systemId))->queryAll();
+        return $userList;
     }
 }

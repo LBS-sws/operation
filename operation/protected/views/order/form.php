@@ -295,13 +295,22 @@ goodsTotalPrice();
 goodsIfyChange();
 disabledTable('.$tableBool.');
 
+//物品數量即時驗證
+$("#table-change").delegate("input","blur",function(){
+    validateGoods("'.Yii::app()->createUrl('order/validateAjax').'");
+});
+$("body").delegate("#shenValidate,#shenValidate button","click",function(){
+    $("#shenValidate").fadeOut(200,function(){
+        $("#shenValidate").remove();
+    });
+});
 ';
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 ?>
 <?php
 $js = Script::genReadonlyField();
 Yii::app()->clientScript->registerScript('readonlyClass',$js,CClientScript::POS_READY);
-Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/goodsChangeTwo.js", CClientScript::POS_END);
+Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/goodsChangeTwo.js?2", CClientScript::POS_END);
 Yii::app()->clientScript->registerCssFile(Yii::app()->baseUrl . "/css/goodsChange.css");
 ?>
 

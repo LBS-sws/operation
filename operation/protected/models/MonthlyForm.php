@@ -142,8 +142,8 @@ class MonthlyForm extends CFormModel
 				$temp['code'] = $row['data_field'];
 				$temp['function_name'] = $row['function_name'];
 				$temp['name'] = $row['name'];
-				$temp['datavalue'] = $row['data_value'];
-				$temp['datavalueold'] = $row['data_value'];
+				$temp['datavalue'] = is_numeric($row['data_value']) ? number_format($row['data_value'],2,".","") : $row['data_value'];
+				$temp['datavalueold'] = is_numeric($row['data_value']) ? number_format($row['data_value'],2,".","") : $row['data_value'];
 				$temp['updtype'] = $row['upd_type'];
 				$temp['fieldtype'] = $row['field_type'];
 				$temp['manualinput'] = $row['manual_input'];
@@ -334,18 +334,20 @@ class MonthlyForm extends CFormModel
 		$rows = Yii::app()->db->createCommand($select)->queryAll();
 		foreach ($rows as $row) {
 			$code = $row['function_name'];
+			$num = is_numeric($this->record[$code]['datavalue']) ? number_format($this->record[$code]['datavalue'],2,".","") : $this->record[$code]['datavalue'];
 			$command=$connection->createCommand($sql);
 			if (strpos($sql,':id')!==false)
 				$command->bindParam(':id',$this->record[$code]['id'],PDO::PARAM_INT);
-			if (strpos($sql,':data_value')!==false)
-				$command->bindParam(':data_value',$this->record[$code]['datavalue'],PDO::PARAM_STR);
+			if (strpos($sql,':data_value')!==false) {
+				$command->bindParam(':data_value',$num,PDO::PARAM_STR);
+			}
 			if (strpos($sql,':manual_input')!==false) {
 				$input = 'N';
-				if ($this->record[$code]['updtype']=='M' || $this->record[$code]['datavalueold']==$this->record[$code]['datavalue']) {
+				if ($this->record[$code]['updtype']=='M' || $this->record[$code]['datavalueold']==$num) {
 					$input = $this->record[$code]['manualinput'];
 				} else {
 					if ($this->record[$code]['updtype']!='M') {
-						$input = ($this->record[$code]['datavalue'] || $this->record[$code]['datavalue']=='0') ? 'N' : 'Y';
+						$input = ($this->record[$code]['datavalue'] || $num=='0.00') ? 'N' : 'Y';
 					}
 				}
 				$command->bindParam(':manual_input',$input,PDO::PARAM_STR);

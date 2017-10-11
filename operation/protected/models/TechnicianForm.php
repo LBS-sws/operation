@@ -94,6 +94,10 @@ class TechnicianForm extends CFormModel
                     $message = Yii::t('procurement','Not Font Goods').$goods["goods_id"]."a";
                     $this->addError($attribute,$message);
                     return false;
+                }elseif ($list["decimal_num"] != "是"&& floor($goods["goods_num"])!=$goods["goods_num"]){
+                    $message = $list["name"]."：".Yii::t('procurement','Goods can only be positive integers');
+                    $this->addError($attribute,$message);
+                    return false;
                 }elseif (floatval($list["inventory"])<floatval($goods["goods_num"])){
                     $message = $list["name"]."：".Yii::t('procurement','Cannot exceed the quantity of Inventory')."（".$list["inventory"]."）";
                     $this->addError($attribute,$message);
@@ -276,8 +280,7 @@ class TechnicianForm extends CFormModel
                         'order_id'=>$this->id,
                         'goods_num'=>$goods["goods_num"],
                         'note'=>$goods["note"],
-                        'lcu'=>$uid,
-                        'lcd'=>date('Y-m-d H:i:s'),
+                        'lcu'=>Yii::app()->user->user_display_name(),
                     ));
                 }else{
                     //修改
@@ -285,15 +288,22 @@ class TechnicianForm extends CFormModel
                         'goods_id'=>$goods["goods_id"],
                         'goods_num'=>$goods["goods_num"],
                         'note'=>$goods["note"],
-                        'luu'=>$uid,
-                        'lud'=>date('Y-m-d H:i:s'),
+                        'luu'=>Yii::app()->user->user_display_name(),
                     ), 'id=:id', array(':id'=>$goods["id"]));
                 }
             }
         }
 
+        $this->updateGoodsStatus();
         //發送郵件
         OrderGoods::sendEmailTwo($oldOrderStatus,$this->status,$this->order_code);
         return true;
+    }
+
+    //修改訂單內物品的狀態
+    protected function updateGoodsStatus(){
+        Yii::app()->db->createCommand()->update('opr_order_goods', array(
+            'order_status'=>$this->status,
+        ), 'order_id=:order_id', array(':order_id'=>$this->id));
     }
 }

@@ -73,6 +73,7 @@ class WarehouseList extends CListPageModel
 						'price'=>$record['price'],
 						'inventory'=>$record['inventory'],
 						'goods_code'=>$record['goods_code'],
+						'goodsHistory'=>$this->getGoodsHistory($record['id']),
 					);
 			}
 		}
@@ -81,4 +82,19 @@ class WarehouseList extends CListPageModel
 		return true;
 	}
 
+	//獲取物品由訂單扣減的歷史 (最多顯示5條)
+	private function getGoodsHistory($goods_id){
+	    if (empty($goods_id)){
+	        return "";
+        }
+        $rows = Yii::app()->db->createCommand()->select("*")
+            ->from("opr_order_goods")
+            ->where('goods_id=:goods_id and order_status="finished"',array(':goods_id'=>$goods_id))
+            ->order('lud desc')->limit(5)->queryAll();
+	    if($rows){
+	        return $rows;
+        }else{
+	        return "";
+        }
+    }
 }

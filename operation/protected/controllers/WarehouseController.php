@@ -53,6 +53,17 @@ class WarehouseController extends Controller
         $this->render('form',array('model'=>$model,));
     }
 
+    public function actionCopy()
+    {
+        if (isset($_POST['WarehouseForm'])) {
+            $model = new WarehouseForm($_POST['WarehouseForm']['scenario']);
+            $model->attributes = $_POST['WarehouseForm'];
+            $model->id = 0;
+            $model->setScenario("new");
+            $this->render('form',array('model'=>$model));
+        }
+    }
+
 	public function actionEdit($index)
 	{
 		$model = new WarehouseForm('edit');

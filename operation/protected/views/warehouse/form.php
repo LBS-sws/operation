@@ -35,6 +35,9 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                 <?php echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('misc','Add'), array(
                     'submit'=>Yii::app()->createUrl('warehouse/new')));
                 ?>
+                <?php echo TbHtml::button('<span class="fa fa-copy"></span> '.Yii::t('misc','Copy'), array(
+                    'submit'=>Yii::app()->createUrl('warehouse/copy')));
+                ?>
             <?php endif ?>
 			<?php echo TbHtml::button('<span class="fa fa-save"></span> '.Yii::t('misc','Save'), array(
 				'submit'=>Yii::app()->createUrl('Warehouse/save')));
@@ -102,6 +105,22 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                 <div class="col-sm-4">
                     <?php echo $form->numberField($model, 'price',
                         array('min'=>0,'readonly'=>($model->scenario=='view'))
+                    ); ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'costing',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-4">
+                    <?php echo $form->numberField($model, 'costing',
+                        array('min'=>0,'readonly'=>($model->scenario=='view'))
+                    ); ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'decimal_num',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-4">
+                    <?php echo $form->inlineRadioButtonList($model, 'decimal_num',array("否"=>Yii::t("misc","No"),"是"=>Yii::t("misc","Yes")),
+                        array('readonly'=>($model->scenario=='view'))
                     ); ?>
                 </div>
             </div>

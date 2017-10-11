@@ -218,7 +218,7 @@ class ActivityForm extends CFormModel
         }
         if(!empty($userList)){
             foreach ($userList as $user){
-                $email = $this->getEmailToUsername($user);
+                $email = $this->getEmailToUsername($user["username"]);
                 if(!empty($email)){
                     //發送郵件
                     $this->sendEmail($email);
@@ -271,9 +271,12 @@ class ActivityForm extends CFormModel
 
     //根據用戶username獲取郵箱
     public function getEmailToUsername($username){
+        if(empty($username)){
+            return "";
+        }
         $suffix = Yii::app()->params['envSuffix'];
-        $suffix = "security".$suffix;
-        $email = Yii::app()->db->createCommand()->select("email")->from($suffix.".sec_user")->where("username=:username",array(":username"=>$username))->queryRow();
+        $suffix = "security".$suffix.".sec_user";
+        $email = Yii::app()->db->createCommand()->select("email")->from($suffix)->where("username=:username",array(":username"=>$username))->queryRow();
         if($email){
             return $email["email"];
         }else{

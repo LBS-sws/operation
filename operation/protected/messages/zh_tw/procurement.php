@@ -162,7 +162,7 @@ return array(
 
     'Delivery List'=>'訂單採購',
     'Number Restrictions'=>'最多訂單申請數量',
-    'Max Number Restrictions'=>'最多地方參與數量',
+    'Max Number Restrictions'=>'最多訂單申請數量',
     ' Not Null'=>'不能為空',
     'Fast Form'=>'快速訂單審核',
 
@@ -216,5 +216,10 @@ return array(
     'Success Num：'=>'成功數量：',
     'Error Num：'=>'失敗數量：',
     'finish remark：'=>'T3入庫單號',
+
+    //2017-10-11
+    'Costing（RMB）'=>'成本（RMB）',
+    'Decimal'=>'是否允許小數',
+    'Goods can only be positive integers'=>'物品只能為正整數',
 );
 ?>

@@ -541,8 +541,8 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
                         'order_id'=>$this->id,
                         'goods_num'=>$goods["goods_num"],
                         'note'=>$goods["note"],
-                        'lcu'=>$uid,
-                        'lcd'=>date('Y-m-d H:i:s'),
+                        'city'=>$city,
+                        'lcu'=>Yii::app()->user->user_display_name(),
                     ));
                 }else{
                     //修改
@@ -550,8 +550,7 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
                         'goods_id'=>$goods["goods_id"],
                         'goods_num'=>$goods["goods_num"],
                         'note'=>$goods["note"],
-                        'luu'=>$uid,
-                        'lud'=>date('Y-m-d H:i:s'),
+                        'luu'=>Yii::app()->user->user_display_name(),
                     ), 'id=:id', array(':id'=>$goods["id"]));
                 }
             }
@@ -568,6 +567,7 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
             }
         }
 
+        $this->updateGoodsStatus();
         //發送郵件
         OrderGoods::sendEmail($oldOrderStatus,$this->status,$this->order_code,$this->activity_id);
         /*
@@ -600,4 +600,11 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
          */
 		return true;
 	}
+
+    //修改訂單內物品的狀態
+    protected function updateGoodsStatus(){
+        Yii::app()->db->createCommand()->update('opr_order_goods', array(
+            'order_status'=>$this->status,
+        ), 'order_id=:order_id', array(':order_id'=>$this->id));
+    }
 }

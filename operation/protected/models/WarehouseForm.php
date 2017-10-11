@@ -10,6 +10,8 @@ class WarehouseForm extends CFormModel
 	public $inventory;
 	public $classify_id;
 	public $price;
+	public $costing;
+	public $decimal_num;
 	public $luu;
 	public $lcu;
 
@@ -22,6 +24,8 @@ class WarehouseForm extends CFormModel
             'unit'=>Yii::t('procurement','Unit'),
             'inventory'=>Yii::t('procurement','Inventory'),
             'price'=>Yii::t('procurement','Price（RMB）'),
+            'costing'=>Yii::t('procurement','Costing（RMB）'),
+            'decimal_num'=>Yii::t('procurement','Decimal'),
 		);
 	}
 
@@ -31,7 +35,7 @@ class WarehouseForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, goods_code, name, unit, inventory, classify_id, price, lcu, luu','safe'),
+			array('id, goods_code, name, unit, inventory, classify_id, price, costing, decimal_num, lcu, luu','safe'),
             array('name','required'),
             array('classify_id','required'),
             array('unit','required'),
@@ -92,6 +96,8 @@ class WarehouseForm extends CFormModel
                 $this->classify_id = $row['classify_id'];
                 $this->goods_code = $row['goods_code'];
                 $this->inventory = $row['inventory'];
+                $this->costing = sprintf("%.2f",$row['costing']);
+                $this->decimal_num = empty($row['decimal_num'])?"否":$row['decimal_num'];
                 $this->price = $row['price'];
                 break;
 			}
@@ -149,9 +155,9 @@ class WarehouseForm extends CFormModel
                 break;
             case 'new':
                 $sql = "insert into opr_warehouse(
-							name, unit, inventory, classify_id, lcu, lcd, goods_code,city,price
+							name, unit, inventory, classify_id, lcu, goods_code,city,price,costing,decimal_num
 						) values (
-							:name, :unit, :inventory, :classify_id, :lcu, :lcd, :goods_code,:city,:price
+							:name, :unit, :inventory, :classify_id, :lcu, :goods_code,:city,:price,:costing,:decimal_num
 						)";
                 break;
             case 'edit':
@@ -160,8 +166,9 @@ class WarehouseForm extends CFormModel
 							classify_id = :classify_id, 
 							unit = :unit,
 							price = :price,
+							costing = :costing,
+							decimal_num = :decimal_num,
 							luu = :luu,
-							lud = :lud,
 							inventory = :inventory
 						where id = :id AND city=:city
 						";
@@ -185,6 +192,10 @@ class WarehouseForm extends CFormModel
             $command->bindParam(':unit',$this->unit,PDO::PARAM_STR);
         if (strpos($sql,':price')!==false)
             $command->bindParam(':price',$this->price,PDO::PARAM_STR);
+        if (strpos($sql,':costing')!==false)
+            $command->bindParam(':costing',$this->costing,PDO::PARAM_STR);
+        if (strpos($sql,':decimal_num')!==false)
+            $command->bindParam(':decimal_num',$this->decimal_num,PDO::PARAM_STR);
         if (strpos($sql,':inventory')!==false)
             $command->bindParam(':inventory',$this->inventory,PDO::PARAM_INT);
         if (strpos($sql,':classify_id')!==false)
@@ -196,10 +207,7 @@ class WarehouseForm extends CFormModel
             $command->bindParam(':luu',$uid,PDO::PARAM_STR);
         if (strpos($sql,':lcu')!==false)
             $command->bindParam(':lcu',$uid,PDO::PARAM_STR);
-        if (strpos($sql,':lud')!==false)
-            $command->bindParam(':lud',date("Y-m-d H:s:i"),PDO::PARAM_STR);
-        if (strpos($sql,':lcd')!==false)
-            $command->bindParam(':lcd',date("Y-m-d H:s:i"),PDO::PARAM_STR);
+
         $command->execute();
 
         if ($this->scenario=='new'){

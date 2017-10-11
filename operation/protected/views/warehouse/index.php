@@ -8,7 +8,11 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
 'clientOptions'=>array('validateOnSubmit'=>true,),
 'layout'=>TbHtml::FORM_LAYOUT_INLINE,
 )); ?>
-
+<style>
+    .goodsHistoryDiv>.table{background: #fff;}
+    .goodsHistoryDiv{position: absolute;width: 400px;margin-left: -205px;margin-top: 10px;box-shadow: 5px 5px 5px #999;background: #eee;z-index: 88;padding: 10px;display: none;}
+    .goodsHistoryDiv:after{position: absolute;content: " ";left: 50%;top: -10px;border-bottom: 10px solid #eee;border-left: 5px solid transparent;border-right: 5px solid transparent }
+</style>
 <section class="content-header">
 	<h1>
 		<strong><?php echo Yii::t('app','Warehouse Info'); ?></strong>
@@ -22,7 +26,7 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
 -->
 </section>
 
-<section class="content">
+<section class="content visit">
     <div class="box">
         <div class="box-body">
             <div class="btn-group" role="group">
@@ -58,6 +62,24 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
 <?php $this->endWidget(); ?>
 
 <?php
+$this->renderPartial('//site/goodsHistory',array(
+        'model'=>$model)
+);
+?>
+<?php
+$js='
+    $(".goodsHistoryMouse").on("mousemove",function(e){
+        var num = $(this).data("id");
+        console.log(num);
+        $(".divHistory"+num).show().css({"left":e.pageX+"px","top":e.pageY+"px"});
+    });
+    $(".goodsHistoryMouse").on("mouseout",function(){
+        var num = $(this).data("id");
+        console.log(num);
+        $(".divHistory"+num).hide();
+    });
+';
+Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 	$js = Script::genTableRowClick();
 	Yii::app()->clientScript->registerScript('rowClick',$js,CClientScript::POS_READY);
 ?>

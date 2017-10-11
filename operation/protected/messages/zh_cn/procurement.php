@@ -163,7 +163,7 @@ return array(
 
     'Delivery List'=>'订单采购',
     'Number Restrictions'=>'最多订单申请数量',
-    'Max Number Restrictions'=>'最多地方参与数目',
+    'Max Number Restrictions'=>'最多订单申请数量',
     ' Not Null'=>'不能为空',
     'Fast Form'=>'快速订单审核',
 
@@ -217,6 +217,11 @@ return array(
     'Success Num：'=>'成功数量：',
     'Error Num：'=>'失败数量：',
     'finish remark'=>'T3入库单号',
+
+    //2017-10-11
+    'Costing（RMB）'=>'成本（RMB）',
+    'Decimal'=>'是否允许小数',
+    'Goods can only be positive integers'=>'物品只能是正整數',
 
 );
 ?>

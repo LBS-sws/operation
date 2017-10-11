@@ -4,5 +4,8 @@
 	<td><?php echo $this->record['name']; ?></td>
 	<td><?php echo $this->record['unit']; ?></td>
 	<td><?php echo $this->record['price']; ?></td>
-	<td><?php echo $this->record['inventory']; ?></td>
+	<td>
+        <?php echo $this->record['inventory']; ?>
+        <span class="fa fa-question-circle goodsHistoryMouse" data-id="<?php echo $this->record['id'];?>"></span>
+    </td>
 </tr>

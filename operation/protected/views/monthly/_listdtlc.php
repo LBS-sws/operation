@@ -7,8 +7,10 @@
 	<td><?php echo $this->record['month_no']; ?></td>
 	<td><?php echo $this->record['val_1']; ?></td>
 	<td><?php echo $this->record['val_2']; ?></td>
+	<td><?php echo $this->record['val_6']; ?></td>
 	<td><?php echo $this->record['val_3']; ?></td>
 	<td><?php echo $this->record['val_4']; ?></td>
 	<td><?php echo $this->record['val_5']; ?></td>
+	<td><?php echo $this->record['val_11']; ?></td>
 	<td><?php echo $this->record['wfstatusdesc']; ?></td>
 </tr>

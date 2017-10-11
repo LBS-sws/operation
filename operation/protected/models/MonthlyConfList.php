@@ -50,6 +50,8 @@ class MonthlyConfList extends CListPageModel
 					e.data_value as val_3,
 					f.data_value as val_4,
 					g.data_value as val_5,
+					h.data_value as val_6,
+					i.data_value as val_11,
 					workflow$suffix.RequestStatusDesc('OPRPT',a.id,a.lcd) as wfstatusdesc
 				from opr_monthly_hdr a inner join security$suffix.sec_city b on a.city=b.code 
 					left outer join opr_monthly_dtl c on a.id=c.hdr_id and c.data_field='10001' 
@@ -57,7 +59,9 @@ class MonthlyConfList extends CListPageModel
 					left outer join opr_monthly_dtl e on a.id=e.hdr_id and e.data_field='10003' 
 					left outer join opr_monthly_dtl f on a.id=f.hdr_id and f.data_field='10004' 
 					left outer join opr_monthly_dtl g on a.id=g.hdr_id and g.data_field='10005' 
-				where a.city in ($citylist) and a.city=b.code
+					left outer join opr_monthly_dtl h on a.id=h.hdr_id and h.data_field='10006' 
+					left outer join opr_monthly_dtl i on a.id=i.hdr_id and i.data_field='10011' 
+				where a.city in ($citylist) and a.city=b.code and (a.year_no<>year(now()) or a.month_no<>month(now()))
 			";
 		$sql2 = "select count(a.id)
 				from opr_monthly_hdr a, security$suffix.sec_city b
@@ -106,11 +110,13 @@ class MonthlyConfList extends CListPageModel
 						'month_no'=>$record['month_no'],
 						'wfstatus'=>$record['wfstatus'],
 						'wfstatusdesc'=>$record['wfstatusdesc'],
-						'val_1'=>$record['val_1'],
-						'val_2'=>$record['val_2'],
-						'val_3'=>$record['val_3'],
-						'val_4'=>$record['val_4'],
-						'val_5'=>$record['val_5'],
+						'val_1'=>is_numeric($record['val_1']) ? number_format($record['val_1'],2,".","") : $record['val_1'],
+						'val_2'=>is_numeric($record['val_2']) ? number_format($record['val_2'],2,".","") : $record['val_2'],
+						'val_3'=>is_numeric($record['val_3']) ? number_format($record['val_3'],2,".","") : $record['val_3'],
+						'val_4'=>is_numeric($record['val_4']) ? number_format($record['val_4'],2,".","") : $record['val_4'],
+						'val_5'=>is_numeric($record['val_5']) ? number_format($record['val_5'],2,".","") : $record['val_5'],
+						'val_6'=>is_numeric($record['val_6']) ? number_format($record['val_6'],2,".","") : $record['val_6'],
+						'val_11'=>is_numeric($record['val_11']) ? number_format($record['val_11'],2,".","") : $record['val_11'],
 					);
 			}
 		}

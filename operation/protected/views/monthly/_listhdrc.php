@@ -28,6 +28,11 @@
 		?>
 	</th>
 	<th>
+		<?php echo TbHtml::link('纸品收入'.$this->drawOrderArrow('val_6'),'#',$this->createOrderLink('monthly-list','val_6'))
+			;
+		?>
+	</th>
+	<th>
 		<?php echo TbHtml::link('杂项及其他销售收入'.$this->drawOrderArrow('val_3'),'#',$this->createOrderLink('monthly-list','val_3'))
 			;
 		?>
@@ -39,6 +44,11 @@
 	</th>
 	<th>
 		<?php echo TbHtml::link('甲醛收入'.$this->drawOrderArrow('val_5'),'#',$this->createOrderLink('monthly-list','val_5'))
+			;
+		?>
+	</th>
+	<th>
+		<?php echo TbHtml::link('收入合計'.$this->drawOrderArrow('val_11'),'#',$this->createOrderLink('monthly-list','val_11'))
 			;
 		?>
 	</th>

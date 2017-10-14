@@ -188,7 +188,7 @@ class UploadExcelForm extends CFormModel
                     array("name"=>"主计量单位","sqlName"=>"unit","value"=>""),
                     array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Warehouse' and name=:name","sql"=>"2"),
                     array("name"=>"参考售价","sqlName"=>"price","value"=>""),
-                    array("name"=>"成本","sqlName"=>"costing","value"=>"0.00"),
+                    //array("name"=>"成本","sqlName"=>"costing","value"=>"0.00"),
                     array("name"=>"是否允许小数","sqlName"=>"decimal_num","value"=>"否"),
                     array("name"=>"安全库存","sqlName"=>"inventory","value"=>""),
                 );

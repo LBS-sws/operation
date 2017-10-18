@@ -68,7 +68,7 @@ class UploadExcelForm extends CFormModel
                 }else{
                     //新增
                     $arrList["lcu"] = $uid;
-                    if($this->dbName == "Warehouse"){
+                    if($this->orderClass == "Warehouse"){
                         $arrList["city"] = $city;
                     }
                     Yii::app()->db->createCommand()->insert($this->dbName, $arrList);

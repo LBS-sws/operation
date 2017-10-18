@@ -204,7 +204,18 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 <?php $this->renderPartial('//monthly/reason',array('model'=>$model,'form'=>$form)); ?>
 
 <script>
-		
+function roundNumber(num, scale) {
+  if(!("" + num).includes("e")) {
+    return +(Math.round(num + "e+" + scale)  + "e-" + scale);
+  } else {
+    var arr = ("" + num).split("e");
+    var sig = ""
+    if(+arr[1] + scale > 0) {
+      sig = "+";
+    }
+    return +(Math.round(+arr[0] + "e" + sig + (+arr[1] + scale)) + "e-" + scale);
+  }
+}		
 		$('#MonthlyForm_record_1_datavalue, #MonthlyForm_record_2_datavalue, #MonthlyForm_record_3_datavalue, #MonthlyForm_record_4_datavalue, #MonthlyForm_record_5_datavalue, #MonthlyForm_record_6_datavalue, #MonthlyForm_record_12_datavalue').focusout(function() {
 			$('#MonthlyForm_record_1_datavalue').val(parseFloat(+$('#MonthlyForm_record_1_datavalue').val() || 0 ).toFixed(2));
 			$('#MonthlyForm_record_2_datavalue').val(parseFloat(+$('#MonthlyForm_record_2_datavalue').val() || 0 ).toFixed(2));
@@ -214,8 +225,9 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 			$('#MonthlyForm_record_6_datavalue').val(parseFloat(+$('#MonthlyForm_record_6_datavalue').val() || 0 ).toFixed(2));
 			$('#MonthlyForm_record_12_datavalue').val(parseFloat(+$('#MonthlyForm_record_12_datavalue').val() || 0 ).toFixed(2));
 			$('#MonthlyForm_record_7_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_1_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_2_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_3_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_4_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_5_datavalue').value)).toFixed(2));
-			$('#MonthlyForm_record_8_datavalue').val(((parseFloat(document.getElementById('MonthlyForm_record_7_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_12_datavalue').value)) * 8.5 / 100).toFixed(2));
-			$('#MonthlyForm_record_9_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) * 3.5 / 100).toFixed(2));
+			var total = parseFloat(document.getElementById('MonthlyForm_record_7_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_12_datavalue').value);
+			$('#MonthlyForm_record_8_datavalue').val(roundNumber((total * 8.5 / 100),2));
+			$('#MonthlyForm_record_9_datavalue').val(roundNumber((parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) * 3.5 / 100),2));
 			$('#MonthlyForm_record_10_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_8_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_9_datavalue').value)).toFixed(2));
 			$('#MonthlyForm_record_11_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_7_datavalue').value)).toFixed(2));
 		});
@@ -223,15 +235,19 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 </script>
 
 <script>
+	function numberWithCommas(x) {
+		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	}
+	
 	$('#btnExcel').on('click',function(){
 		var output = '<table><tr><td>史伟莎营业报告</td><td>地区:'+$('#MonthlyForm_city_name').val()+'</td></tr>';
 		output += '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
-		output += '<tr><td>日期：'+$('#MonthlyForm_year_no').val()+'年'+$('#MonthlyForm_year_no').val()+'月份</td><td>人民币（元）</td></tr>';
+		output += '<tr><td>日期：'+$('#MonthlyForm_year_no').val()+'年'+$('#MonthlyForm_month_no').val()+'月份</td><td>人民币（元）</td></tr>';
 		$("[id^='MonthlyForm_record_'][id$='_datavalue']").each(function(){
 			var id = $(this).attr('id');
 			output += '<tr>';
 			output += '<td>'+$("label[for='"+id+"']").text()+'</td>';
-			output += '<td>'+$(this).val()+'</td>';
+			output += '<td>'+numberWithCommas($(this).val())+'</td>';
 			output += '</tr>';
 		});
 		output += '</table>';

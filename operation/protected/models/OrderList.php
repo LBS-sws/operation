@@ -139,6 +139,8 @@ class OrderList extends CListPageModel
                     return Yii::t("procurement","Waiting area audit");
                 case "reject":
                     return Yii::t("procurement","Area rejected");
+                case "finished":
+                    return Yii::t("procurement","finished");
                 default:
                     return Yii::t("procurement","Error Status");
             }

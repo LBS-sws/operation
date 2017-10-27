@@ -55,6 +55,7 @@ return array(
             'OrderAcc Info'=>array(
                 'access'=>'YD05',
                 'url'=>'/orderAcc/form',
+				'text'=>'每次额外发送订单给总部也需要此功能授权',
             ),
             //地區審核
             'Area Audit'=>array(

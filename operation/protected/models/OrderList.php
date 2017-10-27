@@ -221,7 +221,7 @@ class OrderList extends CListPageModel
         $imDo_num = Yii::app()->db->createCommand()->select("count(id)")
             ->from("opr_order")->where('status="sent" and status_type=1  and order_class!="Fast" and judge=1')->queryScalar();
         $area_num = Yii::app()->db->createCommand()->select("count(id)")
-            ->from("opr_order")->where('status="sent" and status_type=0 and judge=1')->queryScalar();
+            ->from("opr_order")->where('status="sent" and status_type=0 and city=:city and judge=1',array(":city"=>$city))->queryScalar();
         $take_num = Yii::app()->db->createCommand()->select("count(id)")
             ->from("opr_order")->where('status="approve" and judge=1 and city=:city',array(":city"=>$city))->queryScalar();
         $deli_num = Yii::app()->db->createCommand()->select("count(id)")
@@ -230,7 +230,7 @@ class OrderList extends CListPageModel
             ->from("opr_order")->where('status="approve" and judge=0 and city=:city and lcu=:lcu',array(":city"=>$city,":lcu"=>$uid))->queryScalar();
 
 		// 营业报告审核的數量
-		$suffix = Yii::app()->params['envSuffix'];
+/*		$suffix = Yii::app()->params['envSuffix'];
 		$type = Yii::app()->user->validFunction('YN01') ? 'PA' : 'PH';
 		$wf = new WorkflowOprpt;
 		$wf->connection = Yii::app()->db;
@@ -242,8 +242,8 @@ class OrderList extends CListPageModel
 				where a.city in ($cityallow) and a.city=b.code 
 				and a.id in ($list)
 			";
-		$rep_num = Yii::app()->db->createCommand($sql)->queryScalar();
-        //$rep_num = 0;
+		$rep_num = Yii::app()->db->createCommand($sql)->queryScalar();*/
+        $rep_num = 0;
 		// 营业报告审核的數量 -- END
 		
 		return array(

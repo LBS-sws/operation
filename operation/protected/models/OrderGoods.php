@@ -34,6 +34,9 @@ class OrderGoods extends CActiveRecord{
         $uid = Yii::app()->user->id;
         $from_addr = Yii::app()->params['adminEmail'];
         if(empty($to_addr)){
+            //發給地區總管
+            $to_addr = EmailForm::getCityEmailList();
+        }elseif($to_addr == 1){
             //發給總部
             $to_addr = EmailForm::getEmailList();
         }else{
@@ -82,9 +85,9 @@ class OrderGoods extends CActiveRecord{
                 $html .= "<p>下單時間：".$oldOrderStatus[0]["lcd"]."</p>";
                 $html .= "<p>訂單編號：".$oldOrderStatus[0]["order_code"]."</p>";
                 if($stauts == "sent"){
-                    OrderGoods::formEmail("營運系統：要求審核訂單（訂單編號：".$oldOrderStatus[0]["order_code"]."）",$html);
+                    OrderGoods::formEmail("營運系統：要求審核訂單（訂單編號：".$oldOrderStatus[0]["order_code"]."）",$html,$oldOrderStatus[0]["status_type"]);
                 }elseif ($stauts == "finished"){ //收貨
-                    OrderGoods::formEmail("營運系統：訂單已完成，地區已收貨（訂單編號：".$oldOrderStatus[0]["order_code"]."）",$html);
+                    OrderGoods::formEmail("營運系統：訂單已完成，地區已收貨（訂單編號：".$oldOrderStatus[0]["order_code"]."）",$html,$oldOrderStatus[0]["status_type"]);
                 }elseif ($stauts == "approve"){ //批准
                     OrderGoods::formEmail("營運系統：總部已發貨，等待收貨（訂單編號：".$oldOrderStatus[0]["order_code"]."）",$html,$oldOrderStatus[0]["lcu_email"]);
                 }elseif ($stauts == "reject"){  //拒絕
@@ -99,7 +102,7 @@ class OrderGoods extends CActiveRecord{
                 $html .= "<p>下單用戶：".$uid."</p>";
                 $html .= "<p>下單時間：".date('Y-m-d H:i:s')."</p>";
                 $html .= "<p>訂單編號：".$order_code."</p>";
-                OrderGoods::formEmail("營運系統：要求審核訂單（訂單編號：".$order_code."）",$html);
+                OrderGoods::formEmail("營運系統：要求審核訂單（訂單編號：".$order_code."）",$html,0);
             }
         }
     }

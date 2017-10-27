@@ -109,7 +109,7 @@ class FastForm extends CFormModel
 	public function retrieveData($index) {
 		$city = Yii::app()->user->city();
 		$rows = Yii::app()->db->createCommand()->select("*")
-            ->from("opr_order")->where("id=:id AND judge=1",array(":id"=>$index))->queryAll();
+            ->from("opr_order")->where("id=:id AND judge=1 AND status_type=1",array(":id"=>$index))->queryAll();
 		if (count($rows) > 0) {
 			foreach ($rows as $row) {
                 $this->id = $row['id'];
@@ -154,7 +154,7 @@ class FastForm extends CFormModel
 							luu = :luu,
 							lud = :lud,
 							status = :status
-						where id = :id AND judge=1
+						where id = :id AND judge=1 AND status_type=1
 						";
                 $this->status = "read";
                 break;
@@ -164,7 +164,7 @@ class FastForm extends CFormModel
 							luu = :luu,
 							lud = :lud,
 							status = :status
-						where id = :id AND judge=1
+						where id = :id AND judge=1 AND status_type=1
 						";
                 $this->status = "approve";
                 break;
@@ -174,7 +174,7 @@ class FastForm extends CFormModel
 							luu = :luu,
 							lud = :lud,
 							status = :status
-						where id = :id AND judge=1
+						where id = :id AND judge=1 AND status_type=1
 						";
                 $this->goods_list = array();
                 $this->status = "reject";

@@ -82,6 +82,27 @@ class EmailForm extends CFormModel
         return $arr;
     }
 
+    //獲取郵箱列表(總管)
+    public function getCityEmailList(){
+        $suffix = Yii::app()->params['envSuffix'];
+        $systemId = Yii::app()->params['systemId'];
+	    $arr = array();
+        $rs = Yii::app()->db->createCommand()->select("username")->from("security$suffix.sec_user_access")
+            ->where("system_id='$systemId' and a_read_write like '%YD06%'")
+            ->queryAll();
+        if($rs){
+            foreach ($rs as $row){
+                $email = Yii::app()->db->createCommand()->select("email")->from("security$suffix.sec_user")
+                    ->where("username=:username",array(":username"=>$row["username"]))
+                    ->queryRow();
+                if($email){
+                    array_push($arr,$email["email"]);
+                }
+            }
+        }
+        return $arr;
+    }
+
     //刪除驗證
     public function deleteValidate(){
         $rs0 = Yii::app()->db->createCommand()->select()->from("opr_email")->queryAll();

@@ -90,7 +90,7 @@ class PurchaseList extends CListPageModel
 	public function getOrderSumToId($activity_id){
 	    $arr=array();
         $rows = Yii::app()->db->createCommand()->select("order_class")->from("opr_order")
-            ->where('activity_id=:activity_id AND judge=1 AND status != "pending" AND status != "cancelled"', array(':activity_id'=>$activity_id))->queryAll();
+            ->where('activity_id=:activity_id AND status_type=1 AND judge=1 AND status != "pending" AND status != "cancelled"', array(':activity_id'=>$activity_id))->queryAll();
         if($rows){
             foreach ($rows as $row){
                 if(empty($arr[$row["order_class"]])){

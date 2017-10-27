@@ -47,11 +47,11 @@ class OrderList extends CListPageModel
 		    $this->activity_title = $this->getActivityTitleToId($activity_id);
             $sql1 = "select *
 				from opr_order
-				where (activity_id = '$activity_id' AND judge=1 AND status != 'pending' AND status != 'cancelled') 
+				where (activity_id = '$activity_id' AND status_type=1 AND judge=1 AND status != 'pending' AND status != 'cancelled') 
 			";
             $sql2 = "select count(id)
 				from opr_order
-				where (activity_id = '$activity_id' AND judge=1 AND status != 'pending' AND status != 'cancelled') 
+				where (activity_id = '$activity_id' AND status_type=1 AND judge=1 AND status != 'pending' AND status != 'cancelled') 
 			";
         }
 		$clause = "";
@@ -100,6 +100,7 @@ class OrderList extends CListPageModel
 						'order_user'=>$record['order_user'],
 						'technician'=>$record['technician'],
 						'status'=>$record['status'],
+						'status_type'=>$record['status_type'],
 						'city'=>$record['city'],
 						'lcd'=>date("Y-m-d",strtotime($record['lcd'])),
 					);
@@ -110,25 +111,37 @@ class OrderList extends CListPageModel
 		return true;
 	}
 
-	public function printOrderStatus($status){
-        switch ($status){
-            case "pending":
-                //草稿，未发送
-                return Yii::t("procurement","Draft, not sent");
-            case "sent":
-                //已发送，待审核
-                return Yii::t("procurement","Sent, pending approval");
-            case "read":
-                return Yii::t("procurement","Have read,Drop shipping");
-            case "approve":
-                //已发货，待收货
-                return Yii::t("procurement","Shipped out, Wait for receiving");
-            case "reject":
-                return Yii::t("procurement","Reject");
-            case "finished":
-                return Yii::t("procurement","finished");
-            default:
-                return Yii::t("procurement","Error Status");
+	public function printOrderStatus($status,$status_type = 1){
+        if($status_type == 1){
+            switch ($status){
+                case "sent":
+                    //已发送，待审核
+                    return Yii::t("procurement","Waiting for central audit");
+                case "read":
+                    return Yii::t("procurement","Central checked");
+                case "approve":
+                    //已发货，待收货
+                    return Yii::t("procurement","Shipped out, Wait for receiving");
+                case "reject":
+                    return Yii::t("procurement","Central refused order");
+                case "finished":
+                    return Yii::t("procurement","finished");
+                default:
+                    return Yii::t("procurement","Error Status");
+            }
+        }else{
+            switch ($status){
+                case "pending":
+                    //草稿，未发送
+                    return Yii::t("procurement","Draft, not sent");
+                case "sent":
+                    //已发送，待审核
+                    return Yii::t("procurement","Waiting area audit");
+                case "reject":
+                    return Yii::t("procurement","Area rejected");
+                default:
+                    return Yii::t("procurement","Error Status");
+            }
         }
     }
 
@@ -204,9 +217,11 @@ class OrderList extends CListPageModel
         $city = Yii::app()->user->city();
         $uid = Yii::app()->user->id;
         $fast_num = Yii::app()->db->createCommand()->select("count(id)")
-            ->from("opr_order")->where('status="sent" and order_class="Fast" and judge=1')->queryScalar();
+            ->from("opr_order")->where('status="sent" and status_type=1 and order_class="Fast" and judge=1')->queryScalar();
         $imDo_num = Yii::app()->db->createCommand()->select("count(id)")
-            ->from("opr_order")->where('status="sent" and order_class!="Fast" and judge=1')->queryScalar();
+            ->from("opr_order")->where('status="sent" and status_type=1  and order_class!="Fast" and judge=1')->queryScalar();
+        $area_num = Yii::app()->db->createCommand()->select("count(id)")
+            ->from("opr_order")->where('status="sent" and status_type=0 and judge=1')->queryScalar();
         $take_num = Yii::app()->db->createCommand()->select("count(id)")
             ->from("opr_order")->where('status="approve" and judge=1 and city=:city',array(":city"=>$city))->queryScalar();
         $deli_num = Yii::app()->db->createCommand()->select("count(id)")
@@ -215,7 +230,7 @@ class OrderList extends CListPageModel
             ->from("opr_order")->where('status="approve" and judge=0 and city=:city and lcu=:lcu',array(":city"=>$city,":lcu"=>$uid))->queryScalar();
 
 		// 营业报告审核的數量
-/*		$suffix = Yii::app()->params['envSuffix'];
+		$suffix = Yii::app()->params['envSuffix'];
 		$type = Yii::app()->user->validFunction('YN01') ? 'PA' : 'PH';
 		$wf = new WorkflowOprpt;
 		$wf->connection = Yii::app()->db;
@@ -227,8 +242,8 @@ class OrderList extends CListPageModel
 				where a.city in ($cityallow) and a.city=b.code 
 				and a.id in ($list)
 			";
-		$rep_num = Yii::app()->db->createCommand($sql)->queryScalar();*/
-        $rep_num = 0;
+		$rep_num = Yii::app()->db->createCommand($sql)->queryScalar();
+        //$rep_num = 0;
 		// 营业报告审核的數量 -- END
 		
 		return array(
@@ -237,6 +252,7 @@ class OrderList extends CListPageModel
             "take_num"=>$take_num,//地區收貨的數量
             "deli_num"=>$deli_num,//地區發貨的數量
             "goods_num"=>$goods_num,//技術員收貨的數量
+            "area_num"=>$area_num,//地區審核數量
 			"rep_num"=>$rep_num,//营业报告审核的數量
         );
     }

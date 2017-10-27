@@ -51,10 +51,15 @@ return array(
                 'access'=>'YD01',
                 'url'=>'/warehouse/index',
             ),
-            //倉庫管理
+            //多訂單限制
             'OrderAcc Info'=>array(
                 'access'=>'YD05',
                 'url'=>'/orderAcc/form',
+            ),
+            //地區審核
+            'Area Audit'=>array(
+                'access'=>'YD06',
+                'url'=>'/areaAudit/index',
             ),
 		),
 	),

@@ -221,5 +221,12 @@ return array(
     'Costing（RMB）'=>'成本（RMB）',
     'Decimal'=>'是否允許小數',
     'Goods can only be positive integers'=>'物品只能為正整數',
+
+    //2017-10-26
+    'Waiting for central audit'=>'等待中央審核',
+    'Central checked'=>'中央已查看',
+    'Central refused order'=>'中央拒絕訂單',
+    'Waiting area audit'=>'等待地區審核',
+    'Area rejected'=>'地區已拒絕',
 );
 ?>

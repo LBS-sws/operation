@@ -9,7 +9,6 @@ return array(
     'Daily Report'=>'日报表系统',
     'Accounting'=>'会计系统',
     'Operation'=>'营运系统',
-	'Personnel'=>'人事系统',
 
     'Data Entry'=>'数据输入',
     'Misc'=>'其他',
@@ -92,7 +91,8 @@ return array(
     'Stickies Summary Entry'=>'标签管理',
     'Classify Summary Entry'=>'分类管理',
     'Goods Hybrid Rules'=>'混合规则管理',
-    'OrderAcc Info'=>'多订单限制',
+    'OrderAcc Info'=>'多发订单授权',
+    'Area Audit'=>'地区审核',
     //沈超添加結束
 	
 );

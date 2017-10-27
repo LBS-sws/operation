@@ -223,5 +223,12 @@ return array(
     'Decimal'=>'是否允许小数',
     'Goods can only be positive integers'=>'物品只能是正整數',
 
+    //2017-10-26
+    'Waiting for central audit'=>'等待中央审核',
+    'Central checked'=>'中央已查看',
+    'Central refused order'=>'中央拒绝订单',
+    'Waiting area audit'=>'等待地区审核',
+    'Area rejected'=>'地区已拒绝',
+
 );
 ?>

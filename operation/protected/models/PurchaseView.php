@@ -181,7 +181,7 @@ class PurchaseView extends CFormModel
         $arr=array();
         $rows = Yii::app()->db->createCommand()->select("c.goods_id as id,b.order_class as goods_class,c.goods_num,c.confirm_num")
             ->from("opr_order b,opr_order_goods c")
-            ->where('b.id = c.order_id AND b.activity_id = :activity_id AND b.judge=1 AND b.status != "pending" AND b.status != "cancelled"',
+            ->where('b.id = c.order_id AND b.activity_id = :activity_id AND b.status_type=1 AND b.judge=1 AND b.status != "pending" AND b.status != "cancelled"',
                 array(':activity_id'=>$activity_id))
             //->leftJoin("opr_goods d","c.goods_id = d.id")
             ->queryAll();
@@ -222,7 +222,7 @@ class PurchaseView extends CFormModel
         $arr=array();
         $rows = Yii::app()->db->createCommand()->select("id,order_class,city")
             ->from("opr_order")
-            ->where("activity_id = :activity_id AND judge=1 AND status != 'pending' AND status != 'cancelled'", array(':activity_id'=>$activity_id))->queryAll();
+            ->where("activity_id = :activity_id AND status_type=1 AND judge=1 AND status != 'pending' AND status != 'cancelled'", array(':activity_id'=>$activity_id))->queryAll();
         if($rows){
             foreach ($rows as $row){
                 if(empty($arr[$row['city']])){
@@ -283,12 +283,14 @@ class PurchaseView extends CFormModel
                 $arr["cityName"] = $company[0]["name"];
                 $arr["cityTel"] = $company[0]["phone"];
                 $arr["cityAdr"] = $company[0]["address"];
-                $incharge = $company[0]["head"];//負責人id
+                $arr["userName"] = $company[0]["head"];
+                $arr["email"] = $company[0]["head_email"];
+/*                $incharge = $company[0]["head"];//負責人id
                 $email = Yii::app()->db->createCommand()->select("email,disp_name")->from($suffix.".sec_user")->where("username=:username",array(":username"=>$incharge))->queryAll();
                 if($email){
                     $arr["userName"] = $email[0]["disp_name"];
                     $arr["email"] = $email[0]["email"];
-                }
+                }*/
             }
         }
 

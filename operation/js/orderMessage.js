@@ -23,6 +23,9 @@ function waitingMessageHeader(url,str) {
                 if(data["deli_num"] != 0){
                     $("#navbar-collapse a[href='"+str+"/index.php/delivery/index']").append("<span class='badge'>"+data["deli_num"]+"</span>");
                 }
+                if(data["area_num"] != 0){
+                    $("#navbar-collapse a[href='"+str+"/index.php/areaAudit/index']").append("<span class='badge'>"+data["area_num"]+"</span>");
+                }
                 if(data["goods_num"] != 0){
                     $message = $("#navbar-collapse a[href='"+str+"/index.php/technician/index']");
                     $message.append("<span class='badge'>"+data["goods_num"]+"</span>");
@@ -32,9 +35,9 @@ function waitingMessageHeader(url,str) {
                     $message = $("#navbar-collapse a[href='"+str+"/index.php/purchase/index']");
                     $message.parents("li.dropdown").find("a:first>span:first").before("<span class='badge'>"+(parseInt(data["fast_num"],10)+parseInt(data["imDo_num"],10))+"</span>");
                 }
-                if(data["take_num"] != 0 || data["deli_num"] != 0){
+                if(data["take_num"] != 0 || data["deli_num"] != 0 || data["area_num"] != 0){
                     $message = $("#navbar-collapse a[href='"+str+"/index.php/order/index']");
-                    $message.parents("li.dropdown").find("a:first>span:first").before("<span class='badge'>"+(parseInt(data["take_num"],10)+parseInt(data["deli_num"],10))+"</span>");
+                    $message.parents("li.dropdown").find("a:first>span:first").before("<span class='badge'>"+(parseInt(data["take_num"],10)+parseInt(data["deli_num"],10)+parseInt(data["area_num"],10))+"</span>");
                 }
 //营业报告审核的數量				
                 if(data["rep_num"] != 0){

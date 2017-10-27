@@ -441,6 +441,7 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
 							order_class = :order_class,
 							activity_id = :activity_id,
 							remark = :remark,
+							ject_remark = '',
 							luu = :luu,
 							lud = :lud,
 							status = :status
@@ -452,12 +453,14 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
                 $sql = "update opr_order set
 							remark = :remark,
 							fish_remark = :fish_remark,
+							status_type = 0,
 							luu = :luu,
 							lud = :lud,
 							status = :status
 						where id = :id and judge=1
 						";
                 $goodsBool = false;
+                $oldOrderStatus[0]["status_type"] = 0;
                 break;
             default:
                 $goodsBool = false;
@@ -570,34 +573,6 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
         $this->updateGoodsStatus();
         //發送郵件
         OrderGoods::sendEmail($oldOrderStatus,$this->status,$this->order_code,$this->activity_id);
-        /*
-
-       if($oldOrderStatus){
-            if($oldOrderStatus[0]["status"] != $this->status){
-                $html = "<p>採購編號：".$this->activity_id."</p>";
-                $html .= "<p>採購標題：".OrderList::getActivityTitleToId($this->activity_id)."</p>";
-                $html .= "<p>下單城市：".$oldOrderStatus[0]["city"]."</p>";
-                $html .= "<p>下單用戶：".$oldOrderStatus[0]["lcu"]."</p>";
-                $html .= "<p>下單時間：".$oldOrderStatus[0]["lcd"]."</p>";
-                $html .= "<p>訂單編號：".$oldOrderStatus[0]["code"]."</p>";
-                if($this->status == "sent"){
-                    OrderGoods::formEmail("營運系統：要求審核訂單（訂單編號：".$this->order_code."）",$html);
-                }elseif ($this->status == "finished"){
-                    OrderGoods::formEmail("營運系統：訂單已完成，地區已收貨（訂單編號：".$this->order_code."）",$html);
-                }
-            }
-        }else{
-            if($this->scenario=='new' && $this->status == "sent"){
-                $html = "<p>採購編號：".$this->activity_id."</p>";
-                $html .= "<p>採購標題：".OrderList::getActivityTitleToId($this->activity_id)."</p>";
-                $html .= "<p>下單城市：".$city."</p>";
-                $html .= "<p>下單用戶：".$uid."</p>";
-                $html .= "<p>下單時間：".date('Y-m-d H:i:s')."</p>";
-                $html .= "<p>訂單編號：".$this->order_code."</p>";
-                OrderGoods::formEmail("營運系統：要求審核訂單（訂單編號：".$this->order_code."）",$html);
-            }
-        }
-         */
 		return true;
 	}
 

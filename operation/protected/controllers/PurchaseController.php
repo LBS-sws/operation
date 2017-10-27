@@ -132,7 +132,7 @@ class PurchaseController extends Controller
     //下載訂單
     public function actionDownorder($index){
         $model = new PurchaseForm('edit');
-        if (!$model->retrieveData($index)) {
+        if ($model->validateOrderId($index)) {
             throw new CHttpException(404,'The requested page does not exist.');
         } else {
             $title = OrderList::getActivityTitleToId($model->activity_id);
@@ -164,7 +164,7 @@ class PurchaseController extends Controller
                 $myExcel->setRowContent("A2","公司名稱：".$goodsList["cityName"],"F2");
                 $myExcel->setRowContent("A3","公司電話：".$goodsList["cityTel"],"F3");
                 $myExcel->setRowContent("A4","公司地址：".$goodsList["cityAdr"],"F4");
-                $myExcel->setRowContent("A5","公司負責人：".$goodsList["cityUser"]["name"].$goodsList["cityUser"]["email"],"F5");
+                $myExcel->setRowContent("A5","公司負責人：".$goodsList["cityUser"]["name"]."   ".$goodsList["cityUser"]["email"],"F5");
                 $myExcel->setStartRow(9);
                 $myExcel->fillDownExcel($goodsList["goodList"],$model->order_class);
                 $myExcel->setProtoValue($cityCode,"cityName",$goodsList["cityName"]);

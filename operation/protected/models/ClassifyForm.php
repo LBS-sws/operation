@@ -62,11 +62,30 @@ class ClassifyForm extends CFormModel
 
     //獲取分類列表
     public function getClassifyList($str="Import"){
+	    switch ($str){
+            case "Import":
+                $from = "opr_goods_im";
+                break;
+            case "Domestic":
+                $from = "opr_goods_do";
+                break;
+            case "Fast":
+                $from = "opr_goods_fa";
+                break;
+            case "Warehouse":
+                $from = "opr_warehouse";
+                break;
+            default:
+                $from = "opr_warehouse";
+        }
 	    $arr = array(""=>"");
         $rs = Yii::app()->db->createCommand()->select()->from("opr_classify")->where("class_type=:class_type",array(":class_type"=>$str))->order('level desc')->queryAll();
         if($rs){
             foreach ($rs as $row){
-                $arr[$row["id"]] = $row["name"];
+                $bool = Yii::app()->db->createCommand()->select("count(id)")->from($from)->where("classify_id=:classify_id",array(":classify_id"=>$row["id"]))->queryScalar();
+                if($bool>0){
+                    $arr[$row["id"]] = $row["name"];
+                }
             }
         }
         return $arr;

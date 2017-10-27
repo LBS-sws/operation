@@ -89,7 +89,8 @@ return array(
     'Stickies Summary Entry'=>'標籤管理',
     'Classify Summary Entry'=>'分類管理',
     'Goods Hybrid Rules'=>'混合規則管理',
-    'OrderAcc Info'=>'多訂單限制',
+    'OrderAcc Info'=>'多發訂單授權',
+    'Area Audit'=>'地區審核',
     //沈超添加結束
 );
 ?>

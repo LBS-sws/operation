@@ -18,6 +18,12 @@
 	<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	<![endif]-->
+    <style type="">
+        .table-condensed th.datepicker-switch{text-align: center}
+        .table-condensed th.next{text-align: right}
+        .table-condensed td>span:first-child{margin-left: 0px;}
+        .table-condensed td>span{margin-left: 4px;}
+    </style>
 </head>
 
 <body class="hold-transition skin-green layout-top-nav">
@@ -135,7 +141,7 @@ $("#'.$oid.'").on("click",function(){$("#syschangedialog").modal("hide");window.
 	}
 	Yii::app()->clientScript->registerScript('systemchange',$js,CClientScript::POS_READY);
 
-Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/orderMessage.js", CClientScript::POS_END);
+Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/orderMessage.js?2", CClientScript::POS_END);
 Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/message.js", CClientScript::POS_END);
 }
 ?>

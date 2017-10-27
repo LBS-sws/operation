@@ -153,7 +153,7 @@ class PurchaseForm extends CFormModel
 	public function retrieveData($index) {
 		$city = Yii::app()->user->city();
 		$rows = Yii::app()->db->createCommand()->select("*")
-            ->from("opr_order")->where("id=:id AND judge=1",array(":id"=>$index))->queryAll();
+            ->from("opr_order")->where("id=:id AND status_type=1 AND judge=1",array(":id"=>$index))->queryAll();
 		if (count($rows) > 0) {
 			foreach ($rows as $row) {
                 $this->id = $row['id'];
@@ -169,6 +169,29 @@ class PurchaseForm extends CFormModel
                 $this->remark = "";
                 $this->statusList = OrderForm::getStatusListToId($row['id']);
                 break;
+			}
+		}
+		return true;
+	}
+
+	public function validateOrderId($index) {
+		$rows = Yii::app()->db->createCommand()->select("*")
+            ->from("opr_order")->where("id=:id AND judge=1",array(":id"=>$index))->queryAll();
+		if (count($rows) > 0) {
+			foreach ($rows as $row) {
+                $this->id = $row['id'];
+                $this->order_code = $row['order_code'];
+                $this->order_class = $row['order_class'];
+                $this->activity_id = $row['activity_id'];
+                $this->lcu = $row['lcu'];
+                $this->goods_list = OrderForm::getGoodsListToId($row['id']);
+                $this->order_user = $row['order_user'];
+                //$this->technician = $row['technician'];
+                $this->status = $row['status'];
+                $this->ject_remark = $row['ject_remark'];
+                $this->remark = "";
+                $this->statusList = OrderForm::getStatusListToId($row['id']);
+                return false;
 			}
 		}
 		return true;
@@ -283,7 +306,7 @@ class PurchaseForm extends CFormModel
 							luu = :luu,
 							lud = :lud,
 							status = :status
-						where id = :id AND judge=1
+						where id = :id AND judge=1 AND status_type=1
 						";
                 $this->status = "read";
                 break;
@@ -293,7 +316,7 @@ class PurchaseForm extends CFormModel
 							luu = :luu,
 							lud = :lud,
 							status = :status
-						where id = :id AND judge=1
+						where id = :id AND judge=1 AND status_type=1
 						";
                 $this->status = "approve";
                 break;
@@ -303,7 +326,7 @@ class PurchaseForm extends CFormModel
 							luu = :luu,
 							lud = :lud,
 							status = :status
-						where id = :id AND judge=1
+						where id = :id AND judge=1 AND status_type=1
 						";
                 $this->goods_list = array();
                 $this->status = "reject";

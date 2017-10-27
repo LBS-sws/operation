@@ -26,11 +26,11 @@ class FastList extends CListPageModel
         $userName = Yii::app()->user->name;
         $sql1 = "select *
 				from opr_order
-				where (order_class = 'Fast' AND judge=1 AND status != 'pending' AND status != 'cancelled') 
+				where (order_class = 'Fast' AND status_type=1 AND judge=1 AND status != 'pending' AND status != 'cancelled') 
 			";
         $sql2 = "select count(id)
 				from opr_order
-				where (order_class = 'Fast' AND judge=1 AND status != 'pending' AND status != 'cancelled') 
+				where (order_class = 'Fast' AND status_type=1 AND judge=1 AND status != 'pending' AND status != 'cancelled') 
 			";
         $clause = "";
         if (!empty($this->searchField) && !empty($this->searchValue)) {

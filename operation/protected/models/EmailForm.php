@@ -86,6 +86,7 @@ class EmailForm extends CFormModel
     public function getCityEmailList(){
         $suffix = Yii::app()->params['envSuffix'];
         $systemId = Yii::app()->params['systemId'];
+        $city = Yii::app()->user->city();
 	    $arr = array();
         $rs = Yii::app()->db->createCommand()->select("username")->from("security$suffix.sec_user_access")
             ->where("system_id='$systemId' and a_read_write like '%YD06%'")
@@ -93,7 +94,7 @@ class EmailForm extends CFormModel
         if($rs){
             foreach ($rs as $row){
                 $email = Yii::app()->db->createCommand()->select("email")->from("security$suffix.sec_user")
-                    ->where("username=:username",array(":username"=>$row["username"]))
+                    ->where("username=:username and city=:city",array(":username"=>$row["username"],":city"=>$city))
                     ->queryRow();
                 if($email){
                     array_push($arr,$email["email"]);

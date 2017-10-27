@@ -78,11 +78,17 @@ class ClassifyForm extends CFormModel
             default:
                 $from = "opr_warehouse";
         }
+        $city = Yii::app()->user->city();
 	    $arr = array(""=>"");
         $rs = Yii::app()->db->createCommand()->select()->from("opr_classify")->where("class_type=:class_type",array(":class_type"=>$str))->order('level desc')->queryAll();
         if($rs){
             foreach ($rs as $row){
-                $bool = Yii::app()->db->createCommand()->select("count(id)")->from($from)->where("classify_id=:classify_id",array(":classify_id"=>$row["id"]))->queryScalar();
+                if($from == "opr_warehouse"){
+                    $bool = Yii::app()->db->createCommand()->select("count(id)")
+                        ->from($from)->where("classify_id=:classify_id and city=:city",array(":classify_id"=>$row["id"],":city"=>$city))->queryScalar();
+                }else{
+                    $bool = Yii::app()->db->createCommand()->select("count(id)")->from($from)->where("classify_id=:classify_id",array(":classify_id"=>$row["id"]))->queryScalar();
+                }
                 if($bool>0){
                     $arr[$row["id"]] = $row["name"];
                 }

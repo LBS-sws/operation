@@ -9,6 +9,7 @@ return array(
     'Daily Report'=>'日报表系统',
     'Accounting'=>'会计系统',
     'Operation'=>'营运系统',
+	'Personnel'=>'人事系统',
 
     'Data Entry'=>'数据输入',
     'Misc'=>'其他',

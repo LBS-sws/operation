@@ -8,6 +8,8 @@ return array(
 'System Change'=>'系統切換',
 'Daily Report'=>'日報表系統',
 'Accounting'=>'會計系統',
+'Operation'=>'营运系统',
+'Personnel'=>'人事系统',
 
 'Data Entry'=>'數據輸入',
 

@@ -36,5 +36,5 @@ switch ($this->record['status']){
             }
         ?>
     </td>
-    <td><?php echo OrderList::printOrderStatus($this->record['status']);?></td>
+    <td><?php echo OrderList::printTechnicianStatus($this->record['status']);?></td>
 </tr>

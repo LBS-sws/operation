@@ -145,6 +145,28 @@ class OrderList extends CListPageModel
         }
     }
 
+	public function printTechnicianStatus($status){
+        switch ($status){
+            case "pending":
+                //已发送，待审核
+                return Yii::t("procurement","Draft, not sent");
+            case "sent":
+                //已发送，待审核
+                return Yii::t("procurement","Sent, pending approval");
+            case "read":
+                return Yii::t("procurement","Have read,Drop shipping");
+            case "approve":
+                //已审核，已发货
+                return Yii::t("procurement","Shipped out, Wait for receiving");
+            case "reject":
+                return Yii::t("procurement","Reject");
+            case "finished":
+                return Yii::t("procurement","finished");
+            default:
+                return Yii::t("procurement","Error Status");
+        }
+    }
+
 	public function printPurchaseStatus($status){
         switch ($status){
             case "sent":

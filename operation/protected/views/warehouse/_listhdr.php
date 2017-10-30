@@ -11,6 +11,11 @@
         ?>
     </th>
     <th>
+        <?php echo TbHtml::link($this->getLabelName('classify_id').$this->drawOrderArrow('classify_id'),'#',$this->createOrderLink('warehouse-list','classify_id'))
+        ;
+        ?>
+    </th>
+    <th>
         <?php echo TbHtml::link($this->getLabelName('unit').$this->drawOrderArrow('unit'),'#',$this->createOrderLink('warehouse-list','unit'))
         ;
         ?>

@@ -106,13 +106,13 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                         <thead>
                         <tr>
                             <td width="20%"><?php echo Yii::t("procurement","Goods Name")?></td>
-                            <td width="11%"><?php echo Yii::t("procurement","Unit")?></td>
+                            <td width="11%" ><?php echo Yii::t("procurement","Unit")?></td>
                             <td width="12%"><?php echo Yii::t("procurement","Demand Note")?></td>
-                            <?php if ($model->scenario=='edit' && $model->status == "approve"): ?>
+                            <?php if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished" || $model->status == "read")): ?>
                                 <td width="12%"><?php echo Yii::t("procurement","Headquarters Note")?></td>
                             <?php endif ?>
                             <td width="8%"><?php echo Yii::t("procurement","Goods Number")?></td>
-                            <?php if ($model->scenario=='edit' && $model->status == "approve"): ?>
+                            <?php if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished" || $model->status == "read")): ?>
                                 <td width="8%"><?php echo Yii::t("procurement","Actual Number")?></td>
                             <?php endif ?>
                             <td width="1%">&nbsp;</td>
@@ -152,11 +152,11 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
 
                                 $tableTr.="<td><input type='text' class='form-control unit' readonly name='TechnicianForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
                                 $tableTr.="<td><input type='text' class='form-control' name='TechnicianForm[goods_list][$con_num][note]' value='".$val['note']."'></td>";
-                                if($model->scenario=='edit' && $model->status == "approve"){
+                                if($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished" || $model->status == "read")){
                                     $tableTr.="<td><input type='text' class='form-control' name='TechnicianForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
                                 }
                                 $tableTr.="<td><input type='number' class='form-control' name='TechnicianForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
-                                if($model->scenario=='edit' && $model->status == "approve"){
+                                if($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished" || $model->status == "read")){
                                     $tableTr.="<td><input type='number' class='form-control' name='TechnicianForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
                                 }
                                 $tableTr.="<td><button type='button' class='btn btn-danger delGoods'>".Yii::t("misc","Delete")."</button>";
@@ -173,7 +173,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                         <tfoot>
                         <tr>
                             <?php
-                            if ($model->scenario=='edit' && $model->status == "approve"){
+                            if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished" || $model->status == "read")){
                                 echo '<td colspan="6"></td>';
                             }else{
                                 echo '<td colspan="4"></td>';
@@ -187,16 +187,14 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
             </div>
 
             <!--備註-->
-            <?php if ($model->scenario =='new' || $model->status=='approve' || $model->status=='pending'): ?>
             <div class="form-group">
                 <?php echo $form->labelEx($model,'remark',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-7">
                     <?php echo $form->textArea($model, 'remark',
-                        array('rows'=>4,'cols'=>50,'maxlength'=>1000,'readonly'=>($model->scenario=='view'))
+                        array('rows'=>4,'cols'=>50,'maxlength'=>1000,'readonly'=>(!($model->scenario=='new'||$model->status=='pending')))
                     ); ?>
                 </div>
             </div>
-            <?php endif ?>
 		</div>
 	</div>
 

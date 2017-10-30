@@ -10,6 +10,7 @@ class WarehouseList extends CListPageModel
 			'unit'=>Yii::t('procurement','Unit'),
 			'inventory'=>Yii::t('procurement','Inventory'),
 			'price'=>Yii::t('procurement','Price（RMB）'),
+            'classify_id'=>Yii::t('procurement','Classify'),
 		);
 	}
 	
@@ -46,6 +47,9 @@ class WarehouseList extends CListPageModel
 				case 'inventory':
 					$clause .= General::getSqlConditionClause('inventory', $svalue);
 					break;
+				case 'classify_id':
+					$clause .= $this->getClassifyToSql($svalue);
+					break;
 			}
 		}
 		
@@ -70,6 +74,8 @@ class WarehouseList extends CListPageModel
 						'id'=>$record['id'],
 						'name'=>$record['name'],
 						'unit'=>$record['unit'],
+						'unit'=>$record['unit'],
+						'classify_id'=>ClassifyForm::getClassifyToId($record['classify_id']),
 						'price'=>$record['price'],
 						'inventory'=>$record['inventory'],
 						'goods_code'=>$record['goods_code'],
@@ -78,7 +84,7 @@ class WarehouseList extends CListPageModel
 			}
 		}
 		$session = Yii::app()->session;
-		$session['criteria_ya01'] = $this->getCriteria();
+		$session['warehouse_ya01'] = $this->getCriteria();
 		return true;
 	}
 
@@ -95,6 +101,23 @@ class WarehouseList extends CListPageModel
 	        return $rows;
         }else{
 	        return "";
+        }
+    }
+
+    //分類的模糊查詢
+    private function getClassifyToSql($str){
+        $rows = Yii::app()->db->createCommand()->select("id")
+            ->from("opr_classify")
+            ->where("class_type = 'Warehouse' and name like '%$str%'")->queryAll();
+        if($rows){
+            $arr = array();
+            foreach ($rows as $row){
+                array_push($arr,"'".$row["id"]."'");
+            }
+            $sqlStr = implode(",",$arr);
+            return " and classify_id in ($sqlStr)";
+        }else{
+            return " and classify_id in ('')";
         }
     }
 }

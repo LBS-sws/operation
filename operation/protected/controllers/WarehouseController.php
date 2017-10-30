@@ -9,8 +9,8 @@ class WarehouseController extends Controller
 			$model->attributes = $_POST['WarehouseList'];
 		} else {
 			$session = Yii::app()->session;
-			if (isset($session['criteria_ya01']) && !empty($session['fcriteria_ya01'])) {
-				$criteria = $session['criteria_ya01'];
+			if (isset($session['warehouse_ya01']) && !empty($session['warehouse_ya01'])) {
+				$criteria = $session['warehouse_ya01'];
 				$model->setCriteria($criteria);
 			}
 		}

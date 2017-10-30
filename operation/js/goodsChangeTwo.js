@@ -264,7 +264,7 @@ function disabledTable(bool) {
 function goodsIfyChange() {
     $("body").delegate(".goodsIfy>li","click",function () {
         var dataId = $(this).data("id");
-        var $btn = $(this).parent(".goodsIfy").prev(".btn");
+        var $btn = $(this).parents(".input-group-btn:first").find(".btn:first");
         var oldDataId = $btn.attr("data-id");
         if(oldDataId != "" && oldDataId!= undefined &&oldDataId != dataId){
             $(this).parents("tr:first").find(".testInput").next("input").val("");

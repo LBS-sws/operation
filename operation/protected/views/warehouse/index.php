@@ -48,6 +48,7 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
 				'search'=>array(
 							'name',
 							'unit',
+							'classify_id',
 							'inventory',
 						),
 		));

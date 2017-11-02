@@ -60,7 +60,7 @@ class ClassifyForm extends CFormModel
 		return true;
 	}
 
-    //獲取分類列表
+    //獲取分類列表(排除沒有物品的分類)
     public function getClassifyList($str="Import"){
 	    switch ($str){
             case "Import":
@@ -92,6 +92,18 @@ class ClassifyForm extends CFormModel
                 if($bool>0){
                     $arr[$row["id"]] = $row["name"];
                 }
+            }
+        }
+        return $arr;
+    }
+
+    //獲取分類列表
+    public function getAllClassifyList($str="Import"){
+        $arr = array(""=>"");
+        $rs = Yii::app()->db->createCommand()->select()->from("opr_classify")->where("class_type=:class_type",array(":class_type"=>$str))->order('level desc')->queryAll();
+        if($rs){
+            foreach ($rs as $row){
+                $arr[$row["id"]] = $row["name"];
             }
         }
         return $arr;

@@ -76,7 +76,7 @@ $this->pageTitle=Yii::app()->name . ' - Goods Summary Form';
             <div class="form-group">
                 <?php echo $form->labelEx($model,'classify_id',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
-                    <?php echo $form->dropDownList($model, 'classify_id',ClassifyForm::getClassifyList("Fast"),
+                    <?php echo $form->dropDownList($model, 'classify_id',ClassifyForm::getAllClassifyList("Fast"),
                         array('disabled'=>($model->scenario =='view'))
                     ); ?>
                 </div>

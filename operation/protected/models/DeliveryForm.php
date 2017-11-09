@@ -56,7 +56,7 @@ class DeliveryForm extends CFormModel
         foreach ($goods_list as $key =>$goods){
             if(empty($goods["goods_id"]) && empty($goods["confirm_num"])){
                 unset($this->goods_list[$key]);
-            }else if (empty($goods["confirm_num"]) && $goods["confirm_num"] != 0){
+            }else if ($goods["confirm_num"] === ""){
                 $message = Yii::t('procurement','Actual Number cannot be empty');
                 $this->addError($attribute,$message);
                 return false;
@@ -64,7 +64,7 @@ class DeliveryForm extends CFormModel
                 $message = Yii::t('procurement','Actual Number can only be numbered');
                 $this->addError($attribute,$message);
                 return false;
-            }else{
+            }else if ($goods["confirm_num"] != 0){
                 $list = WarehouseForm::getGoodsToGoodsId($goods["goods_id"]);
                 if (empty($list)){
                     $message = Yii::t('procurement','Not Font Goods').$goods["goods_id"]."a";

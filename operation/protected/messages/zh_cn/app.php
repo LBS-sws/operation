@@ -24,6 +24,7 @@ return array(
 
     'Report'=>'报表',
     'Sales Summary'=>'营业报告',
+	'Order Records'=>'订货记录报表',
     'Report Manager'=>'报表管理员',
 
     'System Setting'=>'系统设置',

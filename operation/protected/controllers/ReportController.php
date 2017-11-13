@@ -3,6 +3,7 @@ class ReportController extends Controller
 {
 	protected static $actions = array(
 						'salessummary'=>'YB02',
+						'orderlist'=>'YB03',
 					);
 	
 	public function filters()
@@ -42,6 +43,21 @@ class ReportController extends Controller
 			}
 		}
 		$this->render('form_y01',array('model'=>$model));
+	}
+
+	public function actionOrderlist() {
+		$model = new ReportY02Form;
+		if (isset($_POST['ReportY02Form'])) {
+			$model->attributes = $_POST['ReportY02Form'];
+			if ($model->validate()) {
+				$model->addQueueItem();
+				Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Report submitted. Please go to Report Manager to retrieve the output.'));
+			} else {
+				$message = CHtml::errorSummary($model);
+				Dialog::message(Yii::t('dialog','Validation Message'), $message);
+			}
+		}
+		$this->render('form_y02',array('model'=>$model));
 	}
 
 	public static function allowExecute() {

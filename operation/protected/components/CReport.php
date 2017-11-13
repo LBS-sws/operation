@@ -9,7 +9,7 @@ class CReport {
 	public $subtitle;
 	
 	public function genReport() {
-		return;
+		return true;
 	}
 
 	protected function sendEmail(&$connection, $record=array()) {
@@ -71,7 +71,7 @@ class CReport {
 				$j++;
 			}
 
-			$itemcnt = count($this->fields);
+			$itemcnt = count($fields);
 			$range = $this->excel->getColumn(0).$row.':'.$this->excel->getColumn($itemcnt-1).$row;
 			$this->excel->setRangeStyle($range,true,false,'C','C','allborders',true);
 		}

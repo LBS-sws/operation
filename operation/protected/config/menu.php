@@ -101,6 +101,10 @@ return array(
                 'access'=>'YB02',
                 'url'=>'/report/salessummary',
             ),
+            'Order Records'=>array(
+                'access'=>'YB03',
+                'url'=>'/report/orderlist',
+            ),
             'Report Manager'=>array(
                 'access'=>'YB01',
                 'url'=>'/queue/index',

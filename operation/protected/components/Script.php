@@ -94,7 +94,7 @@ EOF;
 		$str = <<<EOF
 $('#$btnName').on('click',function() {
 	var code = $("input[id*='$codeField']").attr("id");
-	var value = $("input[id*='$valueField']").attr("id");
+	var value = $("input[id*='$valueField'],textarea[id*='$valueField']").attr("id");
 	var title = $("label[for='"+value+"']").text();
 	$lookuptypeStmt
 	$('#lookupcodefield').val(code);

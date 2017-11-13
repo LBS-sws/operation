@@ -40,6 +40,12 @@ return array(
 	'Clean_PC_Misc_Paper'=>'清洁_灭虫_杂项_纸品',
 	'Puriscent'=>'飘盈香',
 	'Formaldehye'=>'甲醛',
-
+	
+	'Goods'=>'物品',
+	'HQ Approved Date'=>'总部审批日期',
+	'Requestor'=>'地方申请人',
+	'Order Records Report'=>'订货记录报表',
+	'Activity Info'=>'采购周期',
+	
 );
 ?>

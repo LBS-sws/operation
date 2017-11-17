@@ -253,20 +253,25 @@ class ActivityForm extends CFormModel
 
     //根據城市獲取地區管理員郵件
     public function getEmailToCity($city){
+        $systemId = Yii::app()->params['systemId'];
         $suffix = Yii::app()->params['envSuffix'];
         $suffix = "security".$suffix;
+        $arr = array();
         if (!empty($city)){
-            $rs = Yii::app()->db->createCommand()->select("incharge")->from($suffix.".sec_city")->where("code=:code",array(":code"=>$city))->queryAll();
-            if($rs){
-                $rs = $rs[0]["incharge"];
-                $email = Yii::app()->db->createCommand()->select("email")->from($suffix.".sec_user")->where("username=:username",array(":username"=>$rs))->queryAll();
-                if($email){
-                    return $email[0]["email"];
+            $userList = Yii::app()->db->createCommand()->select("username")->from($suffix.".sec_user_access")
+                ->where("system_id=:system_id and a_read_write like '%YD02%'",array(":system_id"=>$systemId))->queryAll();
+            if($userList){
+                foreach ($userList as $user){
+                    $email = Yii::app()->db->createCommand()->select("email")->from($suffix.".sec_user")
+                    ->where("username=:username and city='$city'",array(":username"=>$user["username"]))->queryRow();
+                    if($email){
+                        array_push($arr,$email["email"]);
+                    }
                 }
             }
         }
 
-        return "";
+        return $arr;
     }
 
     //根據用戶username獲取郵箱

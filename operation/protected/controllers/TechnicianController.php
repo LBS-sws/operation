@@ -108,4 +108,13 @@ class TechnicianController extends Controller
         $this->redirect(Yii::app()->createUrl('technician/index'));
     }
 
+    public function actionOrderGoodsDelete(){
+        if(Yii::app()->request->isAjaxRequest) {//是否ajax请求
+            $id = $_POST['id'];
+            $rs = OrderGoods::model()->deleteByPk($id);
+            echo CJSON::encode(array('status'=>$rs));//Yii 的方法将数组处理成json数据
+        }else{
+            $this->redirect(Yii::app()->createUrl('order/index'));
+        }
+    }
 }

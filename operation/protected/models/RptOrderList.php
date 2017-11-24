@@ -84,7 +84,7 @@ class RptOrderList extends CReport {	protected function fields() {		return arr
 	protected function getHQApproveInfo($id, $type, $status) {
 		$rtn = array('appr_dt'=>'', 'appr_user'=>'');
 		if (($type==1 && $status=='approve') || $status=='finished') {
-			$sql = "select time, lcu
+			$sql = "select a.time, a.lcu
 					from opr_order_status a left outer join opr_order_status b
 						on a.order_id=b.order_id and a.status=b.status
 						and b.time > a.time

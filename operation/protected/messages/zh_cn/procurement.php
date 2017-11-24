@@ -230,5 +230,8 @@ return array(
     'Waiting area audit'=>'等待地区审核',
     'Area rejected'=>'地区已拒绝',
 
+    //2017-11-24
+    'Mobile phone users please horizontal screen operation'=>'手机用户请横屏操作',
+
 );
 ?>

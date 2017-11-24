@@ -77,6 +77,15 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
 			<?php echo $form->hiddenField($model, 'id'); ?>
 			<?php echo $form->hiddenField($model, 'status'); ?>
 
+
+            <div class="form-group">
+                <div class="col-sm-10 col-sm-offset-2">
+                    <div class="text-danger form-control-static"><span class="required">*</span>
+                        <?php echo Yii::t("procurement","Mobile phone users please horizontal screen operation");?>
+                    </div>
+                </div>
+            </div>
+
             <?php if (!empty($model->ject_remark)): ?>
                 <div class="form-group has-error">
                     <?php echo $form->labelEx($model,'ject_remark',array('class'=>"col-sm-2 control-label")); ?>

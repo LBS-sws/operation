@@ -228,5 +228,8 @@ return array(
     'Central refused order'=>'中央拒絕訂單',
     'Waiting area audit'=>'等待地區審核',
     'Area rejected'=>'地區已拒絕',
+
+    //2017-11-24
+    'Mobile phone users please horizontal screen operation'=>'手機用戶請橫屏操作',
 );
 ?>

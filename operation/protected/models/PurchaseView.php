@@ -67,14 +67,18 @@ class PurchaseView extends CFormModel
                     $html.="<legend>$classifyName</legend>";
                     $sum = 0;
                     $exSum = 0;
+                    $unit = 'US$';
+                    if($this->order_class == "Document"){
+                        $unit = "RMB";
+                    }
                     $html.="<table class='table table-bordered table-striped'><thead><tr>
                             <th>".Yii::t("procurement","Goods Code")."</th>
                             <th>".Yii::t("procurement","Goods Name")."</th>
-                            <th>".Yii::t("procurement","Price（RMB）")."</th>
+                            <th>".Yii::t("procurement",'Price（'.$unit.'）')."</th>
                             <th>".Yii::t("procurement","Goods Number")."</th>
                             <th>".Yii::t("procurement","Confirm Number")."</th>
-                            <th>".Yii::t("procurement","expected to price（RMB）")."</th>
-                            <th>".Yii::t("procurement","Total（RMB）")."</th>
+                            <th>".Yii::t("procurement",'expected to price（'.$unit.'）')."</th>
+                            <th>".Yii::t("procurement",'Total（'.$unit.'）')."</th>
                             </tr></thead><tbody>";
                     foreach ($list as $goods){
                         //sprintf(".2%",$aaa);

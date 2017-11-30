@@ -24,6 +24,9 @@
         <?php echo Yii::t("procurement","Order Sum");?>
     </th>
     <th class="text-primary">
+        <?php echo Yii::t("procurement","Send Num");?>
+    </th>
+    <th class="text-primary">
         <?php echo Yii::t("procurement","Status");?>
     </th>
     <th></th>

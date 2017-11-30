@@ -64,6 +64,7 @@ class PurchaseList extends CListPageModel
                     'start_time'=>$record['start_time'],
                     'end_time'=>$record['end_time'],
                     'order_sum'=>$OrderSumArr["sum"],
+                    'sentSum'=>$OrderSumArr["sentSum"],
                     'order_type_sum'=>$OrderSumArr["list"],
                     'activity_status'=>$this->compareDate($record['start_time'],$record['end_time'])
                 );
@@ -89,6 +90,8 @@ class PurchaseList extends CListPageModel
 	//對比時間有沒有到期
 	public function getOrderSumToId($activity_id){
 	    $arr=array();
+        $sentRows = Yii::app()->db->createCommand()->select("id")->from("opr_order")
+            ->where('activity_id=:activity_id AND status_type=1 AND judge=1 AND status = "sent"', array(':activity_id'=>$activity_id))->queryAll();
         $rows = Yii::app()->db->createCommand()->select("order_class")->from("opr_order")
             ->where('activity_id=:activity_id AND status_type=1 AND judge=1 AND status != "pending" AND status != "cancelled"', array(':activity_id'=>$activity_id))->queryAll();
         if($rows){
@@ -101,6 +104,7 @@ class PurchaseList extends CListPageModel
         }
         return array(
             "sum"=>count($rows),
+            "sentSum"=>count($sentRows),
             "list"=>$arr
         );
     }

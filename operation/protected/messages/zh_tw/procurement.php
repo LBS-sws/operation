@@ -231,5 +231,7 @@ return array(
 
     //2017-11-24
     'Mobile phone users please horizontal screen operation'=>'手機用戶請橫屏操作',
+    'Select Goods'=>'选择物品',
+    'Send Num'=>'待審核數量',
 );
 ?>

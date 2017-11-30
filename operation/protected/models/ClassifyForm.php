@@ -97,6 +97,7 @@ class ClassifyForm extends CFormModel
         return $arr;
     }
 
+
     //獲取分類列表
     public function getAllClassifyList($str="Import"){
         $arr = array(""=>"");
@@ -104,6 +105,44 @@ class ClassifyForm extends CFormModel
         if($rs){
             foreach ($rs as $row){
                 $arr[$row["id"]] = $row["name"];
+            }
+        }
+        return $arr;
+    }
+
+    //獲取物品列表(按分類生成二維數組）
+    public function getGoodsListToClassify($str="Import"){
+        switch ($str){
+            case "Import":
+                $from = "opr_goods_im";
+                break;
+            case "Domestic":
+                $from = "opr_goods_do";
+                break;
+            case "Fast":
+                $from = "opr_goods_fa";
+                break;
+            case "Warehouse":
+                $from = "opr_warehouse";
+                break;
+            default:
+                $from = "opr_warehouse";
+        }
+        $city = Yii::app()->user->city();
+        $arr = array(array("id"=>0,"name"=>"所有分類","list"=>array()));
+        $rs = Yii::app()->db->createCommand()->select()->from("opr_classify")->where("class_type=:class_type",array(":class_type"=>$str))->order('level desc')->queryAll();
+        if($rs){
+            foreach ($rs as $row){
+                if($from == "opr_warehouse"){
+                    $goodList = Yii::app()->db->createCommand()->select("*")
+                        ->from($from)->where("classify_id=:classify_id and city=:city",array(":classify_id"=>$row["id"],":city"=>$city))->queryAll();
+                }else{
+                    $goodList = Yii::app()->db->createCommand()->select("*")
+                        ->from($from)->where("classify_id=:classify_id",array(":classify_id"=>$row["id"]))->queryAll();
+                }
+                if($goodList){
+                    array_push($arr,array("id"=>$row["id"],"name"=>$row["name"],"list"=>$goodList));
+                }
             }
         }
         return $arr;

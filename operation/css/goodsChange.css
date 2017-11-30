@@ -16,3 +16,8 @@
 #table-change .input-group-btn{float: left;width: 100%;margin-bottom: 5px;}
 #table-change .dropdown-menu{overflow-x: hidden;overflow-y: scroll;max-height: 220px;}
 #table-change tbody>tr>td{vertical-align: middle;}
+@media (min-width: 840px){
+    #selectGoods_div>div{
+        width: 800px;
+    }
+}

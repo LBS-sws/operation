@@ -61,10 +61,21 @@ class OrderGoods extends CActiveRecord{
         ));
     }
 
+    //獲取用戶暱稱
+    public function getNameToUsername($username){
+        $suffix = Yii::app()->params['envSuffix'];
+        $rs = Yii::app()->db->createCommand()->select("disp_name")->from("security$suffix.sec_user")
+            ->where("username=:username",array(":username"=>$username))->queryRow();
+        if($rs){
+            return $rs["disp_name"];
+        }
+        return $username;
+    }
+
     //訂單發郵件(總部)
     public function sendEmail($oldOrderStatus,$stauts,$order_code=0,$activity_id = 0){
         $city = Yii::app()->user->city();
-        $uid = Yii::app()->user->id;
+        $uid = Yii::app()->user->user_display_name();
         $activityList = new ActivityForm();
         if(empty($oldOrderStatus[0]["activity_id"])){
             $activityList->activity_code = "快速訂單";
@@ -81,7 +92,7 @@ class OrderGoods extends CActiveRecord{
         if($oldOrderStatus){
             if($oldOrderStatus[0]["status"] != $stauts){
                 $html .= "<p>下單城市：".$oldOrderStatus[0]["city"]."</p>";
-                $html .= "<p>下單用戶：".$oldOrderStatus[0]["lcu"]."</p>";
+                $html .= "<p>下單用戶：".OrderGoods::getNameToUsername($oldOrderStatus[0]["lcu"])."</p>";
                 $html .= "<p>下單時間：".$oldOrderStatus[0]["lcd"]."</p>";
                 $html .= "<p>訂單編號：".$oldOrderStatus[0]["order_code"]."</p>";
                 if($stauts == "sent"){
@@ -109,7 +120,7 @@ class OrderGoods extends CActiveRecord{
     //訂單發郵件(倉庫)
     public function sendEmailTwo($oldOrderStatus,$stauts,$order_code=0){
         $city = Yii::app()->user->city();
-        $uid = Yii::app()->user->id;
+        $uid = Yii::app()->user->user_display_name();
         $email = ActivityForm::getEmailToCity($city);
         if(empty($email)){
             return false;
@@ -119,7 +130,7 @@ class OrderGoods extends CActiveRecord{
         if($oldOrderStatus){
             if($oldOrderStatus[0]["status"] != $stauts){
                 $html .= "<p>下單城市：".$oldOrderStatus[0]["city"]."</p>";
-                $html .= "<p>下單用戶：".$oldOrderStatus[0]["lcu"]."</p>";
+                $html .= "<p>下單用戶：".OrderGoods::getNameToUsername($oldOrderStatus[0]["lcu"])."</p>";
                 $html .= "<p>下單時間：".$oldOrderStatus[0]["lcd"]."</p>";
                 $html .= "<p>訂單編號：".$oldOrderStatus[0]["order_code"]."</p>";
                 if($stauts == "sent"){

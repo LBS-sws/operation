@@ -72,7 +72,7 @@ class DeliveryList extends CListPageModel
                     'technician'=>$record['technician'],
                     'status'=>$record['status'],
                     'city'=>$record['city'],
-                    'lcu'=>$record['lcu'],
+                    'lcu'=>OrderGoods::getNameToUsername($record['lcu']),
                     'lcd'=>date("Y-m-d",strtotime($record['lcd'])),
                 );
             }

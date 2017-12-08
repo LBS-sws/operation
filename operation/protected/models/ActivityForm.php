@@ -219,6 +219,7 @@ class ActivityForm extends CFormModel
         if(!empty($userList)){
             foreach ($userList as $user){
                 $email = $this->getEmailToUsername($user["username"]);
+                $email = array($email);
                 if(!empty($email)){
                     //發送郵件
                     $this->sendEmail($email);
@@ -240,7 +241,7 @@ class ActivityForm extends CFormModel
             Yii::app()->db->createCommand()->insert("swoper$suffix.swo_email_queue", array(
                 'request_dt'=>$this->start_time,
                 'from_addr'=>$from_addr,
-                'to_addr'=>$to_addr,
+                'to_addr'=>json_encode($to_addr),
                 'subject'=>"總部受理訂單:".$this->activity_title,//郵件主題
                 'description'=>"總部受理訂單",//郵件副題
                 'message'=>$message,//郵件內容（html）

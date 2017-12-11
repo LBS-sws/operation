@@ -231,8 +231,10 @@ class PurchaseView extends CFormModel
             foreach ($rows as $row){
                 if(empty($arr[$row['city']])){
                     $arr[$row['city']]=array();
+                    $goodList = array();
+                }else{
+                    $goodList = $arr[$row['city']]["goodList"];
                 }
-                $goodList = array();
                 $idList = Yii::app()->db->createCommand()->select("goods_id,goods_num,confirm_num")->from("opr_order_goods")->where("order_id=:order_id",array(":order_id"=>$row["id"]))->queryAll();
                 foreach ($idList as $goods_id){
                     $goodId=$goods_id["goods_id"];

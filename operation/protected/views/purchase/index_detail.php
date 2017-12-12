@@ -33,6 +33,11 @@ $this->pageTitle=Yii::app()->name . ' - Purchase List';
                     'submit'=>Yii::app()->createUrl('purchase/index')));
                 ?>
             </div>
+            <div class="btn-group" role="group">
+                <?php echo TbHtml::button('<span class="fa fa-magnet"></span> '.Yii::t('procurement','All to see'), array(
+                    'submit'=>Yii::app()->createUrl('purchase/see',array("index"=>$model->activity_id))));
+                ?>
+            </div>
         </div>
     </div>
 	<?php $this->widget('ext.layout.ListPageWidgetTwo', array(

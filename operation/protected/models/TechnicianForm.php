@@ -298,4 +298,16 @@ class TechnicianForm extends CFormModel
             'order_status'=>$this->status,
         ), 'order_id=:order_id', array(':order_id'=>$this->id));
     }
+
+    //判斷輸入框能否修改
+    public function getInputBool(){
+        if($this->scenario=='view'){
+            return true;
+        }
+        if($this->status == "pending"||$this->status == "reject"){
+            return false;
+        }else{
+            return true;
+        }
+    }
 }

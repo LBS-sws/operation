@@ -2,6 +2,7 @@
 
 class OrderList extends CListPageModel
 {
+    public $activity_id;
     public $activity_title;
 	public function attributeLabels()
 	{
@@ -44,6 +45,7 @@ class OrderList extends CListPageModel
 				where (city = '$city' AND judge=1) 
 			";
         }else{
+            $this->activity_id = $activity_id;
 		    $this->activity_title = $this->getActivityTitleToId($activity_id);
             $sql1 = "select *
 				from opr_order
@@ -254,7 +256,7 @@ class OrderList extends CListPageModel
             ->from("opr_order")->where('status="approve" and judge=0 and city=:city and lcu=:lcu',array(":city"=>$city,":lcu"=>$uid))->queryScalar();
 
 		// 营业报告审核的數量
-		$suffix = Yii::app()->params['envSuffix'];
+/*		$suffix = Yii::app()->params['envSuffix'];
 		$type = Yii::app()->user->validFunction('YN01') ? 'PA' : 'PH';
 		$wf = new WorkflowOprpt;
 		$wf->connection = Yii::app()->db;
@@ -266,8 +268,8 @@ class OrderList extends CListPageModel
 				where a.city in ($cityallow) and a.city=b.code 
 				and a.id in ($list)
 			";
-		$rep_num = Yii::app()->db->createCommand($sql)->queryScalar();
-        //$rep_num = 0;
+		$rep_num = Yii::app()->db->createCommand($sql)->queryScalar();*/
+        $rep_num = 0;
 		// 营业报告审核的數量 -- END
 		
 		return array(

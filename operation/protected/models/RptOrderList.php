@@ -1,5 +1,6 @@
 <?php
-class RptOrderList extends CReport {	protected function fields() {		return array(			'goods_code'=>array('label'=>Yii::t('procurement','Order Code'),'width'=>22,'align'=>'L'),
+class RptOrderList extends CReport {	protected function fields() {		return array(			'city_name'=>array('label'=>Yii::t('misc','City'),'width'=>15,'align'=>'L'),
+			'goods_code'=>array('label'=>Yii::t('procurement','Order Code'),'width'=>22,'align'=>'L'),
 			'goods_name'=>array('label'=>Yii::t('procurement','Goods Name'),'width'=>30,'align'=>'L'),
 			'class_name'=>array('label'=>Yii::t('procurement','Goods Class'),'width'=>25,'align'=>'L'),
 			'goods_num'=>array('label'=>Yii::t('procurement','Goods Number'),'width'=>15,'align'=>'R'),
@@ -30,6 +31,10 @@ class RptOrderList extends CReport {	protected function fields() {		return arr
 		$goods_id = $this->criteria['GOODS'];
 		$order_status = $this->criteria['ORDERSTATUS'];
 		
+		$citymodel = new City();
+		$citylist = $citymodel->getDescendantList($city);
+		$citylist = empty($citylist) ? "'$city'" : "$citylist,'$city'";
+		
 		$suffix = Yii::app()->params['envSuffix'];
 		
 		$cond_goods = '';
@@ -50,11 +55,12 @@ class RptOrderList extends CReport {	protected function fields() {		return arr
 		
 		$sql = "select a.goods_id, a.goods_num, a.confirm_num, c.activity_code, c.activity_title, 
 					b.lcd, b.id, b.order_code, b.order_user, b.order_class, b.status_type, b.status, b.city,
-					d.disp_name as req_user 
+					d.disp_name as req_user, e.name as city_name 
 				from opr_order_goods a inner join opr_order b on a.order_id=b.id
 					inner join opr_order_activity c on b.activity_id=c.id
 					inner join security$suffix.sec_user d on d.username=b.order_user 
-				where b.city='$city' and b.order_class in ('Fast','Import','Domestic')
+					inner join security$suffix.sec_city e on e.code=b.city 
+				where b.city in($citylist) and b.order_class in ('Fast','Import','Domestic')
 					and b.lcd >= '$start_dt' and b.lcd <= '$end_dt'
 					$cond_goods $cond_status 
 				order by b.lcd desc, a.id
@@ -66,6 +72,7 @@ class RptOrderList extends CReport {	protected function fields() {		return arr
 				$appr_info = $this->getHQApproveInfo($row['id'], $row['status_type'], $row['status']);
 				
 				$temp = array();
+				$temp['city_name'] = $row['city_name'];
 				$temp['goods_code'] = $goods_info['code'];
 				$temp['goods_name'] = $goods_info['name'];
 				$temp['class_name'] = $goods_info['classify_name'];

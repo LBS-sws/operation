@@ -47,6 +47,7 @@ $(function () {
                 html+="<td>"+goods["unit"]+"</td>";
                 html+="<td><input class='form-control select_remark' name='TechnicianForm[goods_list]["+key+"][note]' type='text' value='"+value["remark"]+"'></td>";
                 html+="<td><input class='form-control select_num' name='TechnicianForm[goods_list]["+key+"][goods_num]' type='number' value='"+value["num"]+"'></td>";
+                html+="<td><a class='btn btn-danger goodsDelete' data-id='"+id+"'>刪除</a></td>";
                 html+="</tr>";
                 tBody.append(html);
             });
@@ -153,6 +154,19 @@ $(function () {
                 }
             });
         }
+    });
+
+    //點擊刪除按鈕
+    $("#table-change>tbody").delegate(".goodsDelete","click",function () {
+        var id = $(this).data("id");
+        selectGoodsList = $.grep(selectGoodsList,function (value,key) {
+            if(value == undefined || value=="" || value==null){
+                return false;
+            }else{
+                return value["id"] != id;
+            }
+        });
+        $(this).parents("tr:first").remove();
     });
 
 });

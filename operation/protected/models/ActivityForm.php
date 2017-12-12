@@ -115,6 +115,33 @@ class ActivityForm extends CFormModel
         }
     }
 
+	//查看活動下面的所有訂單
+    public function seeAllOrder(){
+        //read
+        $rows = Yii::app()->db->createCommand()->select("id")->from("opr_order")->where("activity_id=:activity_id and status='sent' AND status_type=1 AND judge=1",
+            array(":activity_id"=>$this->id))->queryAll();
+        if($rows){
+            foreach ($rows as $row){
+                //修改物品的實際數量
+                $sql = "UPDATE opr_order_goods SET confirm_num = goods_num WHERE order_id=".$row["id"];
+                Yii::app()->db->createCommand($sql)->execute();
+
+                //記錄操作
+                Yii::app()->db->createCommand()->insert('opr_order_status', array(
+                    'order_id'=>$row["id"],
+                    'status'=>"read",
+                    'lcu'=>Yii::app()->user->user_display_name(),
+                    'time'=>date('Y-m-d H:i:s'),
+                ));
+            }
+
+            //修改訂單狀態
+            Yii::app()->db->createCommand()->update("opr_order", array(
+                'status'=>"read",
+            ),"activity_id=:id and status='sent' AND status_type=1 AND judge=1",array(":id"=>$this->id));
+        }
+    }
+
     //自動生成標題和編號
     public function selfTitleAndCode(){
         $day = date("Ymd");

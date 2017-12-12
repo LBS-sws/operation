@@ -129,6 +129,18 @@ class PurchaseController extends Controller
         }
     }
 
+    //查看全部訂單
+    public function actionSee($index)
+    {
+        $model = new ActivityForm('view');
+        if (!$model->retrieveData($index)) {
+            throw new CHttpException(404,'The requested page does not exist.');
+        } else {
+            $model->seeAllOrder();
+            $this->redirect(Yii::app()->createUrl('purchase/detail',array('index'=>$index)));
+        }
+    }
+
     //下載訂單
     public function actionDownorder($index){
         $model = new PurchaseForm('edit');

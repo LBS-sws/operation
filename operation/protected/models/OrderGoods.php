@@ -77,7 +77,7 @@ class OrderGoods extends CActiveRecord{
         $city = Yii::app()->user->city();
         $uid = Yii::app()->user->user_display_name();
         $activityList = new ActivityForm();
-        if(empty($oldOrderStatus[0]["activity_id"])){
+        if(empty($oldOrderStatus[0]["activity_id"])&&empty($activity_id)){
             $activityList->activity_code = "快速訂單";
             $activityList->activity_title = "快速訂單";
         }else{

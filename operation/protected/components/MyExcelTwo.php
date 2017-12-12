@@ -120,24 +120,27 @@ class MyExcelTwo {
         $this->objActSheet->setCellValue("A".$row,"物品編號");
         $this->objActSheet->setCellValue("B".$row,"物品名稱");
         $this->objActSheet->setCellValue("C".$row,"來源地");
-        $this->objActSheet->setCellValue("D".$row,"數量");
-        $this->objActSheet->setCellValue("E".$row,"物品規格");
+        $this->objActSheet->setCellValue("D".$row,"物品規格");
+        $this->objActSheet->setCellValue("E".$row,"要求數量");
         $this->objActSheet->setCellValue("F".$row,"物品單位");
-        $this->objActSheet->setCellValue("G".$row,'物品單價（US$）');
-        $this->objActSheet->setCellValue("H".$row,'總價（US$）');
         if($order_class == "Document"){
             $this->objActSheet->setCellValue("G".$row,'物品單價（RMB）');
             $this->objActSheet->setCellValue("H".$row,'總價（RMB）');
         }
         if($order_class == "Import"){
-            $this->objActSheet->setCellValue("I".$row,"净重（kg）");
-            $this->objActSheet->setCellValue("J".$row,"毛重（kg）");
-            $this->objActSheet->setCellValue("K".$row,"長×寬×高（cm）");
-            $this->objActSheet->setCellValue("L".$row,"總淨重（kg）");
-            $this->objActSheet->setCellValue("M".$row,"總毛重（kg）");
-            $this->objActSheet->setCellValue("N".$row,"體積（m³）");
-            $this->objActSheet->setCellValue("O".$row,"總體積（m³）");
-            $str = "O";
+            $this->objActSheet->setCellValue("G".$row,'由');
+            $this->objActSheet->setCellValue("H".$row,'至');
+            $this->objActSheet->setCellValue("I".$row,"箱數");
+            $this->objActSheet->setCellValue("J".$row,'物品單價（US$）');
+            $this->objActSheet->setCellValue("K".$row,'總價（US$）');
+            $this->objActSheet->setCellValue("L".$row,"净重（kg）");
+            $this->objActSheet->setCellValue("M".$row,"毛重（kg）");
+            $this->objActSheet->setCellValue("N".$row,"長×寬×高（cm）");
+            $this->objActSheet->setCellValue("O".$row,"總淨重（kg）");
+            $this->objActSheet->setCellValue("P".$row,"總毛重（kg）");
+            $this->objActSheet->setCellValue("Q".$row,"體積（m³）");
+            $this->objActSheet->setCellValue("R".$row,"總體積（m³）");
+            $str = "R";
         }
         $row++;
         $list=array("priceSum"=>0,"voleSum"=>0,"maoSum"=>0,"jingSum"=>0);
@@ -145,25 +148,32 @@ class MyExcelTwo {
             $this->objActSheet->setCellValue("A".$row,$goods["goods_code"]);
             $this->objActSheet->setCellValue("B".$row,$goods["name"]);
             $this->objActSheet->setCellValue("C".$row,$goods["origin"]);
-            $this->objActSheet->setCellValue("D".$row,$goods["confirm_num"]);
-            $this->objActSheet->setCellValue("E".$row,$goods["type"]);
+            $this->objActSheet->setCellValue("D".$row,$goods["type"]);
+            $this->objActSheet->setCellValue("E".$row,$goods["goods_num"]);
             $this->objActSheet->setCellValue("F".$row,$goods["unit"]);
-            $this->objActSheet->setCellValue("G".$row,$goods["price"]);
             $priceSum = intval($goods["confirm_num"])*floatval($goods["price"]);
-            $this->objActSheet->setCellValue("H".$row,sprintf("%.2f",$priceSum));
             $list["priceSum"]+=$priceSum;
+            if($order_class == "Document"){
+                $this->objActSheet->setCellValue("G".$row,$goods["price"]);
+                $this->objActSheet->setCellValue("H".$row,sprintf("%.2f",$priceSum));
+            }
             if($order_class == "Import"){
                 $vole = floatval($goods["len"])*floatval($goods["width"])*floatval($goods["height"])/1000000;
                 $jingSum = intval($goods["confirm_num"])*floatval($goods["net_weight"])/intval($goods["multiple"]);
                 $maoSum = intval($goods["confirm_num"])*floatval($goods["gross_weight"])/intval($goods["multiple"]);
                 $voleSum = intval($goods["confirm_num"])*$vole/intval($goods["multiple"]);
-                $this->objActSheet->setCellValue("I".$row,$goods["net_weight"]);
-                $this->objActSheet->setCellValue("J".$row,$goods["gross_weight"]);
-                $this->objActSheet->setCellValue("K".$row,$goods["len"]."×".$goods["width"]."×".$goods["height"]);
-                $this->objActSheet->setCellValue("L".$row,sprintf("%.2f",$jingSum));
-                $this->objActSheet->setCellValue("M".$row,sprintf("%.2f",$maoSum));
-                $this->objActSheet->setCellValue("N".$row,sprintf("%.2f",$vole));
-                $this->objActSheet->setCellValue("O".$row,sprintf("%.2f",$voleSum));
+                $this->objActSheet->setCellValue("G".$row,"");
+                $this->objActSheet->setCellValue("H".$row,"");
+                $this->objActSheet->setCellValue("I".$row,"");
+                $this->objActSheet->setCellValue("J".$row,$goods["price"]);
+                $this->objActSheet->setCellValue("K".$row,sprintf("%.2f",$priceSum));
+                $this->objActSheet->setCellValue("L".$row,$goods["net_weight"]);
+                $this->objActSheet->setCellValue("M".$row,$goods["gross_weight"]);
+                $this->objActSheet->setCellValue("N".$row,$goods["len"]."×".$goods["width"]."×".$goods["height"]);
+                $this->objActSheet->setCellValue("O".$row,sprintf("%.2f",$jingSum));
+                $this->objActSheet->setCellValue("P".$row,sprintf("%.2f",$maoSum));
+                $this->objActSheet->setCellValue("Q".$row,sprintf("%.2f",$vole));
+                $this->objActSheet->setCellValue("R".$row,sprintf("%.2f",$voleSum));
                 $list["jingSum"]+=$jingSum;
                 $list["maoSum"]+=$maoSum;
                 $list["voleSum"]+=$voleSum;
@@ -179,13 +189,17 @@ class MyExcelTwo {
             )
         );
         $this->objActSheet->getStyle('A'.$this->row.':'.$str.($row-1))->applyFromArray($styleArray);
-        $this->objActSheet->freezePane('H'.($this->row+1));
 
-        $this->objActSheet->setCellValue("H".$row,sprintf("%.2f",$list["priceSum"]));
+        if($order_class == "Document") {
+            $this->objActSheet->freezePane('H'.($this->row+1));
+            $this->objActSheet->setCellValue("H" . $row, sprintf("%.2f", $list["priceSum"]));
+        }
         if($order_class == "Import"){
-            $this->objActSheet->setCellValue("L".$row,$list["jingSum"]);
-            $this->objActSheet->setCellValue("M".$row,$list["maoSum"]);
-            $this->objActSheet->setCellValue("O".$row,sprintf("%.2f",$list["voleSum"]));
+            $this->objActSheet->freezePane('G'.($this->row+1));
+            $this->objActSheet->setCellValue("K".$row,sprintf("%.2f",$list["priceSum"]));
+            $this->objActSheet->setCellValue("O".$row,$list["jingSum"]);
+            $this->objActSheet->setCellValue("P".$row,$list["maoSum"]);
+            $this->objActSheet->setCellValue("R".$row,sprintf("%.2f",$list["voleSum"]));
         }
         $cityCode = $this->objActSheet->getTitle();
         $this->protoSum[$cityCode] = $list;

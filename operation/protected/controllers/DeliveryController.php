@@ -127,4 +127,20 @@ class DeliveryController extends Controller
             $myExcel->outDownExcel($model->lcu."的订单.xls");
         }
     }
+
+    //單個物品退回
+    public function actionBlack(){
+        $arr = $_POST;
+        $model = new DeliveryForm("black");
+        $model->attributes = $arr;
+        var_dump($model->attributes);
+        if($model->validate()){
+            $model->blackGoods($arr["name"]);
+            Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
+        }else{
+            $message = CHtml::errorSummary($model);
+            Dialog::message(Yii::t('dialog','Validation Message'), $message);
+        }
+        $this->redirect(Yii::app()->createUrl('delivery/edit',array('index'=>$model->id)));
+    }
 }

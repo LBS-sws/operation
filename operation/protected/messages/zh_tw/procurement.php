@@ -233,5 +233,9 @@ return array(
     'Mobile phone users please horizontal screen operation'=>'手機用戶請橫屏操作',
     'Select Goods'=>'选择物品',
     'Send Num'=>'待審核數量',
+
+    //2017-12-11
+    'Black Number'=>'退回數量',
+    'All to see'=>'全部查看',
 );
 ?>

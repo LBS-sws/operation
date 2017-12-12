@@ -33,13 +33,13 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
 		?>
 <?php if ($model->scenario!='view'): ?>
 			<?php
-            if($model->status == "pending" || $model->status == "cancelled"||$model->scenario=='new'){
+            if($model->status == "pending" || $model->status == "reject"||$model->scenario=='new'){
                 //存為草稿
                 echo TbHtml::button('<span class="fa fa-save"></span> '.Yii::t('misc','Save Draft'), array(
                     'submit'=>Yii::app()->createUrl('technician/save')));
             }
 
-            if($model->status == "pending" && ($model->scenario=='edit' || $model->scenario=='new')){
+            if($model->status == "pending" || $model->status == "reject"){
                 //提交審核
                 echo TbHtml::button('<span class="fa fa-upload"></span> '.Yii::t('procurement','For audit'), array(
                     'submit'=>Yii::app()->createUrl('technician/audit')));
@@ -124,6 +124,9 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                             <?php if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished" || $model->status == "read")): ?>
                                 <td width="8%"><?php echo Yii::t("procurement","Actual Number")?></td>
                             <?php endif ?>
+                            <?php if (!$model->getInputBool()): ?>
+                                <td width="1%">&nbsp;</td>
+                            <?php endif ?>
                         </tr>
                         </thead>
                         <tbody>
@@ -141,7 +144,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                                     echo "<td>".$goodsList["unit"]."</td>";
                                     echo "<td>";
                                     echo TbHtml::textField( "TechnicianForm[goods_list][$key][note]",$goodsList["note"],
-                                        array('class'=>"select_remark",'readonly'=>(!($model->scenario!='view'&&$model->status == "pending")))
+                                        array('class'=>"select_remark",'readonly'=>($model->getInputBool()))
                                     );
                                     echo "</td>";
                                     if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished" || $model->status == "read")){
@@ -153,7 +156,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                                     }
                                     echo "<td>";
                                     echo TbHtml::textField( "TechnicianForm[goods_list][$key][goods_num]",$goodsList["goods_num"],
-                                        array('class'=>"select_num",'readonly'=>(!($model->scenario!='view'&&$model->status == "pending")))
+                                        array('class'=>"select_num",'readonly'=>($model->getInputBool()))
                                     );
                                     echo "</td>";
                                     if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished" || $model->status == "read")){
@@ -163,15 +166,19 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                                         );
                                         echo "</td>";
                                     }
+                                    if(!$model->getInputBool()){
+                                        echo "<td><a class='btn btn-danger goodsDelete' data-id='".$goodsList["goods_id"]."'>刪除</a></td>";
+                                    }
                                     echo "</tr>";
                                 }
                             }
                         ?>
                         </tbody>
                         <tfoot>
-                        <?php if ($model->scenario!='view'&&$model->status == "pending"): ?>
+                        <?php if (!$model->getInputBool()): ?>
                         <tr>
-                            <td colspan="6" class="text-right">
+                            <td colspan="4" class="">&nbsp;</td>
+                            <td class="">
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#selectGoods_div" id="addGoods">
                                     <?php echo Yii::t("misc","Add")?>
                                 </button>
@@ -188,7 +195,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                 <?php echo $form->labelEx($model,'remark',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-7">
                     <?php echo $form->textArea($model, 'remark',
-                        array('rows'=>4,'cols'=>50,'maxlength'=>1000,'readonly'=>(!($model->scenario=='new'||$model->status=='pending')))
+                        array('rows'=>4,'cols'=>50,'maxlength'=>1000,'readonly'=>($model->getInputBool()))
                     ); ?>
                 </div>
             </div>
@@ -273,11 +280,6 @@ if ($model->scenario!='new')
     $this->renderPartial('//site/flowlist',array('model'=>$model));
 ?>
 <?php
-$goodList = json_encode(WarehouseForm::getGoodsList());
-$tableBool = 1;//表格內的輸入框能否輸入
-if($model->status == "pending" || $model->status == "cancelled"||$model->scenario=='new'){
-    $tableBool = 0;
-}
 $js = '
 ';
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
@@ -286,7 +288,7 @@ Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_R
 <?php
 $js = Script::genReadonlyField();
 Yii::app()->clientScript->registerScript('readonlyClass',$js,CClientScript::POS_READY);
-Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/goodsChange.js?2", CClientScript::POS_END);
+Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/goodsChange.js?4", CClientScript::POS_END);
 Yii::app()->clientScript->registerCssFile(Yii::app()->baseUrl . "/css/goodsChange.css");
 ?>
 

@@ -15,9 +15,17 @@ class DeliveryForm extends CFormModel
 	public $goods_list;
 	public $ject_remark;
 
+	//單個物品退回專用
+	public $confirm_num;
+	public $num;
+	public $black_id;
+	public $goods_id;
+
     public function attributeLabels()
 	{
 		return array(
+            'black_id'=>Yii::t('procurement','Goods Name'),
+            'num'=>Yii::t('procurement','Black Number'),
             'order_code'=>Yii::t('procurement','Order Code'),
             'goods_list'=>Yii::t('procurement','Goods List'),
             'order_user'=>Yii::t('procurement','Order User'),
@@ -36,14 +44,41 @@ class DeliveryForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, luu, lcu, lud, lcd','safe'),
+			array('id,num,black_id, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, luu, lcu, lud, lcd','safe'),
             array('goods_list','required','on'=>array('audit','edit','reject')),
             array('goods_list','validateGoods','on'=>array('audit','edit')),
             array('ject_remark','required','on'=>'reject'),
+            array('black_id','required','on'=>'black'),
+            array('num','required','on'=>'black'),
+            array('num','validateNum','on'=>'black'),
             //array('order_num','numerical','allowEmpty'=>true,'integerOnly'=>true),
             //array('order_num','in','range'=>range(0,600)),
 		);
 	}
+	public function validateNum($attribute, $params){
+        if(!empty($this->num)){
+            $idList = Yii::app()->db->createCommand()->select("*")->from("opr_order_goods")->where('id = :id',array(':id'=>$this->black_id))->queryRow();
+            if($idList){
+                if(is_numeric($this->num)){
+                    if(floatval($this->num)<0){
+                        $message = "退回數量不能小於零";
+                        $this->addError($attribute,$message);
+                    }else if(floatval($idList["confirm_num"])<floatval($this->num)){
+                        $message = "退回數量不能大於實際數量";
+                        $this->addError($attribute,$message);
+                    }
+                }else{
+                    $message = "退回數量只能為數字";
+                    $this->addError($attribute,$message);
+                }
+                $this->goods_id = $idList["goods_id"];
+                $this->confirm_num = $idList["confirm_num"];
+            }else{
+                $message = "訂單內的物品不存在";
+                $this->addError($attribute,$message);
+            }
+        }
+    }
 
 	//驗證訂單內的物品
     public function validateGoods($attribute, $params){
@@ -137,6 +172,7 @@ class DeliveryForm extends CFormModel
             case 'audit':
                 $sql = "update opr_order set
 							remark = :remark,
+							ject_remark = '',
 							luu = :luu,
 							lud = :lud,
 							status = :status
@@ -263,5 +299,23 @@ class DeliveryForm extends CFormModel
             array_push($arr,array($goods["goods_code"],$goods["name"],$goods["note"],$goods["remark"],$goods["goods_num"],$goods["confirm_num"]));
         }
         return $arr;
+    }
+
+    //退回單個物品
+    public function blackGoods($str=""){
+        $num = $this->num;
+        $goodsId = $this->goods_id;
+        $blackId = $this->black_id;
+        Yii::app()->db->createCommand("update opr_order_goods set confirm_num=confirm_num-$num where id=$blackId")->execute();
+        Yii::app()->db->createCommand("update opr_warehouse set inventory=inventory+$num where id=$goodsId")->execute();
+
+        //記錄
+        Yii::app()->db->createCommand()->insert('opr_order_status', array(
+            'order_id'=>$this->id,
+            'status'=>"backward",
+            'r_remark'=>$str."退回數量:$num",
+            'lcu'=>Yii::app()->user->user_display_name(),
+            'time'=>date('Y-m-d H:i:s'),
+        ));
     }
 }

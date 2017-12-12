@@ -128,6 +128,9 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                             <td width="12%"><?php echo Yii::t("procurement","Headquarters Note")?></td>
                             <td width="8%"><?php echo Yii::t("procurement","Goods Number")?></td>
                             <td width="8%"><?php echo Yii::t("procurement","Actual Number")?></td>
+                            <?php if ($model->status == "finished"): ?>
+                                <td width="1%">&nbsp;</td>
+                            <?php endif ?>
                         </tr>
                         </thead>
                         <tbody>
@@ -157,6 +160,12 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                                 $tableTr.="<td><input type='number' class='form-control numChange goods_num' readonly name='DeliveryForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
                             }
 
+                            if($model->status == "finished"){
+                                //退回
+                                $tableTr.="<td>";
+                                $tableTr.="<a class='btn btn-danger go-balck' data-id='".$val["id"]."'>".Yii::t('procurement','Back Status')."</a>";
+                                $tableTr.="</td>";
+                            }
                             $tableTr.="</tr>";
                             echo $tableTr;
                         }
@@ -178,6 +187,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
         </div>
     </div>
 </section>
+
 <?php
 $this->renderPartial('//site/flowlist',array('model'=>$model));
 ?>
@@ -186,8 +196,52 @@ $this->renderPartial('//site/flowlist',array('model'=>$model));
 $this->renderPartial('//site/ject',array('model'=>$model,'form'=>$form,'submit'=>Yii::app()->createUrl('delivery/reject')));
 ?>
 <?php
+$js = "
+$('.go-balck').on('click',function(){
+    var trObj = $(this).parents('tr:first');
+    var id = $(this).data('id');
+    var name = trObj.find('.testInput').val();
+    var num = trObj.find('.goods_num').val();
+    $('#black_form input[name=\"black_id\"]').val(id);
+    $('#black_form input[name=\"name\"]').val(name);
+    $('#black_form input[name=\"num\"]').attr('max',num);
+    $('#black_form').modal('show');
+});
+";
+Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 $js = Script::genReadonlyField();
 Yii::app()->clientScript->registerScript('readonlyClass',$js,CClientScript::POS_READY);
 ?>
 
 <?php $this->endWidget(); ?>
+
+<?php if ($model->status == "finished"): ?>
+    <form id="black_form" role="dialog" tabindex="-1" method="post" class="modal fade form-horizontal" action="<?php echo Yii::app()->createUrl('delivery/black');?>">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <input type="hidden" name="id" value="<?php echo $model->id;?>">
+                    <input type="hidden" name="black_id">
+                    <button class="close" data-dismiss="modal" type="button">×</button>
+                    <h4 class="modal-title">退回</h4></div><div class="modal-body"><p></p>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="DeliveryForm_lcd">物品名称</label>
+                        <div class="col-sm-4">
+                            <input class="form-control" type="text" readonly name="name">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="DeliveryForm_lcd">退回数量</label>
+                        <div class="col-sm-4">
+                            <input class="form-control" name="num" type="number" max="3">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button data-dismiss="modal" class="btn btn-define pull-left" type="button">关闭</button>
+                    <button class="btn btn-primary" type="submit">提交</button>
+                </div>
+            </div>
+        </div>
+    </form>
+<?php endif ?>

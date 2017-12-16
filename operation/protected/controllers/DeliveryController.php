@@ -3,6 +3,52 @@
 //技術員模塊的採購控制器
 class DeliveryController extends Controller
 {
+    public function filters()
+    {
+        return array(
+            'enforceSessionExpiration',
+            'enforceNoConcurrentLogin',
+            'accessControl', // perform access control for CRUD operations
+            'postOnly + delete', // we only allow deletion via POST request
+        );
+    }
+
+    /**
+     * Specifies the access control rules.
+     * This method is used by the 'accessControl' filter.
+     * @return array access control rules
+     */
+    public function accessRules()
+    {
+        return array(
+            array('allow',
+                'actions'=>array('save','audit','reject','edit','backward','black'),
+                'expression'=>array('DeliveryController','allowReadWrite'),
+            ),
+            array('allow',
+                'actions'=>array('index','view'),
+                'expression'=>array('DeliveryController','allowReadOnly'),
+            ),
+            array('allow',
+                'actions'=>array('downorder'),
+                'expression'=>array('DeliveryController','allowRead'),
+            ),
+            array('deny',  // deny all users
+                'users'=>array('*'),
+            ),
+        );
+    }
+
+    public static function allowReadWrite() {
+        return Yii::app()->user->validRWFunction('YD02');
+    }
+
+    public static function allowReadOnly() {
+        return Yii::app()->user->validFunction('YD02');
+    }
+    public static function allowRead() {
+        return true;
+    }
 	public function actionIndex($pageNum=0) 
 	{
 		$model = new DeliveryList;

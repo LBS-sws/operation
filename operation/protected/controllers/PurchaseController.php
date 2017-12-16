@@ -2,6 +2,51 @@
 
 class PurchaseController extends Controller
 {
+    public function filters()
+    {
+        return array(
+            'enforceSessionExpiration',
+            'enforceNoConcurrentLogin',
+            'accessControl', // perform access control for CRUD operations
+            'postOnly + delete', // we only allow deletion via POST request
+        );
+    }
+
+    /**
+     * Specifies the access control rules.
+     * This method is used by the 'accessControl' filter.
+     * @return array access control rules
+     */
+    public function accessRules()
+    {
+        return array(
+            array('allow',
+                'actions'=>array('audit','edit','save','backward','reject'),
+                'expression'=>array('PurchaseController','allowReadWrite'),
+            ),
+            array('allow',
+                'actions'=>array('index','view','downactive','see','detail','view'),
+                'expression'=>array('PurchaseController','allowReadOnly'),
+            ),
+            array('allow',
+                'actions'=>array('downorder'),
+                'expression'=>array('PurchaseController','allowRead'),
+            ),
+            array('deny',  // deny all users
+                'users'=>array('*'),
+            ),
+        );
+    }
+
+    public static function allowReadWrite() {
+        return Yii::app()->user->validRWFunction('YS01');
+    }
+    public static function allowReadOnly() {
+        return Yii::app()->user->validFunction('YS01');
+    }
+    public static function allowRead() {
+        return true;
+    }
 	public function actionIndex($pageNum=0) 
 	{
 		$model = new PurchaseList;

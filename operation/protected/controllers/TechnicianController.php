@@ -2,6 +2,45 @@
 
 class TechnicianController extends Controller
 {
+    public function filters()
+    {
+        return array(
+            'enforceSessionExpiration',
+            'enforceNoConcurrentLogin',
+            'accessControl', // perform access control for CRUD operations
+            'postOnly + delete', // we only allow deletion via POST request
+        );
+    }
+
+    /**
+     * Specifies the access control rules.
+     * This method is used by the 'accessControl' filter.
+     * @return array access control rules
+     */
+    public function accessRules()
+    {
+        return array(
+            array('allow',
+                'actions'=>array('new','edit','delete','save','finish','audit','orderGoodsDelete'),
+                'expression'=>array('TechnicianController','allowReadWrite'),
+            ),
+            array('allow',
+                'actions'=>array('index','view'),
+                'expression'=>array('TechnicianController','allowReadOnly'),
+            ),
+            array('deny',  // deny all users
+                'users'=>array('*'),
+            ),
+        );
+    }
+
+    public static function allowReadWrite() {
+        return Yii::app()->user->validRWFunction('YC02');
+    }
+
+    public static function allowReadOnly() {
+        return Yii::app()->user->validFunction('YC02');
+    }
 	public function actionIndex($pageNum=0) 
 	{
 		$model = new TechnicianList;

@@ -2,6 +2,58 @@
 
 class OrderController extends Controller
 {
+    public function filters()
+    {
+        return array(
+            'enforceSessionExpiration',
+            'enforceNoConcurrentLogin',
+            'accessControl', // perform access control for CRUD operations
+            'postOnly + delete', // we only allow deletion via POST request
+        );
+    }
+
+    /**
+     * Specifies the access control rules.
+     * This method is used by the 'accessControl' filter.
+     * @return array access control rules
+     */
+    public function accessRules()
+    {
+        return array(
+            array('allow',
+                'actions'=>array('audit','edit','delete','save','finish','orderGoodsDelete','validateAjax'),
+                'expression'=>array('OrderController','allowReadWrite'),
+            ),
+            array('allow',
+                'actions'=>array('index','view'),
+                'expression'=>array('OrderController','allowReadOnly'),
+            ),
+            array('allow',
+                'actions'=>array('activity','new','save','audit','delete','orderGoodsDelete','validateAjax'),
+                'expression'=>array('OrderController','addReadWrite'),
+            ),
+/*            array('allow',
+                'actions'=>array('index','view'),
+                'expression'=>array('OrderController','addReadOnly'),
+            ),*/
+            array('deny',  // deny all users
+                'users'=>array('*'),
+            ),
+        );
+    }
+
+    public static function allowReadWrite() {
+        return Yii::app()->user->validRWFunction('YD03');
+    }
+    public static function allowReadOnly() {
+        return Yii::app()->user->validFunction('YD03');
+    }
+    public static function addReadWrite() {
+        return Yii::app()->user->validRWFunction('YD04');
+    }
+    public static function addReadOnly() {
+        return Yii::app()->user->validFunction('YD04');
+    }
 	public function actionIndex($pageNum=0) 
 	{
 		$model = new OrderList;

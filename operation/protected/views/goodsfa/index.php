@@ -27,7 +27,7 @@ $this->pageTitle=Yii::app()->name . ' - Goods List';
         <div class="box-body">
             <?php
             //var_dump(Yii::app()->session['rw_func']);
-            if (Yii::app()->user->validRWFunction('YG01'))
+            if (Yii::app()->user->validRWFunction('YG05'))
                 echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('misc','Add').Yii::t("procurement","Fast"), array(
                     'submit'=>Yii::app()->createUrl('goodsfa/new'),
                 ));

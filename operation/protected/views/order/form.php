@@ -38,7 +38,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
         <?php endif;?>
 <?php if ($model->scenario!='view'): ?>
 			<?php
-            if($model->status == "pending" || $model->status == "cancelled"||$model->scenario=='new'){
+            if($model->status == "pending" || $model->status == "cancelled" || $model->status == "reject"||$model->scenario=='new'){
                 //存為草稿
                 echo TbHtml::button('<span class="fa fa-save"></span> '.Yii::t('misc','Save Draft'), array(
                     'submit'=>Yii::app()->createUrl('order/save')));
@@ -178,7 +178,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
                                 $tableTr.="<input type='hidden' class='stickies_id' name='OrderForm[goods_list][$con_num][stickies_id]' value='".$val['stickies_id']."'>";
                                 $tableTr.="<input type='hidden' class='classify_id' name='OrderForm[goods_list][$con_num][classify_id]' value='".$val['classify_id']."'>";
 
-                                if($model->scenario=='new' || $model->status == "pending"){
+                                if($model->scenario=='new' || $model->status == "pending" || $model->status == "reject"){
                                     $tableTr.='<button type="button" class="btn btn-default bg-fff dropdown-toggle" data-toggle="dropdown" data-id="'.$val["classify_id"].'">';
                                     $testNBSP = empty($classify[$val["classify_id"]])?"&nbsp;":$classify[$val["classify_id"]];
                                     $tableTr.='<span>'.$testNBSP.'</span><span class="caret"></span></button><ul class="dropdown-menu goodsIfy">';
@@ -237,7 +237,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
             </div>
 
             <!--備註-->
-            <?php if ($model->scenario =='new' || $model->status=='approve' || $model->status=='pending'): ?>
+            <?php if ($model->scenario =='new' || $model->status=='approve' || $model->status=='pending' || $model->status=='reject'): ?>
             <div class="form-group">
                 <?php echo $form->labelEx($model,'remark',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-7">
@@ -276,7 +276,7 @@ if ($model->scenario!='new')
 $goodList = json_encode($model->getGoodsList($model->order_class));
 $stickiesList = json_encode(StickiesForm::getStickiesContentList());
 $tableBool = 1;//表格內的輸入框能否輸入
-if($model->status == "pending" || $model->status == "cancelled"||$model->scenario=='new'){
+if($model->status == "pending" || $model->status == "cancelled"||$model->scenario=='new'||$model->status=='reject'){
     $tableBool = 0;
 }
 $js = '

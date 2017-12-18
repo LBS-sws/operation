@@ -442,6 +442,7 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
 							activity_id = :activity_id,
 							remark = :remark,
 							ject_remark = '',
+							status_type = 0,
 							luu = :luu,
 							lud = :lud,
 							status = :status

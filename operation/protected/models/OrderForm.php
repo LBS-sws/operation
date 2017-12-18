@@ -182,8 +182,8 @@ class OrderForm extends CFormModel
             if($this->order_class == "Import"||$this->order_class == "Domestic"){
                 $rows = Yii::app()->db->createCommand()->select("id")
                     ->from("opr_order")
-                    ->where('activity_id = :activity_id and judge=1 and order_class=:order_class and city=:city and status!="pending"',
-                        array(':activity_id'=>$this->activity_id,':city'=>$city,':order_class'=>$this->order_class))->queryAll();
+                    ->where('activity_id = :activity_id and judge=1 and order_class=:order_class and city=:city and status!="pending" and id !=:id',
+                        array(':activity_id'=>$this->activity_id,':city'=>$city,':order_class'=>$this->order_class,':id'=>$this->id))->queryAll();
                 $num = $rows?count($rows):0;
                 $rs = Yii::app()->db->createCommand()->select()->from("opr_order_activity")
                     ->where('id=:id and start_time<=:date and end_time>=:date and num>:num and order_class=:order_class',

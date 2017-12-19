@@ -155,6 +155,7 @@ class AreaAuditForm extends CFormModel
         ));
 
         //發送郵件
+        $oldOrderStatus[0]["status"] = "aaa";
         OrderGoods::sendEmail($oldOrderStatus,$this->status,$this->order_code,$this->activity_id);
 		return true;
 	}

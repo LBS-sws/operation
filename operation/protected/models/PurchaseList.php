@@ -108,4 +108,74 @@ class PurchaseList extends CListPageModel
             "list"=>$arr
         );
     }
+
+    public function getOrderListSearch($user_code='',$start_date='',$end_date=''){
+        $suffix = Yii::app()->params['envSuffix'];
+        $city_allow = Yii::app()->user->city_allow();
+        $connection = Yii::app()->db;
+        $sql="SELECT b.order_user, c.disp_name, b.status, b.city, b.order_class,b.lcd,a.goods_id,a.order_id,a.goods_num,a.confirm_num FROM opr_order_goods a LEFT JOIN opr_order b ON a.order_id = b.id
+ LEFT JOIN security$suffix.sec_user c ON b.order_user = c.username WHERE b.judge = 1 AND b.status != 'pending' AND b.order_class !='' AND  b.city in ($city_allow) ";
+        if(!empty($user_code)){
+            $sql.=" c.username like '%$user_code%'";
+        }
+        if(!empty($start_date)){
+            $sql.=" b.lcu >= '$start_date'";
+        }
+        if(!empty($end_date)){
+            $sql.=" b.lcu <= '$end_date'";
+        }
+        $sql.=" order by b.lcu desc";
+        $records = $connection->createCommand($sql)->queryAll();
+        if($records){
+            foreach ($records as &$record){
+                $goods_id=$record["goods_id"];
+                $order_id=$record["order_id"];
+                switch ($record["order_class"]){
+                    case "Import":
+                        $sqlName="opr_goods_im";
+                        break;
+                    case "Domestic":
+                        $sqlName="opr_goods_do";
+                        break;
+                    case "Fast":
+                        $sqlName="opr_goods_fa";
+                        break;
+                    default:
+                        unset($record);
+                        continue;
+                }
+                $goods_sql = "SELECT b.name AS classify_name,a.* FROM $sqlName a LEFT JOIN opr_classify b ON a.classify_id = b.id WHERE a.id=$goods_id";
+                $goods = $connection->createCommand($goods_sql)->queryRow();
+                if($goods){
+                    $record["goods_code"] = $goods["goods_code"];
+                    $record["goods_name"] = $goods["name"];
+                    $record["goods_class"] = $goods["classify_name"];
+                    $record["goods_price"] = $goods["price"];
+                    $num = empty($record["confirm_num"])?$record["goods_num"]:$record["confirm_num"];
+                    $price = floatval($goods["price"]);
+                    $record["goods_sum_price"] = sprintf("%.2f", floatval($num)*$price);
+                    $audit_time = $connection->createCommand("SELECT lcd FROM opr_order_status WHERE order_id=$order_id AND status='head approve'")->queryRow();
+                    if($audit_time){
+                        $record["audit_time"] = $audit_time["lcd"];
+                        $date1 = strtotime($record["lcd"]);
+                        $date2 = strtotime($audit_time["lcd"]);
+                        $time_difference = $date2 - $date1;
+                        $seconds_per_day = 60*60*24;
+                        $day = round($time_difference / $seconds_per_day);
+                        $record["audit_log"] = $day."天";
+                    }else{
+                        $record["audit_time"] = "";
+                        $record["audit_log"] = "";
+                    }
+                }else{
+                    unset($record);
+                    continue;
+                }
+                $record["city_name"] = CGeneral::getCityName($record["city"]);
+            }
+            return $records;
+        }else{
+            return array();
+        }
+    }
 }

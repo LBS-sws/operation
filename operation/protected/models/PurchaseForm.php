@@ -357,7 +357,7 @@ class PurchaseForm extends CFormModel
 
         Yii::app()->db->createCommand()->insert('opr_order_status', array(
             'order_id'=>$this->id,
-            'status'=>$this->status,
+            'status'=>$this->status == "approve"?"head approve":$this->status,
             'r_remark'=>$this->remark,
             'lcu'=>Yii::app()->user->user_display_name(),
             'time'=>date('Y-m-d H:i:s'),

@@ -64,6 +64,7 @@ return array(
 	'pending'=>'等待',
 	'sent'=>'发送',
 	'approve'=>'批准',
+	'head approve'=>'总部批准',
 	'reject'=>'拒绝',
     'reject remark'=>'拒绝原因',
 	'cancelled'=>'取消',

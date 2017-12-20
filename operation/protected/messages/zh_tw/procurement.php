@@ -65,6 +65,7 @@ return array(
     'pending'=>'等待',
     'sent'=>'發送',
     'approve'=>'批准',
+    'head approve'=>'總部批准',
     'reject'=>'拒絕',
     'reject remark'=>'拒絕原因',
     'cancelled'=>'取消',

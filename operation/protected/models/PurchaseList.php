@@ -139,7 +139,7 @@ WHERE a.judge = 0 AND (a.status = 'finished' OR a.status = 'approve') AND a.city
         if(!empty($end_date)){
             $sql.=" a.lcu <= '$end_date'";
         }
-        $sql.=" order by a.lcu desc";
+        $sql.=" order by a.lcd desc";
         $records = $connection->createCommand($sql)->queryAll();
         if($records){
             foreach ($records as &$record){

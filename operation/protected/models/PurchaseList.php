@@ -109,7 +109,60 @@ class PurchaseList extends CListPageModel
         );
     }
 
-    public function getOrderListSearch($user_code='',$start_date='',$end_date=''){
+    /**
+     * 獲取外勤領料列表（一個物品一行）
+     * @param string $city_allow  訂單城市的範圍  例如：'SH','SZ','BJ'
+     * @param string $user_code   用戶編號
+     * @param string $start_date  訂單開始日期
+     * @param string $end_date    訂單結束日期
+     * @return array
+     */
+    public function getOrderListSearch($city_allow,$user_code='',$start_date='',$end_date=''){
+        $suffix = Yii::app()->params['envSuffix'];
+        if(empty($city_allow)){
+            $city_allow = Yii::app()->user->city_allow();
+        }
+        $connection = Yii::app()->db;
+        $sql="SELECT d.disp_name,a.status,a.order_code,a.city,a.lcd,b.order_id,b.goods_id,b.goods_num,b.confirm_num,c.goods_code,c.name AS goods_name,c.costing AS goods_cost,e.name AS classify_name
+FROM opr_order a 
+LEFT JOIN opr_order_goods b ON a.id = b.order_id 
+LEFT JOIN security$suffix.sec_user d ON a.order_user = d.username
+LEFT JOIN opr_warehouse c ON c.id = b.goods_id 
+LEFT JOIN opr_classify e ON e.id = c.classify_id 
+WHERE a.judge = 0 AND (a.status = 'finished' OR a.status = 'approve') AND a.city IN ($city_allow) AND c.goods_code IS NOT NULL ";
+        if(!empty($user_code)){
+            $sql.=" d.username like '%$user_code%'";
+        }
+        if(!empty($start_date)){
+            $sql.=" a.lcu >= '$start_date'";
+        }
+        if(!empty($end_date)){
+            $sql.=" a.lcu <= '$end_date'";
+        }
+        $sql.=" order by a.lcu desc";
+        $records = $connection->createCommand($sql)->queryAll();
+        if($records){
+            foreach ($records as &$record){
+                $order_id=$record["order_id"];
+                $audit_time = $connection->createCommand("SELECT lcd FROM opr_order_status WHERE order_id=$order_id AND status='approve' order by id desc")->queryRow();
+                if($audit_time){
+                    $record["audit_time"] = $audit_time["lcd"];
+                }else{
+                    $record["audit_time"] = "";
+                }
+                $num = empty($record["confirm_num"])?$record["goods_num"]:$record["confirm_num"];
+                $price = floatval($record["goods_cost"]);
+                $record["goods_sum_price"] = sprintf("%.2f", floatval($num)*$price);
+                $record["city_name"] = CGeneral::getCityName($record["city"]);
+            }
+            return $records;
+        }else{
+            return array();
+        }
+    }
+
+    //獲取中央訂單列表（一個物品一行）
+    public function getOrderHeadListSearch($user_code='',$start_date='',$end_date=''){
         $suffix = Yii::app()->params['envSuffix'];
         $city_allow = Yii::app()->user->city_allow();
         $connection = Yii::app()->db;

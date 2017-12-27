@@ -47,5 +47,18 @@ return array(
 	'Order Records Report'=>'订货记录报表',
 	'Activity Info'=>'采购周期',
 	
+	'Picking Records Report'=>'领料记录报表',
+	'Order User ID'=>'申请用户编号',
+	'Order User Name'=>'申请用户名字',
+	'Item Code'=>'货品编号',
+	'Item Name'=>'货品名称',
+	'Item Class'=>'货品类别',
+	'Item Cost'=>'货品成本价格',
+	'Req. Qty.'=>'要求数量',
+	'Act. Qty.'=>'真实数量',
+	'Total Cost'=>'总价',
+	'Order Date'=>'订货日期',
+	'Approved Date'=>'审批日期',
+	'Order Person'=>'申请人',
 );
 ?>

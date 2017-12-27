@@ -141,7 +141,10 @@ WHERE a.judge = 0 AND (a.status = 'finished' OR a.status = 'approve') AND a.city
             $sql.=" AND a.lcd <= '$end_date'";
         }
         $sql.=" order by a.lcd desc";
+<<<<<<< HEAD
 
+=======
+>>>>>>> d2bc8eabf5415e2c8eb88a5cf6ca124f037591c7
         $records = $connection->createCommand($sql)->queryAll();
         if($records){
             foreach ($records as &$record){

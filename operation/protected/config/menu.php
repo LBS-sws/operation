@@ -105,6 +105,10 @@ return array(
                 'access'=>'YB03',
                 'url'=>'/report/orderlist',
             ),
+            'Picking List'=>array(
+                'access'=>'YB04',
+                'url'=>'/report/pickinglist',
+            ),
             'Report Manager'=>array(
                 'access'=>'YB01',
                 'url'=>'/queue/index',

@@ -26,6 +26,7 @@ return array(
     'Sales Summary'=>'营业报告',
 	'Order Records'=>'订货记录报表',
     'Report Manager'=>'报表管理员',
+	'Picking List'=>'领料记录报表',
 
     'System Setting'=>'系统设置',
     'Security'=>'保安',

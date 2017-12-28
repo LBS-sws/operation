@@ -229,6 +229,7 @@ class PurchaseView extends CFormModel
             ->where("activity_id = :activity_id AND status_type=1 AND judge=1 AND status != 'pending' AND status != 'cancelled'", array(':activity_id'=>$activity_id))->queryAll();
         if($rows){
             foreach ($rows as $row){
+                $cityName = CGeneral::getCityName($row['city']);
                 if(empty($arr[$row['city']])){
                     $arr[$row['city']]=array();
                     $goodList = array();
@@ -251,6 +252,7 @@ class PurchaseView extends CFormModel
                         $rules = RulesForm::getRulesToId($goods["rules_id"]);
                         $goodList[$goodId]["multiple"] = $rules["multiple"];
                     }
+                    $goodList[$goodId]["order_city"] = $cityName;
                 }
                 $company = PurchaseView::getCompanyToCity($row['city']);
                 $arr[$row['city']]["cityCode"]=$row['city'];

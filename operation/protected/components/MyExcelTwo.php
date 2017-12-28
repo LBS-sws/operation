@@ -205,6 +205,47 @@ class MyExcelTwo {
         $this->protoSum[$cityCode] = $list;
     }
 
+    //填充內容
+    public function fillDownExcelToDocument($cityList){
+        $str ="H";
+        $row = $this->row;
+        $this->objActSheet->setCellValue("A".$row,"物品編號");
+        $this->objActSheet->setCellValue("B".$row,"物品名稱");
+        $this->objActSheet->setCellValue("C".$row,"來源地");
+        $this->objActSheet->setCellValue("D".$row,"物品規格");
+        $this->objActSheet->setCellValue("E".$row,"要求數量");
+        $this->objActSheet->setCellValue("F".$row,"物品單位");
+        $this->objActSheet->setCellValue("G".$row,"地區");
+        $row++;
+        foreach ($cityList as $cityCode => $goodsList){
+            foreach ($goodsList["goodList"] as $goods){
+                $this->objActSheet->setCellValue("A".$row,$goods["goods_code"]);
+                $this->objActSheet->setCellValue("B".$row,$goods["name"]);
+                $this->objActSheet->setCellValue("C".$row,$goods["origin"]);
+                $this->objActSheet->setCellValue("D".$row,$goods["type"]);
+                $this->objActSheet->setCellValue("E".$row,$goods["goods_num"]);
+                $this->objActSheet->setCellValue("F".$row,$goods["unit"]);
+                $this->objActSheet->setCellValue("G".$row,$goods["order_city"]);
+                /*            $priceSum = intval($goods["confirm_num"])*floatval($goods["price"]);
+                            if($order_class == "Document"){
+                                $this->objActSheet->setCellValue("G".$row,$goods["price"]);
+                                $this->objActSheet->setCellValue("H".$row,sprintf("%.2f",$priceSum));
+                            }*/
+                $row++;
+            }
+        }
+        //$this->objActSheet->getStyle('A'.$this->row.':'.$str.$row)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+        $styleArray = array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        );
+        $this->objActSheet->getStyle('A'.$this->row.':'.$str.($row-1))->applyFromArray($styleArray);
+        $this->objActSheet->freezePane('A'.($this->row+1));
+    }
+
     //添加新的sheet
     public function addNewSheet($sheetName=""){
         $this->sheetNum++;

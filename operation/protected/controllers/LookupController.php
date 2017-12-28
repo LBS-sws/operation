@@ -24,7 +24,7 @@ class LookupController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('goodex'),
+				'actions'=>array('goodex','yc02userex'),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -60,6 +60,23 @@ class LookupController extends Controller
 		echo TbHtml::listBox('lstlookup', '', $data, array('size'=>'15',));
 	}
 */
+	public function actionYC02UserEx($search)
+	{
+		$suffix = Yii::app()->params['envSuffix'];
+		$suffix = ($suffix=='dev') ? '_w' : $suffix;
+		$city = Yii::app()->user->city_allow();
+		$result = array();
+		$searchx = str_replace("'","\'",$search);
+
+		$sql = "select a.username as id, concat(a.disp_name, ' (', a.username, ')') as value 
+				from security$suffix.sec_user a, security$suffix.sec_user_access b 
+				where (a.username like '%$searchx%' or a.disp_name like '%$searchx%')
+				and a.username=b.username and (b.a_read_only like '%YC02%' or b.a_read_write like '%YC02%')
+				and a.city in ($city)
+			";
+		$result = Yii::app()->db->createCommand($sql)->queryAll();
+		print json_encode($result);
+	}
 
 	public function actionGoodEx($search)
 	{

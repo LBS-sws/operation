@@ -4,6 +4,7 @@ class ReportController extends Controller
 	protected static $actions = array(
 						'salessummary'=>'YB02',
 						'orderlist'=>'YB03',
+						'pickinglist'=>'YB04',
 					);
 	
 	public function filters()
@@ -58,6 +59,21 @@ class ReportController extends Controller
 			}
 		}
 		$this->render('form_y02',array('model'=>$model));
+	}
+
+	public function actionPickinglist() {
+		$model = new ReportY03Form;
+		if (isset($_POST['ReportY03Form'])) {
+			$model->attributes = $_POST['ReportY03Form'];
+			if ($model->validate()) {
+				$model->addQueueItem();
+				Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Report submitted. Please go to Report Manager to retrieve the output.'));
+			} else {
+				$message = CHtml::errorSummary($model);
+				Dialog::message(Yii::t('dialog','Validation Message'), $message);
+			}
+		}
+		$this->render('form_y03',array('model'=>$model));
 	}
 
 	public static function allowExecute() {

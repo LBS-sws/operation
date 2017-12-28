@@ -123,7 +123,7 @@ class PurchaseList extends CListPageModel
             $city_allow = Yii::app()->user->city_allow();
         }
         $connection = Yii::app()->db;
-        $sql="SELECT d.disp_name,a.status,a.order_code,a.city,a.lcd,b.order_id,b.goods_id,b.goods_num,b.confirm_num,c.goods_code,c.name AS goods_name,c.costing AS goods_cost,e.name AS classify_name
+        $sql="SELECT a.order_user,d.disp_name,a.status,a.order_code,a.city,a.lcd,b.order_id,b.goods_id,b.goods_num,b.confirm_num,c.goods_code,c.name AS goods_name,c.costing AS goods_cost,e.name AS classify_name
 FROM opr_order a 
 LEFT JOIN opr_order_goods b ON a.id = b.order_id 
 LEFT JOIN security$suffix.sec_user d ON a.order_user = d.username
@@ -131,15 +131,17 @@ LEFT JOIN opr_warehouse c ON c.id = b.goods_id
 LEFT JOIN opr_classify e ON e.id = c.classify_id 
 WHERE a.judge = 0 AND (a.status = 'finished' OR a.status = 'approve') AND a.city IN ($city_allow) AND c.goods_code IS NOT NULL ";
         if(!empty($user_code)){
-            $sql.=" d.username like '%$user_code%'";
+//            $sql.=" d.username like '%$user_code%'";
+            $sql.=" AND d.username in ($user_code)";
         }
         if(!empty($start_date)){
-            $sql.=" a.lcu >= '$start_date'";
+            $sql.=" AND a.lcd >= '$start_date'";
         }
         if(!empty($end_date)){
-            $sql.=" a.lcu <= '$end_date'";
+            $sql.=" AND a.lcd <= '$end_date'";
         }
         $sql.=" order by a.lcd desc";
+
         $records = $connection->createCommand($sql)->queryAll();
         if($records){
             foreach ($records as &$record){

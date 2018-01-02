@@ -198,7 +198,8 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 													'form'=>$form,
 													'doctype'=>'OPER4',
 													'header'=>Yii::t('monthly','Report Detail'),
-													'ronly'=>(!($model->wfstatus=='PA' && Yii::app()->user->validFunction('YN01'))),
+//													'ronly'=>(!($model->wfstatus=='PA' && Yii::app()->user->validFunction('YN01'))),
+													'ronly'=>(!(Yii::app()->user->validFunction('YN01'))),
 													)); 
 ?>
 <?php $this->renderPartial('//monthly/reason',array('model'=>$model,'form'=>$form)); ?>

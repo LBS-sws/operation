@@ -180,16 +180,16 @@ $("#radio-change input").on("change",function(){
         $("#row"+num).show();
         $("#row"+(1-num)).hide();
         if(num == 0){
-            $("#GoodsImForm_rules_id").val(0);
+            $("#GoodsDoForm_rules_id").val(0);
         }
-        if($("#GoodsImForm_small_num").val() < 1){
-            $("#GoodsImForm_small_num").val(1);
+        if($("#GoodsDoForm_small_num").val() < 1){
+            $("#GoodsDoForm_small_num").val(1);
         }
-        if($("#GoodsImForm_big_num").val() < 1){
-            $("#GoodsImForm_big_num").val(1);
+        if($("#GoodsDoForm_big_num").val() < 1){
+            $("#GoodsDoForm_big_num").val(1);
         }
-        if($("#GoodsImForm_multiple").val() < 1){
-            $("#GoodsImForm_multiple").val(1);
+        if($("#GoodsDoForm_multiple").val() < 1){
+            $("#GoodsDoForm_multiple").val(1);
         }
     }
 });

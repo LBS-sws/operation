@@ -288,7 +288,7 @@ class DeliveryForm extends CFormModel
 
 
     public function getTableHeard(){
-        $arr = array("物品編號","物品名称","要求備註","總部備註","要求數量","實際數量");
+        $arr = array("物品編號","物品名称","物品單位","要求備註","總部備註","要求數量","實際數量");
         return $arr;
     }
     //整理出下載的物品列表
@@ -296,7 +296,7 @@ class DeliveryForm extends CFormModel
         $goodsList = $this->goods_list;
         $arr = array();
         foreach ($goodsList as $goods){
-            array_push($arr,array($goods["goods_code"],$goods["name"],$goods["note"],$goods["remark"],$goods["goods_num"],$goods["confirm_num"]));
+            array_push($arr,array($goods["goods_code"],$goods["name"],$goods["unit"],$goods["note"],$goods["remark"],$goods["goods_num"],$goods["confirm_num"]));
         }
         return $arr;
     }

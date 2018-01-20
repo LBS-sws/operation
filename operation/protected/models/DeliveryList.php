@@ -2,6 +2,9 @@
 
 class DeliveryList extends CListPageModel
 {
+    public $searchTimeStart;//開始日期
+    public $searchTimeEnd;//結束日期
+    public $goods_name;//結束日期
     public function attributeLabels()
     {
         return array(
@@ -16,6 +19,13 @@ class DeliveryList extends CListPageModel
             'city'=>Yii::t('procurement','Order For City'),
             'lcd'=>Yii::t('procurement','Apply for time'),
             'lcu'=>Yii::t('procurement','Apply for user'),
+            'goods_name'=>Yii::t('procurement','Goods Name'),
+        );
+    }
+
+    public function rules(){
+        return array(
+            array('attr, pageNum, noOfItem, totalRow, searchField, searchValue, orderField, orderType, searchTimeStart, searchTimeEnd','safe',),
         );
     }
 
@@ -42,9 +52,20 @@ class DeliveryList extends CListPageModel
                     $clause .= General::getSqlConditionClause('order_code', $svalue);
                     break;
                 case 'lcu':
-                    $clause .= General::getSqlConditionClause('lcu', $svalue);
+                    $clause .= ' and lcu in '.$this->getUserCodeSqlLikeName($svalue);
+                    break;
+                case 'goods_name':
+                    $clause .= ' and id in '.$this->getOrderIdSqlLikeGoodsName($svalue);
                     break;
             }
+        }
+        if (!empty($this->searchTimeStart) && !empty($this->searchTimeStart)) {
+            $svalue = str_replace("'","\'",$this->searchTimeStart);
+            $clause .= " and lcd >='$svalue 00:00:00' ";
+        }
+        if (!empty($this->searchTimeEnd) && !empty($this->searchTimeEnd)) {
+            $svalue = str_replace("'","\'",$this->searchTimeEnd);
+            $clause .= " and lcd <='$svalue 23:59:59' ";
         }
 
         $order = "";
@@ -82,4 +103,37 @@ class DeliveryList extends CListPageModel
         return true;
     }
 
+//用戶名字（模糊查詢）
+    public function getUserCodeSqlLikeName($name)
+    {
+        $from =  'security'.Yii::app()->params['envSuffix'].'.sec_user';
+        $rows = Yii::app()->db->createCommand()->select("username")->from($from)->where(array('like', 'disp_name', "%$name%"))->queryAll();
+        $arr = array();
+        foreach ($rows as $row){
+            array_push($arr,"'".$row["username"]."'");
+        }
+        if(empty($arr)){
+            return "('')";
+        }else{
+            $arr = implode(",",$arr);
+            return "($arr)";
+        }
+    }
+
+//物品查詢（模糊查詢）
+    public function getOrderIdSqlLikeGoodsName($name)
+    {
+        $rows = Yii::app()->db->createCommand()->select("a.order_id")->from("opr_order_goods a")->leftJoin("opr_warehouse b","a.goods_id=b.id")
+            ->where(array('like', 'b.name', "%$name%"))->queryAll();
+        $arr = array();
+        foreach ($rows as $row){
+            array_push($arr,"'".$row["order_id"]."'");
+        }
+        if(empty($arr)){
+            return "('')";
+        }else{
+            $arr = implode(",",$arr);
+            return "($arr)";
+        }
+    }
 }

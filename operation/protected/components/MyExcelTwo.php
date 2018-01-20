@@ -113,6 +113,43 @@ class MyExcelTwo {
 
     }
 
+    //下載外勤領料所有沒審核的訂單
+    public function setDeliveryExcel($orderList){
+        $strList = $this->listArr;
+        if(!empty($orderList)){
+            $foreachNum = 1;
+            foreach ($orderList as $order){
+                $maxHeight = 8;
+                $strNum = $foreachNum%2 != 0?0:5;
+                $numStart = $this->row;
+                $this->setRowContent($strList[$strNum].$numStart,"订单编号：".$order["order_code"],$strList[$strNum+3].$numStart);
+                $this->setRowContent($strList[$strNum].($numStart+1),"申請日期：".$order["lcd"],$strList[$strNum+3].($numStart+1));
+                $this->setRowContent($strList[$strNum].($numStart+2),"下的用戶：".$order["lcu_name"],$strList[$strNum+3].($numStart+2));
+                $this->setRowContent($strList[$strNum].($numStart+3),"訂單狀態：".$order["status"],$strList[$strNum+3].($numStart+3));
+
+                $this->objActSheet->setCellValue($strList[$strNum].($numStart+5),"物品编号");
+                $this->objActSheet->setCellValue($strList[$strNum+1].($numStart+5),"物品名称");
+                $this->objActSheet->setCellValue($strList[$strNum+2].($numStart+5),"单位");
+                $this->objActSheet->setCellValue($strList[$strNum+3].($numStart+5),"要求数量");
+                if(is_array($order["goodsList"])){
+                    $maxHeight+=count($order["goodsList"]);
+                    $goodsNum = $numStart+6;
+                    foreach ($order["goodsList"] as $goods){
+                        $this->objActSheet->setCellValue($strList[$strNum].$goodsNum,$goods["goods_code"]);
+                        $this->objActSheet->setCellValue($strList[$strNum+1].$goodsNum,$goods["name"]);
+                        $this->objActSheet->setCellValue($strList[$strNum+2].$goodsNum,$goods["unit"]);
+                        $this->objActSheet->setCellValue($strList[$strNum+3].$goodsNum,$goods["goods_num"]);
+                        $goodsNum++;
+                    }
+                }
+                if($foreachNum%2 == 0){
+                    $this->row +=$maxHeight;
+                }
+                $foreachNum++;
+            }
+        }
+    }
+
     //填充內容
     public function fillDownExcel($goodList,$order_class){
         $str ="H";

@@ -238,5 +238,9 @@ return array(
     //2017-12-11
     'Black Number'=>'退回數量',
     'All to see'=>'全部查看',
+
+    //2018-01-19
+    'All shipments'=>'全部發貨',
+    'Are you sure you want to approve all shipments?'=>'您確定要全部批准發貨嗎？',
 );
 ?>

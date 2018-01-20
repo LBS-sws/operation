@@ -21,6 +21,9 @@ class DeliveryForm extends CFormModel
 	public $black_id;
 	public $goods_id;
 
+	//批量處理的訂單
+    public $orderList;
+
     public function attributeLabels()
 	{
 		return array(
@@ -317,5 +320,62 @@ class DeliveryForm extends CFormModel
             'lcu'=>Yii::app()->user->user_display_name(),
             'time'=>date('Y-m-d H:i:s'),
         ));
+    }
+
+    //檢查是否有未發貨的訂單
+    public function validateAll(){
+        $city = Yii::app()->user->city();
+        $rows = Yii::app()->db->createCommand()->select("*")->from("opr_order")->where("city='$city' AND judge=0 AND status in ('read','sent')")->queryAll();
+        if($rows){
+            $this->orderList = $rows;
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    //批量下載訂單
+    public function allDownload(){
+        $orderList = $this->orderList;
+        if(!empty($orderList)) {
+            foreach ($orderList as &$order) {
+                $order["lcu_name"]=OrderGoods::getNameToUsername($order['lcu']);
+                $order["goodsList"] = WarehouseForm::getGoodsListToId($order['id']);
+                $order["status"] = OrderList::printPurchaseStatus($order["status"]);
+                $order["lcd"] = date("Y-m-d",strtotime($order["lcd"]));
+            }
+            return $orderList;
+        }else{
+            return array();
+        }
+    }
+
+    //批量批准訂單
+    public function allApproved(){
+        $orderList = $this->orderList;
+        $uid = Yii::app()->user->id;
+        $city = Yii::app()->user->city();
+        if(!empty($orderList)){
+            foreach ($orderList as $order){
+                //記錄
+                Yii::app()->db->createCommand()->insert('opr_order_status', array(
+                    'order_id'=>$order["id"],
+                    'status'=>"approve",
+                    'r_remark'=>"",
+                    'lcu'=>Yii::app()->user->user_display_name(),
+                    'time'=>date('Y-m-d H:i:s'),
+                ));
+                //修改物品的實際數量
+                $sql = "UPDATE opr_order_goods SET confirm_num = goods_num WHERE order_id=".$order["id"];
+                Yii::app()->db->createCommand($sql)->execute();
+            }
+
+            //批量修改
+            Yii::app()->db->createCommand()->update('opr_order', array(
+                'status'=>"approve",
+                'luu'=>$uid,
+            ), "city='$city' AND judge=0 AND status in ('read','sent')");
+        }
+
     }
 }

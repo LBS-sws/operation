@@ -26,7 +26,7 @@ class DeliveryController extends Controller
                 'expression'=>array('DeliveryController','allowReadWrite'),
             ),
             array('allow',
-                'actions'=>array('index','view'),
+                'actions'=>array('index','view','allApproved','allDownload'),
                 'expression'=>array('DeliveryController','allowReadOnly'),
             ),
             array('allow',
@@ -179,7 +179,6 @@ class DeliveryController extends Controller
         $arr = $_POST;
         $model = new DeliveryForm("black");
         $model->attributes = $arr;
-        var_dump($model->attributes);
         if($model->validate()){
             $model->blackGoods($arr["name"]);
             Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
@@ -188,5 +187,30 @@ class DeliveryController extends Controller
             Dialog::message(Yii::t('dialog','Validation Message'), $message);
         }
         $this->redirect(Yii::app()->createUrl('delivery/edit',array('index'=>$model->id)));
+    }
+
+    //全部批准發貨
+    public function actionAllApproved(){
+        $model = new DeliveryForm();
+        if($model->validateAll()){
+            $model->allApproved();
+            $this->redirect(Yii::app()->createUrl('delivery/index'));
+            Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
+        }else{
+            Dialog::message(Yii::t('dialog','Validation Message'), "沒有待发货的订单");
+        }
+    }
+
+    //下載全部未發貨訂單
+    public function actionAllDownload(){
+        $model = new DeliveryForm();
+        if($model->validateAll()){
+            $orderList = $model->allDownload();
+            $myExcel = new MyExcelTwo();
+            $myExcel->setDeliveryExcel($orderList);
+            $myExcel->outDownExcel("全部订单.xls");
+        }else{
+            Dialog::message(Yii::t('dialog','Validation Message'), "沒有待发货的订单");
+        }
     }
 }

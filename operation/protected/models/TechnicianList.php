@@ -2,6 +2,9 @@
 
 class TechnicianList extends CListPageModel
 {
+    public $searchTimeStart;//開始日期
+    public $searchTimeEnd;//結束日期
+    public $goods_name;//結束日期
     public function attributeLabels()
     {
         return array(
@@ -15,6 +18,13 @@ class TechnicianList extends CListPageModel
             'status'=>Yii::t('procurement','Order Status'),
             'city'=>Yii::t('procurement','Order For City'),
             'lcd'=>Yii::t('procurement','Apply for time'),
+            'goods_name'=>Yii::t('procurement','Goods Name'),
+        );
+    }
+
+    public function rules(){
+        return array(
+            array('attr, pageNum, noOfItem, totalRow, searchField, searchValue, orderField, orderType, searchTimeStart, searchTimeEnd','safe',),
         );
     }
 
@@ -40,7 +50,18 @@ class TechnicianList extends CListPageModel
                 case 'order_code':
                     $clause .= General::getSqlConditionClause('order_code', $svalue);
                     break;
+                case 'goods_name':
+                    $clause .= ' and id in '.DeliveryList::getOrderIdSqlLikeGoodsName($svalue);
+                    break;
             }
+        }
+        if (!empty($this->searchTimeStart) && !empty($this->searchTimeStart)) {
+            $svalue = str_replace("'","\'",$this->searchTimeStart);
+            $clause .= " and lcd >='$svalue 00:00:00' ";
+        }
+        if (!empty($this->searchTimeEnd) && !empty($this->searchTimeEnd)) {
+            $svalue = str_replace("'","\'",$this->searchTimeEnd);
+            $clause .= " and lcd <='$svalue 23:59:59' ";
         }
 
         $order = "";

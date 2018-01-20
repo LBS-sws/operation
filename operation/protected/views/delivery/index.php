@@ -23,16 +23,43 @@ $this->pageTitle=Yii::app()->name . ' - Delivery List';
 </section>
 
 <section class="content">
-	<?php $this->widget('ext.layout.ListPageWidget', array(
-			'title'=>Yii::t('procurement','Order List'),
-			'model'=>$model,
-				'viewhdr'=>'//delivery/_listhdr',
-				'viewdtl'=>'//delivery/_listdtl',
-				'search'=>array(
-							'order_code',
-							'lcu',
-						),
-		));
+    <div class="box">
+        <div class="box-body">
+            <div class="btn-group" role="group">
+                <?php
+                echo TbHtml::button('<span class="fa fa-paper-plane"></span> '.Yii::t('procurement','All shipments'), array(
+                    'submit'=>Yii::app()->createUrl('delivery/allApproved'),
+                ));
+                ?>
+            </div>
+            <div class="btn-group pull-right" role="group">
+                <?php
+                echo TbHtml::button('<span class="fa fa-cloud-download"></span> '.Yii::t('misc','Download'), array(
+                    'submit'=>Yii::app()->createUrl('delivery/allDownload'),
+                ));
+                ?>
+            </div>
+        </div>
+    </div>
+	<?php
+    $search_add_html="";
+    $search_add_html .= TbHtml::textField('DeliveryList[searchTimeStart]',$model->searchTimeStart,
+        array('size'=>15,'placeholder'=>Yii::t('misc','Start Date'),"class"=>"form-control","id"=>"start_time"));
+    $search_add_html.="<span>&nbsp;&nbsp;-&nbsp;&nbsp;</span>";
+    $search_add_html .= TbHtml::textField('DeliveryList[searchTimeEnd]',$model->searchTimeEnd,
+        array('size'=>15,'placeholder'=>Yii::t('misc','End Date'),"class"=>"form-control","id"=>"end_time"));
+    $this->widget('ext.layout.ListPageWidget', array(
+        'title'=>Yii::t('procurement','Order List'),
+        'model'=>$model,
+        'viewhdr'=>'//delivery/_listhdr',
+        'viewdtl'=>'//delivery/_listdtl',
+        'search_add_html'=>$search_add_html,
+        'search'=>array(
+            'order_code',
+            'lcu',
+            'goods_name',
+        ),
+	));
 	?>
 </section>
 <?php
@@ -44,6 +71,11 @@ $this->pageTitle=Yii::app()->name . ' - Delivery List';
 <?php $this->endWidget(); ?>
 
 <?php
+$js = "
+$('#start_time').datepicker({autoclose: true, format: 'yyyy/mm/dd',language: 'zh_cn'});
+$('#end_time').datepicker({autoclose: true, format: 'yyyy/mm/dd',language: 'zh_cn'});
+";
+Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 	$js = Script::genTableRowClick();
 	Yii::app()->clientScript->registerScript('rowClick',$js,CClientScript::POS_READY);
 ?>

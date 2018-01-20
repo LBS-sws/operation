@@ -36,15 +36,25 @@ $this->pageTitle=Yii::app()->name . ' - Technician List';
             </div>
         </div>
     </div>
-	<?php $this->widget('ext.layout.ListPageWidget', array(
-			'title'=>Yii::t('procurement','Order List'),
-			'model'=>$model,
-				'viewhdr'=>'//technician/_listhdr',
-				'viewdtl'=>'//technician/_listdtl',
-				'search'=>array(
-							'order_code',
-						),
-		));
+	<?php
+    $search_add_html="";
+    $search_add_html .= TbHtml::textField('TechnicianList[searchTimeStart]',$model->searchTimeStart,
+        array('size'=>15,'placeholder'=>Yii::t('misc','Start Date'),"class"=>"form-control","id"=>"start_time"));
+    $search_add_html.="<span>&nbsp;&nbsp;-&nbsp;&nbsp;</span>";
+    $search_add_html .= TbHtml::textField('TechnicianList[searchTimeEnd]',$model->searchTimeEnd,
+        array('size'=>15,'placeholder'=>Yii::t('misc','End Date'),"class"=>"form-control","id"=>"end_time"));
+
+    $this->widget('ext.layout.ListPageWidget', array(
+        'title'=>Yii::t('procurement','Order List'),
+        'model'=>$model,
+        'viewhdr'=>'//technician/_listhdr',
+        'viewdtl'=>'//technician/_listdtl',
+        'search_add_html'=>$search_add_html,
+        'search'=>array(
+            'order_code',
+            'goods_name',
+        ),
+    ));
 	?>
 </section>
 <?php
@@ -56,6 +66,11 @@ $this->pageTitle=Yii::app()->name . ' - Technician List';
 <?php $this->endWidget(); ?>
 
 <?php
+$js = "
+$('#start_time').datepicker({autoclose: true, format: 'yyyy/mm/dd',language: 'zh_cn'});
+$('#end_time').datepicker({autoclose: true, format: 'yyyy/mm/dd',language: 'zh_cn'});
+";
+Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 	$js = Script::genTableRowClick();
 	Yii::app()->clientScript->registerScript('rowClick',$js,CClientScript::POS_READY);
 ?>

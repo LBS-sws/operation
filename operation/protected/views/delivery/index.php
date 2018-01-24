@@ -74,6 +74,9 @@ $this->pageTitle=Yii::app()->name . ' - Delivery List';
 $js = "
 $('#start_time').datepicker({autoclose: true, format: 'yyyy/mm/dd',language: 'zh_cn'});
 $('#end_time').datepicker({autoclose: true, format: 'yyyy/mm/dd',language: 'zh_cn'});
+$('.checkBoxDown').on('click',function(e){
+    e.stopPropagation();
+});
 ";
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 	$js = Script::genTableRowClick();

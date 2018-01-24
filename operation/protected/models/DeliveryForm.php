@@ -23,6 +23,7 @@ class DeliveryForm extends CFormModel
 
 	//批量處理的訂單
     public $orderList;
+    public $checkBoxDown;
 
     public function attributeLabels()
 	{
@@ -47,7 +48,7 @@ class DeliveryForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id,num,black_id, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, luu, lcu, lud, lcd','safe'),
+			array('id,num,black_id, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, luu, lcu, lud, lcd, checkBoxDown','safe'),
             array('goods_list','required','on'=>array('audit','edit','reject')),
             array('goods_list','validateGoods','on'=>array('audit','edit')),
             array('ject_remark','required','on'=>'reject'),
@@ -133,7 +134,7 @@ class DeliveryForm extends CFormModel
                 $this->order_user = $row['order_user'];
                 //$this->technician = $row['technician'];
                 $this->status = $row['status'];
-                $this->remark = "";
+                $this->remark = $row['remark'];
                 $this->lcu = $row['lcu'];
                 $this->ject_remark = $row['ject_remark'];
                 $this->lcd = date("Y-m-d",strtotime($row['lcd']));
@@ -325,7 +326,15 @@ class DeliveryForm extends CFormModel
     //檢查是否有未發貨的訂單
     public function validateAll(){
         $city = Yii::app()->user->city();
-        $rows = Yii::app()->db->createCommand()->select("*")->from("opr_order")->where("city='$city' AND judge=0 AND status in ('read','sent')")->queryAll();
+        $sql ="city='$city' AND judge=0 AND status in ('read','sent')";
+        if($this->getScenario()=="approved"){
+            if(empty($this->checkBoxDown)||!is_array($this->checkBoxDown)){
+                return false;
+            }
+            $idList = implode(",",$this->checkBoxDown);
+            $sql.=" and id in($idList)";
+        }
+        $rows = Yii::app()->db->createCommand()->select("*")->from("opr_order")->where($sql)->queryAll();
         if($rows){
             $this->orderList = $rows;
             return true;
@@ -370,11 +379,12 @@ class DeliveryForm extends CFormModel
                 Yii::app()->db->createCommand($sql)->execute();
             }
 
+            $idList = implode(",",$this->checkBoxDown);
             //批量修改
             Yii::app()->db->createCommand()->update('opr_order', array(
                 'status'=>"approve",
                 'luu'=>$uid,
-            ), "city='$city' AND judge=0 AND status in ('read','sent')");
+            ), "city='$city' AND judge=0 AND status in ('read','sent') and id in($idList)");
         }
 
     }

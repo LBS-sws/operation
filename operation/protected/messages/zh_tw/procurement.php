@@ -240,7 +240,7 @@ return array(
     'All to see'=>'全部查看',
 
     //2018-01-19
-    'All shipments'=>'全部發貨',
+    'All shipments'=>'批量发货',
     'Are you sure you want to approve all shipments?'=>'您確定要全部批准發貨嗎？',
 );
 ?>

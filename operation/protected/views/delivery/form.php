@@ -10,6 +10,14 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
     'clientOptions'=>array('validateOnSubmit'=>true,),
     'layout'=>TbHtml::FORM_LAYOUT_HORIZONTAL,
 )); ?>
+<style>
+    .input-text-span{display: block;width: 100%;padding: 6px 12px;
+        font-size: 14px;
+        line-height: 1.42857143;
+        border: 1px solid #d2d6de;
+        background-color: #eee;
+    }
+</style>
 
 <section class="content-header">
     <h1>
@@ -206,6 +214,11 @@ $('.go-balck').on('click',function(){
     $('#black_form input[name=\"name\"]').val(name);
     $('#black_form input[name=\"num\"]').attr('max',num);
     $('#black_form').modal('show');
+});
+$('.testInput').each(function(){
+    var text = $(this).val();
+    $(this).hide();
+    $(this).parent('td').append('<span class=\'input-text-span\'>'+text+'</span>');
 });
 ";
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);

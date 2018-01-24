@@ -191,19 +191,21 @@ class DeliveryController extends Controller
 
     //全部批准發貨
     public function actionAllApproved(){
-        $model = new DeliveryForm();
+        $model = new DeliveryForm("approved");
+        $model->setAttributes($_POST['DeliveryList']);
         if($model->validateAll()){
             $model->allApproved();
-            $this->redirect(Yii::app()->createUrl('delivery/index'));
             Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
+            $this->redirect(Yii::app()->createUrl('delivery/index'));
         }else{
             Dialog::message(Yii::t('dialog','Validation Message'), "沒有待发货的订单");
+            $this->redirect(Yii::app()->createUrl('delivery/index'));
         }
     }
 
     //下載全部未發貨訂單
     public function actionAllDownload(){
-        $model = new DeliveryForm();
+        $model = new DeliveryForm("down");
         if($model->validateAll()){
             $orderList = $model->allDownload();
             $myExcel = new MyExcelTwo();
@@ -211,6 +213,7 @@ class DeliveryController extends Controller
             $myExcel->outDownExcel("全部订单.xls");
         }else{
             Dialog::message(Yii::t('dialog','Validation Message'), "沒有待发货的订单");
+            $this->redirect(Yii::app()->createUrl('delivery/index'));
         }
     }
 }

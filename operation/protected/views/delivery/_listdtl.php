@@ -20,6 +20,13 @@ switch ($this->record['status']){
         echo "<tr class='clickable-row' data-href='$htmlTrHref'>";
 }
 ?>
+	<td>
+        <?php
+        if($this->record['status'] == "sent"||$this->record['status'] == "read"){
+            echo TbHtml::checkBox("DeliveryList[checkBoxDown][]",false,array("value"=>$this->record['id'],"class"=>"checkBoxDown"));
+        }
+        ?>
+    </td>
 	<td><?php echo $this->drawEditButton('YD02', 'delivery/edit', 'delivery/view', array('index'=>$this->record['id'])); ?></td>
 	<td><?php echo $this->record['lcd']; ?></td>
 	<td><?php echo $this->record['lcu']; ?></td>

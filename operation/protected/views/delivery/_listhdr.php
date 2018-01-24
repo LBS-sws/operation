@@ -1,5 +1,6 @@
 <tr>
     <th></th>
+    <th></th>
     <th>
         <?php echo TbHtml::link($this->getLabelName('lcd').$this->drawOrderArrow('lcd'),'#',$this->createOrderLink('delivery-list','lcd'))
         ;

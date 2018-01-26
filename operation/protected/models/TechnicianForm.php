@@ -57,9 +57,10 @@ class TechnicianForm extends CFormModel
     public function rules()
     {
         return array(
-            array('id, order_code, order_user, order_class, activity_id, technician, status, remark, luu, lcu, lud, lcd','safe'),
+            array('id, order_code, order_user, order_class, technician, status, remark, luu, lcu, lud, lcd','safe'),
             array('goods_list','required'),
             array('goods_list','validateGoods'),
+            array('remark','validateActivity','on'=>'audit'),
             //array('order_num','numerical','allowEmpty'=>true,'integerOnly'=>true),
             //array('order_num','in','range'=>range(0,600)),
         );
@@ -108,6 +109,21 @@ class TechnicianForm extends CFormModel
         if(count($this->goods_list)<1){
             $message = Yii::t('procurement','Fill in at least one goods');
             $this->addError($attribute,$message);
+        }
+    }
+
+    public function validateActivity($attribute, $params){
+        $city = Yii::app()->user->city();
+        $userName = Yii::app()->user->name;
+        if ($this->scenario == "audit") {
+            $rows = Yii::app()->db->createCommand()->select("count(id)")
+                ->from("opr_order")->where("judge=0 and city=:city and status = 'approve' and lcu=:lcu",
+                    array( ":city" => $city, ":lcu" => $userName))->queryScalar();
+            if ($rows > 0) {
+                $message = "您有订单没有收货，请收货后继续操作。";
+                $this->addError($attribute, $message);
+                return false;
+            }
         }
     }
 

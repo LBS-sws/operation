@@ -163,8 +163,8 @@ class OrderForm extends CFormModel
             //不允許多個訂單同時進行
             if(empty($arrBool[$this->order_class])){
                 $rows = Yii::app()->db->createCommand()->select("count(id)")
-                    ->from("opr_order")->where("order_class=:order_class and city=:city and status = 'approve'",
-                        array(":order_class"=>$this->order_class,":city"=>$city))->queryScalar();
+                    ->from("opr_order")->where("order_class=:order_class and city=:city and status = 'approve' and activity_id=:activity_id",
+                        array(":order_class"=>$this->order_class,":city"=>$city,":activity_id"=>$this->activity_id))->queryScalar();
                 if($rows > 0){
                     $message = Yii::t('procurement',"Multiple orders are not allowed simultaneously")."，请联系老总放行";
                     $this->addError($attribute,$message);

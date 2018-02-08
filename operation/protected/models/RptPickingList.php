@@ -7,7 +7,7 @@ class RptPickingList extends CReport {	protected function fields() {		return a
 			'goods_class'=>array('label'=>Yii::t('report','Item Class'),'width'=>25,'align'=>'L'),
 // Percy 2018/2/8 - 报表里面的货品成本价格设置成物品设置里的单价
 //			'goods_cost'=>array('label'=>Yii::t('report','Item Cost'),'width'=>15,'align'=>'R'),
-			'goods_cost'=>array('label'=>Yii::t('report','Item Price'),'width'=>15,'align'=>'R'),
+			'goods_price'=>array('label'=>Yii::t('report','Item Price'),'width'=>15,'align'=>'R'),
 			'goods_num'=>array('label'=>Yii::t('report','Req. Qty.'),'width'=>15,'align'=>'R'),
 			'confirm_num'=>array('label'=>Yii::t('report','Act. Qty.'),'width'=>15,'align'=>'R'),
 			'goods_sum_price'=>array('label'=>Yii::t('report','Total Cost'),'width'=>15,'align'=>'R'),
@@ -44,7 +44,7 @@ class RptPickingList extends CReport {	protected function fields() {		return a
 				$temp['goods_code'] = $row['goods_code'];
 				$temp['goods_name'] = $row['goods_name'];
 				$temp['goods_class'] = $row['classify_name'];
-				$temp['goods_cost'] = $row['goods_cost'];
+				$temp['goods_price'] = $row['goods_price'];
 				$temp['goods_num'] = number_format($row['goods_num'],2,'.','');
 				$temp['confirm_num'] = number_format($row['confirm_num'],2,'.','');
 				$temp['goods_sum_price'] = number_format($row['goods_sum_price'],2,'.','');

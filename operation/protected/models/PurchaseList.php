@@ -4,7 +4,7 @@ class PurchaseList extends CListPageModel
 {
 	public function attributeLabels()
 	{
-		return array(	
+		return array(
 			'activity_code'=>Yii::t('procurement','Activity Code'),
 			'activity_title'=>Yii::t('procurement','Activity Title'),
 			'start_time'=>Yii::t('procurement','Start Time'),
@@ -14,7 +14,7 @@ class PurchaseList extends CListPageModel
 			'order_type_sum'=>Yii::t('procurement','Order Type Sum'),*/
 		);
 	}
-	
+
 	public function retrieveDataByPage($pageNum=1)
 	{
 		$city = Yii::app()->user->city();
@@ -38,7 +38,7 @@ class PurchaseList extends CListPageModel
 					break;
 			}
 		}
-		
+
 		$order = "";
 		if (!empty($this->orderField)) {
 			$order .= " order by ".$this->orderField." ";
@@ -48,11 +48,11 @@ class PurchaseList extends CListPageModel
 
 		$sql = $sql2.$clause;
 		$this->totalRow = Yii::app()->db->createCommand($sql)->queryScalar();
-		
+
 		$sql = $sql1.$clause.$order;
 		$sql = $this->sqlWithPageCriteria($sql, $this->pageNum);
 		$records = Yii::app()->db->createCommand($sql)->queryAll();
-		
+
 		$this->attr = array();
 		if (count($records) > 0) {
 			foreach ($records as $k=>$record) {
@@ -123,9 +123,9 @@ class PurchaseList extends CListPageModel
             $city_allow = Yii::app()->user->city_allow();
         }
         $connection = Yii::app()->db;
-        $sql="SELECT a.order_code,a.remark AS order_remark,a.order_user,d.disp_name,a.status,a.order_code,a.city,a.lcd,
+        $sql="SELECT a.remark AS order_remark,a.order_user,d.disp_name,a.status,a.order_code,a.city,a.lcd,
 b.order_id,b.goods_id,b.goods_num,b.confirm_num,b.note,b.remark,
-c.goods_code,c.name AS goods_name,c.costing AS goods_cost,e.name AS classify_name
+c.goods_code,c.name AS goods_name,c.costing AS goods_cost,e.name AS classify_name,,c.price AS goods_price
 FROM opr_order a 
 LEFT JOIN opr_order_goods b ON a.id = b.order_id 
 LEFT JOIN security$suffix.sec_user d ON a.order_user = d.username
@@ -155,7 +155,7 @@ WHERE a.judge = 0 AND (a.status = 'finished' OR a.status = 'approve') AND a.city
                     $record["audit_time"] = "";
                 }
                 $num = empty($record["confirm_num"])?$record["goods_num"]:$record["confirm_num"];
-                $price = floatval($record["goods_cost"]);
+                $price = floatval($record["goods_price"]);
                 $record["goods_sum_price"] = sprintf("%.2f", floatval($num)*$price);
                 $record["city_name"] = CGeneral::getCityName($record["city"]);
             }

@@ -60,5 +60,7 @@ return array(
 	'Order Date'=>'订货日期',
 	'Approved Date'=>'审批日期',
 	'Order Person'=>'申请人',
+// Percy 2018/2/8
+	'Item Price'=>'参考售价',
 );
 ?>

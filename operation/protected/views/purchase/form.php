@@ -40,6 +40,10 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
                 //发货
                 echo TbHtml::button('<span class="fa fa-upload"></span> '.Yii::t('procurement','Shipments'), array(
                     'submit'=>Yii::app()->createUrl('Purchase/audit')));
+
+                //通知
+                echo TbHtml::button('<span class="fa fa-bullhorn"></span> '.Yii::t('procurement','Notice'), array(
+                    'name'=>'btnNotice','id'=>'btnNotice','data-toggle'=>'modal','data-target'=>'#noticedialog'));
             }
             if($model->status == "approve"){
                 //退回
@@ -207,6 +211,32 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
 <?php
 $this->renderPartial('//site/ject',array('model'=>$model,'form'=>$form,'submit'=>Yii::app()->createUrl('Purchase/reject')));
 ?>
+<div id="noticedialog" role="dialog" tabindex="-1" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" type="button">×</button>
+                <h4 class="modal-title"><?php echo Yii::t("procurement","Notice")?></h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <?php echo $form->labelEx($model,'notice',array('class'=>"col-sm-2 control-label")); ?>
+                    <div class="col-sm-9">
+                        <?php echo $form->textArea($model, 'notice',
+                            array('rows'=>4,'cols'=>50,'maxlength'=>1000,'readonly'=>($model->scenario=='view'))
+                        ); ?>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <?php
+                echo TbHtml::button(Yii::t('dialog','Close'), array('data-dismiss'=>'modal','color'=>TbHtml::BUTTON_COLOR_DEFAULT,"class"=>"pull-left"));
+                echo TbHtml::button(Yii::t('procurement','sent'), array('data-dismiss'=>'modal','color'=>TbHtml::BUTTON_COLOR_PRIMARY,'submit' => Yii::app()->createUrl('Purchase/notice')));
+                ?>
+            </div>
+        </div>
+    </div>
+</div>
 <?php
 $stickiesList = json_encode(StickiesForm::getStickiesContentList());
 $js = '

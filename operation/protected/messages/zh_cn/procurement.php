@@ -243,5 +243,8 @@ return array(
     //2018-01-19
     'All shipments'=>'批量发货',
     'Are you sure you want to approve all shipments?'=>'您确定要全部批准发货吗？',
+
+    'Notice'=>'通知',
+    'Notice text'=>'通知内容',
 );
 ?>

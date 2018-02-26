@@ -22,7 +22,7 @@ class FastController extends Controller
     {
         return array(
             array('allow',
-                'actions'=>array('audit','edit','reject','save','backward'),
+                'actions'=>array('audit','edit','reject','save','backward','notice'),
                 'expression'=>array('FastController','allowReadWrite'),
             ),
             array('allow',
@@ -71,6 +71,27 @@ class FastController extends Controller
                 Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
                 $this->redirect(Yii::app()->createUrl('fast/edit',array('index'=>$model->id)));
             } else {
+                $message = CHtml::errorSummary($model);
+                Dialog::message(Yii::t('dialog','Validation Message'), $message);
+                $this->render('form',array('model'=>$model,));
+            }
+        }
+    }
+
+//通知
+    public function actionNotice()
+    {
+        if (isset($_POST['FastForm'])) {
+            $model = new FastForm("notice");
+            $model->attributes = $_POST['FastForm'];
+            if ($model->validate()) {
+                $model->scenario = "edit";
+                $model->saveData();
+                $model->notice();
+                Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done and Sent Notification'));
+                $this->redirect(Yii::app()->createUrl('fast/edit',array('index'=>$model->id)));
+            } else {
+                $model->scenario = "edit";
                 $message = CHtml::errorSummary($model);
                 Dialog::message(Yii::t('dialog','Validation Message'), $message);
                 $this->render('form',array('model'=>$model,));

@@ -21,7 +21,7 @@ class PurchaseController extends Controller
     {
         return array(
             array('allow',
-                'actions'=>array('audit','edit','save','backward','reject'),
+                'actions'=>array('audit','edit','save','backward','reject','notice'),
                 'expression'=>array('PurchaseController','allowReadWrite'),
             ),
             array('allow',
@@ -81,6 +81,26 @@ class PurchaseController extends Controller
 			}
 		}
 	}
+//通知
+    public function actionNotice()
+    {
+        if (isset($_POST['PurchaseForm'])) {
+            $model = new PurchaseForm("notice");
+            $model->attributes = $_POST['PurchaseForm'];
+            if ($model->validate()) {
+                $model->scenario = "edit";
+                $model->saveData();
+                $model->notice();
+                Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done and Sent Notification'));
+                $this->redirect(Yii::app()->createUrl('purchase/edit',array('index'=>$model->id)));
+            } else {
+                $model->scenario = "edit";
+                $message = CHtml::errorSummary($model);
+                Dialog::message(Yii::t('dialog','Validation Message'), $message);
+                $this->render('form',array('model'=>$model,));
+            }
+        }
+    }
 //接受
 	public function actionAudit()
 	{

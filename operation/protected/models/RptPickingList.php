@@ -1,9 +1,14 @@
 <?php
-class RptPickingList extends CReport {	protected function fields() {		return array(			'city_name'=>array('label'=>Yii::t('misc','City'),'width'=>15,'align'=>'L'),
+class RptPickingList extends CReport {
+	protected function fields() {
+		return array(
+			'city_name'=>array('label'=>Yii::t('misc','City'),'width'=>15,'align'=>'L'),
+			'order_code'=>array('label'=>Yii::t('procurement','Order Code'),'width'=>15,'align'=>'L'),
 			'order_user'=>array('label'=>Yii::t('report','Order User ID'),'width'=>15,'align'=>'L'),
 			'disp_name'=>array('label'=>Yii::t('report','Order User Name'),'width'=>30,'align'=>'L'),
 			'goods_code'=>array('label'=>Yii::t('report','Item Code'),'width'=>25,'align'=>'L'),
 			'goods_name'=>array('label'=>Yii::t('report','Item Name'),'width'=>30,'align'=>'L'),
+			'unit'=>array('label'=>Yii::t('procurement','Unit'),'width'=>15,'align'=>'L'),
 			'goods_class'=>array('label'=>Yii::t('report','Item Class'),'width'=>25,'align'=>'L'),
 			'goods_cost'=>array('label'=>Yii::t('report','Item Cost'),'width'=>15,'align'=>'R'),
 			'goods_num'=>array('label'=>Yii::t('report','Req. Qty.'),'width'=>15,'align'=>'R'),
@@ -11,7 +16,12 @@ class RptPickingList extends CReport {	protected function fields() {		return a
 			'goods_sum_price'=>array('label'=>Yii::t('report','Total Cost'),'width'=>15,'align'=>'R'),
 			'lcd'=>array('label'=>Yii::t('report','Order Date'),'width'=>15,'align'=>'C'),
 			'audit_time'=>array('label'=>Yii::t('report','Approved Date'),'width'=>15,'align'=>'C'),
-		);	}	
+            'note'=>array('label'=>Yii::t('procurement','Demand Note'),'width'=>50,'align'=>'L'),
+            'remark'=>array('label'=>Yii::t('procurement','Headquarters Note'),'width'=>50,'align'=>'L'),
+            'order_remark'=>array('label'=>Yii::t('procurement','Remark'),'width'=>50,'align'=>'L'),
+		);
+	}
+	
 	public function genReport() {
 		$this->retrieveData();
 		$this->title = $this->getReportName();
@@ -37,10 +47,12 @@ class RptPickingList extends CReport {	protected function fields() {		return a
 			foreach ($rows as $row) {
 				$temp = array();
 				$temp['city_name'] = $row['city_name'];
+				$temp['order_code'] = $row['order_code'];
 				$temp['order_user'] = $row['order_user'];
 				$temp['disp_name'] = $row['disp_name'];
 				$temp['goods_code'] = $row['goods_code'];
 				$temp['goods_name'] = $row['goods_name'];
+				$temp['unit'] = $row['unit'];
 				$temp['goods_class'] = $row['classify_name'];
 				$temp['goods_cost'] = $row['goods_cost'];
 				$temp['goods_num'] = number_format($row['goods_num'],2,'.','');
@@ -48,10 +60,14 @@ class RptPickingList extends CReport {	protected function fields() {		return a
 				$temp['goods_sum_price'] = number_format($row['goods_sum_price'],2,'.','');
 				$temp['lcd'] = General::toDate($row['lcd']);
 				$temp['audit_time'] = General::toDate($row['audit_time']);
+                $temp['note'] = $row['note'];
+                $temp['remark'] = $row['remark'];
+                $temp['order_remark'] = $row['order_remark'];
 				$this->data[] = $temp;
 			}
 		}
-		return true;	}
+		return true;
+	}
 
 	public function getReportName() {
 		$city_name = isset($this->criteria) ? ' - '.General::getCityName($this->criteria['CITY']) : '';

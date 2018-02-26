@@ -15,6 +15,7 @@ class FastForm extends CFormModel
 	public $activity_id;
 	public $goods_list;
 	public $ject_remark;
+	public $notice;
 
 	public function init()
     {
@@ -46,6 +47,7 @@ class FastForm extends CFormModel
             //'technician'=>Yii::t('procurement','Technician'),
             'status'=>Yii::t('procurement','Order Status'),
             'remark'=>Yii::t('procurement','Remark'),
+            'notice'=>Yii::t('procurement','Notice text'),
             'ject_remark'=>Yii::t('procurement','reject remark'),
 		);
 	}
@@ -56,10 +58,11 @@ class FastForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, luu, lcu, lud, lcd','safe'),
+			array('id, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, luu, lcu, lud, lcd, goods_list, notice','safe'),
             array('goods_list','required','on'=>array('audit','edit','reject')),
             array('goods_list','validateGoods','on'=>array('audit','edit')),
             array('ject_remark','required','on'=>'reject'),
+            array('notice','required','on'=>'notice'),
             //array('order_num','numerical','allowEmpty'=>true,'integerOnly'=>true),
             //array('order_num','in','range'=>range(0,600)),
 		);
@@ -306,5 +309,50 @@ class FastForm extends CFormModel
             return true;
         }
         return false;
+    }
+
+    //管理員操作通知
+    function notice(){
+        $uid = Yii::app()->user->id;
+        $suffix = Yii::app()->params['envSuffix'];
+        $systemId = Yii::app()->params['systemId'];
+        $from_addr = Yii::app()->params['adminEmail'];
+        $to_addr = array();//
+        $rs = Yii::app()->db->createCommand()->select("b.email")->from("security$suffix.sec_user_access a")
+            ->leftJoin("security$suffix.sec_user b","b.username=a.username")
+            ->where("a.system_id='$systemId' and a.a_read_write like '%YD06%' and b.status ='A'")
+            ->queryAll();
+        if($rs){
+            foreach ($rs as $row){
+                array_push($to_addr,$row["email"]);
+            }
+        }else{
+            return false;
+        }
+        $rs = Yii::app()->db->createCommand()->select("b.email")->from("opr_order a")
+            ->leftJoin("security$suffix.sec_user b","b.username=a.lcu")
+            ->where("a.id=".$this->id)
+            ->queryRow();;
+        if($rs){
+            if(!in_array($rs["email"],$to_addr)){
+                array_push($to_addr,$rs["email"]);
+            }
+        }else{
+            return false;
+        }
+        $to_addr = json_encode($to_addr);
+        $message = "<p>订单编号：".$this->order_code."</p>";
+        $message.="<p>通知原因：".$this->notice."</p>";
+        Yii::app()->db->createCommand()->insert("swoper$suffix.swo_email_queue", array(
+            'request_dt'=>date('Y-m-d H:i:s'),
+            'from_addr'=>$from_addr,
+            'to_addr'=>$to_addr,
+            'subject'=>"订单通知，订单编号：".$this->order_code,//郵件主題
+            'description'=>"订单通知，订单编号：".$this->order_code,//郵件副題
+            'message'=>$message,//郵件內容（html）
+            'status'=>"P",
+            'lcu'=>$uid,
+            'lcd'=>date('Y-m-d H:i:s'),
+        ));
     }
 }

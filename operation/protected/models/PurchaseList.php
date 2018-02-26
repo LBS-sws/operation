@@ -123,7 +123,9 @@ class PurchaseList extends CListPageModel
             $city_allow = Yii::app()->user->city_allow();
         }
         $connection = Yii::app()->db;
-        $sql="SELECT a.order_user,d.disp_name,a.status,a.order_code,a.city,a.lcd,b.order_id,b.goods_id,b.goods_num,b.confirm_num,c.goods_code,c.name AS goods_name,c.costing AS goods_cost,e.name AS classify_name
+        $sql="SELECT a.order_code,a.remark AS order_remark,a.order_user,d.disp_name,a.status,a.order_code,a.city,a.lcd,
+b.order_id,b.goods_id,b.goods_num,b.confirm_num,b.note,b.remark,
+c.goods_code,c.name AS goods_name,c.costing AS goods_cost,e.name AS classify_name
 FROM opr_order a 
 LEFT JOIN opr_order_goods b ON a.id = b.order_id 
 LEFT JOIN security$suffix.sec_user d ON a.order_user = d.username

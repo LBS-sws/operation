@@ -447,24 +447,25 @@ class PurchaseForm extends CFormModel
         $systemId = Yii::app()->params['systemId'];
         $from_addr = Yii::app()->params['adminEmail'];
         $to_addr = array();//
-        $rs = Yii::app()->db->createCommand()->select("b.email")->from("security$suffix.sec_user_access a")
-            ->leftJoin("security$suffix.sec_user b","b.username=a.username")
-            ->where("a.system_id='$systemId' and a.a_read_write like '%YD06%' and b.status ='A'")
-            ->queryAll();
-        if($rs){
-            foreach ($rs as $row){
-                array_push($to_addr,$row["email"]);
-            }
-        }else{
-            return false;
-        }
-        $rs = Yii::app()->db->createCommand()->select("b.email")->from("opr_order a")
+        $rs = Yii::app()->db->createCommand()->select("b.email,b.city")->from("opr_order a")
             ->leftJoin("security$suffix.sec_user b","b.username=a.lcu")
             ->where("a.id=".$this->id)
             ->queryRow();;
         if($rs){
+            $city = $rs["city"];
             if(!in_array($rs["email"],$to_addr)){
                 array_push($to_addr,$rs["email"]);
+            }
+        }else{
+            return false;
+        }
+        $rs = Yii::app()->db->createCommand()->select("b.email")->from("security$suffix.sec_user_access a")
+            ->leftJoin("security$suffix.sec_user b","b.username=a.username")
+            ->where("a.system_id='$systemId' and a.a_read_write like '%YD06%' and b.status ='A' and b.city='$city'")
+            ->queryAll();
+        if($rs){
+            foreach ($rs as $row){
+                array_push($to_addr,$row["email"]);
             }
         }else{
             return false;

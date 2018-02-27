@@ -59,7 +59,12 @@ class RptPickingList extends CReport {
 				$temp['goods_price'] = $row['goods_price'];
 				$temp['goods_num'] = number_format($row['goods_num'],2,'.','');
 				$temp['confirm_num'] = number_format($row['confirm_num'],2,'.','');
-				$temp['goods_sum_price'] = number_format($row['goods_sum_price'],2,'.','');
+// Percy 2018/2/8 - 报表里面的货品成本价格设置成物品设置里的单价
+//				$temp['goods_sum_price'] = number_format($row['goods_sum_price'],2,'.','');
+                $num = empty($row["confirm_num"])?$row["goods_num"]:$row["confirm_num"];
+                $price = floatval($row["goods_price"]);
+                $temp["goods_sum_price"] = sprintf("%.2f", floatval($num)*$price);
+//
 				$temp['lcd'] = General::toDate($row['lcd']);
 				$temp['audit_time'] = General::toDate($row['audit_time']);
                 $temp['note'] = $row['note'];

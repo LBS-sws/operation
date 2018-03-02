@@ -48,8 +48,8 @@ class EmailController extends Controller
 			$model->attributes = $_POST['EmailList'];
 		} else {
 			$session = Yii::app()->session;
-			if (isset($session['criteria_ya01']) && !empty($session['fcriteria_ya01'])) {
-				$criteria = $session['criteria_ya01'];
+			if (isset($session['email_op01']) && !empty($session['email_op01'])) {
+				$criteria = $session['email_op01'];
 				$model->setCriteria($criteria);
 			}
 		}

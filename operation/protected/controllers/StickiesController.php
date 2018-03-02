@@ -48,8 +48,8 @@ class StickiesController extends Controller
 			$model->attributes = $_POST['StickiesList'];
 		} else {
 			$session = Yii::app()->session;
-			if (isset($session['criteria_ya01']) && !empty($session['fcriteria_ya01'])) {
-				$criteria = $session['criteria_ya01'];
+			if (isset($session['stickies_ya01']) && !empty($session['stickies_ya01'])) {
+				$criteria = $session['stickies_ya01'];
 				$model->setCriteria($criteria);
 			}
 		}

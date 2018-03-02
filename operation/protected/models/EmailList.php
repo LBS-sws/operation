@@ -59,7 +59,7 @@ class EmailList extends CListPageModel
 			}
 		}
 		$session = Yii::app()->session;
-		$session['criteria_ya01'] = $this->getCriteria();
+		$session['email_op01'] = $this->getCriteria();
 		return true;
 	}
 

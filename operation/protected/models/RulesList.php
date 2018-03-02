@@ -60,7 +60,7 @@ class RulesList extends CListPageModel
 			}
 		}
 		$session = Yii::app()->session;
-		$session['criteria_ya01'] = $this->getCriteria();
+		$session['rules_ya01'] = $this->getCriteria();
 		return true;
 	}
 

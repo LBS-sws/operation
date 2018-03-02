@@ -85,7 +85,7 @@ class GoodsImList extends CListPageModel
 			}
 		}
 		$session = Yii::app()->session;
-		$session['criteria_ya01'] = $this->getCriteria();
+		$session['goodsim_ya01'] = $this->getCriteria();
 		return true;
 	}
 

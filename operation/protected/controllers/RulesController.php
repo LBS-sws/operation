@@ -48,8 +48,8 @@ class RulesController extends Controller
 			$model->attributes = $_POST['RulesList'];
 		} else {
 			$session = Yii::app()->session;
-			if (isset($session['criteria_ya01']) && !empty($session['fcriteria_ya01'])) {
-				$criteria = $session['criteria_ya01'];
+			if (isset($session['rules_ya01']) && !empty($session['rules_ya01'])) {
+				$criteria = $session['rules_ya01'];
 				$model->setCriteria($criteria);
 			}
 		}

@@ -99,7 +99,7 @@ class DeliveryList extends CListPageModel
             }
         }
         $session = Yii::app()->session;
-        $session['criteria_ya01'] = $this->getCriteria();
+        $session['delivery_ya01'] = $this->getCriteria();
         return true;
     }
 

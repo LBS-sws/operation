@@ -76,7 +76,7 @@ class GoodsDoList extends CListPageModel
 			}
 		}
 		$session = Yii::app()->session;
-		$session['criteria_ya01'] = $this->getCriteria();
+		$session['goodsdo_ya01'] = $this->getCriteria();
 		return true;
 	}
 

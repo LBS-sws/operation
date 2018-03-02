@@ -79,7 +79,7 @@ class FastList extends CListPageModel
             }
         }
         $session = Yii::app()->session;
-        $session['criteria_ya01'] = $this->getCriteria();
+        $session['fast_ya01'] = $this->getCriteria();
         return true;
     }
 

@@ -48,8 +48,8 @@ class GoodsimController extends Controller
 			$model->attributes = $_POST['GoodsImList'];
 		} else {
 			$session = Yii::app()->session;
-			if (isset($session['criteria_ya01']) && !empty($session['fcriteria_ya01'])) {
-				$criteria = $session['criteria_ya01'];
+			if (isset($session['goodsim_ya01']) && !empty($session['goodsim_ya01'])) {
+				$criteria = $session['goodsim_ya01'];
 				$model->setCriteria($criteria);
 			}
 		}

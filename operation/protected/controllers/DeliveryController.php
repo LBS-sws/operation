@@ -56,8 +56,8 @@ class DeliveryController extends Controller
 			$model->attributes = $_POST['DeliveryList'];
 		} else {
 			$session = Yii::app()->session;
-			if (isset($session['criteria_ya01']) && !empty($session['fcriteria_ya01'])) {
-				$criteria = $session['criteria_ya01'];
+			if (isset($session['delivery_ya01']) && !empty($session['delivery_ya01'])) {
+				$criteria = $session['delivery_ya01'];
 				$model->setCriteria($criteria);
 			}
 		}

@@ -48,8 +48,8 @@ class ClassifyController extends Controller
 			$model->attributes = $_POST['ClassifyList'];
 		} else {
 			$session = Yii::app()->session;
-			if (isset($session['criteria_ya01']) && !empty($session['fcriteria_ya01'])) {
-				$criteria = $session['criteria_ya01'];
+			if (isset($session['classify_ya01']) && !empty($session['classify_ya01'])) {
+				$criteria = $session['classify_ya01'];
 				$model->setCriteria($criteria);
 			}
 		}

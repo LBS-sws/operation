@@ -49,8 +49,8 @@ class FastController extends Controller
 			$model->attributes = $_POST['FastList'];
 		} else {
 			$session = Yii::app()->session;
-			if (isset($session['criteria_ya01']) && !empty($session['fcriteria_ya01'])) {
-				$criteria = $session['criteria_ya01'];
+			if (isset($session['fast_ya01']) && !empty($session['fast_ya01'])) {
+				$criteria = $session['fast_ya01'];
 				$model->setCriteria($criteria);
 			}
 		}

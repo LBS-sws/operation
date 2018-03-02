@@ -49,8 +49,8 @@ class ActivityController extends Controller
 			$model->attributes = $_POST['ActivityList'];
 		} else {
 			$session = Yii::app()->session;
-			if (isset($session['criteria_ya01']) && !empty($session['fcriteria_ya01'])) {
-				$criteria = $session['criteria_ya01'];
+			if (isset($session['activity_ya01']) && !empty($session['activity_ya01'])) {
+				$criteria = $session['activity_ya01'];
 				$model->setCriteria($criteria);
 			}
 		}

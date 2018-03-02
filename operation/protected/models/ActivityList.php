@@ -111,7 +111,7 @@ class ActivityList extends CListPageModel
 			}
 		}
 		$session = Yii::app()->session;
-		$session['criteria_ya01'] = $this->getCriteria();
+		$session['activity_ya01'] = $this->getCriteria();
 		return true;
 	}
 

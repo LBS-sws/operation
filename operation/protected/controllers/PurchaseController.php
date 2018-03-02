@@ -54,8 +54,8 @@ class PurchaseController extends Controller
 			$model->attributes = $_POST['PurchaseList'];
 		} else {
 			$session = Yii::app()->session;
-			if (isset($session['criteria_ya01']) && !empty($session['fcriteria_ya01'])) {
-				$criteria = $session['criteria_ya01'];
+			if (isset($session['purchase_ya01']) && !empty($session['purchase_ya01'])) {
+				$criteria = $session['purchase_ya01'];
 				$model->setCriteria($criteria);
 			}
 		}
@@ -156,8 +156,8 @@ class PurchaseController extends Controller
             $model->attributes = $_POST['OrderList'];
         } else {
             $session = Yii::app()->session;
-            if (isset($session['criteria_ya01']) && !empty($session['fcriteria_ya01'])) {
-                $criteria = $session['criteria_ya01'];
+            if (isset($session['order_ya01']) && !empty($session['order_ya01'])) {
+                $criteria = $session['order_ya01'];
                 $model->setCriteria($criteria);
             }
         }

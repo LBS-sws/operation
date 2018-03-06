@@ -10,6 +10,8 @@ return array(
 'Accounting'=>'會計系統',
 'Operation'=>'营运系统',
 'Personnel'=>'人事系统',
+'Sales'=>'銷售系統',
+'Quiz'=>'測驗系統',
 
 'Data Entry'=>'數據輸入',
 

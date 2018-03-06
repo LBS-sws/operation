@@ -57,6 +57,9 @@ class DeliveryList extends CListPageModel
                 case 'goods_name':
                     $clause .= ' and id in '.$this->getOrderIdSqlLikeGoodsName($svalue);
                     break;
+                case 'status':
+                    $clause .= ' and status in '.$this->getStatusSqlToStr($svalue);
+                    break;
             }
         }
         if (!empty($this->searchTimeStart) && !empty($this->searchTimeStart)) {
@@ -128,6 +131,29 @@ class DeliveryList extends CListPageModel
         $arr = array();
         foreach ($rows as $row){
             array_push($arr,"'".$row["order_id"]."'");
+        }
+        if(empty($arr)){
+            return "('')";
+        }else{
+            $arr = implode(",",$arr);
+            return "($arr)";
+        }
+    }
+
+//訂單狀態（模糊查詢）
+    public function getStatusSqlToStr($str)
+    {
+        $state=array(
+            "sent"=>Yii::t("procurement","pending approval"),
+            "read"=>Yii::t("procurement","Have read,Drop shipping"),
+            "approve"=>Yii::t("procurement","Has been approved, Shipped out"),
+            "reject"=>Yii::t("procurement","Reject"),
+            "finished"=>Yii::t("procurement","finished"),
+        );
+        $arr = array();
+        foreach ($state as $key =>$row){
+            if (strpos($row,$str)!==false)
+                array_push($arr,"'$key'");
         }
         if(empty($arr)){
             return "('')";

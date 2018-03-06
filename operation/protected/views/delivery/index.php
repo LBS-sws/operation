@@ -58,6 +58,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery List';
             'order_code',
             'lcu',
             'goods_name',
+            'status',
         ),
 	));
 	?>

@@ -55,7 +55,11 @@ class WarehouseList extends CListPageModel
 		
 		$order = "";
 		if (!empty($this->orderField)) {
-			$order .= " order by ".$this->orderField." ";
+		    if("inventory" === $this->orderField){
+                $order .= " order by CAST(inventory AS DECIMAL) ";
+            }else{
+                $order .= " order by ".$this->orderField." ";
+            }
 			if ($this->orderType=='D') $order .= "desc ";
 		} else
 			$order = " order by id desc";

@@ -57,7 +57,7 @@ class TechnicianForm extends CFormModel
     public function rules()
     {
         return array(
-            array('id, order_code, order_user, order_class, technician, status, remark, luu, lcu, lud, lcd','safe'),
+            array('id, order_code, order_user, order_class, technician, status, remark, luu, lcu, lud, lcd, goods_list','safe'),
             array('goods_list','required'),
             array('goods_list','validateGoods'),
             array('remark','validateActivity','on'=>'audit'),
@@ -204,6 +204,7 @@ class TechnicianForm extends CFormModel
                     $sql = "update opr_order set
 							remark = :remark,
 							luu = :luu,
+							lcd = :lcd,
 							lud = :lud,
 							status = :status
 						where id = :id and judge=0

@@ -209,7 +209,8 @@ class DeliveryController extends Controller
         if($model->validateAll()){
             $orderList = $model->allDownload();
             $myExcel = new MyExcelTwo();
-            $myExcel->setDeliveryExcel($orderList);
+            $goodsList = $myExcel->setDeliveryExcel($orderList);
+            $myExcel->setDeliveryExcelTwo($goodsList);
             $myExcel->outDownExcel("全部订单.xls");
         }else{
             Dialog::message(Yii::t('dialog','Validation Message'), "沒有待发货的订单");

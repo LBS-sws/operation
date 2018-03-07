@@ -116,6 +116,7 @@ class MyExcelTwo {
     //下載外勤領料所有沒審核的訂單
     public function setDeliveryExcel($orderList){
         $strList = $this->listArr;
+        $goodsList = array();
         if(!empty($orderList)){
             $foreachNum = 1;
             foreach ($orderList as $order){
@@ -135,6 +136,12 @@ class MyExcelTwo {
                     $maxHeight+=count($order["goodsList"]);
                     $goodsNum = $numStart+6;
                     foreach ($order["goodsList"] as $goods){
+                        if(array_key_exists($goods["goods_id"],$goodsList)){
+                            $good_num =$goodsList[$goods["goods_id"]]["goods_num"];
+                            $goodsList[$goods["goods_id"]]["goods_num"]=floatval($good_num)+floatval($goods["goods_num"]);
+                        }else{
+                            $goodsList[$goods["goods_id"]]=$goods;
+                        }
                         $this->objActSheet->setCellValue($strList[$strNum].$goodsNum,$goods["goods_code"]);
                         $this->objActSheet->setCellValue($strList[$strNum+1].$goodsNum,$goods["name"]);
                         $this->objActSheet->setCellValue($strList[$strNum+2].$goodsNum,$goods["unit"]);
@@ -146,6 +153,25 @@ class MyExcelTwo {
                     $this->row +=$maxHeight;
                 }
                 $foreachNum++;
+            }
+        }
+        return $goodsList;
+    }
+    //下載外勤領料所有沒審核的訂單(物品匯總)
+    public function setDeliveryExcelTwo($goodsList){
+        $this->addNewSheet("物品汇总");
+        $this->row = 1;
+        $strList = $this->listArr;
+        $row = $this->row;
+        $this->objActSheet->setCellValue("A".$row,"物品名稱");
+        $this->objActSheet->setCellValue("B".$row,"物品單位");
+        $this->objActSheet->setCellValue("C".$row,"要求數量");
+        if(!empty($goodsList)){
+            foreach ($goodsList as $goods){
+                $row++;
+                $this->objActSheet->setCellValue("A".$row,$goods["name"]);
+                $this->objActSheet->setCellValue("B".$row,$goods["unit"]);
+                $this->objActSheet->setCellValue("C".$row,$goods["goods_num"]);
             }
         }
     }

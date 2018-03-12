@@ -245,5 +245,8 @@ return array(
 
     'Notice'=>'通知',
     'Notice text'=>'通知內容',
+
+    'expired'=>'已過期',
+    'The order has expired'=>'訂單已過期',
 );
 ?>

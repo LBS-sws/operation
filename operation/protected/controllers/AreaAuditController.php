@@ -70,7 +70,7 @@ class AreaAuditController extends Controller
 			} else {
 				$message = CHtml::errorSummary($model);
 				Dialog::message(Yii::t('dialog','Validation Message'), $message);
-				$this->render('form',array('model'=>$model,));
+                $this->redirect(Yii::app()->createUrl('areaAudit/edit',array('index'=>$model->id)));
 			}
 		}
 	}
@@ -87,7 +87,7 @@ class AreaAuditController extends Controller
 			} else {
 				$message = CHtml::errorSummary($model);
 				Dialog::message(Yii::t('dialog','Validation Message'), $message);
-				$this->render('form',array('model'=>$model,));
+                $this->redirect(Yii::app()->createUrl('areaAudit/edit',array('index'=>$model->id)));
 			}
 		}
 	}

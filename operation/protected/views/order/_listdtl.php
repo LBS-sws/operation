@@ -16,6 +16,9 @@ switch ($this->record['status']){
     case "finished":
         echo "<tr class='clickable-row text-success' data-href='$htmlTrHref'>";
         break;
+    case "expired":
+        echo "<tr class='clickable-row text-gray' data-href='$htmlTrHref'>";
+        break;
     default:
         echo "<tr class='clickable-row' data-href='$htmlTrHref'>";
 }

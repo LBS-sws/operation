@@ -128,6 +128,8 @@ class OrderList extends CListPageModel
                     return Yii::t("procurement","Central refused order");
                 case "finished":
                     return Yii::t("procurement","finished");
+                case "expired":
+                    return Yii::t("procurement","expired");
                 default:
                     return Yii::t("procurement","Error Status");
             }
@@ -143,6 +145,8 @@ class OrderList extends CListPageModel
                     return Yii::t("procurement","Area rejected");
                 case "finished":
                     return Yii::t("procurement","finished");
+                case "expired":
+                    return Yii::t("procurement","expired");
                 default:
                     return Yii::t("procurement","Error Status");
             }

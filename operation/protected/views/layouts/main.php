@@ -23,6 +23,7 @@
         .table-condensed th.next{text-align: right}
         .table-condensed td>span:first-child{margin-left: 0px;}
         .table-condensed td>span{margin-left: 4px;}
+        .main-header{max-height:none;}
     </style>
 </head>
 

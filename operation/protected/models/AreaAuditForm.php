@@ -62,8 +62,60 @@ class AreaAuditForm extends CFormModel
 		return array(
             array('id, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, luu, lcu, lud, lcd','safe'),
             array('ject_remark','required','on'=>'reject'),
+            array('id','validateTime'),
 		);
 	}
+
+    public function validateTime($attribute, $params){
+        $connection = Yii::app()->db;
+        $rows = $connection->createCommand()->select("activity_id,order_code")->from("opr_order")
+            ->where('id=:id', array(':id'=>$this->id))->queryRow();
+        if($rows){
+            $this->activity_id = $rows["activity_id"];
+            $this->order_code = $rows["order_code"];
+            if(!empty($this->activity_id)){
+                $nowDate = date("Y-m-d");
+                $list = $connection->createCommand()->select("activity_code,activity_title")->from("opr_order_activity")
+                    ->where("id=:id and start_time<='$nowDate' and end_time>='$nowDate'", array(':id'=>$this->activity_id))->queryRow();
+                if($list){
+                    //允許審核
+                }else{
+                    //訂單過期
+                    $this->orderExpired();
+                    $message = Yii::t('procurement','The order has expired');
+                    $this->addError($attribute,$message);
+                }
+            }else{
+                //快速訂單不做驗證
+            }
+        }else{
+            $message = Yii::t('dialog','No Record Found');
+            $this->addError($attribute,$message);
+        }
+    }
+
+    //訂單過期操作
+    protected function orderExpired(){
+        $connection = Yii::app()->db;
+        $oldOrderStatus = $connection->createCommand()->select()->from("opr_order")
+            ->where("id=:id",array(":id"=>$this->id))->queryRow();
+        Yii::app()->db->createCommand()->update('opr_order', array(
+            'status'=>'expired',
+            'luu'=>Yii::app()->user->id,
+        ), 'id=:id', array(':id'=>$this->id));
+        Yii::app()->db->createCommand()->insert('opr_order_status', array(
+            'order_id'=>$this->id,
+            'status'=>'expired',
+            'lcu'=>Yii::app()->user->user_display_name(),
+            'time'=>date('Y-m-d H:i:s'),
+        ));
+        //發送郵件
+        $html = "";
+        $html .= "<p>下單用戶：".OrderGoods::getNameToUsername($oldOrderStatus["lcu"])."</p>";
+        $html .= "<p>下單時間：".$oldOrderStatus["lcd"]."</p>";
+        $html .= "<p>訂單編號：".$oldOrderStatus["order_code"]."</p>";
+        OrderGoods::formEmail("營運系統：訂單已過期（訂單編號：".$oldOrderStatus["order_code"]."）",$html,$oldOrderStatus["lcu_email"]);
+    }
 
     public function retrieveData($index) {
         $city = Yii::app()->user->city();

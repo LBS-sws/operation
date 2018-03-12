@@ -106,6 +106,11 @@ class AreaAuditList extends CListPageModel
                         "status"=>Yii::t("procurement","Central refused order"),
                         "style"=>" text-yellow"
                     );//中央拒绝订单
+                case "expired":
+                    return array(
+                        "status"=>Yii::t("procurement","expired"),
+                        "style"=>" text-gray"
+                    );//中央拒绝订单
                 default:
                     return array(
                         "status"=>Yii::t("procurement","Error Status"),
@@ -123,6 +128,11 @@ class AreaAuditList extends CListPageModel
                     return array(
                         "status"=>Yii::t("procurement","Area rejected"),
                         "style"=>" text-red"
+                    );//地区已拒绝
+                case "expired":
+                    return array(
+                        "status"=>Yii::t("procurement","expired"),
+                        "style"=>" text-gray"
                     );//地区已拒绝
                 default:
                     return array(

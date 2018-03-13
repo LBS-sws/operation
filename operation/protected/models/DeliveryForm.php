@@ -271,6 +271,7 @@ class DeliveryForm extends CFormModel
         if(count($rows) > 0){
             $uid = Yii::app()->user->id;
             $this->status = "sent";
+            //修改訂單狀態
             Yii::app()->db->createCommand()->update('opr_order', array(
                 'status'=>$this->status,
                 'remark'=>$this->remark,
@@ -278,6 +279,18 @@ class DeliveryForm extends CFormModel
                 'lud'=>date('Y-m-d H:i:s'),
             ), 'id=:id', array(':id'=>$this->id));
 
+            //補回庫存
+            $goods_list = Yii::app()->db->createCommand()->select("goods_id,confirm_num")->from("opr_order_goods")
+                ->where('order_id = :order_id',array(':order_id'=>$this->id))->queryAll();
+            if($goods_list){
+                foreach ($goods_list as $goods){
+                    $num = $goods["confirm_num"];
+                    $goodsId = $goods["goods_id"];
+                    Yii::app()->db->createCommand("update opr_warehouse set inventory=inventory+$num where id=$goodsId")->execute();
+                }
+            }
+
+            //添加狀態記錄
             Yii::app()->db->createCommand()->insert('opr_order_status', array(
                 'order_id'=>$this->id,
                 'status'=>"backward",

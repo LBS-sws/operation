@@ -45,7 +45,8 @@ class WarehouseList extends CListPageModel
 					$clause .= General::getSqlConditionClause('price', $svalue);
 					break;
 				case 'inventory':
-					$clause .= General::getSqlConditionClause('inventory', $svalue);
+					//$clause .= General::getSqlConditionClause('inventory', $svalue);
+					$clause .= "and inventory = '$svalue' ";
 					break;
 				case 'classify_id':
 					$clause .= $this->getClassifyToSql($svalue);

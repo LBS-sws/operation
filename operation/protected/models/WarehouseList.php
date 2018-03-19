@@ -26,7 +26,14 @@ class WarehouseList extends CListPageModel
 				where city = '$city' 
 			";
 		$clause = "";
-		if (!empty($this->searchField) && !empty($this->searchValue)) {
+		if($this->searchField == 'inventory'){
+		    if(empty($this->searchValue)){
+                $svalue = 0;
+            }else{
+                $svalue = str_replace("'","\'",$this->searchValue);
+            }
+            $clause .= "and inventory = '$svalue' ";
+        }elseif (!empty($this->searchField) && !empty($this->searchValue)) {
 			$svalue = str_replace("'","\'",$this->searchValue);
 			switch ($this->searchField) {
 				case 'goods_code':

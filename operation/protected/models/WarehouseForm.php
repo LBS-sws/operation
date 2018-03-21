@@ -229,4 +229,27 @@ class WarehouseForm extends CFormModel
             'goods_code'=>$this->goods_code
         ), 'id=:id', array(':id'=>$this->id));
     }
+
+    public function downExcel(){
+        $city = Yii::app()->user->city();
+        $list["head"] = array("存货编码","存货名称","主计量单位","所属分类码","参考售价","是否允许小数","安全库存");
+        $rs = Yii::app()->db->createCommand()->select("a.*,b.name as classify_name")->from("opr_warehouse a")
+            ->leftJoin("opr_classify b","a.classify_id=b.id")
+            ->where('a.city=:city',array(':city'=>$city))->queryAll();
+        $list["body"] = array();
+        if($rs){
+            foreach ($rs as $row){
+                $list["body"][]=array(
+                    "goods_code"=>$row["goods_code"],
+                    "name"=>$row["name"],
+                    "unit"=>$row["unit"],
+                    "classify_name"=>$row["classify_name"],
+                    "price"=>$row["price"],
+                    "decimal_num"=>$row["decimal_num"],
+                    "inventory"=>$row["inventory"],
+                );
+            }
+        }
+        return $list;
+    }
 }

@@ -21,7 +21,7 @@ class WarehouseController extends Controller
     {
         return array(
             array('allow',
-                'actions'=>array('new','edit','delete','save','copy','importGoods'),
+                'actions'=>array('new','edit','delete','save','copy','importGoods','downExcel'),
                 'expression'=>array('WarehouseController','allowReadWrite'),
             ),
             array('allow',
@@ -130,6 +130,16 @@ class WarehouseController extends Controller
         }else{
             $this->redirect(Yii::app()->createUrl('warehouse/index'));
         }
+    }
+
+    public function actionDownExcel()
+    {
+        //$model = new WarehouseForm();
+        $warehouseList = WarehouseForm::downExcel();
+        $myExcel = new MyExcelTwo();
+        $myExcel->setDataHeard($warehouseList["head"]);
+        $myExcel->setDataBody($warehouseList["body"]);
+        $myExcel->outDownExcel("仓库物品.xls");
     }
 
     public function actionImportGoods(){

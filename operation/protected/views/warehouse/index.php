@@ -38,6 +38,15 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                     ));
                 ?>
             </div>
+            <div class="btn-group pull-right" role="group">
+                <?php
+                //var_dump(Yii::app()->session['rw_func']);
+                if (Yii::app()->user->validRWFunction('YD01'))
+                    echo TbHtml::button('<span class="fa fa-cloud-download"></span> '.Yii::t('misc','Download'), array(
+                        'submit'=>Yii::app()->createUrl('warehouse/DownExcel'),
+                    ));
+                ?>
+            </div>
         </div>
     </div>
 	<?php $this->widget('ext.layout.ListPageWidget', array(

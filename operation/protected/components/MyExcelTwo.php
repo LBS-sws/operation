@@ -136,9 +136,12 @@ class MyExcelTwo {
                     $maxHeight+=count($order["goodsList"]);
                     $goodsNum = $numStart+6;
                     foreach ($order["goodsList"] as $goods){
+                        $goods["confirm_num"] = $goods["confirm_num"] === null?$goods["goods_num"]:$goods["confirm_num"];
                         if(array_key_exists($goods["goods_id"],$goodsList)){
                             $good_num =$goodsList[$goods["goods_id"]]["goods_num"];
                             $goodsList[$goods["goods_id"]]["goods_num"]=floatval($good_num)+floatval($goods["goods_num"]);
+                            $confirm_num =$goodsList[$goods["goods_id"]]["confirm_num"];
+                            $goodsList[$goods["goods_id"]]["confirm_num"]=floatval($confirm_num)+floatval($goods["confirm_num"]);
                         }else{
                             $goodsList[$goods["goods_id"]]=$goods;
                         }
@@ -165,13 +168,13 @@ class MyExcelTwo {
         $row = $this->row;
         $this->objActSheet->setCellValue("A".$row,"物品名稱");
         $this->objActSheet->setCellValue("B".$row,"物品單位");
-        $this->objActSheet->setCellValue("C".$row,"要求數量");
+        $this->objActSheet->setCellValue("C".$row,"实际數量");
         if(!empty($goodsList)){
             foreach ($goodsList as $goods){
                 $row++;
                 $this->objActSheet->setCellValue("A".$row,$goods["name"]);
                 $this->objActSheet->setCellValue("B".$row,$goods["unit"]);
-                $this->objActSheet->setCellValue("C".$row,$goods["goods_num"]);
+                $this->objActSheet->setCellValue("C".$row,$goods["confirm_num"]);
             }
         }
     }

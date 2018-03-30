@@ -16,6 +16,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
         line-height: 1.42857143;
         border: 1px solid #d2d6de;
         background-color: #eee;
+        min-height: 34px;
     }
 </style>
 
@@ -148,24 +149,24 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                             $con_num = empty($val['id'])?$key:$val['id'];
                             $tableTr = "<tr datanum='$con_num'>";
                             $val['confirm_num'] = (empty($val['confirm_num']) && $val['confirm_num'] !== "0")?$val['goods_num']:$val['confirm_num'];
-                            $tableTr.="<td><input type='text' class='form-control testInput' readonly name='DeliveryForm[goods_list][$con_num][name]' value='".$val['name']."'>";
+                            $tableTr.="<td><input type='text' class='form-control testInput spanInput' readonly name='DeliveryForm[goods_list][$con_num][name]' value='".$val['name']."'>";
                             $tableTr.="<input type='hidden' name='DeliveryForm[goods_list][$con_num][goods_id]' value='".$val['goods_id']."'>";
                             $tableTr.="<input type='hidden' name='DeliveryForm[goods_list][$con_num][id]' value='".$val['id']."'></td>";
-                            $tableTr.="<td><input type='text' class='form-control unit' readonly name='DeliveryForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
-                            $tableTr.="<td><input type='text' class='form-control unit' readonly name='DeliveryForm[goods_list][$con_num][inventory]' value='".$val['inventory']."'></td>";
-                            $tableTr.="<td><input type='text' class='form-control' readonly name='DeliveryForm[goods_list][$con_num][note]' value='".$val['note']."'></td>";
+                            $tableTr.="<td><input type='text' class='form-control unit spanInput' readonly name='DeliveryForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
+                            $tableTr.="<td><input type='text' class='form-control unit spanInput' readonly name='DeliveryForm[goods_list][$con_num][inventory]' value='".$val['inventory']."'></td>";
+                            $tableTr.="<td><input type='text' class='form-control spanInput' readonly name='DeliveryForm[goods_list][$con_num][note]' value='".$val['note']."'></td>";
                             if($model->status == "sent" || $model->status == "read"){
                                 $tableTr.="<td><input type='text' class='form-control' name='DeliveryForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
                             }else{
-                                $tableTr.="<td><input type='text' class='form-control' readonly name='DeliveryForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
+                                $tableTr.="<td><input type='text' class='form-control spanInput' readonly name='DeliveryForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
                             }
 
 
-                            $tableTr.="<td><input type='number' class='form-control' readonly name='DeliveryForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
+                            $tableTr.="<td><input type='number' class='form-control spanInput' readonly name='DeliveryForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
                             if($model->status == "sent" || $model->status == "read"){
                                 $tableTr.="<td><input type='number' class='form-control numChange goods_num' name='DeliveryForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
                             }else{
-                                $tableTr.="<td><input type='number' class='form-control numChange goods_num' readonly name='DeliveryForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
+                                $tableTr.="<td><input type='number' class='form-control numChange goods_num spanInput' readonly name='DeliveryForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
                             }
 
                             if($model->status == "finished"){
@@ -215,7 +216,7 @@ $('.go-balck').on('click',function(){
     $('#black_form input[name=\"num\"]').attr('max',num);
     $('#black_form').modal('show');
 });
-$('.testInput').each(function(){
+$('.spanInput').each(function(){
     var text = $(this).val();
     $(this).hide();
     $(this).parent('td').append('<span class=\'input-text-span\'>'+text+'</span>');

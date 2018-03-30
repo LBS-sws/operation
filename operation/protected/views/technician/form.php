@@ -12,6 +12,15 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
 'layout'=>TbHtml::FORM_LAYOUT_HORIZONTAL,
 )); ?>
 
+<style>
+    .input-text-span{display: block;width: 100%;padding: 6px 12px;
+        font-size: 14px;
+        line-height: 1.42857143;
+        border: 1px solid #d2d6de;
+        background-color: #eee;
+        min-height: 34px;
+    }
+</style>
 <section class="content-header">
 	<h1>
 		<strong><?php echo Yii::t('procurement','Order Form'); ?></strong>
@@ -132,6 +141,10 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                         <tbody>
                         <?php
                             if(!empty($model->goods_list)){
+                                $spanInput = "";
+                                if($model->getInputBool()){
+                                    $spanInput = "spanInput";
+                                }
                                 foreach ($model->goods_list as $key =>$goodsList){
                                     echo "<tr data-classify='".$goodsList["classify_id"]."'>";
                                     echo "<td>";
@@ -144,25 +157,25 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                                     echo "<td>".$goodsList["unit"]."</td>";
                                     echo "<td>";
                                     echo TbHtml::textField( "TechnicianForm[goods_list][$key][note]",$goodsList["note"],
-                                        array('class'=>"select_remark",'readonly'=>($model->getInputBool()))
+                                        array('class'=>"select_remark $spanInput",'readonly'=>($model->getInputBool()))
                                     );
                                     echo "</td>";
                                     if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished" || $model->status == "read")){
                                         echo "<td>";
                                         echo TbHtml::textField( "TechnicianForm[goods_list][$key][remark]",$goodsList["remark"],
-                                            array('readonly'=>(true))
+                                            array('readonly'=>(true),'class'=>'spanInput')
                                         );
                                         echo "</td>";
                                     }
                                     echo "<td>";
                                     echo TbHtml::textField( "TechnicianForm[goods_list][$key][goods_num]",$goodsList["goods_num"],
-                                        array('class'=>"select_num",'readonly'=>($model->getInputBool()))
+                                        array('class'=>"select_num $spanInput",'readonly'=>($model->getInputBool()))
                                     );
                                     echo "</td>";
                                     if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished" || $model->status == "read")){
                                         echo "<td>";
                                         echo TbHtml::textField( "TechnicianForm[goods_list][$key][confirm_num]",$goodsList["confirm_num"],
-                                            array('readonly'=>(true))
+                                            array('readonly'=>(true),'class'=>'spanInput')
                                         );
                                         echo "</td>";
                                     }
@@ -280,8 +293,13 @@ if ($model->scenario!='new')
     $this->renderPartial('//site/flowlist',array('model'=>$model));
 ?>
 <?php
-$js = '
-';
+$js = "
+$('.spanInput').each(function(){
+    var text = $(this).val();
+    $(this).hide();
+    $(this).parent('td').append('<span class=\'input-text-span\'>'+text+'</span>');
+});
+";
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 ?>
 

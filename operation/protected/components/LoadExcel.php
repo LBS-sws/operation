@@ -40,7 +40,8 @@ class LoadExcel {
             /**从第A列开始输出*/
             $arr = array();
             for($currentColumn= 0;$currentColumn<= $allColumn; $currentColumn++){
-                $val = $currentSheet->getCellByColumnAndRow($currentColumn,$currentRow)->getValue();/**ord()将字符转为十进制数*/
+                //$val = $currentSheet->getCellByColumnAndRow($currentColumn,$currentRow)->getValue();/**ord()将字符转为十进制数*/
+                $val = $currentSheet->getCellByColumnAndRow($currentColumn,$currentRow)->getCalculatedValue();//獲取公式后的結果
                 array_push($arr,$val);
             }
             array_push($listBody,$arr);

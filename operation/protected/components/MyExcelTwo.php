@@ -119,10 +119,18 @@ class MyExcelTwo {
         $goodsList = array();
         if(!empty($orderList)){
             $foreachNum = 1;
+            $maxNum = 0;
             foreach ($orderList as $order){
                 $maxHeight = 8;
-                $strNum = $foreachNum%2 != 0?0:5;
+                if($foreachNum%2 != 0){
+                    $strNum =0;
+                    $maxNum = 0;
+                }else{
+                    $strNum =5;
+                }
                 $numStart = $this->row;
+                $startRow = $strList[$strNum].$numStart;
+                $endRow = $strList[$strNum+3].($numStart+5);
                 $this->setRowContent($strList[$strNum].$numStart,"订单编号：".$order["order_code"],$strList[$strNum+3].$numStart);
                 $this->setRowContent($strList[$strNum].($numStart+1),"申請日期：".$order["lcd"],$strList[$strNum+3].($numStart+1));
                 $this->setRowContent($strList[$strNum].($numStart+2),"下的用戶：".$order["lcu_name"],$strList[$strNum+3].($numStart+2));
@@ -133,7 +141,8 @@ class MyExcelTwo {
                 $this->objActSheet->setCellValue($strList[$strNum+2].($numStart+5),"单位");
                 $this->objActSheet->setCellValue($strList[$strNum+3].($numStart+5),"要求数量");
                 if(is_array($order["goodsList"])){
-                    $maxHeight+=count($order["goodsList"]);
+                    $maxNum = $maxNum>count($order["goodsList"])?$maxNum:count($order["goodsList"]);
+                    $maxHeight+=$maxNum;
                     $goodsNum = $numStart+6;
                     foreach ($order["goodsList"] as $goods){
                         $goods["confirm_num"] = $goods["confirm_num"] === null?$goods["goods_num"]:$goods["confirm_num"];
@@ -149,6 +158,7 @@ class MyExcelTwo {
                         $this->objActSheet->setCellValue($strList[$strNum+1].$goodsNum,$goods["name"]);
                         $this->objActSheet->setCellValue($strList[$strNum+2].$goodsNum,$goods["unit"]);
                         $this->objActSheet->setCellValue($strList[$strNum+3].$goodsNum,$goods["goods_num"]);
+                        $endRow = $strList[$strNum+3].$goodsNum;
                         $goodsNum++;
                     }
                 }
@@ -156,6 +166,16 @@ class MyExcelTwo {
                     $this->row +=$maxHeight;
                 }
                 $foreachNum++;
+                $styleArray = array(
+                    'borders' => array(
+                        'allborders' => array(
+                            //'style' => PHPExcel_Style_Border::BORDER_THICK,//边框是粗的
+                            'style' => PHPExcel_Style_Border::BORDER_THIN,//细边框
+                            //'color' => array('argb' => 'FFFF0000'),
+                        ),
+                    ),
+                );
+                $this->objActSheet->getStyle("$startRow:$endRow")->applyFromArray($styleArray);;
             }
         }
         return $goodsList;

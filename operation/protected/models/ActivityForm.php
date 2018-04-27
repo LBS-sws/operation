@@ -9,6 +9,8 @@ class ActivityForm extends CFormModel
 	public $end_time;
 	public $order_class;
 	public $num=3;
+    public $city_auth;
+    public $city_name="全部";
     public $luu;
     public $lcu;
     public $lud;
@@ -26,7 +28,8 @@ class ActivityForm extends CFormModel
             'start_time'=>Yii::t('procurement','Start Time'),
             'end_time'=>Yii::t('procurement','End Time'),
             'num'=>Yii::t('procurement','Max Number Restrictions'),
-            'order_class'=>Yii::t('procurement','Order Class')
+            'order_class'=>Yii::t('procurement','Order Class'),
+            'city_auth'=>Yii::t('user','City')
 		);
 	}
 
@@ -36,16 +39,22 @@ class ActivityForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, start_time, end_time, order_class, num','safe'),
+			array('id, start_time, end_time, order_class, num, city_name, city_auth','safe'),
             array('start_time','required'),
             array('end_time','required'),
             array('end_time','validateDate'),
+            array('city_auth','validateCity'),
             array('order_class','required',"on"=>"new"),
             array('num','required'),
             array('num','numerical','allowEmpty'=>false,'integerOnly'=>true,'min'=>1),
 		);
 	}
 
+    public function validateCity($attribute, $params){
+	    if(!empty($this->city_auth)){
+            $this->city_auth ="~".$this->city_auth."~";
+        }
+    }
     public function validateDate($attribute, $params){
         if(strtotime($this->start_time)>strtotime($this->end_time)){
             $message = Yii::t('procurement','The end time cannot be less than the start time');
@@ -62,19 +71,22 @@ class ActivityForm extends CFormModel
 
 	public function retrieveData($index) {
 		$city = Yii::app()->user->city();
-		$rows = Yii::app()->db->createCommand()->select("*")
-            ->from("opr_order_activity")->where("id=:id",array(":id"=>$index))->queryAll();
-		if (count($rows) > 0) {
-			foreach ($rows as $row) {
-                $this->id = $row['id'];
-                $this->activity_code = $row['activity_code'];
-                $this->activity_title = $row['activity_title'];
-                $this->start_time = $row['start_time'];
-                $this->end_time = $row['end_time'];
-                $this->order_class = $row['order_class'];
-                $this->num = $row['num'];
-                break;
-			}
+        $row = Yii::app()->db->createCommand()->select("*")
+            ->from("opr_order_activity")->where("id=:id",array(":id"=>$index))->queryRow();
+		if ($row) {
+            $this->id = $row['id'];
+            $this->activity_code = $row['activity_code'];
+            $this->activity_title = $row['activity_title'];
+            $this->start_time = $row['start_time'];
+            $this->end_time = $row['end_time'];
+            $this->order_class = $row['order_class'];
+            $this->num = $row['num'];
+            $this->city_auth = empty($row['city_auth'])?"":substr($row['city_auth'],1,-1);
+            $this->city_name =empty($this->city_auth)?"全部":"";
+            $cityList = explode("~",$this->city_auth);
+            foreach ($cityList as $code){
+                $this->city_name.=CGeneral::getCityName($code)." ";
+            }
 		}
 		return true;
 	}
@@ -144,10 +156,10 @@ class ActivityForm extends CFormModel
 
     //自動生成標題和編號
     public function selfTitleAndCode(){
-        $day = date("Ymd");
+        $day = date("Ymd",strtotime($this->start_time));
         $codeStr = $this->order_class == "Import"?"PHJK":"PHGN";
         $titleStr = $this->order_class == "Import"?"进口货":"国内货";
-        $count = Yii::app()->db->createCommand()->select("count(id)")->from("opr_order_activity")->where(array('like', 'activity_code', "%$codeStr%"))->queryScalar();
+        $count = Yii::app()->db->createCommand()->select("count(id)")->from("opr_order_activity")->where(array('like', 'activity_code', "%$codeStr$day%"))->queryScalar();
         $count = empty($count)?"":$count+1;
         $this->activity_code = $codeStr.$day.$count;
         $this->activity_title = $day.$titleStr."采购订单".$count;
@@ -163,9 +175,9 @@ class ActivityForm extends CFormModel
                 break;
             case 'new':
                 $sql = "insert into opr_order_activity(
-							activity_code, activity_title, start_time, end_time, order_class, num, lcu, lcd
+							activity_code, activity_title, start_time, end_time, order_class, num, city_auth, lcu, lcd
 						) values (
-							:activity_code, :activity_title, :start_time, :end_time, :order_class, :num, :lcu, :lcd
+							:activity_code, :activity_title, :start_time, :end_time, :order_class, :num, :city_auth, :lcu, :lcd
 						)";
                 break;
             case 'edit':
@@ -174,6 +186,7 @@ class ActivityForm extends CFormModel
 							end_time = :end_time,
 							num = :num,
 							luu = :luu,
+							city_auth = :city_auth,
 							lud = :lud
 						where id = :id
 						";
@@ -198,6 +211,8 @@ class ActivityForm extends CFormModel
             $command->bindParam(':end_time',$this->end_time,PDO::PARAM_STR);
         if (strpos($sql,':order_class')!==false)
             $command->bindParam(':order_class',$this->order_class,PDO::PARAM_STR);
+        if (strpos($sql,':city_auth')!==false)
+            $command->bindParam(':city_auth',$this->city_auth,PDO::PARAM_STR);
         if (strpos($sql,':num')!==false)
             $command->bindParam(':num',$this->num,PDO::PARAM_INT);
 
@@ -234,9 +249,13 @@ class ActivityForm extends CFormModel
 
 	//發送郵件
 	private function setEmail(){
+        $authCity = explode("~",$this->city_auth);//採購單允許的城市
         $cityList = General::getCityListWithNoDescendant();//城市列表
         $userList = $this->getUserListToAddOrder();//有添加權限的用戶
         foreach ($cityList as $city=>$cityName){
+            if(!empty($this->city_auth)&&!in_array($city,$authCity)){
+                continue;
+            }
             $email = $this->getEmailToCity($city);
             if(!empty($email)){
                 //發送郵件
@@ -245,8 +264,7 @@ class ActivityForm extends CFormModel
         }
         if(!empty($userList)){
             foreach ($userList as $user){
-                $email = $this->getEmailToUsername($user["username"]);
-                $email = array($email);
+                $email = $user["email"];
                 if(!empty($email)){
                     //發送郵件
                     $this->sendEmail($email);
@@ -322,8 +340,16 @@ class ActivityForm extends CFormModel
         $systemId = Yii::app()->params['systemId'];
         $suffix = Yii::app()->params['envSuffix'];
         $suffix = "security".$suffix;
-        $userList = Yii::app()->db->createCommand()->select("username")->from($suffix.".sec_user_access")
-            ->where("system_id=:system_id and a_read_write like '%YD04%'",array(":system_id"=>$systemId))->queryAll();
+        if(empty($this->city_auth)){
+            $sql = "";
+        }else{
+            $city = substr($this->city_auth,1,-1);
+            $city = explode("~",$city);
+            $sql = " and b.city in ('".implode("','",$city)."')";
+        }
+        $userList = Yii::app()->db->createCommand()->select("b.email")->from($suffix.".sec_user_access a")
+            ->leftJoin($suffix.".sec_user b","a.username=b.username")
+            ->where("a.system_id=:system_id and a.a_read_write like '%YD04%'$sql",array(":system_id"=>$systemId))->queryAll();
         return $userList;
     }
 }

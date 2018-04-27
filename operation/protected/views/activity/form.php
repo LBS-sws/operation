@@ -49,6 +49,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Activity Form';
 		<div class="box-body">
 			<?php echo $form->hiddenField($model, 'scenario'); ?>
 			<?php echo $form->hiddenField($model, 'id'); ?>
+			<?php echo $form->hiddenField($model, 'city_auth'); ?>
 
             <?php if ($model->scenario!='new'): ?>
             <div class="form-group">
@@ -113,14 +114,44 @@ $this->pageTitle=Yii::app()->name . ' - Order Activity Form';
                     ); ?>
                 </div>
             </div>
+
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'city_auth',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-6">
+                    <?php
+                    echo $form->textArea($model, 'city_name',
+                        array('rows'=>4,'cols'=>80,'maxlength'=>1000,'readonly'=>true)
+                    );
+                    ?>
+                </div>
+                <div class="col-sm-2">
+                    <?php
+                    echo TbHtml::button('<span class="fa fa-search"></span> '.Yii::t('user','City'),
+                        array('name'=>'btnCity','id'=>'btnCity',)
+                    );
+                    ?>
+                </div>
+            </div>
 		</div>
 	</div>
 </section>
 
 
+<?php $this->renderPartial('//site/lookup'); ?>
 <?php
 
 if ($model->scenario!='view') {
+    $js = Script::genLookupSearchEx();
+    Yii::app()->clientScript->registerScript('lookupSearch',$js,CClientScript::POS_READY);
+
+    $js = Script::genLookupButtonEx('btnCity', 'citySearch', 'city_auth', 'city_name',
+        array(),
+        true
+    );
+    Yii::app()->clientScript->registerScript('lookupUsers',$js,CClientScript::POS_READY);
+
+    $js = Script::genLookupSelect();
+    Yii::app()->clientScript->registerScript('lookupSelect',$js,CClientScript::POS_READY);
     $js = Script::genDatePicker(array(
         'ActivityForm_start_time',
         'ActivityForm_end_time',

@@ -9,6 +9,8 @@ class PurchaseView extends CFormModel
 	public $end_time;
 	public $num;
 	public $order_class;
+    public $city_auth;
+    public $city_name="全部";
     public $luu;
     public $lcu;
     public $lud;
@@ -22,29 +24,32 @@ class PurchaseView extends CFormModel
             'start_time'=>Yii::t('procurement','Start Time'),
             'end_time'=>Yii::t('procurement','End Time'),
             'num'=>Yii::t('procurement','Number Restrictions'),
-            'order_class'=>Yii::t('procurement','Order Class')
+            'order_class'=>Yii::t('procurement','Order Class'),
+            'city_auth'=>Yii::t('user','City')
 		);
 	}
 
-
-	public function retrieveData($index) {
-		$city = Yii::app()->user->city();
-		$rows = Yii::app()->db->createCommand()->select("*")
-            ->from("opr_order_activity")->where("id=:id",array(":id"=>$index))->queryAll();
-		if (count($rows) > 0) {
-			foreach ($rows as $row) {
-                $this->id = $row['id'];
-                $this->activity_code = $row['activity_code'];
-                $this->activity_title = $row['activity_title'];
-                $this->start_time = $row['start_time'];
-                $this->end_time = $row['end_time'];
-                $this->num = $row['num'];
-                $this->order_class = $row['order_class'];
-                break;
-			}
-		}
-		return true;
-	}
+    public function retrieveData($index) {
+        $city = Yii::app()->user->city();
+        $row = Yii::app()->db->createCommand()->select("*")
+            ->from("opr_order_activity")->where("id=:id",array(":id"=>$index))->queryRow();
+        if ($row) {
+            $this->id = $row['id'];
+            $this->activity_code = $row['activity_code'];
+            $this->activity_title = $row['activity_title'];
+            $this->start_time = $row['start_time'];
+            $this->end_time = $row['end_time'];
+            $this->order_class = $row['order_class'];
+            $this->num = $row['num'];
+            $this->city_auth = empty($row['city_auth'])?"":substr($row['city_auth'],1,-1);
+            $this->city_name =empty($this->city_auth)?"全部":"";
+            $cityList = explode("~",$this->city_auth);
+            foreach ($cityList as $code){
+                $this->city_name.=CGeneral::getCityName($code)." ";
+            }
+        }
+        return true;
+    }
 
 	public function getHeaderList() {
 		$arr = array(

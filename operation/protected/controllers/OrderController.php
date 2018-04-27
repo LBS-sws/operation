@@ -185,13 +185,13 @@ class OrderController extends Controller
 
     //區域訂單活動
     public function actionActivity($pageNum=0){
-        $model = new ActivityList;
-        if (isset($_POST['ActivityList'])) {
-            $model->attributes = $_POST['ActivityList'];
+        $model = new AddOrderList;
+        if (isset($_POST['AddOrderList'])) {
+            $model->attributes = $_POST['AddOrderList'];
         } else {
             $session = Yii::app()->session;
-            if (isset($session['activity_ya01']) && !empty($session['activity_ya01'])) {
-                $criteria = $session['activity_ya01'];
+            if (isset($session['addOrder_ya01']) && !empty($session['addOrder_ya01'])) {
+                $criteria = $session['addOrder_ya01'];
                 $model->setCriteria($criteria);
             }
         }

@@ -135,7 +135,7 @@ class DeliveryForm extends CFormModel
                 //$this->technician = $row['technician'];
                 $this->status = $row['status'];
                 $this->remark = $row['remark'];
-                $this->lcu = $row['lcu'];
+                $this->lcu = OrderGoods::getNameToUsername($row['lcu']);
                 $this->ject_remark = $row['ject_remark'];
                 $this->lcd = date("Y-m-d",strtotime($row['lcd']));
                 $this->statusList = OrderForm::getStatusListToId($row['id']);

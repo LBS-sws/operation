@@ -9,7 +9,7 @@ class WarehouseForm extends CFormModel
 	public $orderClass = "Warehouse";
 	public $inventory;
 	public $classify_id;
-	public $price;
+	public $price=0.00;
 	public $costing;
 	public $decimal_num;
 	public $luu;
@@ -43,10 +43,10 @@ class WarehouseForm extends CFormModel
             array('inventory','numerical','allowEmpty'=>false,'integerOnly'=>false),
 			array('name','validateName'),
 			array('goods_code','validateCode'),
-			array('price','required'),
+			array('price','validatePrice'),
 		);
 	}
-
+//
 	public function validateName($attribute, $params){
         $city = Yii::app()->user->city();
         $id = -1;
@@ -71,6 +71,22 @@ class WarehouseForm extends CFormModel
         if(count($rows)>0){
             $message = Yii::t('procurement','the Goods Code of already exists');
             $this->addError($attribute,$message);
+        }
+	}
+	public function validatePrice($attribute, $params){
+	    if(Yii::app()->user->validFunction('YN02')){
+            if(empty($this->price)||!is_numeric($this->price)){
+                $message = Yii::t('procurement','Price（RMB）').Yii::t('procurement',' Not Null');
+                $this->addError($attribute,$message);
+            }
+        }else{
+            $rows = Yii::app()->db->createCommand()->select("price")->from("opr_warehouse")
+                ->where('id=:id', array(':id'=>$this->id))->queryRow();
+            if($rows){
+                $this->price = $rows["price"];
+            }else{
+                $this->price = 0.00;
+            }
         }
 	}
 

@@ -100,6 +100,7 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                     ); ?>
                 </div>
             </div>
+            <?php if (Yii::app()->user->validFunction('YN02')): ?>
             <div class="form-group">
                 <?php echo $form->labelEx($model,'price',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
@@ -108,6 +109,7 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                     ); ?>
                 </div>
             </div>
+            <?php endif ?>
             <div class="form-group">
                 <?php echo $form->labelEx($model,'costing',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">

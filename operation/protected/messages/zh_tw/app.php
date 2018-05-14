@@ -96,6 +96,7 @@ return array(
     'Goods Hybrid Rules'=>'混合規則管理',
     'OrderAcc Info'=>'多發訂單授權',
     'Area Audit'=>'地區審核',
+    'Warehouse unit price'=>'倉庫物品單價',
     //沈超添加結束
 );
 ?>

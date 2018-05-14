@@ -20,11 +20,13 @@
         ;
         ?>
     </th>
+    <?php if (Yii::app()->user->validFunction('YN02')): ?>
     <th>
         <?php echo TbHtml::link($this->getLabelName('price').$this->drawOrderArrow('price'),'#',$this->createOrderLink('warehouse-list','price'))
         ;
         ?>
     </th>
+    <?php endif ?>
     <th>
         <?php echo TbHtml::link($this->getLabelName('inventory').$this->drawOrderArrow('inventory'),'#',$this->createOrderLink('warehouse-list','inventory'))
         ;

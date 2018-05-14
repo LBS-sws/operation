@@ -100,6 +100,7 @@ return array(
     'Goods Hybrid Rules'=>'混合规则管理',
     'OrderAcc Info'=>'多发订单授权',
     'Area Audit'=>'地区审核',
+    'Warehouse unit price'=>'仓库物品单价',
     //沈超添加結束
 	
 );

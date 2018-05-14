@@ -4,7 +4,9 @@
 	<td><?php echo $this->record['name']; ?></td>
 	<td><?php echo $this->record['classify_id']; ?></td>
 	<td><?php echo $this->record['unit']; ?></td>
+    <?php if (Yii::app()->user->validFunction('YN02')): ?>
 	<td><?php echo $this->record['price']; ?></td>
+    <?php endif ?>
 	<td>
         <?php echo $this->record['inventory']; ?>
         <span class="fa fa-question-circle goodsHistoryMouse" data-id="<?php echo $this->record['id'];?>"></span>

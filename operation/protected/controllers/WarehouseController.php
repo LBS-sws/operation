@@ -21,7 +21,7 @@ class WarehouseController extends Controller
     {
         return array(
             array('allow',
-                'actions'=>array('new','edit','delete','save','copy','importGoods','downExcel'),
+                'actions'=>array('new','edit','delete','save','copy','importGoods','downExcel','test'),
                 'expression'=>array('WarehouseController','allowReadWrite'),
             ),
             array('allow',
@@ -174,4 +174,18 @@ class WarehouseController extends Controller
         }
     }
 
+    //訂單新增審核時間字段，系統自動完成數據輸入（一次性方法），將舊數據更新
+    public function actionTest(){
+        $connection = Yii::app()->db;
+        $sql = "SELECT * FROM opr_order WHERE status IN ('finished','approve') AND (audit_time='' OR audit_time IS NULL )";
+        $records = $connection->createCommand($sql)->queryAll();
+        foreach ($records as $record){
+            $order_id=$record["id"];
+            $audit_time = $connection->createCommand("SELECT lcd FROM opr_order_status WHERE order_id=$order_id AND status='approve' order by id desc")->queryRow();
+            if($audit_time){
+                $audit_time = $audit_time["lcd"];
+                $connection->createCommand()->update('opr_order', array("audit_time"=>$audit_time),"id=$order_id");
+            }
+        }
+    }
 }

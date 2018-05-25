@@ -9,6 +9,7 @@ class WarehouseList extends CListPageModel
 			'name'=>Yii::t('procurement','Name'),
 			'unit'=>Yii::t('procurement','Unit'),
 			'inventory'=>Yii::t('procurement','Inventory'),
+			'min_num'=>Yii::t('procurement','min inventory'),
 			'price'=>Yii::t('procurement','Price（RMB）'),
             'classify_id'=>Yii::t('procurement','Classify'),
 		);
@@ -70,7 +71,7 @@ class WarehouseList extends CListPageModel
             }
 			if ($this->orderType=='D') $order .= "desc ";
 		} else
-			$order = " order by id desc";
+			$order = " order by z_index desc, id desc";
 
 		$sql = $sql2.$clause;
 		$this->totalRow = Yii::app()->db->createCommand($sql)->queryScalar();
@@ -86,11 +87,12 @@ class WarehouseList extends CListPageModel
 						'id'=>$record['id'],
 						'name'=>$record['name'],
 						'unit'=>$record['unit'],
-						'unit'=>$record['unit'],
+						'min_num'=>$record['min_num'],
 						'classify_id'=>ClassifyForm::getClassifyToId($record['classify_id']),
 						'price'=>$record['price'],
 						'inventory'=>$record['inventory'],
 						'goods_code'=>$record['goods_code'],
+						'color'=>$record['z_index'] == 1?"":" text-danger",
 						'goodsHistory'=>$this->getGoodsHistory($record['id']),
 					);
 			}

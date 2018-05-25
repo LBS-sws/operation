@@ -14,6 +14,8 @@ class WarehouseForm extends CFormModel
 	public $decimal_num;
 	public $luu;
 	public $lcu;
+	public $min_num;
+	public $z_index=1;
 
 	public function attributeLabels()
 	{
@@ -26,6 +28,7 @@ class WarehouseForm extends CFormModel
             'price'=>Yii::t('procurement','Price（RMB）'),
             'costing'=>Yii::t('procurement','Costing（RMB）'),
             'decimal_num'=>Yii::t('procurement','Decimal'),
+            'min_num'=>Yii::t('procurement','min inventory'),
 		);
 	}
 
@@ -35,12 +38,14 @@ class WarehouseForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, goods_code, name, unit, inventory, classify_id, price, costing, decimal_num, lcu, luu','safe'),
+			array('id, goods_code, min_num, name, unit, inventory, classify_id, price, costing, decimal_num, lcu, luu','safe'),
             array('name','required'),
             array('classify_id','required'),
             array('unit','required'),
             array('inventory','required'),
             array('inventory','numerical','allowEmpty'=>false,'integerOnly'=>false),
+            array('min_num','required'),
+            array('min_num','numerical','allowEmpty'=>false,'integerOnly'=>false),
 			array('name','validateName'),
 			array('goods_code','validateCode'),
 			array('price','validatePrice'),
@@ -74,6 +79,11 @@ class WarehouseForm extends CFormModel
         }
 	}
 	public function validatePrice($attribute, $params){
+	    if(floatval($this->inventory)<=floatval($this->min_num)){
+	        $this->z_index = 2;
+        }else{
+	        $this->z_index = 1;
+        }
 	    if(Yii::app()->user->validFunction('YN02')){
             if(empty($this->price)||!is_numeric($this->price)){
                 $message = Yii::t('procurement','Price（RMB）').Yii::t('procurement',' Not Null');
@@ -115,6 +125,7 @@ class WarehouseForm extends CFormModel
                 $this->costing = sprintf("%.2f",$row['costing']);
                 $this->decimal_num = empty($row['decimal_num'])?"否":$row['decimal_num'];
                 $this->price = $row['price'];
+                $this->min_num = $row['min_num'];
                 break;
 			}
 		}
@@ -171,9 +182,9 @@ class WarehouseForm extends CFormModel
                 break;
             case 'new':
                 $sql = "insert into opr_warehouse(
-							name, unit, inventory, classify_id, lcu, goods_code,city,price,costing,decimal_num
+							name, unit, inventory, classify_id, lcu, goods_code,city,price,costing,decimal_num,min_num,z_index
 						) values (
-							:name, :unit, :inventory, :classify_id, :lcu, :goods_code,:city,:price,:costing,:decimal_num
+							:name, :unit, :inventory, :classify_id, :lcu, :goods_code,:city,:price,:costing,:decimal_num,:min_num,:z_index
 						)";
                 break;
             case 'edit':
@@ -184,6 +195,8 @@ class WarehouseForm extends CFormModel
 							price = :price,
 							costing = :costing,
 							decimal_num = :decimal_num,
+							z_index = :z_index,
+							min_num = :min_num,
 							luu = :luu,
 							inventory = :inventory
 						where id = :id AND city=:city
@@ -212,8 +225,12 @@ class WarehouseForm extends CFormModel
             $command->bindParam(':costing',$this->costing,PDO::PARAM_STR);
         if (strpos($sql,':decimal_num')!==false)
             $command->bindParam(':decimal_num',$this->decimal_num,PDO::PARAM_STR);
+        if (strpos($sql,':min_num')!==false)
+            $command->bindParam(':min_num',$this->min_num,PDO::PARAM_STR);
+        if (strpos($sql,':z_index')!==false)
+            $command->bindParam(':z_index',$this->z_index,PDO::PARAM_INT);
         if (strpos($sql,':inventory')!==false)
-            $command->bindParam(':inventory',$this->inventory,PDO::PARAM_INT);
+            $command->bindParam(':inventory',$this->inventory,PDO::PARAM_STR);
         if (strpos($sql,':classify_id')!==false)
             $command->bindParam(':classify_id',$this->classify_id,PDO::PARAM_INT);
 

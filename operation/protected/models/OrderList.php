@@ -260,7 +260,7 @@ class OrderList extends CListPageModel
             ->from("opr_order")->where('status="approve" and judge=0 and city=:city and lcu=:lcu',array(":city"=>$city,":lcu"=>$uid))->queryScalar();
 
 		// 营业报告审核的數量
-/*		$suffix = Yii::app()->params['envSuffix'];
+		$suffix = Yii::app()->params['envSuffix'];
 		$type = Yii::app()->user->validFunction('YN01') ? 'PA' : 'PH';
 		$wf = new WorkflowOprpt;
 		$wf->connection = Yii::app()->db;
@@ -272,18 +272,18 @@ class OrderList extends CListPageModel
 				where a.city in ($cityallow) and a.city=b.code 
 				and a.id in ($list)
 			";
-		$rep_num = Yii::app()->db->createCommand($sql)->queryScalar();*/
+		$rep_num = Yii::app()->db->createCommand($sql)->queryScalar();
         $rep_num = 0;
 		// 营业报告审核的數量 -- END
 		
 		return array(
-            "fast_num"=>$fast_num,//快速訂單的數量
-            "imDo_num"=>$imDo_num,//採購活動的數量
-            "take_num"=>$take_num,//地區收貨的數量
-            "deli_num"=>$deli_num,//地區發貨的數量
-            "goods_num"=>$goods_num,//技術員收貨的數量
-            "area_num"=>$area_num,//地區審核數量
-			"rep_num"=>$rep_num,//营业报告审核的數量
+            "YS04"=>$fast_num,//快速訂單的數量
+            "YS01"=>$imDo_num,//採購活動的數量
+            "YD03"=>$take_num,//地區待收貨的數量
+            "YD02"=>$deli_num,//地區發貨的數量
+            "YD06"=>$area_num,//地區審核數量
+            "YC02"=>$goods_num,//技術員收貨的數量
+			"YA03"=>$rep_num,//营业报告审核的數量
         );
     }
 }

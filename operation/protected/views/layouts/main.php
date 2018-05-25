@@ -118,7 +118,7 @@ var checkLogin = function() {
 	});
 };
 var logincheckinterval = setInterval(checkLogin, 30000);
-waitingMessageHeader('$waitingMessageUrl','".Yii::app()->baseUrl."');
+//waitingMessageHeader('$waitingMessageUrl','".Yii::app()->baseUrl."');
 	";
 	Yii::app()->clientScript->registerScript('checksession',$js,CClientScript::POS_READY);
 	$js = "
@@ -142,7 +142,7 @@ $("#'.$oid.'").on("click",function(){$("#syschangedialog").modal("hide");window.
 	}
 	Yii::app()->clientScript->registerScript('systemchange',$js,CClientScript::POS_READY);
 
-Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/orderMessage.js?2", CClientScript::POS_END);
+Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/orderMessage.js?3", CClientScript::POS_END);
 Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/message.js", CClientScript::POS_END);
 }
 ?>

@@ -169,7 +169,8 @@ return array(
     'Fast Form'=>'快速订单审核',
 
     //倉庫信息
-    'Inventory'=>'库存',
+    'Inventory'=>'现有库存',
+    'min inventory'=>'安全库存',
     'Shipments Info'=>'发货信息',
     'Shipments Form'=>'发货表单',
     'Cannot exceed the quantity of Inventory'=>'不能超过库存的数量',

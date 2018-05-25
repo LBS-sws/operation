@@ -251,6 +251,7 @@ class DeliveryForm extends CFormModel
                 }
             }
         }
+        $this->resetZIndex();
 
         //發送郵件
         OrderGoods::sendEmailTwo($oldOrderStatus,$this->status,$this->order_code);
@@ -291,6 +292,7 @@ class DeliveryForm extends CFormModel
                     $goodsId = $goods["goods_id"];
                     Yii::app()->db->createCommand("update opr_warehouse set inventory=inventory+$num where id=$goodsId")->execute();
                 }
+                $this->resetZIndex();
             }
 
             //添加狀態記錄
@@ -320,6 +322,11 @@ class DeliveryForm extends CFormModel
         }
         return $arr;
     }
+    //
+    private function resetZIndex(){
+        Yii::app()->db->createCommand("update opr_warehouse set z_index=1 where inventory>min_num")->execute();
+        Yii::app()->db->createCommand("update opr_warehouse set z_index=2 where inventory<=min_num")->execute();
+    }
 
     //退回單個物品
     public function blackGoods($str=""){
@@ -329,6 +336,7 @@ class DeliveryForm extends CFormModel
         Yii::app()->db->createCommand("update opr_order_goods set confirm_num=confirm_num-$num where id=$blackId")->execute();
         Yii::app()->db->createCommand("update opr_warehouse set inventory=inventory+$num where id=$goodsId")->execute();
 
+        $this->resetZIndex();
         //記錄
         Yii::app()->db->createCommand()->insert('opr_order_status', array(
             'order_id'=>$this->id,

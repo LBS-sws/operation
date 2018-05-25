@@ -168,7 +168,8 @@ return array(
     'Fast Form'=>'快速訂單審核',
 
     //倉庫信息
-    'Inventory'=>'庫存',
+    'Inventory'=>'現有庫存',
+    'min inventory'=>'安全庫存',
     'Shipments Info'=>'發貨信息',
     'Shipments Form'=>'發貨表單',
     'Cannot exceed the quantity of Inventory'=>'不能超過庫存數量',

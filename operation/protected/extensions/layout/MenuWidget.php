@@ -2,7 +2,8 @@
 class MenuWidget extends CWidget
 {
 	public $config;
-	
+	private $arr;//角標數組
+
 	protected function printMenuHtml($items) {
 		$rtn = '';
 		foreach ($items as $name=>$item) {
@@ -17,8 +18,16 @@ class MenuWidget extends CWidget
 					$rtn .= $this->printMenuHtml($item['items']);
 					$rtn .= "</ul></li>";
 				} else {
+                    $num = "";
+                    if(key_exists($item['access'],$this->arr)){
+                        $num = $this->arr[$item['access']];
+                    }
 					$tag = isset($item['text']) ? 'title="'.$item['text'].'"' : '';
-					$rtn .= "<li><a href=\"$url\" $tag>$itemname</a></li>";
+                    if(empty($num)){
+                        $rtn .= "<li><a href=\"$url\" $tag>$itemname </a></li>";
+                    }else{
+                        $rtn .= "<li><a href=\"$url\" $tag>$itemname <span class=\"badge\">$num</span></a></li>";
+                    }
 				}
 			}
 		}
@@ -28,7 +37,8 @@ class MenuWidget extends CWidget
 	public function run()
 	{
 		$menuitems = require($this->config);
-		
+		$this->arr = OrderList::waitingMessage();
+
 		$layout = '<ul class="nav navbar-nav">';
 		$layout .= $this->printMenuHtml($menuitems);
 		$layout .= '</ul>';

@@ -273,7 +273,7 @@ class OrderList extends CListPageModel
 				and a.id in ($list)
 			";
 		$rep_num = Yii::app()->db->createCommand($sql)->queryScalar();
-        $rep_num = 0;
+        //$rep_num = 0;
 		// 营业报告审核的數量 -- END
 		
 		return array(

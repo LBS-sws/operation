@@ -44,7 +44,7 @@ class RptPickingList extends CReport {
 		$citylist = empty($citylist) ? "'$city'" : "$citylist,'$city'";
 		if (!empty($user_ids)) $user_ids = "'".str_replace("~","','",$user_ids)."'";
 		
-		$rows = PurchaseList::getOrderListSearch($citylist,$user_ids,$start_dt,$end_dt);
+		$rows = PurchaseList::getOrderListSearchX($citylist,$user_ids,$start_dt,$end_dt);
 		if (count($rows) > 0) {
 			foreach ($rows as $row) {
 				$temp = array();

@@ -189,10 +189,10 @@ WHERE a.judge = 0 AND (a.status = 'finished' OR a.status = 'approve') AND a.city
             $sql.=" AND d.username in ($user_code)";
         }
         if(!empty($start_date)){
-            $sql.=" AND a.lcd >= '$start_date'";
+            $sql.=" AND a.lcd >= '$start_date 00:00:00'";
         }
         if(!empty($end_date)){
-            $sql.=" AND a.lcd <= '$end_date'";
+            $sql.=" AND a.lcd <= '$end_date 23:59:59'";
         }
         $sql.=" order by a.lcd desc";
         $records = $connection->createCommand($sql)->queryAll();

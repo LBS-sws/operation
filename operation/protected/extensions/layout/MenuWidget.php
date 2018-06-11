@@ -19,7 +19,7 @@ class MenuWidget extends CWidget
 					$rtn .= "</ul></li>";
 				} else {
                     $num = "";
-                    if(key_exists($item['access'],$this->arr)){
+                    if(key_exists($item['access'],$this->arr)&& Yii::app()->user->validRWFunction($item['access'])){
                         $num = $this->arr[$item['access']];
                     }
 					$tag = isset($item['text']) ? 'title="'.$item['text'].'"' : '';

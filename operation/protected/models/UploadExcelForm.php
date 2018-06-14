@@ -190,7 +190,7 @@ class UploadExcelForm extends CFormModel
                     array("name"=>"参考售价","sqlName"=>"price","value"=>"0.00"),
                     //array("name"=>"成本","sqlName"=>"costing","value"=>"0.00"),
                     array("name"=>"是否允许小数","sqlName"=>"decimal_num","value"=>"否"),
-                    array("name"=>"安全库存","sqlName"=>"inventory","value"=>"0"),
+                    array("name"=>"现有库存","sqlName"=>"inventory","value"=>"0"),
                 );
                 break;
             case "Document":

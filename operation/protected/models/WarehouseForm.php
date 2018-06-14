@@ -265,7 +265,7 @@ class WarehouseForm extends CFormModel
 
     public function downExcel(){
         $city = Yii::app()->user->city();
-        $list["head"] = array("存货编码","存货名称","主计量单位","所属分类码","参考售价","是否允许小数","安全库存");
+        $list["head"] = array("存货编码","存货名称","主计量单位","所属分类码","参考售价","是否允许小数","现有库存");
         $rs = Yii::app()->db->createCommand()->select("a.*,b.name as classify_name")->from("opr_warehouse a")
             ->leftJoin("opr_classify b","a.classify_id=b.id")
             ->where('a.city=:city',array(':city'=>$city))->queryAll();

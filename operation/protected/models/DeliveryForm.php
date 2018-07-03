@@ -407,6 +407,7 @@ class DeliveryForm extends CFormModel
             //批量修改
             Yii::app()->db->createCommand()->update('opr_order', array(
                 'status'=>"approve",
+                'audit_time'=>date('Y-m-d H:i:s'),
                 'luu'=>$uid,
             ), "city='$city' AND judge=0 AND status in ('read','sent') and id in($idList)");
         }

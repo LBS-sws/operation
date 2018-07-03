@@ -160,7 +160,7 @@ class UploadExcelForm extends CFormModel
                     if($rows){
                         return array("status"=>1,"data"=>$rows["id"]);
                     }else{
-                        return array("status"=>0,"error"=>$this->start_title."："."没找到对应的混合规则（$value）");
+                        return array("status"=>0,"error"=>$this->start_title."："."没找到对应的混合规则($value)");
                     }
                     break;
                 default:

@@ -39,6 +39,9 @@ class OrderGoods extends CActiveRecord{
         }elseif($to_addr == 1){
             //發給總部
             $to_addr = EmailForm::getEmailList();
+        }elseif($to_addr === "aaa"){
+            //用戶郵箱為空不發送郵件
+            return false;
         }else{
             //發給地區
             if(!is_array($to_addr)){
@@ -90,6 +93,9 @@ class OrderGoods extends CActiveRecord{
         $html .= "<p>採購標題：".$activityList->activity_title."</p>";
         //發送郵件
         if($oldOrderStatus){
+            if(empty($oldOrderStatus[0]["lcu_email"])){
+                $oldOrderStatus[0]["lcu_email"] = "aaa";//後期bug修改，不想重構
+            }
             if($oldOrderStatus[0]["status"] != $stauts){
                 $html .= "<p>下單城市：".$oldOrderStatus[0]["city"]."</p>";
                 $html .= "<p>下單用戶：".OrderGoods::getNameToUsername($oldOrderStatus[0]["lcu"])."</p>";
@@ -128,6 +134,9 @@ class OrderGoods extends CActiveRecord{
         $html = "";
         //發送郵件
         if($oldOrderStatus){
+            if(empty($oldOrderStatus[0]["lcu_email"])){
+                $oldOrderStatus[0]["lcu_email"] = "aaa";//後期bug修改，不想重構
+            }
             if($oldOrderStatus[0]["status"] != $stauts){
                 $html .= "<p>下單城市：".$oldOrderStatus[0]["city"]."</p>";
                 $html .= "<p>下單用戶：".OrderGoods::getNameToUsername($oldOrderStatus[0]["lcu"])."</p>";

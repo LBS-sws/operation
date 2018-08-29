@@ -97,6 +97,7 @@ return array(
     'OrderAcc Info'=>'多發訂單授權',
     'Area Audit'=>'地區審核',
     'Warehouse unit price'=>'倉庫物品單價',
+    'Business Report'=>'營業報告匯總報表',
     //沈超添加結束
 );
 ?>

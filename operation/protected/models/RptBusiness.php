@@ -4,7 +4,7 @@ class RptBusiness extends CReport {
 	protected $month;
 	protected $city;
 	protected $labels;
-	protected $posrow=1;
+	protected $posrow=4;
 	protected $cityList=array();
 
 	public function genReport() {

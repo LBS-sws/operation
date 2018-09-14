@@ -402,8 +402,18 @@ class DeliveryForm extends CFormModel
                 $sql = "UPDATE opr_order_goods SET confirm_num = goods_num WHERE order_id=".$order["id"];
                 Yii::app()->db->createCommand($sql)->execute();
             }
-
             $idList = implode(",",$this->checkBoxDown);
+
+            //批量減少庫存
+            $rows = Yii::app()->db->createCommand()->select("goods_id,confirm_num")->from("opr_order_goods")->where("order_id in($idList)")->queryAll();
+            if($rows){
+                foreach ($rows as $row){
+                    $num = floatval($row["confirm_num"]);
+                    $goodsId = intval($row["goods_id"]);
+                    Yii::app()->db->createCommand("update opr_warehouse set inventory=inventory-$num where id=$goodsId")->execute();
+                }
+            }
+
             //批量修改
             Yii::app()->db->createCommand()->update('opr_order', array(
                 'status'=>"approve",

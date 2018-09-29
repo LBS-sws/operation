@@ -44,5 +44,8 @@ switch ($this->record['status']){
             }
         ?>
     </td>
+<?php if (!Yii::app()->user->isSingleCity()): ?>
+    <td><?php echo $this->record['city']; ?></td>
+<?php endif ?>
     <td><?php echo OrderList::printPurchaseStatus($this->record['status']);?></td>
 </tr>

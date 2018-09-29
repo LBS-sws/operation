@@ -5,6 +5,7 @@ class DeliveryList extends CListPageModel
     public $searchTimeStart;//開始日期
     public $searchTimeEnd;//結束日期
     public $goods_name;//結束日期
+    public $city;//查詢的城市
     public function attributeLabels()
     {
         return array(
@@ -25,50 +26,57 @@ class DeliveryList extends CListPageModel
 
     public function rules(){
         return array(
-            array('attr, pageNum, noOfItem, totalRow, searchField, searchValue, orderField, orderType, searchTimeStart, searchTimeEnd','safe',),
+            array('attr, pageNum, noOfItem, totalRow, searchField, searchValue, orderField, orderType, city, searchTimeStart, searchTimeEnd','safe',),
         );
     }
 
     public function retrieveDataByPage($pageNum=1)
     {
         //order_user = '$userName' OR technician = '$userName'
+        $suffix =  Yii::app()->params['envSuffix'];
         $city = Yii::app()->user->city();
         $userName = Yii::app()->user->name;
-        $sql1 = "select *
-				from opr_order
-				where (city = '$city' AND judge=0 AND status != 'pending' AND status != 'cancelled') 
+        $sql1 = "select a.*,b.disp_name,b.city AS s_city 
+				from opr_order a
+				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
+				where (a.city = '$city' AND a.judge=0 AND a.status != 'pending' AND a.status != 'cancelled') 
 			";
         $sql2 = "select count(id)
-				from opr_order
-				where (city = '$city' AND judge=0 AND status != 'pending' AND status != 'cancelled') 
+				from opr_order a
+				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
+				where (a.city = '$city' AND a.judge=0 AND a.status != 'pending' AND a.status != 'cancelled') 
 			";
         $clause = "";
         if (!empty($this->searchField) && !empty($this->searchValue)) {
             $svalue = str_replace("'","\'",$this->searchValue);
             switch ($this->searchField) {
                 case 'lcd':
-                    $clause .= General::getSqlConditionClause('lcd', $svalue);
+                    $clause .= General::getSqlConditionClause('a.lcd', $svalue);
                 case 'order_code':
-                    $clause .= General::getSqlConditionClause('order_code', $svalue);
+                    $clause .= General::getSqlConditionClause('a.order_code', $svalue);
                     break;
                 case 'lcu':
-                    $clause .= ' and lcu in '.$this->getUserCodeSqlLikeName($svalue);
+                    $clause .= General::getSqlConditionClause('b.disp_name', $svalue);
                     break;
                 case 'goods_name':
-                    $clause .= ' and id in '.$this->getOrderIdSqlLikeGoodsName($svalue);
+                    $clause .= ' and a.id in '.$this->getOrderIdSqlLikeGoodsName($svalue);
                     break;
                 case 'status':
-                    $clause .= ' and status in '.$this->getStatusSqlToStr($svalue);
+                    $clause .= ' and a.status in '.$this->getStatusSqlToStr($svalue);
                     break;
             }
         }
         if (!empty($this->searchTimeStart) && !empty($this->searchTimeStart)) {
             $svalue = str_replace("'","\'",$this->searchTimeStart);
-            $clause .= " and lcd >='$svalue 00:00:00' ";
+            $clause .= " and a.lcd >='$svalue 00:00:00' ";
         }
         if (!empty($this->searchTimeEnd) && !empty($this->searchTimeEnd)) {
             $svalue = str_replace("'","\'",$this->searchTimeEnd);
-            $clause .= " and lcd <='$svalue 23:59:59' ";
+            $clause .= " and a.lcd <='$svalue 23:59:59' ";
+        }
+        if (!empty($this->city)) {
+            $svalue = str_replace("'","\'",$this->city);
+            $clause .= " and a.city ='$svalue' ";
         }
 
         $order = "";
@@ -76,7 +84,7 @@ class DeliveryList extends CListPageModel
             $order .= " order by ".$this->orderField." ";
             if ($this->orderType=='D') $order .= "desc ";
         } else
-            $order = " order by id desc";
+            $order = " order by a.id desc";
 
         $sql = $sql2.$clause;
         $this->totalRow = Yii::app()->db->createCommand($sql)->queryScalar();
@@ -95,8 +103,8 @@ class DeliveryList extends CListPageModel
                     'order_user'=>$record['order_user'],
                     'technician'=>$record['technician'],
                     'status'=>$record['status'],
-                    'city'=>$record['city'],
-                    'lcu'=>OrderGoods::getNameToUsername($record['lcu']),
+                    'city'=>CGeneral::getCityName($record['city']),
+                    'lcu'=>$record['disp_name'],
                     'lcd'=>date("Y-m-d",strtotime($record['lcd'])),
                 );
             }
@@ -121,6 +129,19 @@ class DeliveryList extends CListPageModel
             $arr = implode(",",$arr);
             return "($arr)";
         }
+    }
+
+//獲取城市列表
+    public function getCityAllList()
+    {
+        $city_allow = Yii::app()->user->city_allow();
+        $from =  'security'.Yii::app()->params['envSuffix'].'.sec_city';
+        $rows = Yii::app()->db->createCommand()->select("code,name")->from($from)->where("code in ($city_allow)")->queryAll();
+        $arr = array(""=>" -- ".Yii::t("user","City")." -- ");
+        foreach ($rows as $row){
+            $arr[$row["code"]] = $row["name"];
+        }
+        return $arr;
     }
 
 //物品查詢（模糊查詢）

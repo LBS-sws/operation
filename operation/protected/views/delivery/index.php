@@ -43,6 +43,10 @@ $this->pageTitle=Yii::app()->name . ' - Delivery List';
     </div>
 	<?php
     $search_add_html="";
+    if(!Yii::app()->user->isSingleCity()){
+        $search_add_html .= TbHtml::dropDownList('DeliveryList[city]',$model->city,$model->getCityAllList(),
+            array("class"=>"form-control","id"=>"change_city"))."<span style='display:inline-block;width:20px;'>&nbsp;</span>";
+    }
     $search_add_html .= TbHtml::textField('DeliveryList[searchTimeStart]',$model->searchTimeStart,
         array('size'=>15,'placeholder'=>Yii::t('misc','Start Date'),"class"=>"form-control","id"=>"start_time"));
     $search_add_html.="<span>&nbsp;&nbsp;-&nbsp;&nbsp;</span>";

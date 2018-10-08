@@ -34,17 +34,17 @@ class DeliveryList extends CListPageModel
     {
         //order_user = '$userName' OR technician = '$userName'
         $suffix =  Yii::app()->params['envSuffix'];
-        $city = Yii::app()->user->city();
+        $city_allow = Yii::app()->user->city_allow();
         $userName = Yii::app()->user->name;
         $sql1 = "select a.*,b.disp_name,b.city AS s_city 
 				from opr_order a
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
-				where (a.city = '$city' AND a.judge=0 AND a.status != 'pending' AND a.status != 'cancelled') 
+				where (a.city in ($city_allow) AND a.judge=0 AND a.status != 'pending' AND a.status != 'cancelled') 
 			";
         $sql2 = "select count(id)
 				from opr_order a
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
-				where (a.city = '$city' AND a.judge=0 AND a.status != 'pending' AND a.status != 'cancelled') 
+				where (a.city in ($city_allow) AND a.judge=0 AND a.status != 'pending' AND a.status != 'cancelled') 
 			";
         $clause = "";
         if (!empty($this->searchField) && !empty($this->searchValue)) {

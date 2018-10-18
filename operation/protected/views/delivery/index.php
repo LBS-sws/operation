@@ -48,10 +48,10 @@ $this->pageTitle=Yii::app()->name . ' - Delivery List';
             array("class"=>"form-control","id"=>"change_city"))."<span style='display:inline-block;width:20px;'>&nbsp;</span>";
     }
     $search_add_html .= TbHtml::textField('DeliveryList[searchTimeStart]',$model->searchTimeStart,
-        array('size'=>15,'placeholder'=>Yii::t('misc','Start Date'),"class"=>"form-control","id"=>"start_time"));
+        array('size'=>15,'placeholder'=>Yii::t('misc','Start Date'),"class"=>"form-control","id"=>"start_time","style"=>"width:100px;"));
     $search_add_html.="<span>&nbsp;&nbsp;-&nbsp;&nbsp;</span>";
     $search_add_html .= TbHtml::textField('DeliveryList[searchTimeEnd]',$model->searchTimeEnd,
-        array('size'=>15,'placeholder'=>Yii::t('misc','End Date'),"class"=>"form-control","id"=>"end_time"));
+        array('size'=>15,'placeholder'=>Yii::t('misc','End Date'),"class"=>"form-control","id"=>"end_time","style"=>"width:100px;"));
     $this->widget('ext.layout.ListPageWidget', array(
         'title'=>Yii::t('procurement','Order List'),
         'model'=>$model,

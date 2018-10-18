@@ -309,7 +309,7 @@ class ActivityForm extends CFormModel
             if($userList){
                 foreach ($userList as $user){
                     $email = Yii::app()->db->createCommand()->select("email")->from($suffix.".sec_user")
-                    ->where("username=:username and city='$city'",array(":username"=>$user["username"]))->queryRow();
+                    ->where("username=:username and city='$city' and status='A'",array(":username"=>$user["username"]))->queryRow();
                     if($email){
                         array_push($arr,$email["email"]);
                     }

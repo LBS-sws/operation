@@ -11,7 +11,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery List';
 
 <section class="content-header">
 	<h1>
-		<strong><?php echo Yii::t('procurement','Delivery List'); ?></strong>
+		<strong><?php echo Yii::t('app','Technician take Goods'); ?></strong>
 	</h1>
 <!--
 	<ol class="breadcrumb">

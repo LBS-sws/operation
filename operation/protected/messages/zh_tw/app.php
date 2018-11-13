@@ -11,7 +11,7 @@ return array(
 'Operation'=>'营运系统',
 'Personnel'=>'人事系统',
 'Sales'=>'銷售系統',
-'Quiz'=>'測驗系統',
+'Quiz'=>'培訓測驗系統',
 'Academic Credit'=>'學分系統',
 
 'Data Entry'=>'數據輸入',

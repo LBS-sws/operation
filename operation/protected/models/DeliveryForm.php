@@ -168,7 +168,6 @@ class DeliveryForm extends CFormModel
                 $sql = "update opr_order set
 							remark = :remark,
 							luu = :luu,
-							lud = :lud,
 							status = :status
 						where id = :id AND judge=0
 						";
@@ -179,7 +178,7 @@ class DeliveryForm extends CFormModel
 							ject_remark = '',
 							luu = :luu,
 							audit_time = :audit_time,
-							lud = :lud,
+							lcd = :lcd,
 							status = :status
 						where id = :id AND judge=0
 						";
@@ -188,7 +187,6 @@ class DeliveryForm extends CFormModel
                 $sql = "update opr_order set
 							ject_remark = :ject_remark,
 							luu = :luu,
-							lud = :lud,
 							status = :status
 						where id = :id AND judge=0
 						";
@@ -221,6 +219,8 @@ class DeliveryForm extends CFormModel
             $command->bindParam(':ject_remark',$this->ject_remark,PDO::PARAM_STR);
         if (strpos($sql,':audit_time')!==false)
             $command->bindParam(':audit_time',date('Y-m-d H:i:s'),PDO::PARAM_STR);
+        if (strpos($sql,':lcd')!==false)
+            $command->bindParam(':lcd',date('Y-m-d H:i:s'),PDO::PARAM_STR);
         if (strpos($sql,':lud')!==false)
             $command->bindParam(':lud',date('Y-m-d H:i:s'),PDO::PARAM_STR);
         if (strpos($sql,':luu')!==false)

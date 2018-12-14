@@ -61,7 +61,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
 
             <div class="btn-group pull-right" role="group">
                 <?php if ($model->scenario!='new'){
-                    if($model->status == "sent" || $model->status == "read") {
+                    if(($model->status == "sent" || $model->status == "read")&&$model->scenario!='view') {
                         //拒絕
 /*                        echo TbHtml::button('<span class="fa fa-mail-reply-all"></span> ' . Yii::t('procurement', 'Reject'), array(
                             'submit' => Yii::app()->createUrl('delivery/reject')));*/

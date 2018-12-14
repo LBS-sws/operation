@@ -84,7 +84,7 @@ class DeliveryList extends CListPageModel
             $order .= " order by ".$this->orderField." ";
             if ($this->orderType=='D') $order .= "desc ";
         } else
-            $order = " order by a.id desc";
+            $order = " order by a.lcd desc";
 
         $sql = $sql2.$clause;
         $this->totalRow = Yii::app()->db->createCommand($sql)->queryScalar();

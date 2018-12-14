@@ -124,8 +124,9 @@ class DeliveryForm extends CFormModel
 
 	public function retrieveData($index) {
 		$city = Yii::app()->user->city();
+        $city_allow = Yii::app()->user->city_allow();
 		$rows = Yii::app()->db->createCommand()->select("*")
-            ->from("opr_order")->where("id=:id AND judge=0 AND city=:city",array(":id"=>$index,":city"=>$city))->queryAll();
+            ->from("opr_order")->where("id=:id AND judge=0 AND city in ($city_allow)",array(":id"=>$index))->queryAll();
 		if (count($rows) > 0) {
 			foreach ($rows as $row) {
                 $this->id = $row['id'];
@@ -178,7 +179,6 @@ class DeliveryForm extends CFormModel
 							ject_remark = '',
 							luu = :luu,
 							audit_time = :audit_time,
-							lcd = :lcd,
 							status = :status
 						where id = :id AND judge=0
 						";
@@ -219,8 +219,6 @@ class DeliveryForm extends CFormModel
             $command->bindParam(':ject_remark',$this->ject_remark,PDO::PARAM_STR);
         if (strpos($sql,':audit_time')!==false)
             $command->bindParam(':audit_time',date('Y-m-d H:i:s'),PDO::PARAM_STR);
-        if (strpos($sql,':lcd')!==false)
-            $command->bindParam(':lcd',date('Y-m-d H:i:s'),PDO::PARAM_STR);
         if (strpos($sql,':lud')!==false)
             $command->bindParam(':lud',date('Y-m-d H:i:s'),PDO::PARAM_STR);
         if (strpos($sql,':luu')!==false)

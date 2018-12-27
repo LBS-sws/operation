@@ -231,6 +231,7 @@ function roundNumber(num, scale) {
 			$('#MonthlyForm_record_9_datavalue').val(roundNumber((parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) * 3.5 / 100),2));
 			$('#MonthlyForm_record_10_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_8_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_9_datavalue').value)).toFixed(2));
 			$('#MonthlyForm_record_11_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_7_datavalue').value)).toFixed(2));
+			$('#MonthlyForm_record_13_datavalue').val(parseFloat(+$('#MonthlyForm_record_13_datavalue').val() || 0 ).toFixed(2));
 		});
 		
 </script>

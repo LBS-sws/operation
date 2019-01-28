@@ -334,27 +334,29 @@ class MonthlyForm extends CFormModel
 		$rows = Yii::app()->db->createCommand($select)->queryAll();
 		foreach ($rows as $row) {
 			$code = $row['function_name'];
-			$num = is_numeric($this->record[$code]['datavalue']) ? number_format($this->record[$code]['datavalue'],2,".","") : $this->record[$code]['datavalue'];
-			$command=$connection->createCommand($sql);
-			if (strpos($sql,':id')!==false)
-				$command->bindParam(':id',$this->record[$code]['id'],PDO::PARAM_INT);
-			if (strpos($sql,':data_value')!==false) {
-				$command->bindParam(':data_value',$num,PDO::PARAM_STR);
-			}
-			if (strpos($sql,':manual_input')!==false) {
-				$input = 'N';
-				if ($this->record[$code]['updtype']=='M' || $this->record[$code]['datavalueold']==$num) {
-					$input = $this->record[$code]['manualinput'];
-				} else {
-					if ($this->record[$code]['updtype']!='M') {
-						$input = ($this->record[$code]['datavalue'] || $num=='0.00') ? 'N' : 'Y';
-					}
+			if (isset($this->record[$code])) {
+				$num = is_numeric($this->record[$code]['datavalue']) ? number_format($this->record[$code]['datavalue'],2,".","") : $this->record[$code]['datavalue'];
+				$command=$connection->createCommand($sql);
+				if (strpos($sql,':id')!==false)
+					$command->bindParam(':id',$this->record[$code]['id'],PDO::PARAM_INT);
+				if (strpos($sql,':data_value')!==false) {
+					$command->bindParam(':data_value',$num,PDO::PARAM_STR);
 				}
-				$command->bindParam(':manual_input',$input,PDO::PARAM_STR);
-			}
-			if (strpos($sql,':uid')!==false)
+				if (strpos($sql,':manual_input')!==false) {
+					$input = 'N';
+					if ($this->record[$code]['updtype']=='M' || $this->record[$code]['datavalueold']==$num) {
+						$input = $this->record[$code]['manualinput'];
+					} else {
+						if ($this->record[$code]['updtype']!='M') {
+							$input = ($this->record[$code]['datavalue'] || $num=='0.00') ? 'N' : 'Y';
+						}
+					}
+					$command->bindParam(':manual_input',$input,PDO::PARAM_STR);
+				}
+				if (strpos($sql,':uid')!==false)
 				$command->bindParam(':uid',$uid,PDO::PARAM_STR);
-			$command->execute();
+				$command->execute();
+			}
 		}
 		return true;
 	}

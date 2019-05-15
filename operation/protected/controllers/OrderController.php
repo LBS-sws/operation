@@ -56,6 +56,9 @@ class OrderController extends Controller
     }
 	public function actionIndex($pageNum=0) 
 	{
+		$this->function_id = 'YD03';
+		Yii::app()->session['active_func'] = $this->function_id;
+
 		$model = new OrderList;
 		if (isset($_POST['OrderList'])) {
 			$model->attributes = $_POST['OrderList'];
@@ -185,6 +188,9 @@ class OrderController extends Controller
 
     //區域訂單活動
     public function actionActivity($pageNum=0){
+		$this->function_id = 'YD04';
+		Yii::app()->session['active_func'] = $this->function_id;
+
         $model = new AddOrderList;
         if (isset($_POST['AddOrderList'])) {
             $model->attributes = $_POST['AddOrderList'];

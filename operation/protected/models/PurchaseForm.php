@@ -447,7 +447,8 @@ class PurchaseForm extends CFormModel
         $systemId = Yii::app()->params['systemId'];
         $from_addr = Yii::app()->params['adminEmail'];
         $to_addr = array();//
-        $rs = Yii::app()->db->createCommand()->select("b.email,b.city")->from("opr_order a")
+		$to_user = array(); //因通知記錄需要
+        $rs = Yii::app()->db->createCommand()->select("b.email,b.city,b.username")->from("opr_order a")
             ->leftJoin("security$suffix.sec_user b","b.username=a.lcu")
             ->where("a.id=".$this->id)
             ->queryRow();;
@@ -456,16 +457,22 @@ class PurchaseForm extends CFormModel
             if(!in_array($rs["email"],$to_addr)){
                 array_push($to_addr,$rs["email"]);
             }
+            if(!in_array($rs["username"],$to_user)){	//因通知記錄需要
+                array_push($to_user,$rs["username"]);
+            }
         }else{
             return false;
         }
-        $rs = Yii::app()->db->createCommand()->select("b.email")->from("security$suffix.sec_user_access a")
+        $rs = Yii::app()->db->createCommand()->select("b.email,b.username")->from("security$suffix.sec_user_access a")
             ->leftJoin("security$suffix.sec_user b","b.username=a.username")
             ->where("a.system_id='$systemId' and a.a_read_write like '%YD06%' and b.status ='A' and b.city='$city'")
             ->queryAll();
         if($rs){
             foreach ($rs as $row){
                 array_push($to_addr,$row["email"]);
+				if(!in_array($row["username"],$to_user)){	//因通知記錄需要
+					array_push($to_user,$rs["username"]);
+				}
             }
         }else{
             return false;
@@ -484,5 +491,20 @@ class PurchaseForm extends CFormModel
             'lcu'=>$uid,
             'lcd'=>date('Y-m-d H:i:s'),
         ));
+		
+		//新增通知記錄
+		$connection = Yii::app()->db;
+		SystemNotice::addNotice($connection, array(
+				'note_type'=>'notice',
+				'subject'=>"订单通知，订单编号：".$this->order_code,//郵件主題
+				'description'=>"订单通知，订单编号：".$this->order_code,//郵件副題
+				'message'=>$message,
+				'username'=>json_encode($to_user),
+				'system_id'=>Yii::app()->user->system(),
+				'form_id'=>'PurchaseForm',
+				'rec_id'=>$this->id,
+			)
+		);
+
     }
 }

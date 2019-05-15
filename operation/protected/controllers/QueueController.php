@@ -1,6 +1,8 @@
 <?php
 class QueueController extends Controller
 {
+	public $function_id='YB01';
+
 	public function filters()
 	{
 		return array(

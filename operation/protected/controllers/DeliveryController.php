@@ -3,6 +3,8 @@
 //技術員模塊的採購控制器
 class DeliveryController extends Controller
 {
+	public $function_id='YD02';
+	
     public function filters()
     {
         return array(

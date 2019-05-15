@@ -252,25 +252,34 @@ class ActivityForm extends CFormModel
         $authCity = explode("~",$this->city_auth);//採購單允許的城市
         $cityList = General::getCityListWithNoDescendant();//城市列表
         $userList = $this->getUserListToAddOrder();//有添加權限的用戶
+		$to_user = array(); //因通知記錄需要
         foreach ($cityList as $city=>$cityName){
             if(!empty($this->city_auth)&&!in_array($city,$authCity)){
                 continue;
             }
             $email = $this->getEmailToCity($city);
+			$username = $this->getUserToCity($city);	//因通知記錄需要
             if(!empty($email)){
                 //發送郵件
                 $this->sendEmail($email);
+				$to_user = $username;	//因通知記錄需要
             }
         }
         if(!empty($userList)){
             foreach ($userList as $user){
                 $email = $user["email"];
+				$username = $user["username"]; 	//因通知記錄需要
                 if(!empty($email)){
                     //發送郵件
                     $this->sendEmail($email);
+					if(!in_array($username,$to_user)){ 	//因通知記錄需要
+						$to_user[] = $username;
+					}
                 }
             }
         }
+		//新增通知記錄
+		$this->setNotification($to_user);
     }
 
     private function sendEmail($to_addr){
@@ -297,6 +306,28 @@ class ActivityForm extends CFormModel
         }
     }
 
+	private function setNotification($to_user) {
+		if (!empty($to_user)) {
+            $message = "<p>總部採購編號：".$this->activity_code."</p>";
+            $message .= "<p>總部採購標題：".$this->activity_title."</p>";
+            $message .= "<p>總部採購類型：".Yii::t("procurement",$this->order_class)."</p>";
+            $message .= "<p>總部採購開始時間：".$this->start_time."</p>";
+            $message .= "<p>總部採購結束時間：".$this->end_time."</p>";
+			$connection = Yii::app()->db;
+			SystemNotice::addNotice($connection, array(
+					'note_type'=>'notice',
+					'subject'=>"總部受理訂單:".$this->activity_title,//郵件主題
+					'description'=>"總部受理訂單",//郵件副題
+					'message'=>$message,
+					'username'=>json_encode($to_user),
+					'system_id'=>Yii::app()->user->system(),
+					'form_id'=>'FastForm',
+					'rec_id'=>$this->id,
+				)
+			);
+		}
+	}
+
     //根據城市獲取地區管理員郵件
     public function getEmailToCity($city){
         $systemId = Yii::app()->params['systemId'];
@@ -313,6 +344,24 @@ class ActivityForm extends CFormModel
                     if($email){
                         array_push($arr,$email["email"]);
                     }
+                }
+            }
+        }
+
+        return $arr;
+    }
+
+    public function getUserToCity($city){
+        $systemId = Yii::app()->params['systemId'];
+        $suffix = Yii::app()->params['envSuffix'];
+        $suffix = "security".$suffix;
+        $arr = array();
+        if (!empty($city)){
+            $userList = Yii::app()->db->createCommand()->select("username")->from($suffix.".sec_user_access")
+                ->where("system_id=:system_id and a_read_write like '%YD02%'",array(":system_id"=>$systemId))->queryAll();
+            if($userList){
+                foreach ($userList as $user){
+					$arr[] = $user["username"];
                 }
             }
         }
@@ -347,7 +396,7 @@ class ActivityForm extends CFormModel
             $city = explode("~",$city);
             $sql = " and b.city in ('".implode("','",$city)."')";
         }
-        $userList = Yii::app()->db->createCommand()->select("b.email")->from($suffix.".sec_user_access a")
+        $userList = Yii::app()->db->createCommand()->select("b.email, b.username")->from($suffix.".sec_user_access a")
             ->leftJoin($suffix.".sec_user b","a.username=b.username")
             ->where("a.system_id=:system_id and a.a_read_write like '%YD04%'$sql",array(":system_id"=>$systemId))->queryAll();
         return $userList;

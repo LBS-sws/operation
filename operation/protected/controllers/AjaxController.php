@@ -2,6 +2,7 @@
 
 class AjaxController extends Controller
 {
+	public $interactive = false;
 	/**
 	 * @return array action filters
 	 */
@@ -22,7 +23,7 @@ class AjaxController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('dummy','waitingmessage','remoteloginonlib'),
+				'actions'=>array('dummy','waitingmessage','remoteloginonlib','notify','notifybadge'),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -36,6 +37,36 @@ class AjaxController extends Controller
 	 */
 	public function actionDummy()
 	{
+		Yii::app()->end();
+	}
+
+	public function actionRemotelogin() {
+		$rtn = '';
+		if (!Yii::app()->user->isGuest) {
+			$id = Yii::app()->user->staffid(); 
+			if (!empty($id)) {
+				$suffix = Yii::app()->params['envSuffix'];
+				$sql = "select code,code_old from hr$suffix.hr_employee where id=$id";
+				$row = Yii::app()->db->createCommand($sql)->queryRow();
+				if ($row !== false) {
+					$staffcode = $row['code'];
+					$staffocode = empty($row['code_old']) ? $row['code'] : $row['code_old'];
+					$lang = Yii::app()->language;
+					$lang = ($lang=='zh_cn' ? 'zhcn' : ($lang=='zh_tw' ? 'zhtw' : 'en'));
+					$sesskey = Yii::app()->user->sessionkey();
+					$salt = 'lbscorp168';
+					$key = md5($staffcode.$salt.$sesskey.$staffocode);
+					$temp = array(
+							'id'=>$staffcode.':'.$staffocode,
+							'sk'=>$sesskey,
+							'ky'=>$key,
+							'lang'=>$lang,
+						);
+					$rtn = json_encode($temp);
+				}
+			}
+		}
+		echo $rtn;
 		Yii::app()->end();
 	}
 
@@ -87,9 +118,40 @@ class AjaxController extends Controller
         Yii::app()->end();
     }
 
-//	public function actionSystemDate()
-//	{
-//		echo CHtml::tag( date('Y-m-d H:i:s'));
-//		Yii::app()->end();
-//	}
+	public function actionNotify() {
+		$rtn = array();
+		if (!Yii::app()->user->isGuest) {
+			$uid = Yii::app()->user->id;
+			$sysid = Yii::app()->params['systemId'];
+			$suffix = Yii::app()->params['envSuffix'];
+
+			$sql = "select a.note_type, count(a.id) as num
+				from swoper$suffix.swo_notification a, swoper$suffix.swo_notification_user b 
+				where b.username='$uid' and a.system_id='$sysid'
+				and a.id=b.note_id and b.status<>'C'
+				group by a.note_type
+			";
+			$rows = Yii::app()->db->createCommand($sql)->queryAll();
+			foreach ($rows as $row) {
+				$rtn[] = array('type'=>$row['note_type'],'count'=>$row['num']);
+			}
+		}
+		echo json_encode($rtn);
+		Yii::app()->end();
+	}
+	
+	public function actionNotifybadge($param='') {
+		$rtn = array();
+		$items = empty($param) ? array() : json_decode($param);
+		foreach ($items as $item) {
+//			if (isset($item->code) && isset($item->function) && isset($this->color)) {
+			if (Yii::app()->user->validFunction($item->code)) {
+				$result = call_user_func($item->function);
+				$rtn[] = array('code'=>$item->code,'count'=>$result,'color'=>$item->color);
+			}
+//			} 
+		}
+		echo json_encode($rtn);
+		Yii::app()->end();
+	}
 }

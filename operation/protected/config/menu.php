@@ -4,6 +4,7 @@ return array(
     //總部管理員採購
 	'Activity'=>array(
 		'access'=>'YS',
+		'icon'=>'fa-calendar',
 		'items'=>array(
             //訂單活動
 			'Order Activity'=>array(
@@ -30,6 +31,7 @@ return array(
     //區域管理員下單
 	'Order'=>array(
 		'access'=>'YD',
+		'icon'=>'fa-pencil-square-o',
 		'items'=>array(
             //訂單活動(下訂單)
             'Add Order'=>array(
@@ -67,6 +69,7 @@ return array(
     //技術員入口
 	'Technician'=>array(
 		'access'=>'YC',
+		'icon'=>'fa-truck',
 		'items'=>array(
             //訂貨列表(下訂單)
 			'Technician List'=>array(
@@ -78,6 +81,7 @@ return array(
 
     'Sales Summary'=>array(
         'access'=>'YA',
+		'icon'=>'fa-bar-chart',
         'items'=>array(
             'Sales Summary Entry'=>array(
                 'access'=>'YA01',
@@ -96,6 +100,7 @@ return array(
 
     'Report'=>array(
         'access'=>'YB',
+		'icon'=>'fa-file-text-o',
         'items'=>array(
             'Sales Summary'=>array(
                 'access'=>'YB02',
@@ -123,6 +128,7 @@ return array(
     //物品管理
     'Goods'=>array(
         'access'=>'YG',
+		'icon'=>'fa-cubes',
         'items'=>array(
             //物品管理
             'Import Summary Entry'=>array(

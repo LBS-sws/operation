@@ -2,7 +2,9 @@
 
 class StickiesController extends Controller
 {
-    public function filters()
+	public $function_id='YG02';
+
+   public function filters()
     {
         return array(
             'enforceSessionExpiration',

@@ -3,6 +3,8 @@
 
 class FastController extends Controller
 {
+	public $function_id='YS04';
+	
     public function filters()
     {
         return array(

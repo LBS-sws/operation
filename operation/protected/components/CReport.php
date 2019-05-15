@@ -14,8 +14,7 @@ class CReport {
 
 	protected function sendEmail(&$connection, $record=array()) {
 		$suffix = Yii::app()->params['envSuffix'];
-		$suffix1 = ($suffix=='dev') ? '_w' : $suffix;
-		$sql = "insert into swoper$suffix1.swo_email_queue
+		$sql = "insert into swoper$suffix.swo_email_queue
 					(from_addr, to_addr, cc_addr, subject, description, message, status, lcu)
 				values
 					(:from_addr, :to_addr, :cc_addr, :subject, :description, :message, 'P', 'admin')

@@ -49,6 +49,9 @@ class MonthlyController extends Controller
 
 	public function actionIndex($pageNum=0) 
 	{
+		$this->function_id = 'YA01';
+		Yii::app()->session['active_func'] = $this->function_id;
+		
 		$model = new MonthlyList;
 		if (isset($_POST['MonthlyList'])) {
 			$model->attributes = $_POST['MonthlyList'];
@@ -66,6 +69,9 @@ class MonthlyController extends Controller
 
 	public function actionIndexc($pageNum=0) 
 	{
+		$this->function_id = 'YA02';
+		Yii::app()->session['active_func'] = $this->function_id;
+		
 		$model = new MonthlyConfList;
 		if (isset($_POST['MonthlyConfList'])) {
 			$model->attributes = $_POST['MonthlyConfList'];
@@ -83,6 +89,9 @@ class MonthlyController extends Controller
 
 	public function actionIndexa($pageNum=0) 
 	{
+		$this->function_id = 'YA03';
+		Yii::app()->session['active_func'] = $this->function_id;
+		
 		$model = new MonthlyApprList;
 		if (isset($_POST['MonthlyApprList'])) {
 			$model->attributes = $_POST['MonthlyApprList'];
@@ -222,6 +231,9 @@ class MonthlyController extends Controller
 
 	public function actionView($index, $rtn='index')
 	{
+		$this->function_id = $rtn=='indexa' ? 'YA03' : $rtn=='indexc' ? 'YA02' : 'YA01' ;
+		Yii::app()->session['active_func'] = $this->function_id;
+
 		$model = new MonthlyForm('view');
 		if (!$model->retrieveData($index)) {
 			throw new CHttpException(404,'The requested page does not exist.');
@@ -233,6 +245,9 @@ class MonthlyController extends Controller
 	
 	public function actionEdit($index, $rtn='index')
 	{
+		$this->function_id = $rtn=='indexa' ? 'YA03' : $rtn=='indexc' ? 'YA02' : 'YA01' ;
+		Yii::app()->session['active_func'] = $this->function_id;
+
 		$model = new MonthlyForm('edit');
 		if (!$model->retrieveData($index)) {
 			throw new CHttpException(404,'The requested page does not exist.');

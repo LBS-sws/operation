@@ -33,6 +33,9 @@ class ReportController extends Controller
 	}
 
 	public function actionSalessummary() {
+		$this->function_id = 'YB02';
+		Yii::app()->session['active_func'] = $this->function_id;
+
 		$model = new ReportY01Form;
 		if (isset($_POST['ReportY01Form'])) {
 			$model->attributes = $_POST['ReportY01Form'];
@@ -48,6 +51,9 @@ class ReportController extends Controller
 	}
 
 	public function actionOrderlist() {
+		$this->function_id = 'YB03';
+		Yii::app()->session['active_func'] = $this->function_id;
+
 		$model = new ReportY02Form;
 		if (isset($_POST['ReportY02Form'])) {
 			$model->attributes = $_POST['ReportY02Form'];
@@ -63,6 +69,9 @@ class ReportController extends Controller
 	}
 
 	public function actionPickinglist() {
+		$this->function_id = 'YB04';
+		Yii::app()->session['active_func'] = $this->function_id;
+
 		$model = new ReportY03Form;
 		if (isset($_POST['ReportY03Form'])) {
 			$model->attributes = $_POST['ReportY03Form'];
@@ -78,6 +87,9 @@ class ReportController extends Controller
 	}
 
     public function actionBusiness() {
+		$this->function_id = 'YB05';
+		Yii::app()->session['active_func'] = $this->function_id;
+
         $model = new ReportY04Form;
         if (isset($_POST['ReportY04Form'])) {
             $model->attributes = $_POST['ReportY04Form'];

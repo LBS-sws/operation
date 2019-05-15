@@ -82,6 +82,17 @@ class EmailForm extends CFormModel
         return $arr;
     }
 
+    public function getUserList(){
+	    $arr = array();
+        $rs = Yii::app()->db->createCommand()->select()->from("opr_email")->queryAll();
+        if($rs){
+            foreach ($rs as $row){
+                array_push($arr,$row["name"]);
+            }
+        }
+        return $arr;
+    }
+
     //獲取郵箱列表(總管)
     public function getCityEmailList(){
         $suffix = Yii::app()->params['envSuffix'];
@@ -99,6 +110,22 @@ class EmailForm extends CFormModel
                 if($email){
                     array_push($arr,$email["email"]);
                 }
+            }
+        }
+        return $arr;
+    }
+
+    public function getCityUserList(){
+        $suffix = Yii::app()->params['envSuffix'];
+        $systemId = Yii::app()->params['systemId'];
+        $city = Yii::app()->user->city();
+	    $arr = array();
+        $rs = Yii::app()->db->createCommand()->select("username")->from("security$suffix.sec_user_access")
+            ->where("system_id='$systemId' and a_read_write like '%YD06%'")
+            ->queryAll();
+        if($rs){
+            foreach ($rs as $row){
+				$arr[] = $row['username'];
             }
         }
         return $arr;

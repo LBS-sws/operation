@@ -2,6 +2,8 @@
 
 class AreaAuditController extends Controller
 {
+	public $function_id='YD06';
+
     public function filters()
     {
         return array(

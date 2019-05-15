@@ -2,6 +2,8 @@
 
 class EmailController extends Controller
 {
+	public $function_id='YS05';
+
     public function filters()
     {
         return array(

@@ -6,7 +6,7 @@
 // This is the main Web application configuration. Any writable
 // CWebApplication properties can be configured here.
 return array(
-	'id'=>'swoperuat',
+	'id'=>'swoper',
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
 	'charset'=>'UTF-8',
 	'name'=>'LBS Daily Management - UAT',
@@ -73,10 +73,10 @@ return array(
 
 		// uncomment the following to use a MySQL database
 		'db'=>array(
-			'connectionString' => 'mysql:host=localhost;dbname=operationuat',
+			'connectionString' => 'mysql:host=localhost;dbname=operation',
 			'emulatePrepare' => true,
 			'username' => 'swuser',
-			'password' => 'Swisher@168',
+			'password' => 'swisher168',
 			'charset' => 'utf8',
 		),
 		
@@ -106,23 +106,10 @@ return array(
 			'class'=>'CHttpSession',
 			'cookieMode'=>'allow',
 			'cookieParams'=>array(
-				'domain'=>'118.89.46.224',
+				'domain'=>'192.168.0.128',
 			),
 		),
 		
-		// Cache module only if memcached installed
-		/*
-		'cache'=>array(
-			'class'=>'CMemCache',
-			'servers'=>array(
-				array(
-					'host'=>'127.0.0.1',
-					'port'=>11211,
-					'weight'=>100,
-				),
-			),
-		),
-		*/
 	),
 
 	// application-level parameters that can be accessed
@@ -141,48 +128,8 @@ return array(
 		'version'=>'1.0.0',
 		'docmanPath'=>'/docman/uat',
 		'systemId'=>'ops',
-		'envSuffix'=>'uat',
-/*
-		'systemMapping'=>array(
-				'drs'=>array(
-						'webroot'=>'http://118.89.46.224/dr-uat',
-						'name'=>'Daily Report',
-						'icon'=>'fa fa-pencil-square-o',
-					),	
-				'acct'=>array(
-						'webroot'=>'http://118.89.46.224/ac-uat',
-						'name'=>'Accounting',
-						'icon'=>'fa fa-money',
-					),
-				'ops'=>array(
-						'webroot'=>'http://118.89.46.224/op-uat',
-						'name'=>'Operation',
-						'icon'=>'fa fa-gears',
-					),
-				'hr'=>array(
-						'webroot'=>'http://118.89.46.224/hr-uat',
-						'name'=>'Personnel',
-						'icon'=>'fa fa-users',
-					),
-
-                                'sal'=>array(
-                                               'webroot'=>'http://118.89.46.224/sa-uat',
-                                                'name'=>'Sales',
-                                                'icon'=>'fa fa-suitcase',
-                                ),
-                                'quiz'=>array(
-                                               'webroot'=>'http://118.89.46.224/qz-uat',
-                                                'name'=>'Quiz',
-                                                'icon'=>'fa fa-pencil',
-                                ),
-                                'sp'=>array(
-
-                                               'webroot'=>'http://118.89.46.224/sp-uat',
-                                                'name'=>'Academic Credit',
-                                                'icon'=>'fa fa-cube',
-                                ),
-
-			),
-*/
+		'envSuffix'=>'dev',
+		'appname'=>'LBS DMS (UAT)',
+		'appcolor'=>'skin-green-light',
 	),
 );

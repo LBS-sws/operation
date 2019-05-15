@@ -33,12 +33,15 @@ class OrderGoods extends CActiveRecord{
     public function formEmail($subject,$message,$to_addr = 0,$description=""){
         $uid = Yii::app()->user->id;
         $from_addr = Yii::app()->params['adminEmail'];
+		$to_user = array();	//因通知記錄需要
         if(empty($to_addr)){
             //發給地區總管
             $to_addr = EmailForm::getCityEmailList();
+            $to_user = EmailForm::getCityUserList();	//因通知記錄需要
         }elseif($to_addr == 1){
             //發給總部
             $to_addr = EmailForm::getEmailList();
+            $to_user = OrderGoods::getUsernameToEmail($to_addr);	//因通知記錄需要
         }elseif($to_addr === "aaa"){
             //用戶郵箱為空不發送郵件
             return false;
@@ -47,6 +50,7 @@ class OrderGoods extends CActiveRecord{
             if(!is_array($to_addr)){
                 $to_addr = array($to_addr);
             }
+            $to_user = OrderGoods::getUsernameToEmail($to_addr);	//因通知記錄需要
         }
         $to_addr = empty($to_addr)?json_encode(array("it@lbsgroup.com.hk")):json_encode($to_addr);
         $description = empty($description)?"訂單通知":$description;
@@ -62,6 +66,20 @@ class OrderGoods extends CActiveRecord{
             'lcu'=>$uid,
             'lcd'=>date('Y-m-d H:i:s'),
         ));
+		
+		//新增通知記錄
+		$connection = Yii::app()->db;
+		SystemNotice::addNotice($connection, array(
+				'note_type'=>'notice',
+				'subject'=>$subject,//郵件主題
+				'description'=>$description,//郵件副題
+				'message'=>$message,
+				'username'=>json_encode($to_user),
+				'system_id'=>Yii::app()->user->system(),
+				'form_id'=>'OrderGoods',
+				'rec_id'=>0,
+			)
+		);
     }
 
     //獲取用戶暱稱
@@ -73,6 +91,21 @@ class OrderGoods extends CActiveRecord{
             return $rs["disp_name"];
         }
         return $username;
+    }
+
+    public function getUsernameToEmail($emaillist){
+		$rtn = array();
+        $suffix = Yii::app()->params['envSuffix'];
+		foreach ($emaillist as $email){
+			$rs = Yii::app()->db->createCommand()->select("username")->from("security$suffix.sec_user")
+				->where("email=:email",array(":email"=>$email))->queryAll();
+			if($rs){
+				foreach ($rs as $row) {
+					$rtn[] = $row['username'];
+				}
+			}
+        }
+        return $rtn;
     }
 
     //訂單發郵件(總部)

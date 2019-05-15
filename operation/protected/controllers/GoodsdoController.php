@@ -2,6 +2,8 @@
 
 class GoodsdoController extends Controller
 {
+	public $function_id='YG04';
+
     public function filters()
     {
         return array(

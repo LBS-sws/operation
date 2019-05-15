@@ -44,8 +44,34 @@ class WorkflowOprpt extends WorkflowDMS {
 	}
 	
 	protected function emailGeneric($params) {
+		$username = array();
+		$state = isset($params['state']) ? $params['state'] : '';
+		
 		$toaddr = (isset($params['to_addr'])) ? $params['to_addr'] : $this->getCurrentStateRespEmail();
+		$temp = array();
+		foreach ($toaddr as $key=>$email) {
+//			if ($this->canNotify($key) && !$this->skipNotify($key,$state)) {
+				if (!in_array($key,$username)) $username[] = $key;
+				if (!in_array($email,$temp)) $temp[] = $email;
+//			}
+		}
+		$toaddr = $temp;
+
 		$ccaddr = (isset($params['cc_addr'])) ? $params['cc_addr'] : array();
+		$temp = array();
+		foreach ($ccaddr as $key=>$email) {
+//			if ($this->canNotify($key) && !$this->skipNotify($key,$state)) {
+				if (!in_array($key,$username)) $username[] = $key;
+				if (!in_array($email,$temp)) $temp[] = $email;
+//			}
+		}
+		$ccaddr = $temp;
+
+		if (empty($toaddr) && !empty($ccaddr)) {
+			$toaddr = $ccaddr;
+			$ccaddr = array();
+		}
+
 		$subjectPrefix = isset($params['subjtype']) 
 			? ($params['subjtype']=='action' 
 				? Yii::t('workflow','[Action]') 
@@ -55,13 +81,23 @@ class WorkflowOprpt extends WorkflowDMS {
 		$subject = $subjectPrefix.Yii::t('app','Operation').': '.$params['subject'];
 		$description = Yii::t('app','Operation').': '.$params['desc'];
 		$message = $params['message'];
+		$note_type = isset($params['subjtype']) && $params['subjtype']=='notice' 
+				? 'NOTI'
+				: 'ACTN';
+				
 		return array(
+				'send'=>$params['send'],
+				'note_type'=>$note_type,
 				'from_addr'=>Yii::app()->params['adminEmail'],
 				'to_addr'=>json_encode($toaddr),
 				'cc_addr'=>json_encode($ccaddr),
 				'subject'=>$subject,
 				'description'=>$description,
 				'message'=>$message,
+				'username'=>json_encode($username),
+				'system_id'=>Yii::app()->user->system(),
+				'form_id'=>$params['state'],
+				'rec_id'=>$params['doc_id'],
 			);
 	}
 
@@ -73,6 +109,9 @@ class WorkflowOprpt extends WorkflowDMS {
 		$url = Yii::app()->createAbsoluteUrl('monthly/view',array('index'=>$docId,'rtn'=>'indexa'));
 		
 		$v = array();
+		$v['doc_id'] = $docId;
+		$v['send'] = 'Y';
+		$v['state'] = 'PA';
 		$v['subjtype'] = 'action';
 		$v['subject'] = Yii::t('workflow','You have 1 request for report approval')
 			.' ('.$cityname.', '.$year.'/'.$month.')';
@@ -94,6 +133,9 @@ class WorkflowOprpt extends WorkflowDMS {
 		$url = Yii::app()->createAbsoluteUrl('monthly/view',array('index'=>$docId,'rtn'=>'indexa'));
 		
 		$v = array();
+		$v['doc_id'] = $docId;
+		$v['send'] = 'Y';
+		$v['state'] = 'PH';
 		$v['subjtype'] = 'action';
 		$v['subject'] = Yii::t('workflow','You have 1 request for report approval')
 			.' ('.$cityname.', '.$year.'/'.$month.')';
@@ -125,6 +167,9 @@ class WorkflowOprpt extends WorkflowDMS {
 		}
 		
 		$v = array();
+		$v['doc_id'] = $docId;
+		$v['send'] = 'Y';
+		$v['state'] = 'A';
 		$v['to_addr'] = $toaddr;
 		$v['cc_addr'] = $ccaddr;
 		$v['subjtype'] = 'notice';
@@ -158,6 +203,9 @@ class WorkflowOprpt extends WorkflowDMS {
 		}
 		
 		$v = array();
+		$v['doc_id'] = $docId;
+		$v['send'] = 'Y';
+		$v['state'] = 'AH';
 		$v['to_addr'] = $toaddr;
 		$v['cc_addr'] = $ccaddr;
 		$v['subjtype'] = 'notice';
@@ -192,6 +240,9 @@ class WorkflowOprpt extends WorkflowDMS {
 		}
 
 		$v = array();
+		$v['doc_id'] = $docId;
+		$v['send'] = 'Y';
+		$v['state'] = 'D';
 		$v['to_addr'] = $toaddr;
 		$v['cc_addr'] = $ccaddr;
 		$v['subjtype'] = 'notice';
@@ -227,6 +278,9 @@ class WorkflowOprpt extends WorkflowDMS {
 		}
 
 		$v = array();
+		$v['doc_id'] = $docId;
+		$v['send'] = 'Y';
+		$v['state'] = 'DH';
 		$v['to_addr'] = $toaddr;
 		$v['cc_addr'] = $ccaddr;
 		$v['subjtype'] = 'notice';

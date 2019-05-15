@@ -2,6 +2,8 @@
 
 class GoodsimController extends Controller
 {
+	public $function_id='YG01';
+
     public function filters()
     {
         return array(

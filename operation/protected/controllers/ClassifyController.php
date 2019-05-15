@@ -2,7 +2,9 @@
 
 class ClassifyController extends Controller
 {
-    public function filters()
+	public $function_id='YG03';
+
+	public function filters()
     {
         return array(
             'enforceSessionExpiration',

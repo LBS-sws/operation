@@ -2,6 +2,8 @@
 
 class OrderAccController extends Controller
 {
+	public $function_id='YD05';
+
 
     public function filters()
     {

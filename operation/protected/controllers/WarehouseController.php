@@ -2,6 +2,8 @@
 
 class WarehouseController extends Controller
 {
+	public $function_id='YD01';
+
     public function filters()
     {
         return array(

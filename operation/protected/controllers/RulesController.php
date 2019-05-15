@@ -2,6 +2,8 @@
 
 class RulesController extends Controller
 {
+	public $function_id='YG06';
+
     public function filters()
     {
         return array(

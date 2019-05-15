@@ -14,20 +14,15 @@ class Workflow {
 		return $this->connection;
 	}
 	
-	public function startProcess($procCode, $docId, $reqDate, $new=false) {
+	public function startProcess($procCode, $docId, $reqDate) {
 		$rtn = true;
 		$suffix = Yii::app()->params['envSuffix'];
 		$this->proc_id = $this->getProcessId($procCode, $reqDate);
 		$procId = $this->proc_id;
-		
-		if (!$new) {
-			$row = false;
-		} else {
-			$sql = "select id, current_state from workflow$suffix.wf_request
-					where proc_ver_id=$procId and doc_id=$docId
-				";
-			$row = $this->connection->createCommand($sql)->queryRow();
-		}
+		$sql = "select id, current_state from workflow$suffix.wf_request
+				where proc_ver_id=$procId and doc_id=$docId
+			";
+		$row = $this->connection->createCommand($sql)->queryRow();
 		if ($row===false) {
 			$stateId = $this->getStateId($procId,'ST');
 			if ($stateId!=0) {
@@ -75,7 +70,7 @@ class Workflow {
 		$sql = "select a.id, a.lcd, b.name, c.username as targetuser, d.id as resp_id, d.username as actionuser
 				from workflow$suffix.wf_request_transit_log a
 				inner join workflow$suffix.wf_state b on a.new_state=b.id
-				left outer join workflow$suffix.wf_request_resp_user c on a.id=c.log_id
+				left outer join workflow$suffix.wf_request_resp_user c on a.id=c.log_id 
 				left outer join workflow$suffix.wf_request_resp_user d on a.request_id=d.request_id 
 					and a.old_state=d.current_state and d.status='C'
 					and a.id > d.log_id
@@ -101,6 +96,7 @@ class Workflow {
 				}
 				if ($lid!=$row['id']) {
 					$rtn .= "<tr><td>$date</td><td>$state</td><td>$user</td></tr>";
+					$lid = $row['id'];
 					$user = "";
 				}
 				$date = $row['lcd'];
@@ -153,7 +149,9 @@ class Workflow {
 	}
 
 	public function transit($stateCode) {
+//		var_dump($stateCode);
 		$targetState = $this->getStateId($this->proc_id, $stateCode);
+//		var_dump($targetState);
 		if ($this->isValidMove($this->proc_id, $this->current_state, $targetState)) {
 			$suffix = Yii::app()->params['envSuffix'];
 			$reqId = $this->request_id;
@@ -173,6 +171,8 @@ class Workflow {
 		} else {
 			return false;
 		}
+//				var_dump($this->current_state);
+
 		return true;
 	}
 	
@@ -227,26 +227,90 @@ class Workflow {
 						(from_addr, to_addr, cc_addr, subject, description, message, status, lcu)
 					values
 						(:from_addr, :to_addr, :cc_addr, :subject, :description, :message, 'P', 'admin')
-				";
+					";
 			foreach ($params as $record) {
-				$command = $this->connection->createCommand($sql);
-				if (strpos($sql,':from_addr')!==false)
-					$command->bindParam(':from_addr',$record['from_addr'],PDO::PARAM_STR);
-				if (strpos($sql,':to_addr')!==false)
-					$command->bindParam(':to_addr',$record['to_addr'],PDO::PARAM_STR);
-				if (strpos($sql,':cc_addr')!==false)
-					$command->bindParam(':cc_addr',$record['cc_addr'],PDO::PARAM_STR);
-				if (strpos($sql,':subject')!==false)
-					$command->bindParam(':subject',$record['subject'],PDO::PARAM_STR);
-				if (strpos($sql,':description')!==false)
-					$command->bindParam(':description',$record['description'],PDO::PARAM_STR);
-				if (strpos($sql,':message')!==false)
-					$command->bindParam(':message',$record['message'],PDO::PARAM_STR);
-				$command->execute();
+				if (!empty($record['to_addr']) || !empty($record['cc_addr'])) {
+					if (!isset($record['send']) || $record['send']=='Y') {
+						$command = $this->connection->createCommand($sql);
+						if (strpos($sql,':from_addr')!==false)
+							$command->bindParam(':from_addr',$record['from_addr'],PDO::PARAM_STR);
+						if (strpos($sql,':to_addr')!==false)
+							$command->bindParam(':to_addr',$record['to_addr'],PDO::PARAM_STR);
+						if (strpos($sql,':cc_addr')!==false)
+							$command->bindParam(':cc_addr',$record['cc_addr'],PDO::PARAM_STR);
+						if (strpos($sql,':subject')!==false)
+							$command->bindParam(':subject',$record['subject'],PDO::PARAM_STR);
+						if (strpos($sql,':description')!==false)
+							$command->bindParam(':description',$record['description'],PDO::PARAM_STR);
+						if (strpos($sql,':message')!==false)
+							$command->bindParam(':message',$record['message'],PDO::PARAM_STR);
+						$command->execute();
+					}
+				
+					$this->notification($record);
+				}
 			}
 		}
 	}
 
+	protected function notification($param) {
+		$argv = array(
+				'system_id'=>$param['system_id'],
+				'note_type'=>$param['note_type'],
+				'subject'=>$param['subject'],
+				'description'=>$param['description'],
+				'message'=>$param['message'],
+				'username'=>$param['username'],
+				'form_id'=>$param['form_id'],
+				'rec_id'=>$param['rec_id'],
+			);
+		$connection = $this->connection;
+		SystemNotice::addNotice($connection, $argv);
+	}
+
+/*
+	protected function notification($param) {
+		$suffix = Yii::app()->params['envSuffix'];
+		$sql = "insert into swoper$suffix.swo_notification
+					(system_id, note_type, subject, description, message, lcu, luu)
+				values
+					(:system_id, :note_type, :subject, :description, :message, 'admin', 'admin')
+				";
+		$command = $this->connection->createCommand($sql);
+		if (strpos($sql,':system_id')!==false)
+			$command->bindParam(':system_id',$param['system_id'],PDO::PARAM_STR);
+		if (strpos($sql,':note_type')!==false)
+			$command->bindParam(':note_type',$param['note_type'],PDO::PARAM_STR);
+		if (strpos($sql,':subject')!==false)
+			$command->bindParam(':subject',$param['subject'],PDO::PARAM_STR);
+		if (strpos($sql,':description')!==false)
+			$command->bindParam(':description',$param['description'],PDO::PARAM_STR);
+		if (strpos($sql,':message')!==false)
+			$command->bindParam(':message',$param['message'],PDO::PARAM_STR);
+		$command->execute();
+		$noteId = $this->connection->getLastInsertID();
+		
+		$sql = "insert into swoper$suffix.swo_notification_user
+					(note_id, username, status, lcu, luu)
+				values
+					(:note_id, :username, :status, 'admin', 'admin')
+				";
+		$users = json_decode($param['username']);
+		foreach ($users as $user) {
+			$command = $this->connection->createCommand($sql);
+			if (strpos($sql,':note_id')!==false)
+				$command->bindParam(':note_id',$noteId,PDO::PARAM_INT);
+			if (strpos($sql,':username')!==false)
+				$command->bindParam(':username',$user,PDO::PARAM_STR);
+			if (strpos($sql,':status')!==false) {
+				$status = $param['send']=='Y' ? 'S' : 'N';
+				$command->bindParam(':status',$status,PDO::PARAM_STR);
+			}
+			$command->execute();
+		}
+	}
+*/
+	
 	public function getRequestData($code) {
 		$suffix = Yii::app()->params['envSuffix'];
 		$reqId = $this->request_id;
@@ -312,7 +376,7 @@ class Workflow {
 		return $rtn;
 	}
 
-	public function getCurrentStateRespUser() {
+	protected function getCurrentStateRespUser() {
 		return $this->getCurrentStateRespUserByType('P');
 	}
 	
@@ -352,7 +416,7 @@ class Workflow {
 		$reqId = $this->request_id;
 		$stateId = $this->current_state;
 		$logId = $this->transit_log_id;
-		$sql = "select b.email 
+		$sql = "select a.username, b.email 
 				from workflow$suffix.wf_request_resp_user a, security$suffix.sec_user b
 				where a.request_id=$reqId and a.log_id=$logId and a.current_state=$stateId and a.status='$type'  
 				and a.username=b.username
@@ -360,7 +424,7 @@ class Workflow {
 		$rows = $this->connection->createCommand($sql)->queryAll();
 		if (!empty($rows)) {
 			foreach ($rows as $row) {
-				$rtn[] = $row['email'];
+				if (!empty($row['email'])) $rtn[$row['username']] = $row['email'];
 			}
 		}
 		return $rtn;
@@ -380,7 +444,7 @@ class Workflow {
 		$reqId = $this->request_id;
 		$stateId = $this->current_state;
 		$logId = $this->transit_log_id;
-		$sql = "select b.log_id, c.email 
+		$sql = "select b.log_id, c.email, b.username  
 				from workflow$suffix.wf_request_transit_log a, 
 					workflow$suffix.wf_request_resp_user b, 
 					security$suffix.sec_user c
@@ -397,7 +461,7 @@ class Workflow {
 			foreach ($rows as $row) {
 				if ($l==0) $l = $row['log_id'];
 				if ($l!=$row['log_id']) break;
-				$rtn[] = $row['email'];
+				if (!empty($row['email'])) $rtn[$row['username']] = $row['email'];
 			}
 		}
 		return $rtn;
@@ -429,26 +493,6 @@ class Workflow {
 		}
 	}
 	
-	protected function getCurrentStateRemarks($userid) {
-		$suffix = Yii::app()->params['envSuffix'];
-		$reqId = $this->request_id;
-		$state = $this->current_state;
-		$logId = $this->transit_log_id;
-		$sql = "select a.remarks
-				from workflow$suffix.wf_request_resp_user a
-				where a.request_id=$reqId
-				and a.status='C'
-				and a.username='$userid'
-				order by id desc limit 1
-			";
-		$row = $this->connection->createCommand($sql)->queryRow();
-		if ($row===false) {
-			return '';
-		} else {
-			return $row['remarks'];
-		}
-	}
-
 	protected function getLastStateActionRespUser($action) {
 		$suffix = Yii::app()->params['envSuffix'];
 		$reqId = $this->request_id;
@@ -459,6 +503,38 @@ class Workflow {
 					workflow$suffix.wf_request_resp_user b, 
 					workflow$suffix.wf_action c
 				where a.request_id=$reqId and a.id=$logId
+				and a.request_id=b.request_id 
+				and b.current_state=a.old_state   
+				and b.status='C'
+				and b.action_id=c.id
+				and c.code='$action'
+				order by b.log_id desc
+			";
+		$rows = $this->connection->createCommand($sql)->queryAll();
+		if (empty($rows)) {
+			return array();
+		} else {
+			$rtn = array();
+			$l = 0;
+			foreach($rows as $row) {
+				if ($l==0) $l = $row['log_id'];
+				if ($l!=$row['log_id']) break;
+				$rtn[] = $row['username'];
+			}
+			return $rtn;
+		}
+	}
+
+	protected function getLastStateActionRespUserEx($action) {
+		$suffix = Yii::app()->params['envSuffix'];
+		$reqId = $this->request_id;
+		$state = $this->current_state;
+		$logId = $this->transit_log_id;
+		$sql = "select b.log_id, b.username
+				from workflow$suffix.wf_request_transit_log a,
+					workflow$suffix.wf_request_resp_user b, 
+					workflow$suffix.wf_action c
+				where a.request_id=$reqId 
 				and a.request_id=b.request_id 
 				and b.current_state=a.old_state   
 				and b.status='C'

@@ -2,6 +2,8 @@
 
 class GoodsfaController extends Controller
 {
+	public $function_id='YG05';
+
     public function filters()
     {
         return array(

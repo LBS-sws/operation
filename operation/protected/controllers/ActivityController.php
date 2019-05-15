@@ -2,7 +2,9 @@
 
 class ActivityController extends Controller
 {
-    public function filters()
+ 	public $function_id='YS03';
+
+	public function filters()
     {
         return array(
             'enforceSessionExpiration',

@@ -2,6 +2,8 @@
 
 class PurchaseController extends Controller
 {
+	public $function_id='YS01';
+
     public function filters()
     {
         return array(

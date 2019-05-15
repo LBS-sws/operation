@@ -2,6 +2,8 @@
 
 class TechnicianController extends Controller
 {
+	public $function_id='YC02';
+
     public function filters()
     {
         return array(

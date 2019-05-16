@@ -15,17 +15,9 @@
 	<meta name="language" content="<?php echo Yii::app()->language; ?>" />
 	
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
-
-    <style type="">
-        .table-condensed th.datepicker-switch{text-align: center}
-        .table-condensed th.next{text-align: right}
-        .table-condensed td>span:first-child{margin-left: 0px;}
-        .table-condensed td>span{margin-left: 4px;}
-        .main-header{max-height:none;}
-    </style>
 </head>
 
-<body class="hold-transition skin-purple-light <?php echo Yii::app()->params['appcolor']; ?> sidebar-mini">
+<body class="hold-transition <?php echo Yii::app()->params['appcolor']; ?> sidebar-mini">
 <div class="wrapper">
 
 	<header class="main-header">
@@ -99,7 +91,6 @@
 <!-- ./wrapper -->
 
 </body>
-<script>
 <?php
 if (!Yii::app()->user->isGuest) {
 	$this->widget('ext.layout.SessionExpiryWidget');		// Session Expiry
@@ -110,9 +101,6 @@ if (!Yii::app()->user->isGuest) {
 			'url'=>Yii::app()->createUrl('ajax/notifybadge'),
 		)
 	);
-//	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/orderMessage.js?3", CClientScript::POS_END);
-	Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/message.js", CClientScript::POS_END);
 }
 ?>
-</script>
 </html>

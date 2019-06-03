@@ -97,11 +97,13 @@ class OrderGoods extends CActiveRecord{
 		$rtn = array();
         $suffix = Yii::app()->params['envSuffix'];
 		foreach ($emaillist as $email){
-			$rs = Yii::app()->db->createCommand()->select("username")->from("security$suffix.sec_user")
-				->where("email=:email",array(":email"=>$email))->queryAll();
-			if($rs){
-				foreach ($rs as $row) {
-					$rtn[] = $row['username'];
+			if (!empty($email)) {
+				$rs = Yii::app()->db->createCommand()->select("username")->from("security$suffix.sec_user")
+					->where("email=:email",array(":email"=>$email))->queryAll();
+				if($rs){
+					foreach ($rs as $row) {
+						$rtn[] = $row['username'];
+					}
 				}
 			}
         }

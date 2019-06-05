@@ -376,11 +376,11 @@ class Workflow {
 		return $rtn;
 	}
 
-	protected function getCurrentStateRespUser() {
+	public function getCurrentStateRespUser() {
 		return $this->getCurrentStateRespUserByType('P');
 	}
 	
-	protected function getCurrentStateRespStandbyUser() {
+	public function getCurrentStateRespStandbyUser() {
 		return $this->getCurrentStateRespUserByType('Q');
 	}
 	

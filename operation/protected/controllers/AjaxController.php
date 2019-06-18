@@ -23,7 +23,7 @@ class AjaxController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('dummy','waitingmessage','remoteloginonlib','notify','notifybadge'),
+				'actions'=>array('dummy','remotelogin','remoteloginonlib','notify','notifybadge'),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -92,7 +92,7 @@ class AjaxController extends Controller
 		echo $rtn;
 		Yii::app()->end();
 	}
-
+	
 	public function actionChecksession() {
 		$rtn = true;
 		if (!Yii::app()->user->isGuest && Yii::app()->params['sessionIdleTime']!=='') {
@@ -108,22 +108,13 @@ class AjaxController extends Controller
 		Yii::app()->end();
 	}
 
-	public function actionWaitingmessage(){
-        if(Yii::app()->request->isAjaxRequest) {//是否ajax请求
-            $arr = OrderList::waitingMessage();
-            echo CJSON::encode($arr);
-        }else{
-            echo "Error:404";
-        }
-        Yii::app()->end();
-    }
-
 	public function actionNotify() {
 		$rtn = array();
 		if (!Yii::app()->user->isGuest) {
 			$uid = Yii::app()->user->id;
 			$sysid = Yii::app()->params['systemId'];
 			$suffix = Yii::app()->params['envSuffix'];
+			$suffix = $suffix=='dev' ? '_w' : $suffix;
 
 			$sql = "select a.note_type, count(a.id) as num
 				from swoper$suffix.swo_notification a, swoper$suffix.swo_notification_user b 

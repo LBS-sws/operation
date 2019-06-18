@@ -493,6 +493,26 @@ class Workflow {
 		}
 	}
 	
+        protected function getCurrentStateRemarks($userid) {
+                $suffix = Yii::app()->params['envSuffix'];
+                $reqId = $this->request_id;
+                $state = $this->current_state;
+                $logId = $this->transit_log_id;
+                $sql = "select a.remarks
+                                from workflow$suffix.wf_request_resp_user a
+                                where a.request_id=$reqId
+                                and a.status='C'
+                                and a.username='$userid'
+                                order by id desc limit 1
+                        ";
+                $row = $this->connection->createCommand($sql)->queryRow();
+                if ($row===false) {
+                        return '';
+                } else {
+                        return $row['remarks'];
+                }
+        }
+
 	protected function getLastStateActionRespUser($action) {
 		$suffix = Yii::app()->params['envSuffix'];
 		$reqId = $this->request_id;

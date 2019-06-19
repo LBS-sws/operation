@@ -64,10 +64,15 @@ class ListPageWidget extends CWidget
 		if ($this->hasSearchBar) {
 			$layout .= '<div class="box-tools">'.$this->pageBar().'</div>';
 		}
-		$layout .= '<span class="pull-right">'.Yii::t('misc','Rec').': '.$this->model->totalRow.'</span>';
+		$layout .= '<span class="pull-right">'.Yii::t('misc','Rec').': '.$this->model->totalRow.'&nbsp;&nbsp;<a href="#" id="goTableTop">'.Yii::t('misc','Go Top').'</a>'.'</span>';
 		$layout .= '</div>';
 
 		echo $layout;
+		
+		$js = '
+$("#goTableTop").click(function(){$("html,body").animate({scrollTop:0},600);return false;});
+		';
+		Yii::app()->clientScript->registerScript('ListGoTop',$js,CClientScript::POS_READY);
 	}
 
 	protected function navBar() 

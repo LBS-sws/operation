@@ -47,6 +47,21 @@ class MonthlyController extends Controller
 		);
 	}
 
+	// To override the checking in components/Controller.php
+	public function beforeAction($action) {
+		$index_id = $action->getId();
+		if (strpos('index/indexa/indexc/edit/view/', $index_id.'/')!==false) {
+			if (strpos($index_id,'index')===false) {
+				$params = $this->getActionParams();
+				if (isset($params['rtn'])) $index_id = $params['rtn'];
+			}
+			$this->function_id = $index_id=='indexa' ? 'YA03' : ($index_id=='indexc' ? 'YA02' : 'YA01');
+			return parent::beforeAction($action);
+		} else {
+			return true;
+		}
+	}
+
 	public function actionIndex($pageNum=0) 
 	{
 		$this->function_id = 'YA01';
@@ -231,7 +246,7 @@ class MonthlyController extends Controller
 
 	public function actionView($index, $rtn='index')
 	{
-		$this->function_id = $rtn=='indexa' ? 'YA03' : $rtn=='indexc' ? 'YA02' : 'YA01' ;
+		$this->function_id = $rtn=='indexa' ? 'YA03' : ($rtn=='indexc' ? 'YA02' : 'YA01') ;
 		Yii::app()->session['active_func'] = $this->function_id;
 
 		$model = new MonthlyForm('view');
@@ -245,7 +260,7 @@ class MonthlyController extends Controller
 	
 	public function actionEdit($index, $rtn='index')
 	{
-		$this->function_id = $rtn=='indexa' ? 'YA03' : $rtn=='indexc' ? 'YA02' : 'YA01' ;
+		$this->function_id = $rtn=='indexa' ? 'YA03' : ($rtn=='indexc' ? 'YA02' : 'YA01') ;
 		Yii::app()->session['active_func'] = $this->function_id;
 
 		$model = new MonthlyForm('edit');

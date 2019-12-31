@@ -217,7 +217,7 @@ function roundNumber(num, scale) {
     return +(Math.round(+arr[0] + "e" + sig + (+arr[1] + scale)) + "e-" + scale);
   }
 }		
-		$('#MonthlyForm_record_1_datavalue, #MonthlyForm_record_2_datavalue, #MonthlyForm_record_3_datavalue, #MonthlyForm_record_4_datavalue, #MonthlyForm_record_5_datavalue, #MonthlyForm_record_6_datavalue, #MonthlyForm_record_12_datavalue').focusout(function() {
+		$('#MonthlyForm_record_1_datavalue, #MonthlyForm_record_2_datavalue, #MonthlyForm_record_3_datavalue, #MonthlyForm_record_4_datavalue, #MonthlyForm_record_5_datavalue, #MonthlyForm_record_6_datavalue, #MonthlyForm_record_12_datavalue, #MonthlyForm_record_14_datavalue').focusout(function() {
 			$('#MonthlyForm_record_1_datavalue').val(parseFloat(+$('#MonthlyForm_record_1_datavalue').val() || 0 ).toFixed(2));
 			$('#MonthlyForm_record_2_datavalue').val(parseFloat(+$('#MonthlyForm_record_2_datavalue').val() || 0 ).toFixed(2));
 			$('#MonthlyForm_record_3_datavalue').val(parseFloat(+$('#MonthlyForm_record_3_datavalue').val() || 0 ).toFixed(2));
@@ -225,12 +225,15 @@ function roundNumber(num, scale) {
 			$('#MonthlyForm_record_5_datavalue').val(parseFloat(+$('#MonthlyForm_record_5_datavalue').val() || 0 ).toFixed(2));
 			$('#MonthlyForm_record_6_datavalue').val(parseFloat(+$('#MonthlyForm_record_6_datavalue').val() || 0 ).toFixed(2));
 			$('#MonthlyForm_record_12_datavalue').val(parseFloat(+$('#MonthlyForm_record_12_datavalue').val() || 0 ).toFixed(2));
+			$('#MonthlyForm_record_14_datavalue').val(parseFloat(+$('#MonthlyForm_record_14_datavalue').val() || 0 ).toFixed(2));
 			$('#MonthlyForm_record_7_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_1_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_2_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_3_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_4_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_5_datavalue').value)).toFixed(2));
 			var total = parseFloat(document.getElementById('MonthlyForm_record_7_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_12_datavalue').value);
+			var renaud = ($('#MonthlyForm_record_14_datavalue').length!==0) ? parseFloat(document.getElementById('MonthlyForm_record_14_datavalue').value) : 0;
+			var paper = parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) - renaud;
 			$('#MonthlyForm_record_8_datavalue').val(roundNumber((total * 8.5 / 100),2));
-			$('#MonthlyForm_record_9_datavalue').val(roundNumber((parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) * 3.5 / 100),2));
+			$('#MonthlyForm_record_9_datavalue').val(roundNumber((paper * 3.5 / 100),2));
 			$('#MonthlyForm_record_10_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_8_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_9_datavalue').value)).toFixed(2));
-			$('#MonthlyForm_record_11_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_7_datavalue').value)).toFixed(2));
+			$('#MonthlyForm_record_11_datavalue').val((paper + parseFloat(document.getElementById('MonthlyForm_record_7_datavalue').value)).toFixed(2));
 			$('#MonthlyForm_record_13_datavalue').val(parseFloat(+$('#MonthlyForm_record_13_datavalue').val() || 0 ).toFixed(2));
 		});
 		

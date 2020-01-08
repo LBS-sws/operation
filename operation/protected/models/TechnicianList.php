@@ -100,4 +100,17 @@ class TechnicianList extends CListPageModel
         return true;
     }
 
+    public function getCriteria() {
+        return array(
+            'searchField'=>$this->searchField,
+            'searchValue'=>$this->searchValue,
+            'orderField'=>$this->orderField,
+            'orderType'=>$this->orderType,
+            'noOfItem'=>$this->noOfItem,
+            'pageNum'=>$this->pageNum,
+            'filter'=>$this->filter,
+            'searchTimeStart'=>$this->searchTimeStart,
+            'searchTimeEnd'=>$this->searchTimeEnd,
+        );
+    }
 }

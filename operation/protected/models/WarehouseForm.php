@@ -84,20 +84,6 @@ class WarehouseForm extends CFormModel
         }else{
 	        $this->z_index = 1;
         }
-	    if(Yii::app()->user->validFunction('YN02')){
-            if(empty($this->price)||!is_numeric($this->price)){
-                $message = Yii::t('procurement','Price（RMB）').Yii::t('procurement',' Not Null');
-                $this->addError($attribute,$message);
-            }
-        }else{
-            $rows = Yii::app()->db->createCommand()->select("price")->from("opr_warehouse")
-                ->where('id=:id', array(':id'=>$this->id))->queryRow();
-            if($rows){
-                $this->price = $rows["price"];
-            }else{
-                $this->price = 0.00;
-            }
-        }
 	}
 
     //刪除驗證
@@ -124,7 +110,7 @@ class WarehouseForm extends CFormModel
                 $this->inventory = $row['inventory'];
                 $this->costing = sprintf("%.2f",$row['costing']);
                 $this->decimal_num = empty($row['decimal_num'])?"否":$row['decimal_num'];
-                $this->price = $row['price'];
+                $this->price = $this->getPriceToIdAndDate($row["id"]);
                 $this->min_num = $row['min_num'];
                 break;
 			}
@@ -155,9 +141,46 @@ class WarehouseForm extends CFormModel
 
     //根據訂單id查訂單所有物品
     public function getGoodsListToId($order_id){
-        $rs = Yii::app()->db->createCommand()->select("b.name,b.inventory,b.goods_code,b.classify_id,b.unit,a.goods_num,a.confirm_num,a.id,a.goods_id,a.remark,a.note")
+        $rs = Yii::app()->db->createCommand()->select("b.id as warehouse_id,a.lcd,b.name,b.inventory,b.goods_code,b.classify_id,b.unit,a.goods_num,a.confirm_num,a.id,a.goods_id,a.remark,a.note")
             ->from("opr_order_goods a,opr_warehouse b")->where('a.order_id=:order_id and a.goods_id = b.id',array(':order_id'=>$order_id))->queryAll();
         return $rs;
+    }
+
+    //
+    public function getPriceHistory($id){
+        $html = '';
+        $rs = Yii::app()->db->createCommand()->select("a.year,a.month,a.price,b.name,b.goods_code")
+            ->from("opr_warehouse_price a")->leftJoin('opr_warehouse b',"a.warehouse_id=b.id")
+            ->where('b.id =:id',array(':id'=>$id))->order("a.year desc,a.month desc")->queryAll();
+        if($rs){
+            foreach ($rs as $row){
+                $html.="<tr>";
+                $html.="<td>".$row["goods_code"]."</td>";
+                $html.="<td>".$row["name"]."</td>";
+                $html.="<td>".$row["year"]."/".$row["month"]."</td>";
+                $html.="<td>".$row["price"]."</td>";
+                $html.="</tr>";
+            }
+        }
+        if(empty($html)){
+            $html.="<span>该物品没有单价历史</span>";
+        }
+        return array('status'=>1,'html'=>$html);
+    }
+
+    //
+    public function getPriceToIdAndDate($id,$date=''){
+        if(empty($date)){
+            $date = date("Y-m");
+        }
+        $year = intval(date("Y",strtotime($date)));
+        $month = intval(date("m",strtotime($date)));
+        $rs = Yii::app()->db->createCommand()->select("price")->from("opr_warehouse_price")
+            ->where("warehouse_id =:id and (year < $year or (year = $year and month<=$month))",array(':id'=>$id))->order("year desc,month desc")->queryRow();
+        if($rs){
+            return $rs["price"];
+        }
+        return 0;
     }
 
 	public function saveData()
@@ -182,9 +205,9 @@ class WarehouseForm extends CFormModel
                 break;
             case 'new':
                 $sql = "insert into opr_warehouse(
-							name, unit, inventory, classify_id, lcu, goods_code,city,price,costing,decimal_num,min_num,z_index
+							name, unit, inventory, classify_id, lcu, goods_code,city,costing,decimal_num,min_num,z_index
 						) values (
-							:name, :unit, :inventory, :classify_id, :lcu, :goods_code,:city,:price,:costing,:decimal_num,:min_num,:z_index
+							:name, :unit, :inventory, :classify_id, :lcu, :goods_code,:city,:costing,:decimal_num,:min_num,:z_index
 						)";
                 break;
             case 'edit':
@@ -192,7 +215,6 @@ class WarehouseForm extends CFormModel
 							name = :name, 
 							classify_id = :classify_id, 
 							unit = :unit,
-							price = :price,
 							costing = :costing,
 							decimal_num = :decimal_num,
 							z_index = :z_index,

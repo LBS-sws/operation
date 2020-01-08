@@ -48,6 +48,11 @@ return array(
                 'access'=>'YD02',
                 'url'=>'/delivery/index',
             ),
+            //外勤領貨成本總覽
+            'Technician cargo cost'=>array(
+                'access'=>'YD07',
+                'url'=>'/cargoCost/index',
+            ),
             //倉庫管理
             'Warehouse Info'=>array(
                 'access'=>'YD01',

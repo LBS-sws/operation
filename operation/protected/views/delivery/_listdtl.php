@@ -35,12 +35,13 @@ switch ($this->record['status']){
         <?php
         $con_num = 0;
             foreach ($this->record["goods_list"] as $goods){
+                $num = ($goods["confirm_num"]===""||$goods["confirm_num"]===null)?floatval($goods["goods_num"]):floatval($goods["confirm_num"]);
                 $con_num++;
                 if($con_num == 3){
                     echo ".......";
                     break;
                 }
-                echo $goods["name"].'  ×  '.$goods["goods_num"]."<br>";
+                echo $goods["name"].'  ×  '.$num."<br>";
             }
         ?>
     </td>

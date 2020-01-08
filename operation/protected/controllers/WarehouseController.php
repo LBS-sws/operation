@@ -27,6 +27,10 @@ class WarehouseController extends Controller
                 'expression'=>array('WarehouseController','allowReadWrite'),
             ),
             array('allow',
+                'actions'=>array('importPrice','ajaxPriceHistory'),
+                'expression'=>array('WarehouseController','allowImportPrice'),
+            ),
+            array('allow',
                 'actions'=>array('index','view'),
                 'expression'=>array('WarehouseController','allowReadOnly'),
             ),
@@ -34,6 +38,10 @@ class WarehouseController extends Controller
                 'users'=>array('*'),
             ),
         );
+    }
+
+    public static function allowImportPrice() {
+        return Yii::app()->user->validFunction('YN02');
     }
 
     public static function allowReadWrite() {
@@ -173,6 +181,57 @@ class WarehouseController extends Controller
             $message = CHtml::errorSummary($model);
             Dialog::message(Yii::t('dialog','Validation Message'), $message);
             $this->redirect(Yii::app()->createUrl($_POST['prevUrl']));
+        }
+    }
+
+    public function actionImportPrice(){
+        $model = new UploadExcelForm();
+        $img = CUploadedFile::getInstance($model,'file');
+        if(empty($img)){
+            Dialog::message(Yii::t('dialog','Validation Message'), "文件不能为空");
+            $this->redirect(Yii::app()->createUrl('warehouse/index'));
+        }
+        $city = Yii::app()->user->city();
+        $path =Yii::app()->basePath."/../upload/";
+        if (!file_exists($path)){
+            mkdir($path);
+        }
+        $path =Yii::app()->basePath."/../upload/excel/";
+        if (!file_exists($path)){
+            mkdir($path);
+        }
+        $path.=$city."/";
+        if (!file_exists($path)){
+            mkdir($path);
+        }
+        $url = "upload/excel/".$city."/".date("YmdHis").".".$img->getExtensionName();
+        $model->file = $img->getName();
+        if ($model->file && $model->validate()) {
+            $img->saveAs($url);
+            $loadExcel = new LoadExcel($url);
+            $list = $loadExcel->getExcelList();
+            if($model->loadPrice($list)){
+                if(empty($model->error_list)){
+                    Dialog::message(Yii::t('dialog','Validation Message'), "导入成功！");
+                }
+            }
+            $this->redirect(Yii::app()->createUrl('warehouse/index'));
+        }else{
+            $message = CHtml::errorSummary($model);
+            Dialog::message(Yii::t('dialog','Validation Message'), $message);
+            $this->redirect(Yii::app()->createUrl('warehouse/index'));
+        }
+    }
+
+    //價格歷史的異步請求
+    public function actionAjaxPriceHistory(){
+        if(Yii::app()->request->isAjaxRequest) {//是否ajax请求
+            $id = $_GET['id'];
+            $model = new WarehouseForm();
+            $rs =$model->getPriceHistory($id);
+            echo CJSON::encode($rs);//Yii 的方法将数组处理成json数据
+        }else{
+            $this->redirect(Yii::app()->createUrl('warehouse/index'));
         }
     }
 

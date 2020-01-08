@@ -13,6 +13,7 @@ class TechnicianForm extends CFormModel
     public $order_code;
     public $goods_list;
     public $ject_remark;
+    public $total_price=0;
 
     public function init()
     {
@@ -77,6 +78,7 @@ class TechnicianForm extends CFormModel
         foreach ($goods_list as $key =>$goods){
             if(empty($goods["goods_id"]) && empty($goods["goods_num"])){
                 unset($this->goods_list[$key]);
+                continue;
             }else if (empty($goods["goods_id"]) || empty($goods["goods_num"])){
                 $message = Yii::t('procurement','The goods or quantity cannot be empty');
                 $this->addError($attribute,$message);
@@ -105,7 +107,10 @@ class TechnicianForm extends CFormModel
                     return false;
                 }
             }
+
+            $this->total_price += floatval($goods["goods_num"])*floatval(WarehouseForm::getPriceToIdAndDate($goods["goods_id"]));
         }
+
         if(count($this->goods_list)<1){
             $message = Yii::t('procurement','Fill in at least one goods');
             $this->addError($attribute,$message);
@@ -179,14 +184,15 @@ class TechnicianForm extends CFormModel
             case 'new':
                 $insetBool = true;
                 $sql = "insert into opr_order(
-							order_user, remark, status, lcu, lcd
+							order_user, remark, total_price, status, lcu, lcd
 						) values (
-							:order_user,:remark, :status, :lcu, :lcd
+							:order_user,:remark,:total_price, :status, :lcu, :lcd
 						)";
                 break;
             case 'edit':
                 $sql = "update opr_order set
 							remark = :remark,
+							total_price = :total_price,
 							luu = :luu,
 							lud = :lud
 						where id = :id and judge=0
@@ -196,13 +202,14 @@ class TechnicianForm extends CFormModel
                 if(empty($this->id)){
                     $insetBool = true;
                     $sql = "insert into opr_order(
-							order_user, remark, status, lcu, lcd
+							order_user, remark, total_price, status, lcu, lcd
 						) values (
-							:order_user,:remark, :status, :lcu, :lcd
+							:order_user,:remark,:total_price, :status, :lcu, :lcd
 						)";
                 }else{
                     $sql = "update opr_order set
 							remark = :remark,
+							total_price = :total_price,
 							luu = :luu,
 							lcd = :lcd,
 							lud = :lud,
@@ -247,6 +254,8 @@ class TechnicianForm extends CFormModel
 
         if (strpos($sql,':remark')!==false)
             $command->bindParam(':remark',$this->remark,PDO::PARAM_STR);
+        if (strpos($sql,':total_price')!==false)
+            $command->bindParam(':total_price',$this->total_price,PDO::PARAM_STR);
         if (strpos($sql,':lud')!==false)
             $command->bindParam(':lud',date('Y-m-d H:i:s'),PDO::PARAM_STR);
         if (strpos($sql,':luu')!==false)

@@ -82,6 +82,56 @@ class UploadExcelForm extends CFormModel
         Dialog::message(Yii::t('dialog','Information'), Yii::t('procurement','Success Num：').$successNum."<br>".Yii::t('procurement','Error Num：').$errNum."<br>".$error);
     }
 
+	//批量導入物品（倉庫單價）
+    public function loadPrice($arr){
+        $validateArr = $this->getPriceList();
+        foreach ($validateArr as  &$vaList){
+            $column = array_search($vaList["name"],$arr["listHeader"]);
+            if($column!==false){
+                $vaList['column'] =$column;
+            }else{
+                Dialog::message(Yii::t('dialog','Validation Message'), $vaList["name"].Yii::t("procurement"," Not Find"));
+                return false;
+            }
+        }
+        foreach ($arr["listBody"] as $key => $list){
+            $arrList = array();
+            $continue = $this->validatePrice($key,$list,$validateArr,$arrList);
+            $this->start_title = current($list);
+            if($continue){
+                $uid = Yii::app()->user->id;
+                $row = Yii::app()->db->createCommand()->select("id")->from("opr_warehouse_price")
+                    ->where("warehouse_id=:warehouse_id and year=:year and month=:month",
+                        array(
+                            ':warehouse_id'=>$arrList["warehouse_id"],
+                            ':year'=>$arrList["year"],
+                            ':month'=>$arrList["month"]
+                        )
+                    )->queryRow();
+                if($row){
+                    Yii::app()->db->createCommand()->update("opr_warehouse_price",array(
+                        "warehouse_id"=>$arrList["warehouse_id"],
+                        "year"=>$arrList["year"],
+                        "month"=>$arrList["month"],
+                        "price"=>$arrList["price"],
+                        "luu"=>$uid,
+                    ), 'id=:id', array(':id'=>$row['id']));
+                }else{
+                    Yii::app()->db->createCommand()->insert("opr_warehouse_price",array(
+                        "warehouse_id"=>$arrList["warehouse_id"],
+                        "year"=>$arrList["year"],
+                        "month"=>$arrList["month"],
+                        "price"=>$arrList["price"],
+                        "lcu"=>$uid,
+                    ));
+                }
+            }
+        }
+
+        $this->outExcel($arr);
+        return true;
+    }
+
     private function validateStr($value,$list,$bool){
         if(($value === "")&&($list["value"] === "")){
             return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."不能为空");
@@ -175,6 +225,67 @@ class UploadExcelForm extends CFormModel
         }
     }
 
+    private function validatePrice($key,$list,$validateArr,&$arrList){
+        $arr = array();
+        $bool = count($this->error_list);
+        foreach ($validateArr as $item){
+            $arrList[$item["sqlName"]] = $list[$item['column']];
+            if($item["name"] == "物品编号"||$item["name"] == "物品名称"){
+                if(empty($arr)){
+                    $arr[$item["sqlName"]] =$list[$item['column']];
+                    continue;
+                }else{
+                    $arr[$item["sqlName"]] =$list[$item['column']];
+                    $row = Yii::app()->db->createCommand()->select("goods_code,id,name")->from("opr_warehouse")
+                        ->where("goods_code=:goods_code", array(':goods_code'=>$arr["goods_code"]))->queryRow();
+                    if($row){
+                        if($row['name']!=$arr["name"]){
+                            $this->error_list[] = array('key'=>$key,'value'=>"物品编号和物品名稱不一致");
+                            return false;
+                        }else{
+                            $arrList["warehouse_id"] = $row["id"];
+                        }
+                    }else{
+                        $this->error_list[] = array('key'=>$key,'value'=>"物品编号不存在");
+                        return false;
+                    }
+                }
+            }
+            if($item["name"] == "年份"){
+                if(!is_numeric($list[$item['column']])){
+                    $this->error_list[] = array('key'=>$key,'value'=>"年份必須為數字");
+                    return false;
+                }
+            }
+            if($item["name"] == "月份"){
+                if(!is_numeric($list[$item['column']])){
+                    $this->error_list[] = array('key'=>$key,'value'=>"月份必須為數字");
+                    return false;
+                }elseif($list[$item['column']]<1||$list[$item['column']]>12){
+                    $this->error_list[] = array('key'=>$key,'value'=>"月份必須在1-12之間");
+                    return false;
+                }
+            }
+            if($item["name"] == "单价"){
+                if(!is_numeric($list[$item['column']])){
+                    $this->error_list[] = array('key'=>$key,'value'=>"单价必須為數字");
+                    return false;
+                }
+            }
+        }
+        return $bool == count($this->error_list);
+    }
+
+    private function getPriceList(){
+        return array(
+            array("name" => "物品编号", "sqlName" => "goods_code"),
+            array("name" => "物品名称", "sqlName" => "name"),
+            array("name" => "年份", "sqlName" => "year"),
+            array("name" => "月份", "sqlName" => "month"),
+            array("name" => "单价", "sqlName" => "price"),
+        );
+    }
+
     private function getList(){
         $city = Yii::app()->user->city();
         $arr = array();
@@ -249,5 +360,19 @@ class UploadExcelForm extends CFormModel
                 break;
         }
         return $arr;
+    }
+
+    private function outExcel($arr){
+        if(!empty($this->error_list)){
+            $myExcel = new MyExcelTwo(false);
+            $myExcel->setPriceHeader($this->error_list,count($arr["listBody"]));
+            $arr["listHeader"][] = '错误原因';
+            $myExcel->setRowBody($arr["listHeader"]);
+            foreach ($this->error_list as $list){
+                $arr["listBody"][$list["key"]][] = $list["value"];
+                $myExcel->setRowBody($arr["listBody"][$list["key"]]);
+            }
+            $myExcel->outDownExcel("导入错误.xls");
+        }
     }
 }

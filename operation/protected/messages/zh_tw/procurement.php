@@ -249,5 +249,12 @@ return array(
 
     'expired'=>'已過期',
     'The order has expired'=>'訂單已過期',
+
+    //2020-01-04
+    'Import Price'=>'導入物品單價',
+    'price history'=>'價格歷史',
+    'Cargo Cost'=>'成本總價',
+    'Goods Cost'=>'貨品成本',
+    'Sum Cargo Cost'=>'領貨金額',
 );
 ?>

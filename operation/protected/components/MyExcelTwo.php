@@ -8,10 +8,12 @@ class MyExcelTwo {
     protected $sheetNum = 0;
     protected $protoSum=array();
 
-    public function __construct() {
-        $phpExcelPath = Yii::getPathOfAlias('ext.phpexcel');
-        spl_autoload_unregister(array('YiiBase','autoload'));
-        include($phpExcelPath . DIRECTORY_SEPARATOR . 'PHPExcel.php');
+    public function __construct($bool=true) {
+        if($bool){
+            $phpExcelPath = Yii::getPathOfAlias('ext.phpexcel');
+            spl_autoload_unregister(array('YiiBase','autoload'));
+            include($phpExcelPath . DIRECTORY_SEPARATOR . 'PHPExcel.php');
+        }
         $this->objPHPExcel = new PHPExcel();
         $this->objPHPExcel->getProperties()
             ->setCreator("WOLF")
@@ -390,6 +392,26 @@ class MyExcelTwo {
             $this->objActSheet->setCellValue("E".$row,$maoSum);
             $this->objActSheet->setCellValue("F".$row,sprintf("%.2f",$voleSum));
         }
+    }
+
+    //設置某行內容
+    public function setRowBody($rowList){
+        $this->row++;
+        $i = 0;
+        foreach ($rowList as $item){
+            $this->objActSheet->setCellValue($this->listArr[$i].$this->row,$item);
+            $i++;
+        }
+    }
+
+    //设置错误头
+    public function setPriceHeader($errorList,$sumCount){
+        $this->setRowContent("A".$this->row,"总条数：$sumCount","C".$this->row);
+        $this->row++;
+        $this->setRowContent("A".$this->row,"成功数量：".($sumCount-count($errorList)),"C".$this->row);
+        $this->row++;
+        $this->setRowContent("A".$this->row,"失败数量：".count($errorList),"C".$this->row);
+        $this->row++;
     }
 
     //設置sheet的名字

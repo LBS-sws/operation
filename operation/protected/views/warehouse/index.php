@@ -9,6 +9,7 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
 'layout'=>TbHtml::FORM_LAYOUT_INLINE,
 )); ?>
 <style>
+    .goodsHistoryMouse{padding: 10px;margin: -10px;}
     .goodsHistoryDiv>.table{background: #fff;}
     .goodsHistoryDiv{position: absolute;width: 400px;margin-left: -205px;margin-top: 10px;box-shadow: 5px 5px 5px #999;background: #eee;z-index: 88;padding: 10px;display: none;}
     .goodsHistoryDiv:after{position: absolute;content: " ";left: 50%;top: -10px;border-bottom: 10px solid #eee;border-left: 5px solid transparent;border-right: 5px solid transparent }
@@ -45,6 +46,12 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                     echo TbHtml::button('<span class="fa fa-cloud-download"></span> '.Yii::t('misc','Download'), array(
                         'submit'=>Yii::app()->createUrl('warehouse/DownExcel'),
                     ));
+
+                if (Yii::app()->user->validFunction('YN02')){
+                    //導入
+                    echo TbHtml::button('<span class="fa fa-file-text-o"></span> '.Yii::t('procurement','Import Price'), array(
+                        'data-toggle'=>'modal','data-target'=>'#importPrice'));
+                }
                 ?>
             </div>
         </div>
@@ -72,6 +79,11 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
 <?php $this->endWidget(); ?>
 
 <?php
+if (Yii::app()->user->validFunction('YN02')){
+    $this->renderPartial('//site/importPrice',array('name'=>"UploadExcelForm","model"=>$model));
+}
+?>
+<?php
 $this->renderPartial('//site/goodsHistory',array(
         'model'=>$model)
 );
@@ -80,12 +92,12 @@ $this->renderPartial('//site/goodsHistory',array(
 $js='
     $(".goodsHistoryMouse").on("mousemove",function(e){
         var num = $(this).data("id");
-        console.log(num);
-        $(".divHistory"+num).show().css({"left":e.pageX+"px","top":e.pageY+"px"});
+        var pageX = (e.pageX + 5)+"px";
+        var pageY = (e.pageY + 5)+"px";
+        $(".divHistory"+num).show().css({"left":pageX,"top":pageY});
     });
     $(".goodsHistoryMouse").on("mouseout",function(){
         var num = $(this).data("id");
-        console.log(num);
         $(".divHistory"+num).hide();
     });
 ';

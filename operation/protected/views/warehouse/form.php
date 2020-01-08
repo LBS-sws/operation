@@ -100,13 +100,23 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                     ); ?>
                 </div>
             </div>
-            <?php if (Yii::app()->user->validFunction('YN02')): ?>
+            <?php if (Yii::app()->user->validFunction('YN02')&&$model->scenario!='new'): ?>
             <div class="form-group">
                 <?php echo $form->labelEx($model,'price',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
-                    <?php echo $form->numberField($model, 'price',
-                        array('min'=>0,'readonly'=>($model->scenario=='view'))
-                    ); ?>
+                    <div class="input-group">
+                        <?php echo $form->numberField($model, 'price',
+                            array('min'=>0,'readonly'=>(true))
+                        ); ?>
+
+                        <span class="input-group-btn">
+                            <?php
+                            //歷史價格
+                            echo TbHtml::button(Yii::t('procurement','price history'), array(
+                                'name'=>'btnPriceFlow','id'=>'btnPriceFlow','onclick'=>"printPriceTable(".$model->id.")",'data-toggle'=>'modal','data-target'=>'#priceFlow'));
+                            ?>
+                        </span>
+                    </div><!-- /input-group -->
                 </div>
             </div>
             <?php endif ?>
@@ -161,6 +171,8 @@ if ($model->scenario!='view')
         'prevUrl'=>'Warehouse/new',
         'name'=>"UploadExcelForm")
     );
+if (Yii::app()->user->validFunction('YN02'))
+    $this->renderPartial('//site/priceFlow');
 ?>
 
 

@@ -89,7 +89,7 @@ class WarehouseList extends CListPageModel
 						'unit'=>$record['unit'],
 						'min_num'=>$record['min_num'],
 						'classify_id'=>ClassifyForm::getClassifyToId($record['classify_id']),
-						'price'=>$record['price'],
+						'price'=>WarehouseForm::getPriceToIdAndDate($record['id']),
 						'inventory'=>$record['inventory'],
 						'goods_code'=>$record['goods_code'],
 						'color'=>$record['z_index'] == 1?"":" text-danger",

@@ -1,6 +1,6 @@
 <?php
 
-class DeliveryList extends CListPageModel
+class CargoCostList extends CListPageModel
 {
     public $searchTimeStart;//開始日期
     public $searchTimeEnd;//結束日期
@@ -21,6 +21,7 @@ class DeliveryList extends CListPageModel
             'lcd'=>Yii::t('procurement','Apply for time'),
             'lcu'=>Yii::t('procurement','Apply for user'),
             'goods_name'=>Yii::t('procurement','Goods Name'),
+            'total_price'=>Yii::t('procurement','Cargo Cost'),
         );
     }
 
@@ -102,6 +103,7 @@ class DeliveryList extends CListPageModel
                     'goods_list'=>WarehouseForm::getGoodsListToId($record['id']),
                     'order_user'=>$record['order_user'],
                     'technician'=>$record['technician'],
+                    'total_price'=>$record['total_price'],
                     'status'=>$record['status'],
                     'city'=>CGeneral::getCityName($record['city']),
                     'lcu'=>$record['disp_name'],

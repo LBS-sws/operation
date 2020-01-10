@@ -62,6 +62,7 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
 				'viewhdr'=>'//warehouse/_listhdr',
 				'viewdtl'=>'//warehouse/_listdtl',
 				'search'=>array(
+							'goods_code',
 							'name',
 							'unit',
 							'classify_id',

@@ -236,11 +236,11 @@ class UploadExcelForm extends CFormModel
                     continue;
                 }else{
                     $arr[$item["sqlName"]] =$list[$item['column']];
-                    $row = Yii::app()->db->createCommand()->select("goods_code,id,name")->from("opr_warehouse")
-                        ->where("goods_code=:goods_code", array(':goods_code'=>$arr["goods_code"]))->queryRow();
+                    $row = Yii::app()->db->createCommand()->select("id,goods_code,id,name")->from("opr_warehouse")
+                        ->where("goods_code=:goods_code and city=:city", array(':goods_code'=>$arr["goods_code"],":city"=>Yii::app()->user->city()))->queryRow();
                     if($row){
                         if($row['name']!=$arr["name"]){
-                            $this->error_list[] = array('key'=>$key,'value'=>"物品编号和物品名稱不一致(".$arr['name']." != ".$row['name'].")");
+                            $this->error_list[] = array('key'=>$key,'value'=>"物品编号和物品名稱不一致(".$arr['name']." != ".$row['name'].")，物品id:".$row['id']);
                             return false;
                         }else{
                             $arrList["warehouse_id"] = $row["id"];

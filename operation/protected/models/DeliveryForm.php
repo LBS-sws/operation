@@ -24,9 +24,6 @@ class DeliveryForm extends CFormModel
 	//批量處理的訂單
     public $orderList;
     public $checkBoxDown;
-    public $total_price=0;
-
-    private $price_list=array();
 
     public function attributeLabels()
 	{
@@ -119,7 +116,6 @@ class DeliveryForm extends CFormModel
                     return false;
                 }
             }
-            $this->total_price += floatval($goods["confirm_num"])*floatval($this->getGoodsPrice($goods["goods_id"]));
         }
         if(count($this->goods_list)<1){
             $message = Yii::t('procurement','Fill in at least one goods');
@@ -174,7 +170,6 @@ class DeliveryForm extends CFormModel
                 $sql = "update opr_order set
 							remark = :remark,
 							luu = :luu,
-							total_price = :total_price,
 							status = :status
 						where id = :id AND judge=0
 						";
@@ -182,7 +177,6 @@ class DeliveryForm extends CFormModel
             case 'audit':
                 $sql = "update opr_order set
 							remark = :remark,
-							total_price = :total_price,
 							ject_remark = '',
 							luu = :luu,
 							audit_time = :audit_time,
@@ -224,8 +218,6 @@ class DeliveryForm extends CFormModel
             $command->bindParam(':remark',$this->remark,PDO::PARAM_STR);
         if (strpos($sql,':ject_remark')!==false)
             $command->bindParam(':ject_remark',$this->ject_remark,PDO::PARAM_STR);
-        if (strpos($sql,':total_price')!==false)
-            $command->bindParam(':total_price',$this->total_price,PDO::PARAM_STR);
         if (strpos($sql,':audit_time')!==false)
             $command->bindParam(':audit_time',date('Y-m-d H:i:s'),PDO::PARAM_STR);
         if (strpos($sql,':lud')!==false)
@@ -264,24 +256,6 @@ class DeliveryForm extends CFormModel
         OrderGoods::sendEmailTwo($oldOrderStatus,$this->status,$this->order_code);
 		return true;
 	}
-
-	private function getGoodsPrice($goods_id){
-        $key = date("Ym",strtotime($this->lcd));
-        if(key_exists($key,$this->price_list)){
-            if(key_exists($goods_id,$this->price_list[$key])){
-                return $this->price_list[$key][$goods_id];
-            }else{
-                $price = WarehouseForm::getPriceToIdAndDate($goods_id,$this->lcd);
-                $this->price_list[$key][$goods_id] = $price;
-                return $price;
-            }
-        }else{
-            $this->price_list[$key] = array();
-            $price = WarehouseForm::getPriceToIdAndDate($goods_id,$this->lcd);
-            $this->price_list[$key][$goods_id] = $price;
-            return $price;
-        }
-    }
 
     //減少庫存
 	public function reduceInventory($goodsId,$num){
@@ -416,7 +390,6 @@ class DeliveryForm extends CFormModel
         if(!empty($orderList)){
             foreach ($orderList as $order){
                 $this->lcd = $order["lcd"];
-                $total_price = 0;
                 //記錄
                 Yii::app()->db->createCommand()->insert('opr_order_status', array(
                     'order_id'=>$order["id"],
@@ -435,8 +408,6 @@ class DeliveryForm extends CFormModel
                         $goodsId = intval($row["goods_id"]);
                         //減少庫存
                         Yii::app()->db->createCommand("update opr_warehouse set inventory=inventory-$num where id=$goodsId")->execute();
-                        //計算價格
-                        $total_price+=$num*floatval($this->getGoodsPrice($goodsId));
                         //修改物品的實際數量
                         Yii::app()->db->createCommand()->update('opr_order_goods', array(
                             'confirm_num'=>$num,
@@ -446,7 +417,6 @@ class DeliveryForm extends CFormModel
 
                 //修改物品的价格及狀態
                 Yii::app()->db->createCommand()->update('opr_order', array(
-                    'total_price'=>$total_price,
                     'status'=>"approve",
                     'audit_time'=>date('Y-m-d H:i:s'),
                     'luu'=>$uid,
@@ -454,35 +424,5 @@ class DeliveryForm extends CFormModel
             }
         }
 
-    }
-
-    //批量修改訂單總價(測試使用)
-    public function cargoCostTest(){
-        echo "start";
-        echo "<br>-------------------------<br>";
-        $orders = Yii::app()->db->createCommand()->select("*")->from("opr_order")->where("judge=0 AND status not in ('cancelled','pending')")->queryAll();
-        echo "SUM:".count($orders)."<br>";
-        if($orders){
-            foreach ($orders as $order){
-                $this->lcd = $order["lcd"];
-                $total_price = 0;
-                $rows = Yii::app()->db->createCommand()->select("id,goods_id,goods_num,confirm_num")->from("opr_order_goods")
-                    ->where("order_id =:order_id",array(":order_id"=>$order["id"]))->queryAll();
-                if($rows){
-                    foreach ($rows as $row){
-                        $num = ($row["confirm_num"]===""||$row["confirm_num"]===null)?floatval($row["goods_num"]):floatval($row["confirm_num"]);
-                        $goodsId = intval($row["goods_id"]);
-                        //計算價格
-                        $total_price+=$num*floatval($this->getGoodsPrice($goodsId));
-                    }
-                    //修改物品的价格
-                    Yii::app()->db->createCommand()->update('opr_order', array(
-                        'total_price'=>$total_price,
-                    ), "id=:id",array(":id"=>$order["id"]));
-                }
-            }
-        }
-        echo "<br>-------------------------<br>";
-        echo "end";
     }
 }

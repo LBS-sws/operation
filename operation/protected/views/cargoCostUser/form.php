@@ -1,11 +1,11 @@
 <?php
 if (empty($model->id)){
-    $this->redirect(Yii::app()->createUrl('cargoCost/index'));
+    $this->redirect(Yii::app()->createUrl('cargoCostUser/index'));
 }
-$this->pageTitle=Yii::app()->name . ' - cargoCost Form';
+$this->pageTitle=Yii::app()->name . ' - cargoCostUser Form';
 ?>
 <?php $form=$this->beginWidget('TbActiveForm', array(
-    'id'=>'cargoCost-form',
+    'id'=>'cargoCostUser-form',
     'enableClientValidation'=>true,
     'clientOptions'=>array('validateOnSubmit'=>true,),
     'layout'=>TbHtml::FORM_LAYOUT_HORIZONTAL,
@@ -37,7 +37,7 @@ $this->pageTitle=Yii::app()->name . ' - cargoCost Form';
     <div class="box"><div class="box-body">
             <div class="btn-group" role="group">
                 <?php echo TbHtml::button('<span class="fa fa-reply"></span> '.Yii::t('misc','Back'), array(
-                    'submit'=>Yii::app()->createUrl('cargoCost/index')));
+                    'submit'=>Yii::app()->createUrl('cargoCostUser/index')));
                 ?>
             </div>
 
@@ -97,15 +97,6 @@ $this->pageTitle=Yii::app()->name . ' - cargoCost Form';
             </div>
 
             <div class="form-group">
-                <?php echo $form->labelEx($model,'total_price',array('class'=>"col-sm-2 control-label")); ?>
-                <div class="col-sm-3">
-                    <?php echo $form->textField($model, 'total_price',
-                        array('readonly'=>true)
-                    ); ?>
-                </div>
-            </div>
-
-            <div class="form-group">
                 <?php echo $form->labelEx($model,'goods_list',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-8">
                     <table class="table table-bordered table-striped disabled" id="table-change">
@@ -119,11 +110,9 @@ $this->pageTitle=Yii::app()->name . ' - cargoCost Form';
                             <td><?php echo Yii::t("procurement","Sum Cargo Cost")?></td>
                         </tr>
                         </thead>
-                        <tbody>
                         <?php
                         echo $model->printTable();
                         ?>
-                        </tbody>
                     </table>
                 </div>
             </div>
@@ -143,7 +132,6 @@ $this->pageTitle=Yii::app()->name . ' - cargoCost Form';
 
 <?php
 $this->renderPartial('//site/flowlist',array('model'=>$model));
-$this->renderPartial('//site/priceFlow');
 ?>
 
 <?php

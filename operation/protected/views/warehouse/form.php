@@ -113,7 +113,7 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                             <?php
                             //歷史價格
                             echo TbHtml::button(Yii::t('procurement','price history'), array(
-                                'name'=>'btnPriceFlow','id'=>'btnPriceFlow','onclick'=>"printPriceTable(".$model->id.")",'data-toggle'=>'modal','data-target'=>'#priceFlow'));
+                                'class'=>'clickPriceBtn','data-id'=>$model->id));
                             ?>
                         </span>
                     </div><!-- /input-group -->

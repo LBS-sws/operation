@@ -18,7 +18,7 @@ class WarehouseList extends CListPageModel
 	public function retrieveDataByPage($pageNum=1)
 	{
 		$city = Yii::app()->user->city();
-		$sql1 = "select *
+		$sql1 = "select *,costPrice(id,now()) as cost_price 
 				from opr_warehouse
 				where city = '$city' 
 			";
@@ -88,8 +88,8 @@ class WarehouseList extends CListPageModel
 						'name'=>$record['name'],
 						'unit'=>$record['unit'],
 						'min_num'=>$record['min_num'],
+						'price'=>$record['cost_price'],
 						'classify_id'=>ClassifyForm::getClassifyToId($record['classify_id']),
-						'price'=>WarehouseForm::getPriceToIdAndDate($record['id']),
 						'inventory'=>$record['inventory'],
 						'goods_code'=>$record['goods_code'],
 						'color'=>$record['z_index'] == 1?"":" text-danger",

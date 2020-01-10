@@ -5,7 +5,14 @@
 	<td><?php echo $this->record['classify_id']; ?></td>
 	<td><?php echo $this->record['unit']; ?></td>
     <?php if (Yii::app()->user->validFunction('YN02')): ?>
-	<td><?php echo $this->record['price']; ?></td>
+	<td>
+        <span style="margin-right: 10px;">
+        <?php echo $this->record['price']; ?>
+        </span>
+        <?php echo TbHtml::button(Yii::t('procurement','price history'), array(
+            'data-id'=>$this->record['id'],'class'=>'clickPriceBtn'));
+        ?>
+    </td>
     <?php endif ?>
 	<td>
         <?php echo $this->record['inventory']; ?>

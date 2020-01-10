@@ -3,7 +3,7 @@ $this->pageTitle=Yii::app()->name . ' - Cargo Cost List';
 ?>
 
 <?php $form=$this->beginWidget('TbActiveForm', array(
-'id'=>'cargoCost-list',
+'id'=>'cargoCostUser-list',
 'enableClientValidation'=>true,
 'clientOptions'=>array('validateOnSubmit'=>true,),
 'layout'=>TbHtml::FORM_LAYOUT_INLINE,
@@ -11,7 +11,7 @@ $this->pageTitle=Yii::app()->name . ' - Cargo Cost List';
 
 <section class="content-header">
 	<h1>
-		<strong><?php echo Yii::t('app','Technician cargo cost'); ?></strong>
+		<strong><?php echo Yii::t('app','Technician cargo cost') ?></strong>
 	</h1>
 <!--
 	<ol class="breadcrumb">
@@ -23,25 +23,26 @@ $this->pageTitle=Yii::app()->name . ' - Cargo Cost List';
 </section>
 
 <section class="content">
+    <div class="box">
+        <div class="box-body">
+            <div class="btn-group" role="group">
+                <?php echo TbHtml::button('<span class="fa fa-reply"></span> '.Yii::t('misc','Back'), array(
+                    'submit'=>Yii::app()->createUrl('cargoCost/index')));
+                ?>
+            </div>
+        </div>
+    </div>
 	<?php
-    $search_add_html="";
-    if(!Yii::app()->user->isSingleCity()){
-        $search_add_html .= TbHtml::dropDownList('CargoCostList[city]',$model->city,$model->getCityAllList(),
-            array("class"=>"form-control","id"=>"change_city"))."<span style='display:inline-block;width:20px;'>&nbsp;</span>";
-    }
-    $search_add_html .= TbHtml::dropDownList('CargoCostList[year]',$model->year,$model->getYearList(),
-            array("class"=>"form-control"))."<span style='display:inline-block;width:20px;'>&nbsp;</span>";
-    $search_add_html .= TbHtml::dropDownList('CargoCostList[month]',$model->month,$model->getMonthList(),
-            array("class"=>"form-control"))."<span style='display:inline-block;width:20px;'>&nbsp;</span>";
     $this->widget('ext.layout.ListPageWidget', array(
-        'title'=>Yii::t('procurement','Technician Order List'),
+        'title'=>Yii::t('procurement','Order List')." - ".$model->getWebHeadTitle(),
         'model'=>$model,
-        'viewhdr'=>'//cargoCost/_listhdr',
-        'viewdtl'=>'//cargoCost/_listdtl',
-        'search_add_html'=>$search_add_html,
+        'viewhdr'=>'//cargoCostUser/_listhdr',
+        'viewdtl'=>'//cargoCostUser/_listdtl',
         'search'=>array(
-            'city',
+            'order_code',
             'lcu',
+            'goods_name',
+            'status',
         ),
 	));
 	?>

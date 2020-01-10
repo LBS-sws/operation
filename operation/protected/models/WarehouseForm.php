@@ -98,7 +98,7 @@ class WarehouseForm extends CFormModel
 
 	public function retrieveData($index) {
 		$city = Yii::app()->user->city();
-		$rows = Yii::app()->db->createCommand()->select("*")
+		$rows = Yii::app()->db->createCommand()->select("*,costPrice(id,now()) as cost_price")
             ->from("opr_warehouse")->where("id=:id and city=:city",array(":id"=>$index,':city'=>$city))->queryAll();
 		if (count($rows) > 0) {
 			foreach ($rows as $row) {
@@ -110,7 +110,7 @@ class WarehouseForm extends CFormModel
                 $this->inventory = $row['inventory'];
                 $this->costing = sprintf("%.2f",$row['costing']);
                 $this->decimal_num = empty($row['decimal_num'])?"否":$row['decimal_num'];
-                $this->price = $this->getPriceToIdAndDate($row["id"]);
+                $this->price = $row['cost_price'];
                 $this->min_num = $row['min_num'];
                 break;
 			}

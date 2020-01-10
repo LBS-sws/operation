@@ -254,8 +254,9 @@ return array(
     //2020-01-04
     'Import Price'=>'导入物品单价',
     'price history'=>'价格历史',
-    'Cargo Cost'=>'成本总价',
+    'Cargo Cost'=>'领料总金额',
     'Goods Cost'=>'货品成本',
     'Sum Cargo Cost'=>'领货金额',
+    'Technician Order List'=>'技术员领货总览列表',
 );
 ?>

@@ -87,6 +87,8 @@ if (Yii::app()->user->validFunction('YN02')){
 $this->renderPartial('//site/goodsHistory',array(
         'model'=>$model)
 );
+if (Yii::app()->user->validFunction('YN02'))
+    $this->renderPartial('//site/priceFlow');
 ?>
 <?php
 $js='

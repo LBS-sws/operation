@@ -1,6 +1,6 @@
 <?php
 
-class CargoCostController extends Controller
+class CargoCostUserController extends Controller
 {
 	public $function_id='YD07';
 
@@ -24,7 +24,7 @@ class CargoCostController extends Controller
         return array(
             array('allow',
                 'actions'=>array('index','view'),
-                'expression'=>array('CargoCostController','allowReadOnly'),
+                'expression'=>array('CargoCostUserController','allowReadOnly'),
             ),
             array('deny',  // deny all users
                 'users'=>array('*'),
@@ -39,18 +39,19 @@ class CargoCostController extends Controller
     public static function allowReadOnly() {
         return Yii::app()->user->validFunction('YD07');
     }
-	public function actionIndex($pageNum=0) 
+	public function actionIndex($pageNum=0,$username='',$month='',$year='')
 	{
-		$model = new CargoCostList;
-		if (isset($_POST['CargoCostList'])) {
-			$model->attributes = $_POST['CargoCostList'];
+		$model = new CargoCostUserList;
+		if (isset($_POST['CargoCostUserList'])) {
+			$model->attributes = $_POST['CargoCostUserList'];
 		} else {
 			$session = Yii::app()->session;
-			if (isset($session['cargoCost_ya01']) && !empty($session['cargoCost_ya01'])) {
-				$criteria = $session['cargoCost_ya01'];
+			if (isset($session['cargoCostUser_ya01']) && !empty($session['cargoCostUser_ya01'])) {
+				$criteria = $session['cargoCostUser_ya01'];
 				$model->setCriteria($criteria);
 			}
 		}
+        $model->setProSession($username,$year,$month);
 		$model->determinePageNum($pageNum);
 		$model->retrieveDataByPage($model->pageNum);
 		$this->render('index',array('model'=>$model));
@@ -58,12 +59,11 @@ class CargoCostController extends Controller
 
     public function actionView($index)
     {
-        $model = new CargoCostForm('view');
+        $model = new CargoCostUserForm('view');
         if (!$model->retrieveData($index)) {
             throw new CHttpException(404,'The requested page does not exist.');
         } else {
             $this->render('form',array('model'=>$model,));
         }
     }
-
 }

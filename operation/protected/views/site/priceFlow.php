@@ -29,6 +29,8 @@ $this->endWidget();
 
 <script>
     function printPriceTable(id) {
+        $('#priceFlow').modal('show');
+        $("#tblPriceFlow>tbody").html('<span>加载中....</span>');
         if(id==undefined||id==null){
             id = 0;
         }
@@ -51,4 +53,11 @@ $this->endWidget();
             }
         });
     }
+    $(function () {
+        $(".clickPriceBtn").on("click",function (e) {
+            var id = $(this).data("id");
+            printPriceTable(id);
+            e.stopPropagation();
+        })
+    })
 </script>

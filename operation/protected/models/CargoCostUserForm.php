@@ -1,6 +1,6 @@
 <?php
 
-class CargoCostForm extends CFormModel
+class CargoCostUserForm extends CFormModel
 {
 	public $id;
 	public $order_user;
@@ -24,7 +24,6 @@ class CargoCostForm extends CFormModel
 	//批量處理的訂單
     public $orderList;
     public $checkBoxDown;
-    public $total_price=0;
 
 
     public function attributeLabels()
@@ -58,7 +57,6 @@ class CargoCostForm extends CFormModel
                 //$this->technician = $row['technician'];
                 $this->status = $row['status'];
                 $this->remark = $row['remark'];
-                $this->total_price = $row['total_price'];
                 $this->lcu = OrderGoods::getNameToUsername($row['lcu']);
                 $this->ject_remark = $row['ject_remark'];
                 $this->lcd = date("Y-m-d",strtotime($row['lcd']));
@@ -70,7 +68,8 @@ class CargoCostForm extends CFormModel
 	}
 
 	public function printTable(){
-        $html = '';
+        $html = '<tbody>';
+        $total_price = 0;
         $rows = $rs = Yii::app()->db->createCommand()->select("costPrice(b.id,a.lcd) as cost_price,b.id as warehouse_id,a.lcd,b.name,b.inventory,b.goods_code,b.classify_id,b.unit,a.goods_num,a.confirm_num,a.id,a.goods_id,a.remark,a.note")
             ->from("opr_order_goods a")
             ->leftJoin("opr_warehouse b","a.goods_id = b.id")
@@ -80,19 +79,19 @@ class CargoCostForm extends CFormModel
             foreach ($rows as $row){//warehouse_id
                 $num = ($row["confirm_num"]===""||$row["confirm_num"]===null)?floatval($row["goods_num"]):floatval($row["confirm_num"]);
                 $price = empty($row["confirm_num"])?0:$row["confirm_num"];
+                $total_price+=$price*$num;
                 $html.="<tr>";
                 $html.="<td>".$row["goods_code"]."</td>";
                 $html.="<td>".$row["name"]."</td>";
                 $html.="<td>".$row["unit"]."</td>";
-                $html.="<td><span style='margin-right: 10px;'>".sprintf("%.2f",$price)."</span>";
-                $html.=TbHtml::button(Yii::t('procurement','price history'), array(
-                    'onclick'=>"printPriceTable(".$row["warehouse_id"].")",'data-toggle'=>'modal','data-target'=>'#priceFlow'));
-                $html.="</td>";
+                $html.="<td>".sprintf("%.2f",$price)."</td>";
                 $html.="<td>".$row["confirm_num"]."</td>";
                 $html.="<td>".sprintf("%.2f",$price*$num)."</td>";
                 $html.="</tr>";
             }
         }
+        $total_price = sprintf("%.2f",$total_price);
+        $html.="</body><tfoot><tr><td colspan='5' style='text-align: right'><b>".Yii::t('procurement','Cargo Cost')."</b></td><td><b>$total_price</b></td></tr></tfoot>";
         return $html;
     }
 }

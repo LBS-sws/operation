@@ -11,6 +11,7 @@ class WarehouseList extends CListPageModel
 			'inventory'=>Yii::t('procurement','Inventory'),
 			'min_num'=>Yii::t('procurement','min inventory'),
 			'price'=>Yii::t('procurement','Price（RMB）'),
+			'cost_price'=>Yii::t('procurement','price history'),
             'classify_id'=>Yii::t('procurement','Classify'),
 		);
 	}
@@ -18,7 +19,7 @@ class WarehouseList extends CListPageModel
 	public function retrieveDataByPage($pageNum=1)
 	{
 		$city = Yii::app()->user->city();
-		$sql1 = "select *,costPrice(id,now()) as cost_price 
+		$sql1 = "select *,ifnull(costPrice(id,now()),0) as cost_price 
 				from opr_warehouse
 				where city = '$city' 
 			";

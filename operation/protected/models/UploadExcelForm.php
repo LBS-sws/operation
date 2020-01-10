@@ -240,7 +240,7 @@ class UploadExcelForm extends CFormModel
                         ->where("goods_code=:goods_code", array(':goods_code'=>$arr["goods_code"]))->queryRow();
                     if($row){
                         if($row['name']!=$arr["name"]){
-                            $this->error_list[] = array('key'=>$key,'value'=>"物品编号和物品名稱不一致");
+                            $this->error_list[] = array('key'=>$key,'value'=>"物品编号和物品名稱不一致(".$arr['name']." != ".$row['name'].")");
                             return false;
                         }else{
                             $arrList["warehouse_id"] = $row["id"];

@@ -22,7 +22,12 @@
     </th>
     <?php if (Yii::app()->user->validFunction('YN02')): ?>
     <th>
-        <?php echo TbHtml::link($this->getLabelName('price').$this->drawOrderArrow('price'),'#',$this->createOrderLink('warehouse-list','price'))
+        <?php echo TbHtml::link($this->getLabelName('price').$this->drawOrderArrow('cost_price'),'#',$this->createOrderLink('warehouse-list','cost_price'))
+        ;
+        ?>
+    </th>
+    <th>
+        <?php echo TbHtml::link($this->getLabelName('cost_price').$this->drawOrderArrow('cost_price'),'#',$this->createOrderLink('warehouse-list','cost_price'))
         ;
         ?>
     </th>

@@ -6,9 +6,9 @@
 	<td><?php echo $this->record['unit']; ?></td>
     <?php if (Yii::app()->user->validFunction('YN02')): ?>
 	<td>
-        <span style="margin-right: 10px;">
         <?php echo $this->record['price']; ?>
-        </span>
+    </td>
+	<td>
         <?php echo TbHtml::button(Yii::t('procurement','price history'), array(
             'data-id'=>$this->record['id'],'class'=>'clickPriceBtn'));
         ?>

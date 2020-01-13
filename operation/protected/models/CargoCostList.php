@@ -22,7 +22,10 @@ class CargoCostList extends CListPageModel
 
     public function retrieveDataByPage($pageNum=1)
     {
-        $this->year = (empty($this->year)||!is_numeric($this->year))?date("Y"):$this->year;
+        if(empty($this->year)||!is_numeric($this->year)){
+            $this->year = date("Y", strtotime("-1 month"));
+            $this->month = date("m", strtotime("-1 month"));
+        }
         //$this->month = (empty($this->month)||!is_numeric($this->month))?date("m"):$this->month;
         //,ifnull(SUM(costPrice(b.goods_id,a.lcd)*CONVERT(b.confirm_num,DECIMAL)),0) as total_min
         $suffix =  Yii::app()->params['envSuffix'];
@@ -32,13 +35,13 @@ class CargoCostList extends CListPageModel
 				from opr_order_goods d 
 				LEFT JOIN opr_order a ON a.id=d.order_id 
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
-				LEFT JOIN security$suffix.sec_city c ON b.city=c.code 
+				LEFT JOIN security$suffix.sec_city c ON a.city=c.code 
 				where (b.city in ($city_allow) AND a.judge=0 AND a.status IN ('approve','finished')) 
 			";
         $sql2 = "select b.username  
 				from opr_order a 
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
-				LEFT JOIN security$suffix.sec_city c ON b.city=c.code 
+				LEFT JOIN security$suffix.sec_city c ON a.city=c.code 
 				where (b.city in ($city_allow) AND a.judge=0 AND a.status IN ('approve','finished')) 
 			";
         $clause = "";

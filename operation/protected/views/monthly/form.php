@@ -229,7 +229,8 @@ function roundNumber(num, scale) {
 			$('#MonthlyForm_record_7_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_1_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_2_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_3_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_4_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_5_datavalue').value)).toFixed(2));
 			var total = parseFloat(document.getElementById('MonthlyForm_record_7_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_12_datavalue').value);
 			var renaud = ($('#MonthlyForm_record_14_datavalue').length!==0) ? parseFloat(document.getElementById('MonthlyForm_record_14_datavalue').value) : 0;
-			var paper = parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) - renaud;
+//			var paper = parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) - renaud;
+			var paper = parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) + renaud;
 			$('#MonthlyForm_record_8_datavalue').val(roundNumber((total * 8.5 / 100),2));
 			$('#MonthlyForm_record_9_datavalue').val(roundNumber((paper * 3.5 / 100),2));
 			$('#MonthlyForm_record_10_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_8_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_9_datavalue').value)).toFixed(2));

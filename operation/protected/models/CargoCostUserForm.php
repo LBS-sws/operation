@@ -78,7 +78,7 @@ class CargoCostUserForm extends CFormModel
         if($rows){
             foreach ($rows as $row){//warehouse_id
                 $num = ($row["confirm_num"]===""||$row["confirm_num"]===null)?floatval($row["goods_num"]):floatval($row["confirm_num"]);
-                $price = empty($row["confirm_num"])?0:$row["confirm_num"];
+                $price = empty($row["cost_price"])?0:$row["cost_price"];
                 $total_price+=$price*$num;
                 $html.="<tr>";
                 $html.="<td>".$row["goods_code"]."</td>";

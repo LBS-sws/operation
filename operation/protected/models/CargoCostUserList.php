@@ -230,7 +230,7 @@ class CargoCostUserList extends CListPageModel
         $criteria = array(
             "username"=>empty($username)?$cargoList["username"]:$username,
             "year"=>empty($year)?$cargoList["year"]:$year,
-            "month"=>$month
+            "month"=>$month === 'null'?$cargoList["month"]:$month
         );
         $this->year = $criteria['year'];
         $this->username = $criteria['username'];

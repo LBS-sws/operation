@@ -39,7 +39,7 @@ class CargoCostUserController extends Controller
     public static function allowReadOnly() {
         return Yii::app()->user->validFunction('YD07');
     }
-	public function actionIndex($pageNum=0,$username='',$month='',$year='')
+	public function actionIndex($pageNum=0,$username='',$month='null',$year='')
 	{
 		$model = new CargoCostUserList;
 		if (isset($_POST['CargoCostUserList'])) {

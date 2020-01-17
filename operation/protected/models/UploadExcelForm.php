@@ -237,16 +237,30 @@ class UploadExcelForm extends CFormModel
                 }else{
                     $arr[$item["sqlName"]] =$list[$item['column']];
                     $row = Yii::app()->db->createCommand()->select("id,goods_code,id,name")->from("opr_warehouse")
-                        ->where("goods_code=:goods_code and city=:city", array(':goods_code'=>$arr["goods_code"],":city"=>Yii::app()->user->city()))->queryRow();
+                        ->where("goods_code=:goods_code and city=:city", array(':goods_code'=>$arr["goods_code"],":city"=>Yii::app()->user->city()))->queryAll();
                     if($row){
-                        if($row['name']!=$arr["name"]){
+/*                        if($row['name']!=$arr["name"]){
                             $this->error_list[] = array('key'=>$key,'value'=>"物品编号和物品名稱不一致(".$arr['name']." != ".$row['name'].")，物品id:".$row['id']);
                             return false;
                         }else{
                             $arrList["warehouse_id"] = $row["id"];
+                        }*/
+                        $name_bool = true; //考慮到物品編號可能會重複，所以循環驗證
+                        foreach ($row as $name_item){
+                            if($name_item['name']!=$arr["name"]){
+                                $name_bool = false;
+                            }else{
+                                $name_bool = true;
+                                $arrList["warehouse_id"] = $name_item["id"];
+                                break;
+                            }
+                        }
+                        if(!$name_bool){
+                            $this->error_list[] = array('key'=>$key,'value'=>"物品编号和物品名稱不一致(".$arr['name']." != ".$name_item['name'].")，物品id:".$name_item['id']);
+                            return false;
                         }
                     }else{
-                        $this->error_list[] = array('key'=>$key,'value'=>"物品编号不存在");
+                        $this->error_list[] = array('key'=>$key,'value'=>"物品编号不存在（".$arr["goods_code"]."）");
                         return false;
                     }
                 }

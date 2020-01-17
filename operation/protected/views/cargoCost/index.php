@@ -34,7 +34,7 @@ $this->pageTitle=Yii::app()->name . ' - Cargo Cost List';
     $search_add_html .= TbHtml::dropDownList('CargoCostList[month]',$model->month,$model->getMonthList(),
             array("class"=>"form-control"))."<span style='display:inline-block;width:20px;'>&nbsp;</span>";
     $this->widget('ext.layout.ListPageWidget', array(
-        'title'=>Yii::t('procurement','Technician Order List'),
+        'title'=>Yii::t('procurement','Technician Order List')." - ".Yii::t('procurement','total price')."：".$model->total_price,
         'model'=>$model,
         'viewhdr'=>'//cargoCost/_listhdr',
         'viewdtl'=>'//cargoCost/_listdtl',

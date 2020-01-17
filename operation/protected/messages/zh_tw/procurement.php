@@ -257,5 +257,6 @@ return array(
     'Goods Cost'=>'貨品成本',
     'Sum Cargo Cost'=>'領貨金額',
     'Technician Order List'=>'技術員領貨總覽列表',
+    'total price'=>'總金額',
 );
 ?>

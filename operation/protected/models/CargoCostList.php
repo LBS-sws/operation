@@ -5,6 +5,7 @@ class CargoCostList extends CListPageModel
     public $year;//年份
     public $month;//月份
     public $city;//查詢的城市
+    public $total_price;//總額
     public function attributeLabels()
     {
         return array(
@@ -40,6 +41,13 @@ class CargoCostList extends CListPageModel
 			";
         $sql2 = "select b.username  
 				from opr_order a 
+				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
+				LEFT JOIN security$suffix.sec_city c ON a.city=c.code 
+				where (b.city in ($city_allow) AND a.judge=0 AND a.status IN ('approve','finished')) 
+			";
+        $sql3 = "select ifnull(SUM(costPrice(d.goods_id,a.lcd)*CONVERT(d.confirm_num,DECIMAL)),0) as total_price
+				from opr_order_goods d 
+				LEFT JOIN opr_order a ON a.id=d.order_id 
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
 				LEFT JOIN security$suffix.sec_city c ON a.city=c.code 
 				where (b.city in ($city_allow) AND a.judge=0 AND a.status IN ('approve','finished')) 
@@ -80,6 +88,7 @@ class CargoCostList extends CListPageModel
 
         $sql = "select count(*) from ($sql2 $clause GROUP BY b.username) ttt";
         $this->totalRow = Yii::app()->db->createCommand($sql)->queryScalar();
+        $this->total_price = Yii::app()->db->createCommand($sql3.$clause)->queryScalar();
 
         $sql = $sql1.$clause." GROUP BY b.username,b.disp_name,c.name".$order;
         $sql = $this->sqlWithPageCriteria($sql, $this->pageNum);

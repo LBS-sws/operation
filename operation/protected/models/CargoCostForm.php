@@ -71,7 +71,7 @@ class CargoCostForm extends CFormModel
 
 	public function printTable(){
         $html = '';
-        $rows = $rs = Yii::app()->db->createCommand()->select("costPrice(b.id,a.lcd) as cost_price,b.id as warehouse_id,a.lcd,b.name,b.inventory,b.goods_code,b.classify_id,b.unit,a.goods_num,a.confirm_num,a.id,a.goods_id,a.remark,a.note")
+        $rows = $rs = Yii::app()->db->createCommand()->select("costPrice(b.id,a.lud) as cost_price,b.id as warehouse_id,a.lcd,b.name,b.inventory,b.goods_code,b.classify_id,b.unit,a.goods_num,a.confirm_num,a.id,a.goods_id,a.remark,a.note")
             ->from("opr_order_goods a")
             ->leftJoin("opr_warehouse b","a.goods_id = b.id")
             ->where('a.order_id=:order_id',array(':order_id'=>$this->id))->queryAll();

@@ -136,6 +136,8 @@ class OrderController extends Controller
 
 	public function actionView($index)
 	{
+        $this->function_id = 'YD03';
+        Yii::app()->session['active_func'] = $this->function_id;
 		$model = new OrderForm('view');
 		if (!$model->retrieveData($index)) {
 			throw new CHttpException(404,'The requested page does not exist.');
@@ -146,6 +148,8 @@ class OrderController extends Controller
 
     public function actionNew($index)
     {
+        $this->function_id = 'YD04';
+        Yii::app()->session['active_func'] = $this->function_id;
         $model = new OrderForm('new');
         $model->activity_id = $index;
         if ($model->validateLogin()){
@@ -157,6 +161,8 @@ class OrderController extends Controller
 
 	public function actionEdit($index)
 	{
+        $this->function_id = 'YD03';
+        Yii::app()->session['active_func'] = $this->function_id;
 		$model = new OrderForm('edit');
 		if (!$model->retrieveData($index)) {
 			throw new CHttpException(404,'The requested page does not exist.');

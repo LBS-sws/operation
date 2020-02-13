@@ -26,6 +26,11 @@
         ?>
     </th>
     <th>
+        <?php echo TbHtml::link($this->getLabelName('price_two').$this->drawOrderArrow('price_two'),'#',$this->createOrderLink('goodsim-list','price_two'))
+        ;
+        ?>
+    </th>
+    <th>
         <?php echo TbHtml::link($this->getLabelName('net_weight').$this->drawOrderArrow('net_weight'),'#',$this->createOrderLink('goodsim-list','net_weight'))
         ;
         ?>

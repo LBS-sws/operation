@@ -258,5 +258,18 @@ return array(
     'Sum Cargo Cost'=>'領貨金額',
     'Technician Order List'=>'技術員領貨總覽列表',
     'total price'=>'總金額',
+
+    //2020-02-11
+    'Price City List'=>'城市列表',
+    'Price City Form'=>'價格分配表單',
+    'price type'=>'價格分配類別',
+    'price one'=>'價格1',
+    'price two'=>'價格2',
+    'inspection'=>'商檢',
+    'customs code'=>'海關編號',
+    'customs name'=>'海關名字',
+    'Batch No.'=>'批次號碼',
+    'Goods Customs'=>'物品海關',
+    'Save Customs'=>'保存海關物品',
 );
 ?>

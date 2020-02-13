@@ -65,7 +65,7 @@ class PurchaseView extends CFormModel
 	    $html = "";
 	    switch ($str){
             case "price_class":
-                $goodsClass = $this->getGoodsToActivityId($this->id);
+                $goodsClass = $this->getGoodsToActivityIdOnlyPrice($this->id);
                 $html="<p>&nbsp;</p>";
                 foreach ($goodsClass as $key => $list){
                     $classifyName = ClassifyForm::getClassifyToId($key);
@@ -73,33 +73,51 @@ class PurchaseView extends CFormModel
                     $sum = 0;
                     $exSum = 0;
                     $unit = 'US$';
-                    if($this->order_class == "Document"){
+                    if($this->order_class == "Domestic"){
                         $unit = "RMB";
                     }
-                    $html.="<table class='table table-bordered table-striped'><thead><tr>
-                            <th>".Yii::t("procurement","Goods Code")."</th>
-                            <th>".Yii::t("procurement","Goods Name")."</th>
-                            <th>".Yii::t("procurement",'Price（'.$unit.'）')."</th>
-                            <th>".Yii::t("procurement","Goods Number")."</th>
-                            <th>".Yii::t("procurement","Confirm Number")."</th>
-                            <th>".Yii::t("procurement",'expected to price（'.$unit.'）')."</th>
-                            <th>".Yii::t("procurement",'Total（'.$unit.'）')."</th>
-                            </tr></thead><tbody>";
-                    foreach ($list as $goods){
-                        //sprintf(".2%",$aaa);
-                        $sum+=floatval($goods["price"])*intval($goods["confirm_num"]);
-                        $exSum+=intval($goods["goods_num"])*floatval($goods["price"]);
-                        $html.="<tr>
-                        <td>".$goods["goods_code"]."</td>
-                        <td>".$goods["name"]."</td>
-                        <td>".sprintf("%.2f",$goods["price"])."</td>
-                        <td>".$goods["goods_num"]."</td>
-                        <td>".$goods["confirm_num"]."</td>
-                        <td>".sprintf("%.2f",intval($goods["goods_num"])*floatval($goods["price"]))."</td>
-                        <td>".sprintf("%.2f",floatval($goods["price"])*intval($goods["confirm_num"]))."</td>
-                        </tr>";
+                    $html.="<table class='table table-bordered'><thead><tr>";
+                    $html.="<th>".Yii::t("procurement","Goods Code")."</th>";
+                    $html.="<th>".Yii::t("procurement","Goods Name")."</th>";
+                    if($this->order_class != "Domestic"){
+                        $html.="<th>".Yii::t("procurement","customs code")."</th>";
+                        $html.="<th>".Yii::t("procurement","customs name")."</th>";
+                        $html.="<th>".Yii::t("procurement","inspection")."</th>";
                     }
-                    $html.="</tbody><tfoot><tr><td colspan='5'></td><td class='fa-2x'>".sprintf("%.2f",$exSum)."</td><td class='fa-2x'>".sprintf("%.2f",$sum)."</td></tr></tfoot></table>";
+                    $html.="<th>".Yii::t("procurement",'Price（'.$unit.'）')."</th>";
+                    $html.="<th>".Yii::t("procurement","Goods Number")."</th>";
+                    $html.="<th>".Yii::t("procurement","Confirm Number")."</th>";
+                    $html.="<th>".Yii::t("procurement",'expected to price（'.$unit.'）')."</th>";
+                    $html.="<th>".Yii::t("procurement",'Total（'.$unit.'）')."</th>";
+                    $html.="</tr></thead><tbody>";
+                    foreach ($list as $goods_price){
+                        $num = 0;
+                        $count = count($goods_price);
+                        foreach ($goods_price as $goods){
+                            //sprintf(".2%",$aaa);
+                            $sum+=floatval($goods["price"])*intval($goods["confirm_num"]);
+                            $exSum+=intval($goods["goods_num"])*floatval($goods["price"]);
+                            $html.="<tr>";
+                            if($num == 0){
+                                $html.="<td rowspan='$count' style='vertical-align: middle'>".$goods["goods_code"]."</td>";
+                                $html.="<td rowspan='$count' style='vertical-align: middle'>".$goods["name"]."</td>";
+                                if($this->order_class != "Domestic"){
+                                    $html.="<td rowspan='$count' style='vertical-align: middle'>".$goods["customs_code"]."</td>";
+                                    $html.="<td rowspan='$count' style='vertical-align: middle'>".$goods["customs_name"]."</td>";
+                                    $html.="<td rowspan='$count' style='vertical-align: middle'>".$goods["inspection"]."</td>";
+                                }
+                            }
+                            $html.="<td>".sprintf("%.2f",$goods["price"])."</td>";
+                            $html.="<td>".$goods["goods_num"]."</td>";
+                            $html.="<td>".$goods["confirm_num"]."</td>";
+                            $html.="<td>".sprintf("%.2f",intval($goods["goods_num"])*floatval($goods["price"]))."</td>";
+                            $html.="<td>".sprintf("%.2f",floatval($goods["price"])*intval($goods["confirm_num"]))."</td>";
+                            $html.="</tr>";
+                            $num++;
+                        }
+                    }
+                    $colspan = $this->order_class != "Domestic"?8:5;
+                    $html.="</tbody><tfoot><tr><td colspan='$colspan'></td><td class='fa-2x'>".sprintf("%.2f",$exSum)."</td><td class='fa-2x'>".sprintf("%.2f",$sum)."</td></tr></tfoot></table>";
                 }
                 //$html.="<h3>&nbsp;</h3>";
                 break;
@@ -188,11 +206,12 @@ class PurchaseView extends CFormModel
 
 	public function getGoodsToActivityId($activity_id){
         $arr=array();
-        $rows = Yii::app()->db->createCommand()->select("c.goods_id as id,b.order_class as goods_class,c.goods_num,c.confirm_num")
-            ->from("opr_order b,opr_order_goods c")
-            ->where('b.id = c.order_id AND b.activity_id = :activity_id AND b.status_type=1 AND b.judge=1 AND b.status != "pending" AND b.status != "cancelled"',
+        $rows = Yii::app()->db->createCommand()->select("b.city,c.goods_id as id,b.order_class as goods_class,c.goods_num,c.confirm_num")
+            ->from("opr_order_goods c")
+            ->leftJoin("opr_order b","b.id = c.order_id")
+            ->where('b.activity_id = :activity_id AND b.status_type=1 AND b.judge=1 AND b.status != "pending" AND b.status != "cancelled"',
                 array(':activity_id'=>$activity_id))
-            //->leftJoin("opr_goods d","c.goods_id = d.id")
+            ->order("b.city desc")
             ->queryAll();
         // AND c.goods_id = d.id
         if($rows){
@@ -222,6 +241,52 @@ class PurchaseView extends CFormModel
                 }
                 $arr[$goods["classify_id"]][$row["id"]]["goods_num"]+=intval($row["goods_num"]);
                 $arr[$goods["classify_id"]][$row["id"]]["confirm_num"]+=intval($row["confirm_num"]);
+            }
+        }
+        return $arr;
+    }
+
+	private function getGoodsToActivityIdOnlyPrice($activity_id){
+	    $city = '';
+        $arr=array();
+        $rows = Yii::app()->db->createCommand()->select("b.city,c.goods_id as id,b.order_class as goods_class,c.goods_num,c.confirm_num")
+            ->from("opr_order_goods c")
+            ->leftJoin("opr_order b","b.id = c.order_id")
+            ->where('b.activity_id = :activity_id AND b.status_type=1 AND b.judge=1 AND b.status != "pending" AND b.status != "cancelled"',
+                array(':activity_id'=>$activity_id))
+            ->order("b.city desc")
+            ->queryAll();
+        // AND c.goods_id = d.id
+        if($rows){
+            $price_type = 1;//单价1
+            foreach ($rows as $row){
+                if((empty($city)||$city!=$row["city"])&&$row["goods_class"]=="Import"){
+                    $price_type = Yii::app()->db->createCommand()->select("price_type")->from("opr_city_price")
+                        ->where("city=:city",array(":city"=>$row["city"]))->queryScalar();
+                    $city = $row["city"];
+                    $price_type = $price_type == 2?2:1;
+                }
+
+                $goods=OrderForm::getOneGoodsToId($row["id"],$row["goods_class"]);//$row["id"]
+                if(empty($arr[$goods["classify_id"]][$row["id"]][$price_type])){
+                    $goods_list = array(
+                        "goods_code"=>$goods["goods_code"],
+                        "price"=>$price_type == 2?$goods["price_two"]:$goods["price"],
+                        "price_type"=>$price_type,
+                        "name"=>$goods["name"],
+                        "unit"=>$goods["unit"],
+                        "goods_num"=>0,
+                        "confirm_num"=>0,
+                    );
+                    if($row["goods_class"]=="Import"){
+                        $goods_list["customs_code"] = $goods["customs_code"];
+                        $goods_list["customs_name"] = $goods["customs_name"];
+                        $goods_list["inspection"] = $goods["inspection"];
+                    }
+                    $arr[$goods["classify_id"]][$row["id"]][$price_type] = $goods_list;
+                }
+                $arr[$goods["classify_id"]][$row["id"]][$price_type]["goods_num"]+=intval($row["goods_num"]);
+                $arr[$goods["classify_id"]][$row["id"]][$price_type]["confirm_num"]+=intval($row["confirm_num"]);
             }
         }
         return $arr;

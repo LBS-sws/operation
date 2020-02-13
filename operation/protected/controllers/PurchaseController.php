@@ -23,7 +23,7 @@ class PurchaseController extends Controller
     {
         return array(
             array('allow',
-                'actions'=>array('audit','edit','save','backward','reject','notice'),
+                'actions'=>array('audit','edit','save','backward','reject','notice','customs'),
                 'expression'=>array('PurchaseController','allowReadWrite'),
             ),
             array('allow',
@@ -190,6 +190,20 @@ class PurchaseController extends Controller
                 Dialog::message(Yii::t('dialog','Information'), Yii::t('procurement','Backward Done'));
             }else{
                 Dialog::message(Yii::t('dialog','Validation Message'), Yii::t('procurement','Backward Error'));
+            }
+            $model->scenario = "edit";
+            $this->redirect(Yii::app()->createUrl('purchase/edit',array('index'=>$model->id)));
+        }
+    }
+
+    public function actionCustoms()
+    {
+        if (isset($_POST['customs'])) {
+            $model = new PurchaseForm("customs");
+            if($model->saveCustoms($_POST['customs'])){
+                Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
+            }else{
+                Dialog::message(Yii::t('dialog','Validation Message'), '保存失败');
             }
             $model->scenario = "edit";
             $this->redirect(Yii::app()->createUrl('purchase/edit',array('index'=>$model->id)));

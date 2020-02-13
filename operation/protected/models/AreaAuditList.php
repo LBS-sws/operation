@@ -24,11 +24,11 @@ class AreaAuditList extends CListPageModel
         $userName = Yii::app()->user->name;
         $sql1 = "select *
 				from opr_order
-				where (city = '$city' AND judge=1 AND status != 'pending' AND status != 'cancelled' AND status != 'finished') 
+				where (city = '$city' AND judge=1 AND status != 'pending' AND status != 'cancelled' AND status != 'finished' AND status != 'approve') 
 			";
         $sql2 = "select count(id)
 				from opr_order
-				where (city = '$city' AND judge=1 AND status != 'pending' AND status != 'cancelled' AND status != 'finished') 
+				where (city = '$city' AND judge=1 AND status != 'pending' AND status != 'cancelled' AND status != 'finished' AND status != 'approve') 
 			";
         $clause = "";
         if (!empty($this->searchField) && !empty($this->searchValue)) {

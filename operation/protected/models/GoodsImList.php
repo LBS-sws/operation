@@ -9,7 +9,8 @@ class GoodsImList extends CListPageModel
 			'name'=>Yii::t('procurement','Name'),
 			'type'=>Yii::t('procurement','Type'),
 			'unit'=>Yii::t('procurement','Unit'),
-			'price'=>Yii::t('procurement','Price（US$）'),
+            'price'=>Yii::t('procurement','price one').'（US$）',
+            'price_two'=>Yii::t('procurement','price two').'（US$）',
 			'stickies_id'=>Yii::t('procurement','Stickies'),
 			'net_weight'=>Yii::t('procurement','Net Weight（kg）'),
 			'gross_weight'=>Yii::t('procurement','Gross Weight（kg）'),
@@ -46,6 +47,9 @@ class GoodsImList extends CListPageModel
 				case 'price':
 					$clause .= General::getSqlConditionClause('price', $svalue);
 					break;
+				case 'price_two':
+					$clause .= General::getSqlConditionClause('price_two', $svalue);
+					break;
 				case 'net_weight':
 					$clause .= General::getSqlConditionClause('net_weight', $svalue);
 					break;
@@ -78,6 +82,7 @@ class GoodsImList extends CListPageModel
 						'type'=>$record['type'],
 						'unit'=>$record['unit'],
 						'price'=>$record['price'],
+						'price_two'=>$record['price_two'],
 						'goods_code'=>$record['goods_code'],
 						'net_weight'=>$record['net_weight'],
 						'gross_weight'=>$record['gross_weight'],

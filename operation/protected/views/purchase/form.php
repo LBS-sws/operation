@@ -10,6 +10,9 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
 'clientOptions'=>array('validateOnSubmit'=>true,),
 'layout'=>TbHtml::FORM_LAYOUT_HORIZONTAL,
 )); ?>
+<style>
+    td{vertical-align: middle !important;}
+</style>
 
 <section class="content-header">
 	<h1>
@@ -45,16 +48,25 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
                 echo TbHtml::button('<span class="fa fa-bullhorn"></span> '.Yii::t('procurement','Notice'), array(
                     'name'=>'btnNotice','id'=>'btnNotice','data-toggle'=>'modal','data-target'=>'#noticedialog'));
             }
-            if($model->status == "approve"){
-                //退回
-                echo TbHtml::button('<span class="fa fa-backward"></span> '.Yii::t('procurement','Back Status'), array(
-                    'submit'=>Yii::app()->createUrl('Purchase/backward')));
+            if(in_array($model->status,array("approve","finished"))&&$model->order_class == "Import"){
+                //保存物品海关
+                echo TbHtml::button('<span class="fa fa-briefcase"></span> '.Yii::t('procurement','Save Customs'), array(
+                    'submit'=>Yii::app()->createUrl('Purchase/customs')));
             }
 			?>
 <?php endif ?>
 	</div>
 
             <div class="btn-group pull-right" role="group">
+                <?php if ($model->scenario!='view'): ?>
+                    <?php
+                    if($model->status == "approve"){
+                        //退回
+                        echo TbHtml::button('<span class="fa fa-backward"></span> '.Yii::t('procurement','Back Status'), array(
+                            'submit'=>Yii::app()->createUrl('Purchase/backward')));
+                    }
+                    ?>
+                <?php endif ?>
                 <?php
                 if ($model->scenario!='new'){
                     if($model->status == "sent" || $model->status == "read") {
@@ -193,6 +205,12 @@ $this->pageTitle=Yii::app()->name . ' - Purchase Form';
                 </div>
             </div>
 
+            <div class="form-group">
+                <?php
+                echo $model->parentTableOnlyOver();
+                ?>
+            </div>
+
             <!--備註-->
             <div class="form-group">
                 <?php echo $form->labelEx($model,'remark',array('class'=>"col-sm-2 control-label")); ?>
@@ -248,6 +266,7 @@ $("body").delegate(".changeHelp","mouseout",function () {
     $(this).find(".content-help").remove();
   });
 goodsTotalPrice();
+$(".date_etd").datepicker({autoclose: true,language: "zh_cn", format: "yyyy/mm/dd"});
 ';
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 ?>

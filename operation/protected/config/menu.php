@@ -165,6 +165,11 @@ return array(
                 'access'=>'YG06',
                 'url'=>'/rules/index',
             ),
+            //城市分配价格
+            'Price To City'=>array(
+                'access'=>'YG07',
+                'url'=>'/PriceCity/index',
+            ),
         ),
     ),
 //	'System Setting'=>array(

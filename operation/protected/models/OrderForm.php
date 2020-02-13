@@ -6,6 +6,7 @@ class OrderForm extends CFormModel
 	public $order_user;
 	//public $technician;
     public $status;
+    public $city;
     public $remark;
 	public $luu;
 	public $lcu;
@@ -61,7 +62,7 @@ class OrderForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, order_code, goods_list, order_user, order_class, activity_id, technician, status, remark, ject_remark, fish_remark, luu, lcu, lud, lcd','safe'),
+			array('id, city, order_code, goods_list, order_user, order_class, activity_id, technician, status, remark, ject_remark, fish_remark, luu, lcu, lud, lcd','safe'),
             array('goods_list','required','on'=>array("new","edit","audit")),
             array('goods_list','validateGoods','on'=>array("new","edit","audit")),
             //array('activity_id','required','on'=>'audit'),
@@ -227,13 +228,13 @@ class OrderForm extends CFormModel
     }
 
     //根據訂單id查訂單所有物品
-    public function getGoodsListToId($order_id){
+    public function getGoodsListToId($order_id,$city=''){
         $arr=array();
         $order_class=Yii::app()->db->createCommand()->select("order_class")->from("opr_order")->where("id=:id",array(":id"=>$order_id))->queryAll();
         $order_class=$order_class[0]["order_class"];
         $rows=Yii::app()->db->createCommand()->select()->from("opr_order_goods")->where("order_id=:order_id",array(":order_id"=>$order_id))->queryAll();
         foreach ($rows as $row){
-            $goods = OrderForm::getOneGoodsToId($row["goods_id"],$order_class);
+            $goods = OrderForm::getOneGoodsToId($row["goods_id"],$order_class,$city);
             $list = array(
                 "id"=>$row["id"],
                 "goods_id"=>$row["goods_id"],
@@ -267,10 +268,15 @@ class OrderForm extends CFormModel
 
 
     //獲取物品列表
-    public function getGoodsList($order_class=0){
+    public function getGoodsList($order_class=0,$city=''){
+        $city = empty($city)?Yii::app()->user->city():$city;
+        $bool = false;
         switch ($order_class){
             case "Import":
                 $from = "opr_goods_im";
+                $row = Yii::app()->db->createCommand()->select("price_type")->from("opr_city_price")
+                    ->where("city=:city",array(":city"=>$city))->queryRow();
+                $bool = ($row && $row["price_type"] == 2)?true:false;
                 break;
             case "Domestic":
                 $from = "opr_goods_do";
@@ -280,11 +286,16 @@ class OrderForm extends CFormModel
                 break;
         }
         $rs = Yii::app()->db->createCommand()->select()->from($from)->queryAll();
+        if($bool){
+            foreach ($rs as &$r){
+                $r["price"]=$r["price_two"];
+            }
+        }
         return $rs;
     }
 
     //獲取單個物品
-    public function getOneGoodsToId($goods_id,$order_class=0){
+    public function getOneGoodsToId($goods_id,$order_class=0,$city=''){
         switch ($order_class){
             case "Import":
                 $from = "opr_goods_im";
@@ -296,9 +307,13 @@ class OrderForm extends CFormModel
                 $from = "opr_goods_fa";
                 break;
         }
-        $rs = Yii::app()->db->createCommand()->select()->from($from)->where("id=:id",array(":id"=>$goods_id))->queryAll();
+        $rs = Yii::app()->db->createCommand()->select()->from($from)->where("id=:id",array(":id"=>$goods_id))->queryRow();
         if($rs){
-            return $rs[0];
+            if($from == "opr_goods_im"&&!empty($city)){ //进口货的价格需要判定
+                $row = Yii::app()->db->createCommand()->select("price_type")->from("opr_city_price")->where("city=:city",array(":city"=>$city))->queryRow();
+                $rs["price"] = ($row && $row["price_type"] == 2)?$rs["price_two"]:$rs["price"];
+            }
+            return $rs;
         }else{
             return array();
         }
@@ -371,7 +386,7 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
                 $this->order_code = $row['order_code'];
                 $this->order_class = $row['order_class'];
                 $this->activity_id = $row['activity_id'];
-                $this->goods_list = $this->getGoodsListToId($row['id']);
+                $this->goods_list = $this->getGoodsListToId($row['id'],$row["city"]);
                 $this->order_user = $row['order_user'];
                 //$this->technician = $row['technician'];
                 $this->status = $row['status'];
@@ -413,9 +428,9 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
             case 'new':
                 $insetBool = true;
                 $sql = "insert into opr_order(
-							order_user, order_class, activity_id, remark, status, lcu, lcd
+							order_user, order_class, city, activity_id, remark, status, lcu, lcd
 						) values (
-							:order_user,:order_class,:activity_id,:remark, :status, :lcu, :lcd
+							:order_user,:order_class,:city,:activity_id,:remark, :status, :lcu, :lcd
 						)";
                 break;
             case 'edit':
@@ -432,9 +447,9 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
                 if(empty($this->id)){
                     $insetBool = true;
                     $sql = "insert into opr_order(
-							order_user, order_class, activity_id, remark, status, lcu, lcd
+							order_user, order_class, activity_id, city, remark, status, lcu, lcd
 						) values (
-							:order_user,:order_class,:activity_id,:remark, :status, :lcu, :lcd
+							:order_user,:order_class,:activity_id,:city,:remark, :status, :lcu, :lcd
 						)";
                 }else{
                     $sql = "update opr_order set
@@ -454,14 +469,14 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
                 $sql = "update opr_order set
 							remark = :remark,
 							fish_remark = :fish_remark,
-							status_type = 0,
+							status_type = 1,
 							luu = :luu,
 							lud = :lud,
 							status = :status
 						where id = :id and judge=1
 						";
                 $goodsBool = false;
-                $oldOrderStatus[0]["status_type"] = 0;
+                $oldOrderStatus[0]["status_type"] = 1;
                 break;
             default:
                 $goodsBool = false;
@@ -497,6 +512,8 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
             $command->bindParam(':fish_remark',$this->fish_remark,PDO::PARAM_STR);
         if (strpos($sql,':lud')!==false)
             $command->bindParam(':lud',date('Y-m-d H:i:s'),PDO::PARAM_STR);
+        if (strpos($sql,':city')!==false)
+            $command->bindParam(':city',$city,PDO::PARAM_STR);
         if (strpos($sql,':luu')!==false)
             $command->bindParam(':luu',$uid,PDO::PARAM_STR);
         if (strpos($sql,':lcu')!==false)

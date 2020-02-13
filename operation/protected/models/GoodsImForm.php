@@ -9,6 +9,7 @@ class GoodsImForm extends CFormModel
 	public $type;
 	public $unit;
 	public $price;
+	public $price_two;
     public $big_num = 99999;
     public $small_num = 1;
     public $multiple = 1;
@@ -19,6 +20,9 @@ class GoodsImForm extends CFormModel
 	public $height;
 	public $net_weight;
 	public $gross_weight;
+	public $inspection;
+	public $customs_code;
+	public $customs_name;
     public $orderClass = "Import";
 
 	public function attributeLabels()
@@ -31,10 +35,14 @@ class GoodsImForm extends CFormModel
             'classify_id'=>Yii::t('procurement','Classify'),
             'type'=>Yii::t('procurement','Type'),
             'unit'=>Yii::t('procurement','Unit'),
-            'price'=>Yii::t('procurement','Price（US$）'),
+            'price'=>Yii::t('procurement','price one').'（US$）',
+            'price_two'=>Yii::t('procurement','price two').'（US$）',
             'big_num'=>Yii::t('procurement','Max Number'),
             'small_num'=>Yii::t('procurement','Min Number'),
             'origin'=>Yii::t('procurement','Origin'),
+            'inspection'=>Yii::t('procurement','inspection'),
+            'customs_code'=>Yii::t('procurement','customs code'),
+            'customs_name'=>Yii::t('procurement','customs name'),
             'net_weight'=>Yii::t('procurement','Net Weight（kg）'),
             'gross_weight'=>Yii::t('procurement','Gross Weight（kg）'),
             'volume'=>Yii::t('procurement','Length×Width×Height（cm）'),
@@ -47,13 +55,14 @@ class GoodsImForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, goods_code, name, classify_id, type, unit, price, rules_id, multiple, big_num, small_num, net_weight, gross_weight, origin, len, width, height','safe'),
+			array('id, goods_code, name, customs_name, customs_code, inspection, classify_id, type, unit, price, price_two, rules_id, multiple, big_num, small_num, net_weight, gross_weight, origin, len, width, height','safe'),
             array('goods_code','required'),
             array('name','required'),
             array('type','required'),
             array('unit','required'),
             array('origin','required'),
             array('price','required'),
+            array('price_two','required'),
             array('classify_id','required'),
             array('price','numerical','allowEmpty'=>false,'integerOnly'=>false),
             array('classify_id','numerical','allowEmpty'=>true,'integerOnly'=>true),
@@ -101,6 +110,7 @@ class GoodsImForm extends CFormModel
                 $this->type = $row['type'];
                 $this->unit = $row['unit'];
                 $this->price = sprintf("%.2f", $row['price']);
+                $this->price_two = sprintf("%.2f", $row['price_two']);
                 $this->goods_code = $row['goods_code'];
                 $this->classify_id = $row['classify_id'];
                 $this->net_weight = $row['net_weight'];
@@ -113,6 +123,9 @@ class GoodsImForm extends CFormModel
                 $this->small_num = $row['small_num'];
                 $this->multiple = $row['multiple'];
                 $this->rules_id = $row['rules_id'];
+                $this->customs_name = $row['customs_name'];
+                $this->customs_code = $row['customs_code'];
+                $this->inspection = $row['inspection'];
                 break;
 			}
 		}
@@ -150,9 +163,9 @@ class GoodsImForm extends CFormModel
                 break;
             case 'new':
                 $sql = "insert into opr_goods_im(
-							name, type, unit, price, goods_code, classify_id, net_weight, gross_weight, origin, len, width, height, rules_id, multiple, big_num, small_num,lcu,lcd
+							name, type, unit, inspection, customs_code, customs_name, price, price_two, goods_code, classify_id, net_weight, gross_weight, origin, len, width, height, rules_id, multiple, big_num, small_num,lcu,lcd
 						) values (
-							:name, :type, :unit, :price, :goods_code, :classify_id, :net_weight, :gross_weight, :origin, :len, :width, :height, :rules_id, :multiple, :big_num, :small_num,:lcu,:lcd
+							:name, :type, :unit, :inspection, :customs_code, :customs_name, :price, :two_price, :goods_code, :classify_id, :net_weight, :gross_weight, :origin, :len, :width, :height, :rules_id, :multiple, :big_num, :small_num,:lcu,:lcd
 						)";
                 break;
             case 'edit':
@@ -174,7 +187,11 @@ class GoodsImForm extends CFormModel
 							small_num = :small_num,
 							luu = :luu,
 							lud = :lud,
-							price = :price
+							price = :price,
+							inspection = :inspection,
+							customs_code = :customs_code,
+							customs_name = :customs_name,
+							price_two = :two_price
 						where id = :id
 						";
                 break;
@@ -226,6 +243,14 @@ class GoodsImForm extends CFormModel
             $command->bindParam(':unit',$this->unit,PDO::PARAM_STR);
         if (strpos($sql,':price')!==false)
             $command->bindParam(':price',$this->price,PDO::PARAM_STR);
+        if (strpos($sql,':two_price')!==false)
+            $command->bindParam(':two_price',$this->price_two,PDO::PARAM_STR);
+        if (strpos($sql,':inspection')!==false)
+            $command->bindParam(':inspection',$this->inspection,PDO::PARAM_STR);
+        if (strpos($sql,':customs_code')!==false)
+            $command->bindParam(':customs_code',$this->customs_code,PDO::PARAM_STR);
+        if (strpos($sql,':customs_name')!==false)
+            $command->bindParam(':customs_name',$this->customs_name,PDO::PARAM_STR);
 
         if (strpos($sql,':luu')!==false)
             $command->bindParam(':luu',$uid,PDO::PARAM_STR);

@@ -128,7 +128,7 @@ class AreaAuditForm extends CFormModel
                 $this->order_class = $row['order_class'];
                 $this->activity_id = $row['activity_id'];
                 $this->lcu = $row['lcu'];
-                $this->goods_list = OrderForm::getGoodsListToId($row['id']);
+                $this->goods_list = OrderForm::getGoodsListToId($row['id'],$row['city']);
                 $this->order_user = $row['order_user'];
                 //$this->technician = $row['technician'];
                 $this->status = $row['status'];

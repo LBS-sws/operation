@@ -110,6 +110,7 @@ return array(
 'Warehouse unit price'=>'倉庫物品單價',
 'Business Report'=>'營業報告匯總報表',
 'Technician cargo cost'=>'外勤領貨成本總覽',
+'Price To City'=>'城市分配價格',
 //沈超添加結束
 );
 ?>

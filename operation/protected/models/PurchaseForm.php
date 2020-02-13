@@ -164,7 +164,7 @@ class PurchaseForm extends CFormModel
                 $this->order_class = $row['order_class'];
                 $this->activity_id = $row['activity_id'];
                 $this->lcu = $row['lcu'];
-                $this->goods_list = OrderForm::getGoodsListToId($row['id']);
+                $this->goods_list = OrderForm::getGoodsListToId($row['id'],$row['city']);
                 $this->order_user = $row['order_user'];
                 //$this->technician = $row['technician'];
                 $this->status = $row['status'];
@@ -176,6 +176,53 @@ class PurchaseForm extends CFormModel
 		}
 		return true;
 	}
+	public function parentTableOnlyOver(){
+	    $html = "";
+	    if($this->order_class == "Import"&&in_array($this->status,array("approve","finished"))){
+            $rows = Yii::app()->db->createCommand()->select("a.id as s_id,a.batch_code,a.etd,b.*")->from("opr_order_goods a")
+                ->leftJoin("opr_goods_im b","a.goods_id = b.id")->where("a.order_id=:id",array(":id"=>$this->id))->queryAll();
+
+            $html.=TbHtml::label(Yii::t('procurement','Goods Customs'),'',array('class'=>'col-sm-2 control-label'));
+	        $html.='<div class="col-sm-10"><table class="table table-bordered table-striped"><thead><tr>';
+	       $html.='<th>'.Yii::t('procurement','Goods Name').'</th>';
+	        $html.='<th>'.Yii::t('procurement','customs code').'</th>';
+	        $html.='<th>'.Yii::t('procurement','customs name').'</th>';
+	        $html.='<th>'.Yii::t('procurement','inspection').'</th>';
+	        $html.='<th>'.Yii::t('procurement','Batch No.').'</th>';
+	        $html.='<th>'.Yii::t('procurement','ETD').'</th>';
+	        $html.='</tr></thead><tbody>';
+	        foreach ($rows as $key =>$row){
+                $batch_code = !empty($row["batch_code"])?$row["batch_code"]:$this->getDefaultValueToCustoms($row["id"],"batch_code");
+                $etd = !empty($row["etd"])?$row["etd"]:$this->getDefaultValueToCustoms($row["id"],"etd");
+	            $html.="<tr>";
+	            $html.="<td>".$row["name"]."</td>";
+	            $html.="<td>".$row["customs_code"]."</td>";
+	            $html.="<td>".$row["customs_name"]."</td>";
+	            $html.="<td>".$row["inspection"]."</td>";
+	            $html.="<td>";
+	            $html.=TbHtml::hiddenField("customs[id]",$this->id);
+	            $html.=TbHtml::hiddenField("customs[list][$key][id]",$row["s_id"]);
+	            $html.=TbHtml::textField("customs[list][$key][batch_code]",$batch_code,array("class"=>""));
+	            $html.="</td>";
+	            $html.="<td><div class='input-group date'>";
+                $html.='<div class="input-group-addon"><i class="fa fa-calendar"></i></div>';
+                $html.=TbHtml::textField("customs[list][$key][etd]",$etd,array("class"=>"date_etd"));
+	            $html.="</div></td>";
+	            $html.="</tr>";
+            }
+
+	        $html.='</tbody></table></div>';
+        }
+	    return $html;
+    }
+
+    private function getDefaultValueToCustoms($goods_id,$str){
+        $row = Yii::app()->db->createCommand()->select("a.$str")->from("opr_order_goods a")
+            ->leftJoin("opr_order c","a.order_id = c.id")
+            ->where("c.activity_id=:activity_id and a.goods_id=:goods_id  AND a.$str is not null and a.$str != ''",
+                array(":activity_id"=>$this->activity_id,":goods_id"=>$goods_id))->order("a.lud desc")->queryScalar();
+        return $row;
+    }
 
 	public function validateOrderId($index) {
 		$rows = Yii::app()->db->createCommand()->select("*")
@@ -187,7 +234,7 @@ class PurchaseForm extends CFormModel
                 $this->order_class = $row['order_class'];
                 $this->activity_id = $row['activity_id'];
                 $this->lcu = $row['lcu'];
-                $this->goods_list = OrderForm::getGoodsListToId($row['id']);
+                $this->goods_list = OrderForm::getGoodsListToId($row['id'],$row['city']);
                 $this->order_user = $row['order_user'];
                 //$this->technician = $row['technician'];
                 $this->status = $row['status'];
@@ -404,6 +451,27 @@ class PurchaseForm extends CFormModel
                 'lcu'=>Yii::app()->user->user_display_name(),
                 'time'=>date('Y-m-d H:i:s'),
             ));
+            return true;
+        }
+        return false;
+    }
+	//保存物品海关
+	public function saveCustoms($customs){
+	    if(!key_exists('id',$customs)){
+	        return false;
+        }
+	    $this->id = $customs['id'];
+        $order = Yii::app()->db->createCommand()->select("id")->from("opr_order")
+            ->where('status = "approve" and id = :id',array(':id'=>$customs['id']))->queryRow();
+        if($order){
+            if(!empty($customs['list'])){
+                foreach ($customs['list'] as $row){
+                    Yii::app()->db->createCommand()->update('opr_order_goods', array(
+                        'batch_code'=>$row['batch_code'],
+                        'etd'=>$row['etd'],
+                    ), 'id=:id', array(':id'=>$row['id']));
+                }
+            }
             return true;
         }
         return false;

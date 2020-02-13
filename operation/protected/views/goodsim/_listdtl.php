@@ -5,6 +5,7 @@
 	<td><?php echo $this->record['type']; ?></td>
 	<td><?php echo $this->record['unit']; ?></td>
 	<td><?php echo sprintf("%.2f", $this->record['price']); ?></td>
+	<td><?php echo sprintf("%.2f", $this->record['price_two']); ?></td>
     <td><?php echo $this->record['net_weight']; ?></td>
     <td><?php echo $this->record['gross_weight']; ?></td>
 </tr>

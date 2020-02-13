@@ -77,6 +77,7 @@ $this->pageTitle=Yii::app()->name . ' - Order Summary Form';
 		<div class="box-body">
 			<?php echo $form->hiddenField($model, 'scenario'); ?>
 			<?php echo $form->hiddenField($model, 'id'); ?>
+			<?php echo $form->hiddenField($model, 'city'); ?>
 			<?php echo $form->hiddenField($model, 'status'); ?>
 			<?php echo $form->hiddenField($model, 'order_class'); ?>
 			<?php echo $form->hiddenField($model, 'activity_id'); ?>
@@ -273,7 +274,7 @@ if ($model->scenario!='new')
 ?>
 <?php
 //OrderForm_activity_id
-$goodList = json_encode($model->getGoodsList($model->order_class));
+$goodList = json_encode($model->getGoodsList($model->order_class,$model->city));
 $stickiesList = json_encode(StickiesForm::getStickiesContentList());
 $tableBool = 1;//表格內的輸入框能否輸入
 if($model->status == "pending" || $model->status == "cancelled"||$model->scenario=='new'||$model->status=='reject'){

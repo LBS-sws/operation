@@ -108,7 +108,39 @@ $this->pageTitle=Yii::app()->name . ' - Goods Summary Form';
             <div class="form-group">
                 <?php echo $form->labelEx($model,'price',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
-                    <?php echo $form->textField($model, 'price',
+                    <?php echo $form->numberField($model, 'price',
+                        array('min'=>0,'readonly'=>($model->scenario=='view'))
+                    ); ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'price_two',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-4">
+                    <?php echo $form->numberField($model, 'price_two',
+                        array('min'=>0,'readonly'=>($model->scenario=='view'))
+                    ); ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'customs_code',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-4">
+                    <?php echo $form->textField($model, 'customs_code',
+                        array('size'=>40,'maxlength'=>250,'readonly'=>($model->scenario=='view'))
+                    ); ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'customs_name',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-4">
+                    <?php echo $form->textField($model, 'customs_name',
+                        array('size'=>40,'maxlength'=>250,'readonly'=>($model->scenario=='view'))
+                    ); ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'inspection',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-4">
+                    <?php echo $form->textField($model, 'inspection',
                         array('size'=>40,'maxlength'=>250,'readonly'=>($model->scenario=='view'))
                     ); ?>
                 </div>

@@ -254,7 +254,14 @@ WHERE a.judge = 0 AND (a.status = 'finished' OR a.status = 'approve') AND a.city
                 }
                 $goods_sql = "SELECT b.name AS classify_name,a.* FROM $sqlName a LEFT JOIN opr_classify b ON a.classify_id = b.id WHERE a.id=$goods_id";
                 $goods = $connection->createCommand($goods_sql)->queryRow();
+                $price_type = 1;
                 if($goods){
+                    if($record["order_class"]=="Import"){
+                        $price_type = Yii::app()->db->createCommand()->select("price_type")->from("opr_city_price")
+                            ->where("city=:city",array(":city"=>$record["city"]))->queryScalar();
+                        $price_type = $price_type == 2?2:1;
+                    }
+                    $goods["price"] = $price_type==2?$goods["price_two"]:$goods["price"];
                     $record["goods_code"] = $goods["goods_code"];
                     $record["goods_name"] = $goods["name"];
                     $record["goods_class"] = $goods["classify_name"];

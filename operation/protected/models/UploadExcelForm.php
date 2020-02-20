@@ -343,7 +343,8 @@ class UploadExcelForm extends CFormModel
                     array("name"=>"规格型号","sqlName"=>"type","value"=>"无"),
                     array("name"=>"主计量单位","sqlName"=>"unit","value"=>""),
                     array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Import' and name=:name","sql"=>"2"),
-                    array("name"=>"参考售价","sqlName"=>"price","value"=>"0.00"),
+                    array("name"=>"价格1","sqlName"=>"price","value"=>"0.00"),
+                    array("name"=>"价格2","sqlName"=>"price_two","value"=>"0.00"),
                     array("name"=>"来源地","sqlName"=>"origin","value"=>""),
                     array("name"=>"混合規則","sqlName"=>"rules_id","value"=>"id=:name","sql"=>"5"),
                     array("name"=>"长","sqlName"=>"len","value"=>"0.00"),
@@ -354,6 +355,9 @@ class UploadExcelForm extends CFormModel
                     array("name"=>"数量倍率","sqlName"=>"multiple","value"=>"1"),
                     array("name"=>"最大数量","sqlName"=>"big_num","value"=>"9999"),
                     array("name"=>"最小数量","sqlName"=>"small_num","value"=>"1"),
+                    array("name"=>"海关编号","sqlName"=>"customs_code","value"=>""),
+                    array("name"=>"海关名字","sqlName"=>"customs_name","value"=>""),
+                    array("name"=>"商检","sqlName"=>"inspection","value"=>""),
                 );
                 break;
             case "Fast":

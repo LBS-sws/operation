@@ -221,7 +221,7 @@ class PurchaseForm extends CFormModel
             ->leftJoin("opr_order c","a.order_id = c.id")
             ->where("c.activity_id=:activity_id and a.goods_id=:goods_id  AND a.$str is not null and a.$str != ''",
                 array(":activity_id"=>$this->activity_id,":goods_id"=>$goods_id))->order("a.lud desc")->queryScalar();
-        return $row;
+        return $row?$row:"";
     }
 
 	public function validateOrderId($index) {

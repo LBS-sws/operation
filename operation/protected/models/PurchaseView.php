@@ -306,10 +306,10 @@ class PurchaseView extends CFormModel
                 }else{
                     $goodList = $arr[$row['city']]["goodList"];
                 }
-                $idList = Yii::app()->db->createCommand()->select("goods_id,goods_num,confirm_num")->from("opr_order_goods")->where("order_id=:order_id",array(":order_id"=>$row["id"]))->queryAll();
+                $idList = Yii::app()->db->createCommand()->select("goods_id,goods_num,confirm_num,etd,batch_code")->from("opr_order_goods")->where("order_id=:order_id",array(":order_id"=>$row["id"]))->queryAll();
                 foreach ($idList as $goods_id){
                     $goodId=$goods_id["goods_id"];
-                    $goods=OrderForm::getOneGoodsToId($goodId,$row["order_class"]);//$row["id"]
+                    $goods=OrderForm::getOneGoodsToId($goodId,$row["order_class"],$row['city']);//$row["id"]
                     if(empty($goodList[$goodId])){
                         $goodList[$goodId] = $goods;
                         $goodList[$goodId]["goods_num"] = intval($goods_id["goods_num"]);
@@ -323,6 +323,8 @@ class PurchaseView extends CFormModel
                         $goodList[$goodId]["multiple"] = $rules["multiple"];
                     }
                     $goodList[$goodId]["order_city"] = $cityName;
+                    $goodList[$goodId]["etd"] = empty($goods_id["etd"])?$this->getDefaultValueToCustoms($activity_id,$goodId,"etd"):$goods_id["etd"];
+                    $goodList[$goodId]["batch_code"] = empty($goods_id["batch_code"])?$this->getDefaultValueToCustoms($activity_id,$goodId,"batch_code"):$goods_id["batch_code"];
                 }
                 $company = PurchaseView::getCompanyToCity($row['city']);
                 $arr[$row['city']]["cityCode"]=$row['city'];
@@ -335,6 +337,14 @@ class PurchaseView extends CFormModel
             }
         }
         return $arr;
+    }
+
+    private function getDefaultValueToCustoms($activity_id,$goods_id,$str){
+        $row = Yii::app()->db->createCommand()->select("a.$str")->from("opr_order_goods a")
+            ->leftJoin("opr_order c","a.order_id = c.id")
+            ->where("c.activity_id=:activity_id and a.goods_id=:goods_id  AND a.$str is not null and a.$str != ''",
+                array(":activity_id"=>$activity_id,":goods_id"=>$goods_id))->order("a.lud desc")->queryScalar();
+        return $row?$row:"";
     }
 
 

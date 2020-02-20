@@ -249,7 +249,8 @@ class PurchaseController extends Controller
         if (!$model->retrieveData($index)) {
             throw new CHttpException(404,'The requested page does not exist.');
         } else {
-            $cityList = PurchaseView::getCityClassToActivityId($index);
+            $purchaseView = new PurchaseView();
+            $cityList = $purchaseView->getCityClassToActivityId($index);
             $myExcel = new MyExcelTwo();
             if($model->order_class == "Domestic"){
                 $myExcel->addNewSheet("国内货");

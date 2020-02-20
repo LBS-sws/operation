@@ -66,16 +66,17 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
 			<?php echo $form->hiddenField($model, 'id'); ?>
 
 
-            <?php if ($model->scenario!='new'): ?>
-                <div class="form-group">
-                    <?php echo $form->labelEx($model,'goods_code',array('class'=>"col-sm-2 control-label")); ?>
-                    <div class="col-sm-4">
-                        <?php echo $form->textField($model, 'goods_code',
-                            array('min'=>0,'readonly'=>true)
-                        ); ?>
-                    </div>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'goods_code',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-3">
+                    <?php echo $form->textField($model, 'goods_code',
+                        array('min'=>0,'readonly'=>($model->scenario=='view'))
+                    ); ?>
                 </div>
-            <?php endif ?>
+                <div class="col-sm-5">
+                    <p class="form-control-static"><?php echo Yii::t('procurement','Please keep the same with T3 system number');?></p>
+                </div>
+            </div>
             <div class="form-group">
                 <?php echo $form->labelEx($model,'name',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">

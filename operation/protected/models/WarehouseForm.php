@@ -16,6 +16,7 @@ class WarehouseForm extends CFormModel
 	public $lcu;
 	public $min_num;
 	public $z_index=1;
+	private $foreach_num = 0;
 
 	public function attributeLabels()
 	{
@@ -213,6 +214,7 @@ class WarehouseForm extends CFormModel
             case 'edit':
                 $sql = "update opr_warehouse set
 							name = :name, 
+							goods_code = :goods_code, 
 							classify_id = :classify_id, 
 							unit = :unit,
 							costing = :costing,
@@ -231,14 +233,15 @@ class WarehouseForm extends CFormModel
         $city = Yii::app()->user->city();
         $uid = Yii::app()->user->id;
 
-        $this->goods_code = 1;//後續因為自動生成物品編號，數據庫原因固定為1
         $command=$connection->createCommand($sql);
         if (strpos($sql,':id')!==false)
             $command->bindParam(':id',$this->id,PDO::PARAM_INT);
         if (strpos($sql,':name')!==false)
             $command->bindParam(':name',$this->name,PDO::PARAM_STR);
-        if (strpos($sql,':goods_code')!==false)
-            $command->bindParam(':goods_code',$this->goods_code,PDO::PARAM_STR);
+        if (strpos($sql,':goods_code')!==false){
+            $goodsCode = empty($this->goods_code)?1:$this->goods_code;
+            $command->bindParam(':goods_code',$goodsCode,PDO::PARAM_STR);
+        }
         if (strpos($sql,':unit')!==false)
             $command->bindParam(':unit',$this->unit,PDO::PARAM_STR);
         if (strpos($sql,':price')!==false)
@@ -268,21 +271,32 @@ class WarehouseForm extends CFormModel
         if ($this->scenario=='new'){
             $this->id = Yii::app()->db->getLastInsertID();
             $this->scenario = "edit";
-            $this->setGoodsCode();
         }
+        $this->setGoodsCode($this->id);
 		return true;
 	}
 
-    private function setGoodsCode(){
-        $code = strval($this->id);
-        $this->goods_code = "W";
-        for($i = 0;$i < 5-strlen($code);$i++){
-            $this->goods_code.="0";
+    private function setGoodsCode($id){
+        if(empty($this->goods_code)){
+            $this->foreach_num++;
+            $city = Yii::app()->user->city();
+            $code = strval($id);
+            $goodsCode = "W";
+            for($i = 0;$i < 5-strlen($code);$i++){
+                $goodsCode.="0";
+            }
+            $goodsCode .= $code;
+            $row = Yii::app()->db->createCommand()->select("id")->from("opr_warehouse")
+                ->where('goods_code=:goods_code and id!=:id and city = :city',
+                    array(':goods_code'=>$goodsCode,':id'=>$this->id,':city'=>$city))->queryRow();
+            if($row&&$this->foreach_num<10){
+                $this->setGoodsCode($row['id']);
+            }else{
+                Yii::app()->db->createCommand()->update('opr_warehouse', array(
+                    'goods_code'=>$goodsCode
+                ), 'id=:id', array(':id'=>$this->id));
+            }
         }
-        $this->goods_code .= $code;
-        Yii::app()->db->createCommand()->update('opr_warehouse', array(
-            'goods_code'=>$this->goods_code
-        ), 'id=:id', array(':id'=>$this->id));
     }
 
     public function downExcel(){

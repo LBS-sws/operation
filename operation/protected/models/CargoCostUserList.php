@@ -37,7 +37,7 @@ class CargoCostUserList extends CListPageModel
         $suffix =  Yii::app()->params['envSuffix'];
         $city_allow = Yii::app()->user->city_allow();
         $username = str_replace("'","\'",$this->username);
-        $sql1 = "select a.id,a.order_code,a.order_user,a.technician,a.status,a.lcu,a.lcd,ifnull(SUM(costPrice(c.goods_id,c.lud)*CONVERT(c.confirm_num,DECIMAL(8,2))),0) as total_price,b.disp_name,b.city 
+        $sql1 = "select a.id,a.order_code,a.order_user,a.technician,a.status,a.lcu,a.lcd,ifnull(SUM(costPrice(c.goods_id,c.lud)*CONVERT(c.confirm_num,DECIMAL(8,4))),0) as total_price,b.disp_name,b.city 
 				from opr_order_goods c
 				LEFT JOIN opr_order a ON c.order_id = a.id
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
@@ -102,7 +102,7 @@ class CargoCostUserList extends CListPageModel
                     'goods_list'=>WarehouseForm::getGoodsListToId($record['id']),
                     'order_user'=>$record['order_user'],
                     'technician'=>$record['technician'],
-                    'total_price'=>$record['total_price'],
+                    'total_price'=>sprintf("%.2f",$record['total_price']),
                     'status'=>$record['status'],
                     'city'=>CGeneral::getCityName($record['city']),
                     'lcu'=>$record['disp_name'],

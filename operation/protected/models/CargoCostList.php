@@ -32,7 +32,7 @@ class CargoCostList extends CListPageModel
         $suffix =  Yii::app()->params['envSuffix'];
         $city_allow = Yii::app()->user->city_allow();
         $userName = Yii::app()->user->name;
-        $sql1 = "select b.username,b.disp_name,c.name AS s_city,ifnull(SUM(costPrice(d.goods_id,d.lud)*CONVERT(d.confirm_num,DECIMAL(8,2))),0) as total_price
+        $sql1 = "select b.username,b.disp_name,c.name AS s_city,ifnull(SUM(costPrice(d.goods_id,d.lud)*CONVERT(d.confirm_num,DECIMAL(8,4))),0) as total_price
 				from opr_order_goods d 
 				LEFT JOIN opr_order a ON a.id=d.order_id 
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
@@ -99,7 +99,7 @@ class CargoCostList extends CListPageModel
             foreach ($records as $k=>$record) {
                 $this->attr[] = array(
                     'username'=>$record['username'],
-                    'total_price'=>$record['total_price'],
+                    'total_price'=>sprintf("%.2f",$record['total_price']),
                     'city'=>$record['s_city'],
                     'lcu'=>$record['disp_name'],
                 );

@@ -271,6 +271,6 @@ return array(
     'Batch No.'=>'批次號碼',
     'Goods Customs'=>'物品海關',
     'Save Customs'=>'保存海關物品',
-    'Please keep the same with T3 system number'=>'請保持與T3系統編號壹致',
+    'Please keep the same with T3 system number'=>'物品編號與名稱請保持與T3系統編號壹致',
 );
 ?>

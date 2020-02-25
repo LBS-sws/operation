@@ -301,30 +301,37 @@ class WarehouseForm extends CFormModel
 
     public function downExcel(){
         $city = Yii::app()->user->city();
-        $list["head"] = array("存货编码","存货名称","主计量单位","所属分类码","参考售价(成本)","是否允许小数","现有库存","单价年月","单价");
+        $list["head"] = array("存货编码","存货名称","主计量单位","所属分类码","参考售价(成本)","是否允许小数","现有库存");
+        if(Yii::app()->user->validFunction('YN02')){
+            $list["head"][]="单价年月";
+            $list["head"][]="单价";
+        }
         $rs = Yii::app()->db->createCommand()->select("a.*,b.name as classify_name")->from("opr_warehouse a")
             ->leftJoin("opr_classify b","a.classify_id=b.id")
             ->where('a.city=:city',array(':city'=>$city))->queryAll();
         $list["body"] = array();
         if($rs){
             foreach ($rs as $row){
-                $priceList = Yii::app()->db->createCommand()->select("price as cost_price,year,month")->from("opr_warehouse_price")
-                    ->where("(year<date_format(:date_time,'%Y') or (year=date_format(:date_time,'%Y') and month<=date_format(:date_time,'%m'))) AND warehouse_id = :id",
-                        array(':id'=>$row['id'],':date_time'=>date("Y-m-d")))->order("year DESC,month DESC")->queryRow();
-                if(!$priceList){
-                    $priceList=array('cost_price'=>'无','year'=>'无','month'=>'无');
-                }
-                $list["body"][]=array(
+                $arr = array(
                     "goods_code"=>$row["goods_code"],
                     "name"=>$row["name"],
                     "unit"=>$row["unit"],
                     "classify_name"=>$row["classify_name"],
                     "costing"=>$row["costing"],
                     "decimal_num"=>$row["decimal_num"],
-                    "inventory"=>$row["inventory"],
-                    "cost_year_month"=>$priceList["cost_price"]==="无"?"无":$priceList["year"]."/".$priceList["month"],
-                    "cost_price"=>$priceList["cost_price"],
+                    "inventory"=>$row["inventory"]
                 );
+                if(Yii::app()->user->validFunction('YN02')){
+                    $priceList = Yii::app()->db->createCommand()->select("price as cost_price,year,month")->from("opr_warehouse_price")
+                        ->where("(year<date_format(:date_time,'%Y') or (year=date_format(:date_time,'%Y') and month<=date_format(:date_time,'%m'))) AND warehouse_id = :id",
+                            array(':id'=>$row['id'],':date_time'=>date("Y-m-d")))->order("year DESC,month DESC")->queryRow();
+                    if(!$priceList){
+                        $priceList=array('cost_price'=>'无','year'=>'无','month'=>'无');
+                    }
+                    $arr["cost_year_month"] = $priceList["cost_price"]==="无"?"无":$priceList["year"]."/".$priceList["month"];
+                    $arr["cost_price"] = $priceList["cost_price"];
+                }
+                $list["body"][]=$arr;
             }
         }
         return $list;

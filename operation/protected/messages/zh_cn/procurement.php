@@ -273,5 +273,9 @@ return array(
     'Goods Customs'=>'物品海关',
     'Save Customs'=>'保存物品海关',
     'Please keep the same with T3 system number'=>'物品编号与名称请保持与T3系统编号一致',
+
+    //2020-03-04
+    'Price'=>'单价',
+    'Price year month'=>'单价年月',
 );
 ?>

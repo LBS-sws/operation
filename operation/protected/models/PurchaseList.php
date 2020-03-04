@@ -115,10 +115,12 @@ class PurchaseList extends CListPageModel
      * @param string $user_code   用戶編號
      * @param string $start_date  訂單開始日期
      * @param string $end_date    訂單結束日期
+     * @param string $username    管理員的username
      * @return array
      */
-    public function getOrderListSearch($city_allow,$user_code='',$start_date='',$end_date=''){
+    public function getOrderListSearch($city_allow,$user_code='',$start_date='',$end_date='',$username=''){
         $suffix = Yii::app()->params['envSuffix'];
+        $systemId = Yii::app()->params['systemId'];
         if(empty($city_allow)){
             $city_allow = Yii::app()->user->city_allow();
         }
@@ -148,6 +150,9 @@ WHERE a.judge = 0 AND (a.status = 'finished' OR a.status = 'approve') AND a.city
 
         $records = $connection->createCommand($sql)->queryAll();
         if($records){
+            $priceBool = Yii::app()->db->createCommand()->select("username")->from("security$suffix.sec_user_access")
+                ->where("username=:username and system_id='$systemId' and (a_read_only like '%YN02%' or a_read_write like '%YN02%' or a_control like '%YN02%')",
+                    array(':username'=>$username))->queryRow(); //判斷是否有顯示價格的權限
             foreach ($records as &$record){
 /*                $order_id=$record["order_id"];
                 $audit_time = $connection->createCommand("SELECT lcd FROM opr_order_status WHERE order_id=$order_id AND status='approve' order by id desc")->queryRow();
@@ -156,6 +161,18 @@ WHERE a.judge = 0 AND (a.status = 'finished' OR a.status = 'approve') AND a.city
                 }else{
                     $record["audit_time"] = "";
                 }*/
+                $record["cost_year_month"] = "无";
+                $record["goods_price"] = 0;
+                if($priceBool){
+                    $priceList = Yii::app()->db->createCommand()->select("price as cost_price,year,month")->from("opr_warehouse_price")
+                        ->where("(year<date_format(:date_time,'%Y') or (year=date_format(:date_time,'%Y') and month<=date_format(:date_time,'%m'))) AND warehouse_id = :id",
+                            array(':id'=>$record['goods_id'],':date_time'=>$record['audit_time']))->order("year DESC,month DESC")->queryRow();
+                    if(!$priceList){
+                        $priceList=array('cost_price'=>0,'year'=>'无','month'=>'无');
+                    }
+                    $record["cost_year_month"] = $priceList["year"]==="无"?"无":$priceList["year"]."/".$priceList["month"];
+                    $record["goods_price"] = $priceList["cost_price"];
+                }
                 $num = empty($record["confirm_num"])?$record["goods_num"]:$record["confirm_num"];
                 $price = floatval($record["goods_price"]);
                 $record["goods_sum_price"] = sprintf("%.2f", floatval($num)*$price);

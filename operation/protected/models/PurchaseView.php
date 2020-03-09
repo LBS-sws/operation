@@ -332,6 +332,8 @@ class PurchaseView extends CFormModel
                 $arr[$row['city']]["cityName"]=$company["cityName"];
                 $arr[$row['city']]["cityTel"]=$company["cityTel"];
                 $arr[$row['city']]["cityAdr"]=$company["cityAdr"];
+                $arr[$row['city']]["cityAdrTwo"]=$company["cityAdrTwo"];
+                $arr[$row['city']]["company_postal"]=$company["postal2"];
                 $arr[$row['city']]["cityUser"]=array("name"=>$company["userName"],"email"=>$company["email"]);
                 $arr[$row['city']]["goodList"]=$goodList;
             }
@@ -358,6 +360,8 @@ class PurchaseView extends CFormModel
             "cityName"=>"",//公司名字
             "cityTel"=>"",//公司電話
             "cityAdr"=>"",//公司地址
+            "cityAdrTwo"=>"",//收貨地址
+            "postal2"=>"",//收貨姓名
             "userName"=>"",//負責人姓名
             "email"=>""//負責人郵箱
         );
@@ -371,6 +375,8 @@ class PurchaseView extends CFormModel
                 $arr["cityName"] = $company[0]["name"];
                 $arr["cityTel"] = $company[0]["phone"];
                 $arr["cityAdr"] = $company[0]["address"];
+                $arr["cityAdrTwo"] = $company[0]["address2"];
+                $arr["postal2"] = $company[0]["postal2"];
                 $arr["userName"] = $company[0]["head"];
                 $arr["email"] = $company[0]["head_email"];
 /*                $incharge = $company[0]["head"];//負責人id

@@ -132,6 +132,36 @@ class GoodsImForm extends CFormModel
 		return true;
 	}
 
+
+    public function downExcel(){
+        $list["head"] = array("物品编号","物品名称","物品分类","来源地","包装规格","单位"
+        ,'价格1（US$）','价格2（US$）',"海关编号","海关名字","商检","净重（kg）","毛重（kg）","长×宽×高（cm）");
+        $rs = Yii::app()->db->createCommand()->select("a.*,b.name as classify_name")->from("opr_goods_im a")
+            ->leftJoin("opr_classify b","a.classify_id=b.id")->queryAll();
+        $list["body"] = array();
+        if($rs){
+            foreach ($rs as $row){
+                $list["body"][]=array(
+                    "goods_code"=>$row["goods_code"],
+                    "name"=>$row["name"],
+                    "classify_name"=>$row["classify_name"],
+                    "origin"=>$row["origin"],
+                    "type"=>$row["type"],
+                    "unit"=>$row["unit"],
+                    "price"=>$row["price"],
+                    "price_two"=>$row["price_two"],
+                    "customs_code"=>$row["customs_code"],
+                    "customs_name"=>$row["customs_name"],
+                    "inspection"=>$row["inspection"],
+                    "net_weight"=>$row["net_weight"],
+                    "gross_weight"=>$row["gross_weight"],
+                    "inventory"=>$row["len"]."×".$row["width"]."×".$row["height"]
+                );
+            }
+        }
+        return $list;
+    }
+
     //刪除驗證
     public function deleteValidate(){
         $rs = Yii::app()->db->createCommand()->select()->from("opr_order_goods")->where('goods_id=:goods_id',array(':goods_id'=>$this->id))->queryAll();

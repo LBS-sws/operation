@@ -27,7 +27,7 @@ class GoodsimController extends Controller
                 'expression'=>array('GoodsimController','allowReadWrite'),
             ),
             array('allow',
-                'actions'=>array('index','view'),
+                'actions'=>array('index','view','downExcel'),
                 'expression'=>array('GoodsimController','allowReadOnly'),
             ),
             array('deny',  // deny all users
@@ -43,6 +43,17 @@ class GoodsimController extends Controller
     public static function allowReadOnly() {
         return Yii::app()->user->validFunction('YG01');
     }
+
+    public function actionDownExcel()
+    {
+        //$model = new WarehouseForm();
+        $warehouseList = GoodsImForm::downExcel();
+        $myExcel = new MyExcelTwo();
+        $myExcel->setDataHeard($warehouseList["head"],"进口货物品");
+        $myExcel->setDataBody($warehouseList["body"]);
+        $myExcel->outDownExcel("进口货物品.xls");
+    }
+
 	public function actionIndex($pageNum=0)
 	{
 		$model = new GoodsImList;

@@ -25,13 +25,22 @@ $this->pageTitle=Yii::app()->name . ' - Goods List';
 <section class="content">
     <div class="box">
         <div class="box-body">
-            <?php
-            //var_dump(Yii::app()->session['rw_func']);
-            if (Yii::app()->user->validRWFunction('YG01'))
-                echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('misc','Add').Yii::t("procurement","Import"), array(
-                    'submit'=>Yii::app()->createUrl('goodsim/new'),
+            <div class="btn-group" role="group">
+                <?php
+                //var_dump(Yii::app()->session['rw_func']);
+                if (Yii::app()->user->validRWFunction('YG01'))
+                    echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('misc','Add').Yii::t("procurement","Import"), array(
+                        'submit'=>Yii::app()->createUrl('goodsim/new'),
+                    ));
+                ?>
+            </div>
+            <div class="btn-group pull-right" role="group">
+                <?php
+                echo TbHtml::button('<span class="fa fa-cloud-download"></span> '.Yii::t('misc','Download'), array(
+                    'submit'=>Yii::app()->createUrl('goodsim/DownExcel'),
                 ));
-            ?>
+                ?>
+            </div>
         </div>
     </div>
 	<?php $this->widget('ext.layout.ListPageWidget', array(

@@ -51,6 +51,7 @@ class DeliveryForm extends CFormModel
 			array('id,lcd,num,black_id, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, luu, lcu, lud, lcd, checkBoxDown','safe'),
             array('goods_list','required','on'=>array('audit','edit','reject')),
             array('goods_list','validateGoods','on'=>array('audit','edit')),
+            array('id','validatePriceOverTime','on'=>array('audit','edit')),
             array('ject_remark','required','on'=>'reject'),
             array('black_id','required','on'=>'black'),
             array('num','required','on'=>'black'),
@@ -59,6 +60,31 @@ class DeliveryForm extends CFormModel
             //array('order_num','in','range'=>range(0,600)),
 		);
 	}
+	public function validatePriceOverTime($attribute='', $params='')
+    {
+        $city = Yii::app()->user->city();
+        $year = date("Y");
+        $month = date("m");
+        $day = date("d");
+        $month = $day>20?$month:$month-1;
+        if($month == 0){
+            $month = 12;
+            $year--;
+        }
+        $bool = Yii::app()->db->createCommand()->select("a.id")->from("opr_warehouse_price a")
+            ->leftJoin("opr_warehouse b","a.warehouse_id=b.id")
+            ->where('b.city = :city and a.year=:year and a.month=:month', array(':city' =>$city,':year' =>$year,':month' =>$month))->queryRow();
+        if ($bool) {
+            return true;
+        }else{
+            if(!empty($attribute)){
+                $message = $year."年".$month."月未导入仓库价格，请与仓库管理员联系";
+                $this->addError($attribute,$message);
+            }
+            return false;
+        }
+    }
+
 	public function validateNum($attribute, $params){
         if(!empty($this->num)){
             $idList = Yii::app()->db->createCommand()->select("*")->from("opr_order_goods")->where('id = :id',array(':id'=>$this->black_id))->queryRow();

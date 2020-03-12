@@ -196,9 +196,14 @@ class DeliveryController extends Controller
         $model = new DeliveryForm("approved");
         $model->setAttributes($_POST['DeliveryList']);
         if($model->validateAll()){
-            $model->allApproved();
-            Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
-            $this->redirect(Yii::app()->createUrl('delivery/index'));
+            if($model->validatePriceOverTime()){
+                $model->allApproved();
+                Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
+                $this->redirect(Yii::app()->createUrl('delivery/index'));
+            }else{
+                Dialog::message(Yii::t('dialog','Validation Message'), "没有导入仓库价格，请与管理员联系");
+                $this->redirect(Yii::app()->createUrl('delivery/index'));
+            }
         }else{
             Dialog::message(Yii::t('dialog','Validation Message'), "沒有待发货的订单");
             $this->redirect(Yii::app()->createUrl('delivery/index'));

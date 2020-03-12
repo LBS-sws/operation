@@ -334,6 +334,7 @@ class PurchaseView extends CFormModel
                 $arr[$row['city']]["cityAdr"]=$company["cityAdr"];
                 $arr[$row['city']]["cityAdrTwo"]=$company["cityAdrTwo"];
                 $arr[$row['city']]["company_postal"]=$company["postal2"];
+                $arr[$row['city']]["company_phone"]=$company["phone_two"];
                 $arr[$row['city']]["cityUser"]=array("name"=>$company["userName"],"email"=>$company["email"]);
                 $arr[$row['city']]["goodList"]=$goodList;
             }
@@ -363,6 +364,7 @@ class PurchaseView extends CFormModel
             "cityAdrTwo"=>"",//收貨地址
             "postal2"=>"",//收貨姓名
             "userName"=>"",//負責人姓名
+            "phone_two"=>"",//聯繫方式
             "email"=>""//負責人郵箱
         );
         if (!empty($city)){
@@ -379,6 +381,7 @@ class PurchaseView extends CFormModel
                 $arr["postal2"] = $company[0]["postal2"];
                 $arr["userName"] = $company[0]["head"];
                 $arr["email"] = $company[0]["head_email"];
+                $arr["phone_two"] = $company[0]["phone_two"];
 /*                $incharge = $company[0]["head"];//負責人id
                 $email = Yii::app()->db->createCommand()->select("email,disp_name")->from($suffix.".sec_user")->where("username=:username",array(":username"=>$incharge))->queryAll();
                 if($email){

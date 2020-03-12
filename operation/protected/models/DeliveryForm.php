@@ -78,7 +78,7 @@ class DeliveryForm extends CFormModel
             return true;
         }else{
             if(!empty($attribute)){
-                $message = $year."年".$month."月未导入仓库价格，请与仓库管理员联系";
+                $message = $year."年".$month."月价格未导入，请联系财务同事";
                 $this->addError($attribute,$message);
             }
             return false;

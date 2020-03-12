@@ -260,11 +260,12 @@ class PurchaseController extends Controller
                     $myExcel->addNewSheet($cityCode);
                     $myExcel->setRowContent("A1","城市編號：".$goodsList["cityCode"],"F1");
                     $myExcel->setRowContent("A2","公司名稱：".$goodsList["cityName"],"F2");
-                    $myExcel->setRowContent("A3","公司地址：".$goodsList["cityAdr"],"F3");
-                    $myExcel->setRowContent("A4","公司負責人：".$goodsList["cityUser"]["name"]."   ".$goodsList["cityUser"]["email"],"F4");
-                    $myExcel->setRowContent("A5","收货人姓名：".$goodsList["company_postal"],"F5");
-                    $myExcel->setRowContent("A6","收货地址：".$goodsList["cityAdrTwo"],"F6");
-                    $myExcel->setRowContent("A7","联系电话：".$goodsList["cityTel"],"F7");
+                    $myExcel->setRowContent("A3","公司电话：".$goodsList["cityTel"],"F3");
+                    $myExcel->setRowContent("A4","公司地址：".$goodsList["cityAdr"],"F4");
+                    $myExcel->setRowContent("A5","公司負責人：".$goodsList["cityUser"]["name"]."   ".$goodsList["cityUser"]["email"],"F5");
+                    $myExcel->setRowContent("A6","收货人姓名：".$goodsList["company_postal"],"F6");
+                    $myExcel->setRowContent("A7","收货地址：".$goodsList["cityAdrTwo"],"F7");
+                    $myExcel->setRowContent("A8","联系电话：".$goodsList["company_phone"],"F8");
                     $myExcel->setStartRow(10);
                     $myExcel->fillDownExcel($goodsList["goodList"],$model->order_class);
                     $myExcel->setProtoValue($cityCode,"cityName",$goodsList["cityName"]);

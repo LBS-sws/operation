@@ -62,13 +62,16 @@ class DeliveryForm extends CFormModel
 	}
 	public function validatePriceOverTime($attribute='', $params='')
     {
+        if(date("Y-m-d")<="2020-03-20"){ //一月份以前不需要驗證
+            return true;
+        }
         $city = Yii::app()->user->city();
         $year = date("Y");
         $month = date("m");
         $day = date("d");
-        $month = $day>20?$month:$month-1;
-        if($month == 0){
-            $month = 12;
+        $month = $day>20?$month-1:$month-2;
+        if($month <= 0){
+            $month = 12+$month;
             $year--;
         }
         $bool = Yii::app()->db->createCommand()->select("a.id")->from("opr_warehouse_price a")

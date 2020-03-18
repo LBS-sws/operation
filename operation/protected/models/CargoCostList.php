@@ -25,7 +25,7 @@ class CargoCostList extends CListPageModel
     {
         if(empty($this->year)||!is_numeric($this->year)){
             $this->year = date("Y", strtotime("-1 month"));
-            $this->month = date("m", strtotime("-1 month"));
+            $this->month = intval(date("m", strtotime("-1 month")));
         }
         //$this->month = (empty($this->month)||!is_numeric($this->month))?date("m"):$this->month;
         //,ifnull(SUM(costPrice(b.goods_id,a.lcd)*CONVERT(b.confirm_num,DECIMAL)),0) as total_min

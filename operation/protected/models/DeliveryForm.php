@@ -62,6 +62,10 @@ class DeliveryForm extends CFormModel
 	}
 	public function validatePriceOverTime($attribute='', $params='')
     {
+		// Percy: 解決台灣不執行此檢查的問題
+		if ((isset(Yii::app()->params['checkPriceOverTime']) && Yii::app()->params['checkPriceOverTime']==false)) {
+			return true;
+		}
         if(date("Y-m-d")<="2020-03-20"){ //一月份以前不需要驗證
             return true;
         }

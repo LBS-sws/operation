@@ -196,8 +196,7 @@ class DeliveryController extends Controller
         $model = new DeliveryForm("approved");
         $model->setAttributes($_POST['DeliveryList']);
         if($model->validateAll()){
-			// Percy: 解決台灣不執行此檢查的問題
-            if((isset(Yii::app()->params['checkPriceOverTime']) && Yii::app()->params['checkPriceOverTime']==false) || $model->validatePriceOverTime('id')){
+            if($model->validatePriceOverTime('id')){
                 $model->allApproved();
                 Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
                 $this->redirect(Yii::app()->createUrl('delivery/index'));

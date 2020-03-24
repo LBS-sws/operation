@@ -135,9 +135,10 @@ class GoodsImForm extends CFormModel
 
     public function downExcel(){
         $list["head"] = array("物品编号","物品名称","物品分类","来源地","包装规格","单位"
-        ,'价格1（US$）','价格2（US$）',"海关编号","海关名字","商检","净重（kg）","毛重（kg）","长×宽×高（cm）");
-        $rs = Yii::app()->db->createCommand()->select("a.*,b.name as classify_name")->from("opr_goods_im a")
-            ->leftJoin("opr_classify b","a.classify_id=b.id")->queryAll();
+        ,'价格1','价格2',"海关编号","海关名字","商检","净重","毛重","长","宽","高","数量倍率","最大数量","最小数量","混合規則");
+        $rs = Yii::app()->db->createCommand()->select("a.*,b.name as classify_name,c.name as rules_name")->from("opr_goods_im a")
+            ->leftJoin("opr_classify b","a.classify_id=b.id")
+            ->leftJoin("opr_goods_rules c","a.rules_id=c.id")->queryAll();
         $list["body"] = array();
         if($rs){
             foreach ($rs as $row){
@@ -155,7 +156,13 @@ class GoodsImForm extends CFormModel
                     "inspection"=>$row["inspection"],
                     "net_weight"=>$row["net_weight"],
                     "gross_weight"=>$row["gross_weight"],
-                    "inventory"=>$row["len"]."×".$row["width"]."×".$row["height"]
+                    "len"=>$row["len"],
+                    "width"=>$row["width"],
+                    "height"=>$row["height"],
+                    "multiple"=>$row["multiple"],
+                    "big_num"=>$row["big_num"],
+                    "small_num"=>$row["small_num"],
+                    "rules_name"=>$row["rules_name"]
                 );
             }
         }

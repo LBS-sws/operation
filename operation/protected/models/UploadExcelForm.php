@@ -45,6 +45,7 @@ class UploadExcelForm extends CFormModel
         foreach ($arr["listBody"] as $list){
             $arrList = array();
             $continue = true;
+            $this->update_id = 0;
             $this->start_title = current($list);
             foreach ($validateArr as $vaList){
                 $key = array_search($vaList["name"],$arr["listHeader"]);
@@ -60,10 +61,8 @@ class UploadExcelForm extends CFormModel
             if($continue){
                 $city = Yii::app()->user->city();
                 $uid = Yii::app()->user->id;
-                if(!$bool&&!empty($this->update_id)){
+                if(!empty($this->update_id)){
                     $arrList["luu"] = $uid;
-                    $arrList["inventory"] = floatval($arrList["inventory"])+floatval($this->add_num);
-                    //疊加
                     Yii::app()->db->createCommand()->update($this->dbName,$arrList, 'id=:id', array(':id'=>$this->update_id));
                 }else{
                     //新增
@@ -191,7 +190,8 @@ class UploadExcelForm extends CFormModel
                         return array("status"=>0,"error"=>$this->start_title."："."存货编码与存货名称不對應");
                     }else{
                         if($rows){
-                            $this->add_num = $rows["inventory"];
+                            //$this->add_num = key_exists("inventory",$rows)?$rows["inventory"]:0;
+                            $this->add_num = 0;
                             $this->update_id = $rows["id"];
                         }else{
                             $this->add_num = 0;
@@ -315,7 +315,7 @@ class UploadExcelForm extends CFormModel
                     array("name"=>"参考售价","sqlName"=>"price","value"=>"0.00"),
                     //array("name"=>"成本","sqlName"=>"costing","value"=>"0.00"),
                     array("name"=>"是否允许小数","sqlName"=>"decimal_num","value"=>"否"),
-                    array("name"=>"现有库存","sqlName"=>"inventory","value"=>"0"),
+                    //array("name"=>"现有库存","sqlName"=>"inventory","value"=>"0"),
                 );
                 break;
             case "Document":
@@ -329,7 +329,7 @@ class UploadExcelForm extends CFormModel
                     array("name"=>"标签","sqlName"=>"stickies_id","value"=>"id=:name","sql"=>"3"),
                     array("name"=>"参考售价","sqlName"=>"price","value"=>"0.00"),
                     array("name"=>"来源地","sqlName"=>"origin","value"=>""),
-                    array("name"=>"混合規則","sqlName"=>"rules_id","value"=>"id=:name","sql"=>"5"),
+                    array("name"=>"混合規則","sqlName"=>"rules_id","value"=>"name=:name","sql"=>"5"),
                     array("name"=>"数量倍率","sqlName"=>"multiple","value"=>"1"),
                     array("name"=>"最大数量","sqlName"=>"big_num","value"=>"9999"),
                     array("name"=>"最小数量","sqlName"=>"small_num","value"=>"1"),
@@ -338,15 +338,15 @@ class UploadExcelForm extends CFormModel
             case "Import":
                 $this->dbName="opr_goods_im";
                 $arr = array(
-                    array("name"=>"存货编码","sqlName"=>"goods_code","value"=>"goods_code=:name","sql"=>"1"),
-                    array("name"=>"存货名称","sqlName"=>"name","value"=>"name=:name","sql"=>"1"),
-                    array("name"=>"规格型号","sqlName"=>"type","value"=>"无"),
-                    array("name"=>"主计量单位","sqlName"=>"unit","value"=>""),
-                    array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Import' and name=:name","sql"=>"2"),
+                    array("name"=>"物品编号","sqlName"=>"goods_code","value"=>"goods_code=:name","sql"=>"4"),
+                    array("name"=>"物品名称","sqlName"=>"name","value"=>"name=:name","sql"=>"4"),
+                    array("name"=>"包装规格","sqlName"=>"type","value"=>"无"),
+                    array("name"=>"单位","sqlName"=>"unit","value"=>""),
+                    array("name"=>"物品分类","sqlName"=>"classify_id","value"=>"class_type='Import' and name=:name","sql"=>"2"),
                     array("name"=>"价格1","sqlName"=>"price","value"=>"0.00"),
                     array("name"=>"价格2","sqlName"=>"price_two","value"=>"0.00"),
                     array("name"=>"来源地","sqlName"=>"origin","value"=>""),
-                    array("name"=>"混合規則","sqlName"=>"rules_id","value"=>"id=:name","sql"=>"5"),
+                    array("name"=>"混合規則","sqlName"=>"rules_id","value"=>"name=:name","sql"=>"5"),
                     array("name"=>"长","sqlName"=>"len","value"=>"0.00"),
                     array("name"=>"宽","sqlName"=>"width","value"=>"0.00"),
                     array("name"=>"高","sqlName"=>"height","value"=>"0.00"),
@@ -370,7 +370,7 @@ class UploadExcelForm extends CFormModel
                     array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Fast' and name=:name","sql"=>"2"),
                     array("name"=>"参考售价","sqlName"=>"price","value"=>"0.00"),
                     array("name"=>"来源地","sqlName"=>"origin","value"=>""),
-                    array("name"=>"混合規則","sqlName"=>"rules_id","value"=>"id=:name","sql"=>"5"),
+                    array("name"=>"混合規則","sqlName"=>"rules_id","value"=>"name=:name","sql"=>"5"),
                     array("name"=>"数量倍率","sqlName"=>"multiple","value"=>"1"),
                     array("name"=>"最大数量","sqlName"=>"big_num","value"=>"9999"),
                     array("name"=>"最小数量","sqlName"=>"small_num","value"=>"1"),

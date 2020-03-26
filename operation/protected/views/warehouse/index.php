@@ -90,6 +90,7 @@ $this->renderPartial('//site/goodsHistory',array(
 );
 if (Yii::app()->user->validFunction('YN02'))
     $this->renderPartial('//site/priceFlow');
+$this->renderPartial('//site/storageFlow');
 ?>
 <?php
 $js='

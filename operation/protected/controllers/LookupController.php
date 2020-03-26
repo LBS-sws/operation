@@ -26,7 +26,7 @@ class LookupController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('goodex','yc02userex','citySearchEx'),
+				'actions'=>array('goodex','yc02userex','citySearchEx','storageSearchex'),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -76,6 +76,16 @@ class LookupController extends Controller
 			";
 		$result = Yii::app()->db->createCommand($sql)->queryAll();
 		print json_encode($result);
+	}
+
+	public function actionStorageSearchex($search)
+	{
+        $searchx = str_replace("'","\'",$search);
+        $city = Yii::app()->user->city();
+        $rows = Yii::app()->db->createCommand()->select("id,goods_code,name,unit,inventory")
+            ->from("opr_warehouse")
+            ->where("city=:city and name like '%$searchx%'",array(":city"=>$city))->queryAll();
+		print json_encode($rows);
 	}
 
 	public function actionYC02UserEx($search)

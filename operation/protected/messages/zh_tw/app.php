@@ -111,6 +111,8 @@ return array(
 'Business Report'=>'營業報告匯總報表',
 'Technician cargo cost'=>'外勤領貨成本總覽',
 'Price To City'=>'城市分配價格',
+'Warehouse storage Info'=>'倉庫庫存管理',
+'backward storage'=>'入庫單退回',
 //沈超添加結束
 );
 ?>

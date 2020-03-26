@@ -137,14 +137,26 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                     ); ?>
                 </div>
             </div>
+
             <div class="form-group">
                 <?php echo $form->labelEx($model,'inventory',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
-                    <?php echo $form->numberField($model, 'inventory',
-                        array('min'=>0,'readonly'=>($model->scenario=='view'))
-                    ); ?>
+                    <div class="input-group">
+                        <?php echo $form->numberField($model, 'inventory',
+                            array('min'=>0,'readonly'=>(true))
+                        ); ?>
+
+                        <span class="input-group-btn">
+                            <?php
+                            //歷史價格
+                            echo TbHtml::button(Yii::t('procurement','storage history'), array(
+                                'class'=>'clickStorageBtn','data-id'=>$model->id));
+                            ?>
+                        </span>
+                    </div><!-- /input-group -->
                 </div>
             </div>
+
             <div class="form-group">
                 <?php echo $form->labelEx($model,'min_num',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
@@ -174,6 +186,7 @@ if ($model->scenario!='view')
     );
 if (Yii::app()->user->validFunction('YN02'))
     $this->renderPartial('//site/priceFlow');
+$this->renderPartial('//site/storageFlow');
 ?>
 
 

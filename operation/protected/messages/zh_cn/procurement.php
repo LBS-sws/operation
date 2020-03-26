@@ -277,5 +277,21 @@ return array(
     //2020-03-04
     'Price'=>'单价',
     'Price year month'=>'单价年月',
+
+    //2020-03-19
+    'Warehouse storage list'=>'仓库入库列表',
+    'Warehouse storage form'=>'仓库入库表单',
+    'storage'=>'入库',
+    'storage code'=>'入库编号',
+    'storage time'=>'入库时间',
+    'storage goods'=>'入库物品',
+    'storage type'=>'入库状态',
+    'put in storage'=>'已入库',
+    'Draft'=>'草稿',
+    'storage history'=>'入库记录',
+    'Now Inventory'=>'实时库存',
+    'storage num'=>'入库数量',
+    ' is scope of'=>'的范围是',
+    'The receipt is in storage and cannot be modified'=>'该入库单已入库，无法修改',
 );
 ?>

@@ -58,6 +58,11 @@ return array(
                 'access'=>'YD01',
                 'url'=>'/warehouse/index',
             ),
+            //倉庫库存管理
+            'Warehouse storage Info'=>array(
+                'access'=>'YD08',
+                'url'=>'/storage/index',
+            ),
             //多訂單限制
             'OrderAcc Info'=>array(
                 'access'=>'YD05',

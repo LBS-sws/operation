@@ -113,6 +113,7 @@ return array(
 'Price To City'=>'城市分配價格',
 'Warehouse storage Info'=>'倉庫庫存管理',
 'backward storage'=>'入庫單退回',
+'Backward Warehouse'=>'倉庫退回報表',
 //沈超添加結束
 );
 ?>

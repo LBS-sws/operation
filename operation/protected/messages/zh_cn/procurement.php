@@ -293,5 +293,9 @@ return array(
     'storage num'=>'入库数量',
     ' is scope of'=>'的范围是',
     'The receipt is in storage and cannot be modified'=>'该入库单已入库，无法修改',
+
+    'Add requisition sheet'=>'添加领料单',
+    'requisition form'=>'领料表单',
+    'All Goods Class'=>'所有分类',
 );
 ?>

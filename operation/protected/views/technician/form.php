@@ -23,7 +23,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
 </style>
 <section class="content-header">
 	<h1>
-		<strong><?php echo Yii::t('procurement','Order Form'); ?></strong>
+		<strong><?php echo Yii::t('procurement','requisition form'); ?></strong>
 	</h1>
 <!--
 	<ol class="breadcrumb">
@@ -245,7 +245,7 @@ echo "</ul>";
         <div class="modal-content">
             <div class="modal-header">
                 <button class="close" data-dismiss="modal" type="button">×</button>
-                <h4 class="modal-title">選擇物品</h4>
+                <h4 class="modal-title"><?php echo Yii::t("procurement","Select Goods");?></h4>
             </div>
             <div class="modal-body">
                 <div class="form-group">
@@ -255,7 +255,7 @@ echo "</ul>";
                         ); ?>
                     </div>
                     <div class="col-xs-6 col-lg-4">
-                        <input class="form-control" id="selectGoods_search" type="text" placeholder="物品名稱">
+                        <input class="form-control" id="selectGoods_search" type="text" placeholder='<?php echo Yii::t("procurement","Goods Name");?>'>
                     </div>
                 </div>
                 <div class="box" style="max-height: 300px; overflow-y: auto;">
@@ -263,10 +263,10 @@ echo "</ul>";
                         <thead>
                         <tr>
                             <th width="5%">&nbsp;</th>
-                            <th width="25%">物品編號</th>
-                            <th width="32%">物品名稱</th>
-                            <th width="25%">物品分類</th>
-                            <th width="13%">物品單位</th>
+                            <th width="25%"><?php echo Yii::t("procurement","Goods Code");?></th>
+                            <th width="32%"><?php echo Yii::t("procurement","Goods Name");?></th>
+                            <th width="25%"><?php echo Yii::t("procurement","Goods Class");?></th>
+                            <th width="13%"><?php echo Yii::t("procurement","Unit");?></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -282,7 +282,7 @@ echo "</ul>";
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary pull-right" type="button">確定</button>
+                <button class="btn btn-primary pull-right" type="button"><?php echo Yii::t("dialog","OK");?></button>
             </div>
         </div>
     </div>

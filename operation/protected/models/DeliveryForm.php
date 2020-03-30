@@ -93,7 +93,7 @@ class DeliveryForm extends CFormModel
     }
 
 	public function validateNum($attribute, $params){
-        if(!empty($this->num)){
+        if($this->num!==""){
             $idList = Yii::app()->db->createCommand()->select("*")->from("opr_order_goods")->where('id = :id',array(':id'=>$this->black_id))->queryRow();
             if($idList){
                 if(is_numeric($this->num)){

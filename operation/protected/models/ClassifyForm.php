@@ -129,7 +129,7 @@ class ClassifyForm extends CFormModel
                 $from = "opr_warehouse";
         }
         $city = Yii::app()->user->city();
-        $arr = array(array("id"=>0,"name"=>"所有分類","list"=>array()));
+        $arr = array(array("id"=>0,"name"=>Yii::t("procurement","All Goods Class"),"list"=>array()));
         $rs = Yii::app()->db->createCommand()->select()->from("opr_classify")->where("class_type=:class_type",array(":class_type"=>$str))->order('level desc')->queryAll();
         if($rs){
             foreach ($rs as $row){

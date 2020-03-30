@@ -29,7 +29,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician List';
                 <?php
                 //var_dump(Yii::app()->session['rw_func']);
                 if (Yii::app()->user->validRWFunction('YC02'))
-                    echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('procurement','Add Order'), array(
+                    echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('procurement','Add requisition sheet'), array(
                         'submit'=>Yii::app()->createUrl('technician/new'),
                     ));
                 ?>

@@ -184,6 +184,90 @@ WHERE a.judge = 0 AND (a.status = 'finished' OR a.status = 'approve') AND a.city
         }
     }
 
+    /**
+     * 獲取外勤領料退货列表（一個物品一行）
+     * @param string $city_allow  訂單城市的範圍  例如：'SH','SZ','BJ'
+     * @param string $user_code   用戶編號
+     * @param string $start_date  訂單開始日期
+     * @param string $end_date    訂單結束日期
+     * @param string $username    管理員的username
+     * @return array
+     */
+    public function getOrderListSearchToBackward($city_allow,$user_code='',$start_date='',$end_date='',$username=''){
+        $suffix = Yii::app()->params['envSuffix'];
+        $systemId = Yii::app()->params['systemId'];
+        if(empty($city_allow)){
+            $city_allow = Yii::app()->user->city_allow();
+        }
+        $connection = Yii::app()->db;
+        $sql="SELECT a.remark AS order_remark,a.order_user,d.disp_name,a.status,a.order_code,a.city,a.lcd,a.audit_time,
+b.order_id,b.goods_id,b.goods_num,b.confirm_num,b.note,b.remark,
+c.goods_code,c.name AS goods_name,c.costing AS goods_cost,e.name AS classify_name,c.unit,c.price AS goods_price
+FROM opr_order a 
+LEFT JOIN opr_order_goods b ON a.id = b.order_id 
+LEFT JOIN security$suffix.sec_user d ON a.order_user = d.username
+LEFT JOIN opr_warehouse c ON c.id = b.goods_id 
+LEFT JOIN opr_classify e ON e.id = c.classify_id 
+WHERE a.judge = 0 AND (a.status = 'finished' OR a.status = 'approve') AND a.city IN ($city_allow) AND c.goods_code IS NOT NULL ";
+        if(!empty($user_code)){
+//            $sql.=" d.username like '%$user_code%'";
+            $sql.=" AND d.username in ($user_code)";
+        }
+        if(!empty($start_date)){
+            $start_date = date("Y/m/d",strtotime($start_date));
+            $sql.=" AND DATE_FORMAT(a.audit_time,'%Y/%m/%d') >= '$start_date'";
+        }
+        if(!empty($end_date)){
+            $end_date = date("Y/m/d",strtotime($end_date));
+            $sql.=" AND DATE_FORMAT(a.audit_time,'%Y/%m/%d') <= '$end_date'";
+        }
+        $sql.=" order by a.audit_time desc";
+
+        $records = $connection->createCommand($sql)->queryAll();
+        if($records){
+            $priceBool = Yii::app()->db->createCommand()->select("username")->from("security$suffix.sec_user_access")
+                ->where("username=:username and system_id='$systemId' and (a_read_only like '%YN02%' or a_read_write like '%YN02%' or a_control like '%YN02%')",
+                    array(':username'=>$username))->queryRow(); //判斷是否有顯示價格的權限
+            $arrBackward=array();
+            foreach ($records as &$record){
+                $backwardList = Yii::app()->db->createCommand()->select("r_remark")->from("opr_order_status")
+                    ->where("order_id = :order_id and status='backward' and r_remark like '".$record["goods_name"]."退回數量:%'",
+                        array(':order_id'=>$record['order_id']))->queryAll(); //驗證該物品是否含有退回
+                if(count($backwardList)>0){
+                    $black_num = 0;
+                    foreach ($backwardList as $backward){
+                        $backward["r_remark"] = end(explode("退回數量:",$backward["r_remark"]));
+                        $backward["r_remark"] = is_numeric($backward["r_remark"])?floatval($backward["r_remark"]):'异常';
+                        $black_num+=$backward["r_remark"];
+                    }
+                }else{
+                    continue;
+                }
+                $record["cost_year_month"] = "无";
+                $record["goods_price"] = 0;
+                if($priceBool){
+                    $priceList = Yii::app()->db->createCommand()->select("price as cost_price,year,month")->from("opr_warehouse_price")
+                        ->where("(year<date_format(:date_time,'%Y') or (year=date_format(:date_time,'%Y') and month<=date_format(:date_time,'%m'))) AND warehouse_id = :id",
+                            array(':id'=>$record['goods_id'],':date_time'=>$record['audit_time']))->order("year DESC,month DESC")->queryRow();
+                    if(!$priceList){
+                        $priceList=array('cost_price'=>0,'year'=>'无','month'=>'无');
+                    }
+                    $record["cost_year_month"] = $priceList["year"]==="无"?"无":$priceList["year"]."/".$priceList["month"];
+                    $record["goods_price"] = $priceList["cost_price"];
+                }
+                $num = empty($record["confirm_num"])?$record["goods_num"]:$record["confirm_num"];
+                $price = floatval($record["goods_price"]);
+                $record["goods_sum_price"] = sprintf("%.2f", floatval($num)*$price);
+                $record["black_num"] = $black_num;
+                $record["city_name"] = CGeneral::getCityName($record["city"]);
+                $arrBackward[] = $record;
+            }
+            return $arrBackward;
+        }else{
+            return array();
+        }
+    }
+
 	// Percy - 為 RptPickingList.php 讀取資料用
 	//
     public function getOrderListSearchX($city_allow,$user_code='',$start_date='',$end_date=''){

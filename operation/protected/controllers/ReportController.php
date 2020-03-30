@@ -6,6 +6,7 @@ class ReportController extends Controller
 						'orderlist'=>'YB03',
 						'pickinglist'=>'YB04',
 						'business'=>'YB05',
+						'backward'=>'YB06',
 					);
 	
 	public function filters()
@@ -73,6 +74,26 @@ class ReportController extends Controller
 		Yii::app()->session['active_func'] = $this->function_id;
 
 		$model = new ReportY03Form;
+		if (isset($_POST['ReportY03Form'])) {
+			$model->attributes = $_POST['ReportY03Form'];
+			if ($model->validate()) {
+				$model->addQueueItem();
+				Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Report submitted. Please go to Report Manager to retrieve the output.'));
+			} else {
+				$message = CHtml::errorSummary($model);
+				Dialog::message(Yii::t('dialog','Validation Message'), $message);
+			}
+		}
+		$this->render('form_y03',array('model'=>$model));
+	}
+
+	public function actionBackward() {
+		$this->function_id = 'YB06';
+		Yii::app()->session['active_func'] = $this->function_id;
+
+		$model = new ReportY03Form;
+        $model->id="RptBackward";
+        $model->name=Yii::t('app','Backward Warehouse');
 		if (isset($_POST['ReportY03Form'])) {
 			$model->attributes = $_POST['ReportY03Form'];
 			if ($model->validate()) {

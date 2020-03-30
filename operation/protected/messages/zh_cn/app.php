@@ -113,6 +113,7 @@ return array(
     'Price To City'=>'城市分配价格',
     'Warehouse storage Info'=>'仓库库存管理',
     'backward storage'=>'入库单退回',
+    'Backward Warehouse'=>'仓库退回报表',
     //沈超添加結束
 	
 );

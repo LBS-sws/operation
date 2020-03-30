@@ -292,5 +292,9 @@ return array(
     'storage num'=>'入庫數量',
     ' is scope of'=>'的範圍是',
     'The receipt is in storage and cannot be modified'=>'該入庫單已入庫，無法修改',
+
+    'Add requisition sheet'=>'添加領料單',
+    'requisition form'=>'領料表單',
+    'All Goods Class'=>'所有分類',
 );
 ?>

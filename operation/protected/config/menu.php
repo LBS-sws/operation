@@ -128,6 +128,10 @@ return array(
                 'access'=>'YB04',
                 'url'=>'/report/pickinglist',
             ),
+            'Backward Warehouse'=>array(
+                'access'=>'YB06',
+                'url'=>'/report/backward',
+            ),
             'Report Manager'=>array(
                 'access'=>'YB01',
                 'url'=>'/queue/index',

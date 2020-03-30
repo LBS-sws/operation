@@ -25,8 +25,14 @@ $this->pageTitle=Yii::app()->name . ' - Report';
 <section class="content">
 	<div class="box"><div class="box-body">
 	<div class="btn-group" role="group">
-		<?php echo TbHtml::button(Yii::t('misc','Submit'), array(
-				'submit'=>Yii::app()->createUrl('report/pickinglist'))); 
+		<?php
+        if($model->id == "RptBackward"){
+            echo TbHtml::button(Yii::t('misc','Submit'), array(
+                'submit'=>Yii::app()->createUrl('report/backward')));
+        }else{
+            echo TbHtml::button(Yii::t('misc','Submit'), array(
+                'submit'=>Yii::app()->createUrl('report/pickinglist')));
+        }
 		?>
 	</div>
 	</div></div>

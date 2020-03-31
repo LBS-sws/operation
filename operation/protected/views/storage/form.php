@@ -10,7 +10,9 @@ $this->pageTitle=Yii::app()->name . ' - storage Info';
 'clientOptions'=>array('validateOnSubmit'=>true,),
 'layout'=>TbHtml::FORM_LAYOUT_HORIZONTAL,
 )); ?>
-
+<style>
+    #table_storage td{vertical-align: middle;}
+</style>
 <section class="content-header">
 	<h1>
 		<strong><?php echo Yii::t('procurement','Warehouse storage form'); ?></strong>
@@ -89,19 +91,19 @@ $this->pageTitle=Yii::app()->name . ' - storage Info';
 
             <div class="form-group">
                 <?php echo $form->labelEx($model,'goods_list',array('class'=>"col-sm-2 control-label")); ?>
-                <div class="col-sm-7">
+                <div class="col-sm-9">
                     <table class="table table-bordered table-striped">
                         <thead>
                         <tr>
                             <th><?php echo Yii::t("procurement","Goods Code");?></th>
                             <th><?php echo Yii::t("procurement","Goods Name");?></th>
-                            <th><?php echo Yii::t("procurement","Unit");?></th>
-                            <th><?php echo Yii::t("procurement","Now Inventory");?></th>
-                            <th><?php echo Yii::t("procurement","storage num");?></th>
+                            <th width="10%"><?php echo Yii::t("procurement","Unit");?></th>
+                            <th width="10%"><?php echo Yii::t("procurement","Now Inventory");?></th>
+                            <th width="14%"><?php echo Yii::t("procurement","storage num");?></th>
 
                                 <?php
                                 if(!$model->getReadonly()){
-                                    echo '<th class="text-center">'.TbHtml::button('<span class="fa fa-search"></span> '.Yii::t('procurement','Select Goods'),
+                                    echo '<th class="text-center" width="5%">'.TbHtml::button('<span class="fa fa-search"></span> '.Yii::t('procurement','Select Goods'),
                                         array('data-toggle'=>'modal','data-target'=>'#lookupdialog','id'=>'storageSelect')
                                     )."</th>";
                                 }
@@ -173,16 +175,27 @@ if (!$model->getReadonly()) {
     
     $("#btnLookupSelect").on("click",function(){
         $("#lookupdialog").modal("hide");
-        $("#table_storage").children("tr").not("#table_template").remove();
+        //$("#table_storage").children("tr").not("#table_template").remove();
+        var oldcodeval = $("#StorageForm_storage_code").val();
         var codeval = "";
         var valueval = "";
-        $("#lstlookup option:selected").each(function(i, selected) {
+        var selectArr =[];
+        oldcodeval =  oldcodeval==""?[]:oldcodeval.split("~");
+        $("#lstlookup option:selected").each(function(i, selected) { //添加新增的物品
+            selectArr.push(""+$(selected).val());
             codeval = ((codeval=="") ? codeval : codeval+"~") + $(selected).val();
             valueval = ((valueval=="") ? valueval : valueval+",") + $(selected).data("name");
-            setStorageRow(selected);
+            if(oldcodeval.indexOf(""+$(selected).val())<0){
+                setStorageRow(selected);
+            }
         });
         $("#StorageForm_storage_code").val(codeval);
         $("#StorageForm_storage_name").val(valueval);
+        $("#table_storage").children("tr").not("#table_template").each(function(){ //刪除多餘的物品
+            if(selectArr.indexOf(""+$(this).data("num"))<0){
+                $(this).remove();
+            }
+        });
     });
     
     function setStorageRow(row){

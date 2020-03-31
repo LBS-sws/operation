@@ -161,20 +161,24 @@ class StorageForm extends CFormModel
 
     public function printTableStorage(){
         $html = '';
+        $html.="<tr data-num=':id' id='table_template' style='display: none;'>";
+        $html.="<td>";
+        $html.=TbHtml::hiddenField(":model[:id][id]",":id");
+        $html.=TbHtml::hiddenField(":model[:id][name]",":name");
+        $html.=TbHtml::hiddenField(":model[:id][unit]",":unit");
+        $html.=TbHtml::hiddenField(":model[:id][inventory]",":inventory");
+        $html.=TbHtml::hiddenField(":model[:id][goods_code]",":goods_code");
+        $html.="<span class='span-input'>:goods_code</span>";
+        $html.="</td>";
+        $html.="<td><span class='span-input'>:name</span></td>";
+        $html.="<td><span class='span-input'>:unit</span></td>";
+        $html.="<td><span class='span-input'>:inventory</span></td>";
+        $html.="<td>".TbHtml::numberField(":model[:id][add_num]","",array("readonly"=>$this->getReadonly(),'min'=>0))."</td>";
+        if(!$this->getReadonly()) {
+            $html .= "<td class='text-center'>" . TbHtml::button(Yii::t("dialog", "Remove"), array("class" => "storageDelete")) . "</td>";
+        }
+        $html.="</tr>";
         if(empty($this->goods_list)){
-            $html.="<tr data-num=':id' id='table_template' style='display: none;'>";
-            $html.="<td>";
-            $html.=TbHtml::hiddenField(":model[:id][id]",":id");
-            $html.=TbHtml::textField(":model[:id][goods_code]",":goods_code",array("readonly"=>true));
-            $html.="</td>";
-            $html.="<td>".TbHtml::textField(":model[:id][name]",":name",array("readonly"=>true))."</td>";
-            $html.="<td>".TbHtml::textField(":model[:id][unit]",":unit",array("readonly"=>true))."</td>";
-            $html.="<td>".TbHtml::textField(":model[:id][inventory]",":inventory",array("readonly"=>true))."</td>";
-            $html.="<td>".TbHtml::numberField(":model[:id][add_num]","",array("readonly"=>$this->getReadonly(),'min'=>0))."</td>";
-            if(!$this->getReadonly()) {
-                $html .= "<td class='text-center'>" . TbHtml::button(Yii::t("dialog", "Remove"), array("class" => "storageDelete")) . "</td>";
-            }
-            $html.="</tr>";
             $html .= "<tr><td colspan='6'>请选择物品</td></tr>";
         }else{
             foreach ($this->goods_list as $row){
@@ -182,11 +186,15 @@ class StorageForm extends CFormModel
                 $html.="<tr data-num='$id'>";
                 $html.="<td>";
                 $html.=TbHtml::hiddenField("StorageForm[goods_list][$id][id]",$row['id']);
-                $html.=TbHtml::textField("StorageForm[goods_list][$id][goods_code]",$row['goods_code'],array("readonly"=>true));
+                $html.=TbHtml::hiddenField("StorageForm[goods_list][$id][goods_code]",$row['goods_code']);
+                $html.=TbHtml::hiddenField("StorageForm[goods_list][$id][name]",$row['name']);
+                $html.=TbHtml::hiddenField("StorageForm[goods_list][$id][unit]",$row['unit']);
+                $html.=TbHtml::hiddenField("StorageForm[goods_list][$id][inventory]",$row['inventory']);
+                $html.="<span class='span-input'>".$row['goods_code']."</span>";
                 $html.="</td>";
-                $html.="<td>".TbHtml::textField("StorageForm[goods_list][$id][name]",$row['name'],array("readonly"=>true))."</td>";
-                $html.="<td>".TbHtml::textField("StorageForm[goods_list][$id][unit]",$row['unit'],array("readonly"=>true))."</td>";
-                $html.="<td>".TbHtml::textField("StorageForm[goods_list][$id][inventory]",$row['inventory'],array("readonly"=>true))."</td>";
+                $html.="<td><span class='span-input'>".$row['name']."</span></td>";
+                $html.="<td><span class='span-input'>".$row['unit']."</span></td>";
+                $html.="<td><span class='span-input'>".$row['inventory']."</span></td>";
                 $html.="<td>".TbHtml::numberField("StorageForm[goods_list][$id][add_num]",floatval($row['add_num']),array("readonly"=>$this->getReadonly(),'min'=>0))."</td>";
                 if(!$this->getReadonly()){
                     $html.="<td class='text-center'>".TbHtml::button(Yii::t("dialog","Remove"),array("class"=>"storageDelete"))."</td>";

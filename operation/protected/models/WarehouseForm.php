@@ -169,9 +169,12 @@ class WarehouseForm extends CFormModel
 
     //
     public function getStorageHistory($id){
+        $suffix = Yii::app()->params['envSuffix'];
         $html = '';
-        $rs = Yii::app()->db->createCommand()->select("b.id,a.lcd,b.code,b.apply_time,a.add_num,c.name,c.goods_code")
-            ->from("opr_storage_info a")->leftJoin('opr_storage b',"a.storage_id=b.id")
+        $rs = Yii::app()->db->createCommand()->select("b.id,a.lcd,b.code,b.apply_time,a.add_num,c.name,c.goods_code,d.disp_name")
+            ->from("opr_storage_info a")
+            ->leftJoin('opr_storage b',"a.storage_id=b.id")
+            ->leftJoin("security$suffix.sec_user d","d.username=b.lcu")
             ->leftJoin('opr_warehouse c',"a.warehouse_id=c.id")
             ->where('a.warehouse_id =:id and (b.status_type=1 or b.status_type is null)',array(':id'=>$id))->order("b.apply_time desc,a.lcd desc")->queryAll();
         if($rs){
@@ -188,6 +191,7 @@ class WarehouseForm extends CFormModel
                 $html.="<td>".$row["goods_code"]."</td>";
                 $html.="<td>".$row["name"]."</td>";
                 $html.="<td>".floatval($row["add_num"])."</td>";
+                $html.="<td>".$row["disp_name"]."</td>";
                 $html.="</tr>";
             }
         }

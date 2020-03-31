@@ -117,6 +117,7 @@ class StorageController extends Controller
     public function actionNew()
     {
         $model = new StorageForm('new');
+        $model->apply_time=date("Y/m/d");
         $this->render('form',array('model'=>$model,));
     }
 

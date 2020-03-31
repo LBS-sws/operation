@@ -18,6 +18,7 @@ $this->beginWidget('bootstrap.widgets.TbModal', array(
             <th><?php echo Yii::t("procurement","Goods Code"); ?></th>
             <th><?php echo Yii::t("procurement","Goods Name"); ?></th>
             <th><?php echo Yii::t("procurement","storage num"); ?></th>
+            <th><?php echo Yii::t("procurement","Operator User"); ?></th>
         </tr>
         </thead>
         <tbody>

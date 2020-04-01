@@ -67,6 +67,7 @@ class StorageForm extends CFormModel
 	public function validateGoodsList($attribute, $params){
 	    if(!empty($this->goods_list)){
             $city = Yii::app()->user->city();
+            $suffix = Yii::app()->params['envSuffix'];
             $this->storage_list = array();
             $this->storage_code = "";
             $this->storage_name = "";
@@ -82,11 +83,14 @@ class StorageForm extends CFormModel
                         $this->addError($attribute,$message);
                         return false;
                     }else{
+                        $supplier = Yii::app()->db->createCommand()->select("id,code,name")->from("swoper$suffix.swo_supplier")
+                            ->where('city=:city and id=:id', array(':id'=>$row["supplier_id"],":city"=>$city))->queryRow();
                         $this->storage_list[]=array(
                             "warehouse_id"=>$goods["id"],
                             "inventory"=>$goods["inventory"],
                             "min_num"=>$goods["min_num"],
                             "add_num"=>$row["add_num"],
+                            "supplier_id"=>$supplier?$supplier["id"]:"",
                         );
                     }
                 }else{
@@ -100,6 +104,7 @@ class StorageForm extends CFormModel
 
 	public function retrieveData($index) {
         $city = Yii::app()->user->city();
+        $suffix = Yii::app()->params['envSuffix'];
 		$row = Yii::app()->db->createCommand()->select("*")
             ->from("opr_storage")->where("id=:id and city='$city'",array(":id"=>$index))->queryRow();
 		if ($row) {
@@ -110,10 +115,11 @@ class StorageForm extends CFormModel
             $this->status_type = $row['status_type'];
             $this->storage_code = $row['storage_code'];
             $this->storage_name = $row['storage_name'];
-            $rows = Yii::app()->db->createCommand()->select("a.add_num,b.inventory,b.goods_code,b.name,b.unit,b.id")
+            $rows = Yii::app()->db->createCommand()->select("a.supplier_id,a.add_num,b.inventory,b.goods_code,b.name,b.unit,b.id,c.code as supplier_code,c.name as supplier_name")
                 ->from("opr_storage_info a")
                 ->leftJoin("opr_warehouse b","a.warehouse_id = b.id")
-                ->where("a.storage_id=:id",array(":id"=>$index))->queryAll();
+                ->leftJoin("swoper$suffix.swo_supplier c","a.supplier_id = c.id")
+                ->where("a.storage_id=:id",array(":id"=>$index))->order("a.id asc")->queryAll();
             $this->goods_list = $rows?$rows:array();
 		}
 		return true;
@@ -172,6 +178,12 @@ class StorageForm extends CFormModel
         $html.="</td>";
         $html.="<td><span class='span-input'>:name</span></td>";
         $html.="<td><span class='span-input'>:unit</span></td>";
+        $html.="<td><span class='span-input supplier_text'> - </span>";
+        $html.=TbHtml::button(Yii::t("dialog", "Select"), array("class" => "select_supplier"));
+        $html.=TbHtml::hiddenField(":model[:id][supplier_id]","",array('class'=>'supplier_id'));
+        $html.=TbHtml::hiddenField(":model[:id][supplier_code]","",array('class'=>'supplier_code'));
+        $html.=TbHtml::hiddenField(":model[:id][supplier_name]","",array('class'=>'supplier_name'));
+        $html.="</td>";
         $html.="<td><span class='span-input'>:inventory</span></td>";
         $html.="<td>".TbHtml::numberField(":model[:id][add_num]","",array("readonly"=>$this->getReadonly(),'min'=>0))."</td>";
         if(!$this->getReadonly()) {
@@ -179,7 +191,7 @@ class StorageForm extends CFormModel
         }
         $html.="</tr>";
         if(empty($this->goods_list)){
-            $html .= "<tr><td colspan='6'>请选择物品</td></tr>";
+            $html .= "<tr><td colspan='7'>请选择物品</td></tr>";
         }else{
             foreach ($this->goods_list as $row){
                 $id = $row['id'];
@@ -194,6 +206,14 @@ class StorageForm extends CFormModel
                 $html.="</td>";
                 $html.="<td><span class='span-input'>".$row['name']."</span></td>";
                 $html.="<td><span class='span-input'>".$row['unit']."</span></td>";
+                $html.="<td><span class='span-input supplier_text'>".$row['supplier_code']." - ".$row['supplier_name']."</span>";
+                if(!$this->getReadonly()){
+                    $html.=TbHtml::button(Yii::t("dialog", "Select"), array("class" => "select_supplier"));
+                    $html.=TbHtml::hiddenField("StorageForm[goods_list][$id][supplier_id]",$row['supplier_id'],array('class'=>'supplier_id'));
+                    $html.=TbHtml::hiddenField("StorageForm[goods_list][$id][supplier_code]",$row['supplier_code'],array('class'=>'supplier_code'));
+                    $html.=TbHtml::hiddenField("StorageForm[goods_list][$id][supplier_name]",$row['supplier_name'],array('class'=>'supplier_name'));
+                }
+                $html.="</td>";
                 $html.="<td><span class='span-input'>".$row['inventory']."</span></td>";
                 $html.="<td>".TbHtml::numberField("StorageForm[goods_list][$id][add_num]",floatval($row['add_num']),array("readonly"=>$this->getReadonly(),'min'=>0))."</td>";
                 if(!$this->getReadonly()){
@@ -285,11 +305,15 @@ class StorageForm extends CFormModel
 
         Yii::app()->db->createCommand()->delete("opr_storage_info","storage_id=:storage_id",array(":storage_id"=>$this->id));
         foreach ($this->storage_list as $row){ //添加入庫物品
-            Yii::app()->db->createCommand()->insert("opr_storage_info",array(
+            $addArr=array(
                 "add_num"=>$row["add_num"],
                 "storage_id"=>$this->id,
-                "warehouse_id"=>$row["warehouse_id"],
-            ));
+                "warehouse_id"=>$row["warehouse_id"]
+            );
+            if (!empty($row["supplier_id"])){
+                $addArr["supplier_id"] = $row["supplier_id"];
+            }
+            Yii::app()->db->createCommand()->insert("opr_storage_info",$addArr);
             if($this->status_type == 1){ //物品入庫（庫存添加）
                 $inventory = floatval($row["inventory"])+floatval($row["add_num"]);
                 $z_index = $inventory<=floatval($row["min_num"])?2:1;

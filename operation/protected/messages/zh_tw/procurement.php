@@ -296,5 +296,7 @@ return array(
     'Add requisition sheet'=>'添加領料單',
     'requisition form'=>'領料表單',
     'All Goods Class'=>'所有分類',
+    'supplier'=>'供應商',
+    'select supplier'=>'選擇供應商',
 );
 ?>

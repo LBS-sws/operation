@@ -26,7 +26,7 @@ class LookupController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('goodex','yc02userex','citySearchEx','storageSearchex'),
+				'actions'=>array('goodex','yc02userex','citySearchEx','storageSearchex','supplierSearch'),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -85,6 +85,17 @@ class LookupController extends Controller
         $rows = Yii::app()->db->createCommand()->select("id,goods_code,name,unit,inventory")
             ->from("opr_warehouse")
             ->where("city=:city and name like '%$searchx%'",array(":city"=>$city))->queryAll();
+		print json_encode($rows);
+	}
+
+	public function actionSupplierSearch($search)
+	{
+        $suffix = Yii::app()->params['envSuffix'];
+        $searchx = str_replace("'","\'",$search);
+        $city = Yii::app()->user->city();
+        $rows = Yii::app()->db->createCommand()->select("id,code,name")
+            ->from("swoper$suffix.swo_supplier")
+            ->where("city=:city and (name like '%$searchx%' or code like '%$searchx%' or full_name like '%$searchx%')",array(":city"=>$city))->queryAll();
 		print json_encode($rows);
 	}
 

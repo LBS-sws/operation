@@ -95,9 +95,10 @@ $this->pageTitle=Yii::app()->name . ' - storage Info';
                     <table class="table table-bordered table-striped">
                         <thead>
                         <tr>
-                            <th><?php echo Yii::t("procurement","Goods Code");?></th>
-                            <th><?php echo Yii::t("procurement","Goods Name");?></th>
+                            <th width="10%"><?php echo Yii::t("procurement","Goods Code");?></th>
+                            <th width="30%"><?php echo Yii::t("procurement","Goods Name");?></th>
                             <th width="10%"><?php echo Yii::t("procurement","Unit");?></th>
+                            <th width="30%"><?php echo Yii::t("procurement","supplier");?></th>
                             <th width="10%"><?php echo Yii::t("procurement","Now Inventory");?></th>
                             <th width="14%"><?php echo Yii::t("procurement","storage num");?></th>
 
@@ -133,12 +134,13 @@ $this->pageTitle=Yii::app()->name . ' - storage Info';
 
 
 <?php $this->renderPartial('//site/lookup'); ?>
+<?php $this->renderPartial('//site/supplier'); ?>
 <?php
 if (!$model->getReadonly()) {
     $mesg = Yii::t('dialog','No Record Found');
     $link = Yii::app()->createAbsoluteUrl("lookup")."/StorageSearchex";
     $js='
-    $(".modal-title").text($("#storageSelect").text());
+    $("#lookupdialog .modal-title").text($("#storageSelect").text());
     $("#lstlookup").attr("multiple","multiple");
     $("#btnLookup").on("click",function(){
         $.ajax({

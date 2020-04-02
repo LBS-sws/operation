@@ -7,6 +7,7 @@ class ReportController extends Controller
 						'pickinglist'=>'YB04',
 						'business'=>'YB05',
 						'backward'=>'YB06',
+						'storage'=>'YB07',
 					);
 	
 	public function filters()
@@ -105,6 +106,24 @@ class ReportController extends Controller
 			}
 		}
 		$this->render('form_y03',array('model'=>$model));
+	}
+
+	public function actionStorage() {
+		$this->function_id = 'YB07';
+		Yii::app()->session['active_func'] = $this->function_id;
+
+		$model = new ReportY05Form();
+		if (isset($_POST['ReportY05Form'])) {
+			$model->attributes = $_POST['ReportY05Form'];
+			if ($model->validate()) {
+				$model->addQueueItem();
+				Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Report submitted. Please go to Report Manager to retrieve the output.'));
+			} else {
+				$message = CHtml::errorSummary($model);
+				Dialog::message(Yii::t('dialog','Validation Message'), $message);
+			}
+		}
+		$this->render('form_y05',array('model'=>$model));
 	}
 
     public function actionBusiness() {

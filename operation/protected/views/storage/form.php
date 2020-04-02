@@ -177,27 +177,18 @@ if (!$model->getReadonly()) {
     
     $("#btnLookupSelect").on("click",function(){
         $("#lookupdialog").modal("hide");
-        //$("#table_storage").children("tr").not("#table_template").remove();
         var oldcodeval = $("#StorageForm_storage_code").val();
-        var codeval = "";
-        var valueval = "";
-        var selectArr =[];
         oldcodeval =  oldcodeval==""?[]:oldcodeval.split("~");
         $("#lstlookup option:selected").each(function(i, selected) { //添加新增的物品
-            selectArr.push(""+$(selected).val());
-            codeval = ((codeval=="") ? codeval : codeval+"~") + $(selected).val();
-            valueval = ((valueval=="") ? valueval : valueval+",") + $(selected).data("name");
             if(oldcodeval.indexOf(""+$(selected).val())<0){
+                oldcodeval.push(""+$(selected).val());
                 setStorageRow(selected);
             }
         });
-        $("#StorageForm_storage_code").val(codeval);
-        $("#StorageForm_storage_name").val(valueval);
-        $("#table_storage").children("tr").not("#table_template").each(function(){ //刪除多餘的物品
-            if(selectArr.indexOf(""+$(this).data("num"))<0){
-                $(this).remove();
-            }
-        });
+        $("#StorageForm_storage_code").val(oldcodeval.join("~"));
+        if($("#table_storage").children("tr").length>2){
+            $("#table_storage").children("tr.none").hide();
+        }
     });
     
     function setStorageRow(row){
@@ -220,6 +211,9 @@ if (!$model->getReadonly()) {
             selectList.splice(index, 1);
             $("#StorageForm_storage_code").val(selectList.join("~"));
             $thatTr.remove();
+        }
+        if($("#table_storage").children("tr").length<3){
+            $("#table_storage").children("tr.none").show();
         }
     });
 ';

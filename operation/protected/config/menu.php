@@ -132,6 +132,10 @@ return array(
                 'access'=>'YB06',
                 'url'=>'/report/backward',
             ),
+            'storage Report'=>array(
+                'access'=>'YB07',
+                'url'=>'/report/storage',
+            ),
             'Report Manager'=>array(
                 'access'=>'YB01',
                 'url'=>'/queue/index',

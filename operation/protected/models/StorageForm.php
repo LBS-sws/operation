@@ -178,12 +178,12 @@ class StorageForm extends CFormModel
         $html.="</td>";
         $html.="<td><span class='span-input'>:name</span></td>";
         $html.="<td><span class='span-input'>:unit</span></td>";
-        $html.="<td><span class='span-input supplier_text'> - </span>";
-        $html.=TbHtml::button(Yii::t("dialog", "Select"), array("class" => "select_supplier"));
+        $html.="<td><div class='media'><div class='media-body media-middle'><span class='span-input supplier_text'> - </span></div><div class='media-right media-middle'>";
+        $html.=TbHtml::button(Yii::t("dialog", "Select"), array("class" => "select_supplier media-left media-middle"));
         $html.=TbHtml::hiddenField(":model[:id][supplier_id]","",array('class'=>'supplier_id'));
         $html.=TbHtml::hiddenField(":model[:id][supplier_code]","",array('class'=>'supplier_code'));
         $html.=TbHtml::hiddenField(":model[:id][supplier_name]","",array('class'=>'supplier_name'));
-        $html.="</td>";
+        $html.="</div></div></td>";
         $html.="<td><span class='span-input'>:inventory</span></td>";
         $html.="<td>".TbHtml::numberField(":model[:id][add_num]","",array("readonly"=>$this->getReadonly(),'min'=>0))."</td>";
         if(!$this->getReadonly()) {
@@ -191,7 +191,7 @@ class StorageForm extends CFormModel
         }
         $html.="</tr>";
         if(empty($this->goods_list)){
-            $html .= "<tr><td colspan='7'>请选择物品</td></tr>";
+            $html .= "<tr class='none'><td colspan='7'>请选择物品</td></tr>";
         }else{
             foreach ($this->goods_list as $row){
                 $id = $row['id'];
@@ -206,14 +206,15 @@ class StorageForm extends CFormModel
                 $html.="</td>";
                 $html.="<td><span class='span-input'>".$row['name']."</span></td>";
                 $html.="<td><span class='span-input'>".$row['unit']."</span></td>";
-                $html.="<td><span class='span-input supplier_text'>".$row['supplier_code']." - ".$row['supplier_name']."</span>";
+                $row['supplier_name'] = empty($row['supplier_name'])?"-":$row['supplier_name'];
+                $html.="<td><div class='media'><div class='media-body media-middle'><span class='span-input supplier_text'>".$row['supplier_name']."</span></div><div class='media-right media-middle'>";
                 if(!$this->getReadonly()){
                     $html.=TbHtml::button(Yii::t("dialog", "Select"), array("class" => "select_supplier"));
                     $html.=TbHtml::hiddenField("StorageForm[goods_list][$id][supplier_id]",$row['supplier_id'],array('class'=>'supplier_id'));
                     $html.=TbHtml::hiddenField("StorageForm[goods_list][$id][supplier_code]",$row['supplier_code'],array('class'=>'supplier_code'));
                     $html.=TbHtml::hiddenField("StorageForm[goods_list][$id][supplier_name]",$row['supplier_name'],array('class'=>'supplier_name'));
                 }
-                $html.="</td>";
+                $html.="</div></div></td>";
                 $html.="<td><span class='span-input'>".$row['inventory']."</span></td>";
                 $html.="<td>".TbHtml::numberField("StorageForm[goods_list][$id][add_num]",floatval($row['add_num']),array("readonly"=>$this->getReadonly(),'min'=>0))."</td>";
                 if(!$this->getReadonly()){

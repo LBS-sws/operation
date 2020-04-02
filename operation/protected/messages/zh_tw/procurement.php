@@ -298,5 +298,8 @@ return array(
     'All Goods Class'=>'所有分類',
     'supplier'=>'供應商',
     'select supplier'=>'選擇供應商',
+    'storage user'=>'入庫用戶名稱',
+    'old storage num'=>'入庫前數量',
+    'now storage num'=>'入庫後數量',
 );
 ?>

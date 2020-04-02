@@ -78,7 +78,7 @@
             var num = $("#clickNumSupplier").val();
             var select = $("#lstSupplier option:selected").eq(0);
             if(select.length>0){
-                $("#table_storage>tr[data-num='"+num+"']").find(".supplier_text:first").text(select.data("code")+" - "+select.data("name"));
+                $("#table_storage>tr[data-num='"+num+"']").find(".supplier_text:first").text(select.data("name"));
                 $("#table_storage>tr[data-num='"+num+"']").find(".supplier_id:first").val(select.val());
                 $("#table_storage>tr[data-num='"+num+"']").find(".supplier_code:first").val(select.data("code"));
                 $("#table_storage>tr[data-num='"+num+"']").find(".supplier_name:first").val(select.data("name"));

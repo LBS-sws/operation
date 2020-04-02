@@ -299,5 +299,8 @@ return array(
     'All Goods Class'=>'所有分类',
     'supplier'=>'供应商',
     'select supplier'=>'选择供应商',
+    'storage user'=>'入库用户名称',
+    'old storage num'=>'入库前数量',
+    'now storage num'=>'入库后数量',
 );
 ?>

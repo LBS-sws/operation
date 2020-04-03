@@ -377,6 +377,14 @@ class DeliveryForm extends CFormModel
             'lcu'=>Yii::app()->user->user_display_name(),
             'time'=>date('Y-m-d H:i:s'),
         ));
+        //記錄
+        Yii::app()->db->createCommand()->insert('opr_warehouse_back', array(
+            'order_id'=>$this->id,
+            'warehouse_id'=>$goodsId,
+            'back_num'=>$num,
+            'old_num'=>$this->confirm_num,
+            'lcu'=>Yii::app()->user->user_display_name(),
+        ));
     }
 
     //檢查是否有未發貨的訂單

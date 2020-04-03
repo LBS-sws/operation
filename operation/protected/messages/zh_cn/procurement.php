@@ -302,5 +302,9 @@ return array(
     'storage user'=>'入库用户名称',
     'old storage num'=>'入库前数量',
     'now storage num'=>'入库后数量',
+    'Old Black Number'=>'退回前数量',
+    'Now Black Number'=>'退回后数量',
+    'Black User'=>'退回用戶',
+    'Black Time'=>'退回时间',
 );
 ?>

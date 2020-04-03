@@ -10,19 +10,10 @@ class RptBackward extends CReport {
 			'goods_name'=>array('label'=>Yii::t('report','Item Name'),'width'=>30,'align'=>'L'),
 			'unit'=>array('label'=>Yii::t('procurement','Unit'),'width'=>15,'align'=>'L'),
 			'goods_class'=>array('label'=>Yii::t('report','Item Class'),'width'=>25,'align'=>'L'),
-// Percy 2018/2/8 - 报表里面的货品成本价格设置成物品设置里的单价
-//			'goods_cost'=>array('label'=>Yii::t('report','Item Cost'),'width'=>15,'align'=>'R'),
-			'goods_price'=>array('label'=>Yii::t('procurement','Price'),'width'=>15,'align'=>'R'),
-			'cost_year_month'=>array('label'=>Yii::t('procurement','Price year month'),'width'=>15,'align'=>'C'),
-			'goods_num'=>array('label'=>Yii::t('report','Req. Qty.'),'width'=>15,'align'=>'R'),
-			'confirm_num'=>array('label'=>Yii::t('report','Act. Qty.'),'width'=>15,'align'=>'R'),
-			'goods_sum_price'=>array('label'=>Yii::t('report','Total Cost'),'width'=>15,'align'=>'R'),
-			'black_num'=>array('label'=>Yii::t('procurement','Black Number'),'width'=>15,'align'=>'R'),
-			'lcd'=>array('label'=>Yii::t('report','Order Date'),'width'=>15,'align'=>'C'),
-			'audit_time'=>array('label'=>Yii::t('report','Approved Date'),'width'=>15,'align'=>'C'),
-            'note'=>array('label'=>Yii::t('procurement','Demand Note'),'width'=>50,'align'=>'L'),
-            'remark'=>array('label'=>Yii::t('procurement','Headquarters Note'),'width'=>50,'align'=>'L'),
-            'order_remark'=>array('label'=>Yii::t('procurement','Remark'),'width'=>50,'align'=>'L'),
+			'old_num'=>array('label'=>Yii::t('procurement','Old Black Number'),'width'=>15,'align'=>'R'),
+			'back_num'=>array('label'=>Yii::t('procurement','Black Number'),'width'=>15,'align'=>'R'),
+			'now_num'=>array('label'=>Yii::t('procurement','Now Black Number'),'width'=>15,'align'=>'R'),
+			'lcd'=>array('label'=>Yii::t('procurement','Black Time'),'width'=>15,'align'=>'C'),
 		);
 	}
 	
@@ -58,22 +49,11 @@ class RptBackward extends CReport {
 				$temp['goods_name'] = $row['goods_name'];
 				$temp['unit'] = $row['unit'];
 				$temp['goods_class'] = $row['classify_name'];
-				$temp['goods_price'] = $row['goods_price'];  //價格
-				$temp['cost_year_month'] = $row['cost_year_month']; //價格對應的日期
-				$temp['goods_num'] = number_format($row['goods_num'],4,'.','');
-				$temp['confirm_num'] = number_format($row['confirm_num'],4,'.','');
-// Percy 2018/2/8 - 报表里面的货品成本价格设置成物品设置里的单价
-//				$temp['goods_sum_price'] = number_format($row['goods_sum_price'],2,'.','');
-                $num = empty($row["confirm_num"])?$row["goods_num"]:$row["confirm_num"];
-                $price = floatval($row["goods_price"]);
-                $temp["goods_sum_price"] = sprintf("%.2f", floatval($num)*$price);
 //
-                $temp['black_num'] = $row['black_num'];
-				$temp['lcd'] = General::toDate($row['lcd']);
-				$temp['audit_time'] = General::toDate($row['audit_time']);
-                $temp['note'] = $row['note'];
-                $temp['remark'] = $row['remark'];
-                $temp['order_remark'] = $row['order_remark'];
+                $temp['back_num'] = floatval($row['back_num']);
+                $temp['old_num'] = floatval($row['old_num']);
+                $temp['now_num'] = $temp['old_num']-$temp['back_num'];
+				$temp['lcd'] = $row['lcd'];
 				$this->data[] = $temp;
 			}
 		}

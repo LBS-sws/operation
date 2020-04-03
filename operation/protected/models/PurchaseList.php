@@ -161,6 +161,14 @@ WHERE a.judge = 0 AND (a.status = 'finished' OR a.status = 'approve') AND a.city
                 }else{
                     $record["audit_time"] = "";
                 }*/
+                //後期修改物品數量不受退回影響，需要把退回物品還原(開始)
+                $addNum = Yii::app()->db->createCommand()->select("sum(back_num)")->from("opr_warehouse_back")
+                    ->where("order_id=:order_id and warehouse_id=:warehouse_id",
+                        array(':order_id'=>$record["order_id"],':warehouse_id'=>$record["goods_id"]))->queryScalar();
+                $record["confirm_num"] = floatval($record["confirm_num"])+floatval($addNum);
+                //後期修改物品數量不受退回影響，需要把退回物品還原(結束)
+
+
                 $record["cost_year_month"] = "无";
                 $record["goods_price"] = 0;
                 if($priceBool){
@@ -200,69 +208,34 @@ WHERE a.judge = 0 AND (a.status = 'finished' OR a.status = 'approve') AND a.city
             $city_allow = Yii::app()->user->city_allow();
         }
         $connection = Yii::app()->db;
-        $sql="SELECT a.remark AS order_remark,a.order_user,d.disp_name,a.status,a.order_code,a.city,a.lcd,a.audit_time,
-b.order_id,b.goods_id,b.goods_num,b.confirm_num,b.note,b.remark,
+        $sql="SELECT a.remark AS order_remark,a.order_user,d.disp_name,a.status,a.order_code,a.city,a.audit_time,
+f.back_num,f.old_num,f.lcd,
 c.goods_code,c.name AS goods_name,c.costing AS goods_cost,e.name AS classify_name,c.unit,c.price AS goods_price
-FROM opr_order a 
-LEFT JOIN opr_order_goods b ON a.id = b.order_id 
+FROM opr_warehouse_back f 
+LEFT JOIN opr_order a ON a.id = f.order_id  
 LEFT JOIN security$suffix.sec_user d ON a.order_user = d.username
-LEFT JOIN opr_warehouse c ON c.id = b.goods_id 
+LEFT JOIN opr_warehouse c ON c.id = f.warehouse_id 
 LEFT JOIN opr_classify e ON e.id = c.classify_id 
-WHERE a.judge = 0 AND (a.status = 'finished' OR a.status = 'approve') AND a.city IN ($city_allow) AND c.goods_code IS NOT NULL ";
+WHERE f.order_id > 0 AND a.judge = 0 AND a.city IN ($city_allow) AND c.goods_code IS NOT NULL ";
         if(!empty($user_code)){
-//            $sql.=" d.username like '%$user_code%'";
             $sql.=" AND d.username in ($user_code)";
         }
         if(!empty($start_date)){
             $start_date = date("Y/m/d",strtotime($start_date));
-            $sql.=" AND DATE_FORMAT(a.audit_time,'%Y/%m/%d') >= '$start_date'";
+            $sql.=" AND DATE_FORMAT(f.lcd,'%Y/%m/%d') >= '$start_date'";
         }
         if(!empty($end_date)){
             $end_date = date("Y/m/d",strtotime($end_date));
-            $sql.=" AND DATE_FORMAT(a.audit_time,'%Y/%m/%d') <= '$end_date'";
+            $sql.=" AND DATE_FORMAT(f.lcd,'%Y/%m/%d') <= '$end_date'";
         }
-        $sql.=" order by a.audit_time desc";
+        $sql.=" order by f.lcd desc";
 
         $records = $connection->createCommand($sql)->queryAll();
         if($records){
-            $priceBool = Yii::app()->db->createCommand()->select("username")->from("security$suffix.sec_user_access")
-                ->where("username=:username and system_id='$systemId' and (a_read_only like '%YN02%' or a_read_write like '%YN02%' or a_control like '%YN02%')",
-                    array(':username'=>$username))->queryRow(); //判斷是否有顯示價格的權限
-            $arrBackward=array();
             foreach ($records as &$record){
-                $backwardList = Yii::app()->db->createCommand()->select("r_remark")->from("opr_order_status")
-                    ->where("order_id = :order_id and status='backward' and r_remark like '".$record["goods_name"]."退回數量:%'",
-                        array(':order_id'=>$record['order_id']))->queryAll(); //驗證該物品是否含有退回
-                if(count($backwardList)>0){
-                    $black_num = 0;
-                    foreach ($backwardList as $backward){
-                        $backward["r_remark"] = end(explode("退回數量:",$backward["r_remark"]));
-                        $backward["r_remark"] = is_numeric($backward["r_remark"])?floatval($backward["r_remark"]):'异常';
-                        $black_num+=$backward["r_remark"];
-                    }
-                }else{
-                    continue;
-                }
-                $record["cost_year_month"] = "无";
-                $record["goods_price"] = 0;
-                if($priceBool){
-                    $priceList = Yii::app()->db->createCommand()->select("price as cost_price,year,month")->from("opr_warehouse_price")
-                        ->where("(year<date_format(:date_time,'%Y') or (year=date_format(:date_time,'%Y') and month<=date_format(:date_time,'%m'))) AND warehouse_id = :id",
-                            array(':id'=>$record['goods_id'],':date_time'=>$record['audit_time']))->order("year DESC,month DESC")->queryRow();
-                    if(!$priceList){
-                        $priceList=array('cost_price'=>0,'year'=>'无','month'=>'无');
-                    }
-                    $record["cost_year_month"] = $priceList["year"]==="无"?"无":$priceList["year"]."/".$priceList["month"];
-                    $record["goods_price"] = $priceList["cost_price"];
-                }
-                $num = empty($record["confirm_num"])?$record["goods_num"]:$record["confirm_num"];
-                $price = floatval($record["goods_price"]);
-                $record["goods_sum_price"] = sprintf("%.2f", floatval($num)*$price);
-                $record["black_num"] = $black_num;
                 $record["city_name"] = CGeneral::getCityName($record["city"]);
-                $arrBackward[] = $record;
             }
-            return $arrBackward;
+            return $records;
         }else{
             return array();
         }

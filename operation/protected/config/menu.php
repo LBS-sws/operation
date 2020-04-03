@@ -63,6 +63,11 @@ return array(
                 'access'=>'YD08',
                 'url'=>'/storage/index',
             ),
+            //倉庫库存管理
+            'Warehouse Backward List'=>array(
+                'access'=>'YD09',
+                'url'=>'/warehouseBack/index',
+            ),
             //多訂單限制
             'OrderAcc Info'=>array(
                 'access'=>'YD05',

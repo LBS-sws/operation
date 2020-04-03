@@ -45,11 +45,11 @@ class StorageController extends Controller
     }
 
     public static function allowReadWrite() {
-        return Yii::app()->user->validRWFunction('YS05');
+        return Yii::app()->user->validRWFunction('YD08');
     }
 
     public static function allowReadOnly() {
-        return Yii::app()->user->validFunction('YS05');
+        return Yii::app()->user->validFunction('YD08');
     }
 	public function actionIndex($pageNum=0) 
 	{

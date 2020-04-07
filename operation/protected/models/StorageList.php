@@ -67,7 +67,7 @@ class StorageList extends CListPageModel
                     'apply_time'=>$record['apply_time'],
                     'storage_name'=>implode("<br>",$list),
                     'status_type'=>$record['status_type']==1?Yii::t("procurement","put in storage"):Yii::t("procurement","Draft"),
-                    'color'=>$record['status_type']==1?"text-yellow":"",
+                    'color'=>$record['status_type']==1?"text-primary":"",
                 );
 			}
 		}

@@ -209,7 +209,7 @@ WHERE a.judge = 0 AND (a.status = 'finished' OR a.status = 'approve') AND a.city
         }
         $connection = Yii::app()->db;
         $sql="SELECT a.remark AS order_remark,a.order_user,d.disp_name,a.status,a.order_code,a.city,a.audit_time,
-f.back_num,f.old_num,f.lcd,
+f.back_num,f.old_num,f.lcd,f.lcu as back_user,
 c.goods_code,c.name AS goods_name,c.costing AS goods_cost,e.name AS classify_name,c.unit,c.price AS goods_price
 FROM opr_warehouse_back f 
 LEFT JOIN opr_order a ON a.id = f.order_id  

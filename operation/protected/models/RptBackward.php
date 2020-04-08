@@ -4,15 +4,13 @@ class RptBackward extends CReport {
 		return array(
 			'city_name'=>array('label'=>Yii::t('misc','City'),'width'=>15,'align'=>'L'),
 			'order_code'=>array('label'=>Yii::t('procurement','Order Code'),'width'=>15,'align'=>'L'),
-			'order_user'=>array('label'=>Yii::t('report','Order User ID'),'width'=>15,'align'=>'L'),
 			'disp_name'=>array('label'=>Yii::t('report','Order User Name'),'width'=>30,'align'=>'L'),
 			'goods_code'=>array('label'=>Yii::t('report','Item Code'),'width'=>25,'align'=>'L'),
 			'goods_name'=>array('label'=>Yii::t('report','Item Name'),'width'=>30,'align'=>'L'),
 			'unit'=>array('label'=>Yii::t('procurement','Unit'),'width'=>15,'align'=>'L'),
 			'goods_class'=>array('label'=>Yii::t('report','Item Class'),'width'=>25,'align'=>'L'),
-			'old_num'=>array('label'=>Yii::t('procurement','Old Black Number'),'width'=>15,'align'=>'R'),
 			'back_num'=>array('label'=>Yii::t('procurement','Black Number'),'width'=>15,'align'=>'R'),
-			'now_num'=>array('label'=>Yii::t('procurement','Now Black Number'),'width'=>15,'align'=>'R'),
+			'back_user'=>array('label'=>Yii::t('procurement','Black User'),'width'=>15,'align'=>'R'),
 			'lcd'=>array('label'=>Yii::t('procurement','Black Time'),'width'=>15,'align'=>'C'),
 		);
 	}
@@ -51,9 +49,8 @@ class RptBackward extends CReport {
 				$temp['goods_class'] = $row['classify_name'];
 //
                 $temp['back_num'] = floatval($row['back_num']);
-                $temp['old_num'] = floatval($row['old_num']);
-                $temp['now_num'] = $temp['old_num']-$temp['back_num'];
 				$temp['lcd'] = $row['lcd'];
+				$temp['back_user'] = $row['back_user'];
 				$this->data[] = $temp;
 			}
 		}

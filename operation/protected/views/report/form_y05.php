@@ -8,6 +8,9 @@ $this->pageTitle=Yii::app()->name . ' - Report';
 'clientOptions'=>array('validateOnSubmit'=>true,),
 'layout'=>TbHtml::FORM_LAYOUT_HORIZONTAL,
 )); ?>
+<style>
+    .datepicker{z-index: 2000 !important;}
+</style>
 
 <section class="content-header">
 	<h1>

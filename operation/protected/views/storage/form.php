@@ -37,7 +37,7 @@ $this->pageTitle=Yii::app()->name . ' - storage Info';
                 'submit'=>Yii::app()->createUrl('storage/draft')));
             ?>
 			<?php echo TbHtml::button('<span class="fa fa-upload"></span> '.Yii::t('procurement','storage'), array(
-				'submit'=>Yii::app()->createUrl('storage/storage')));
+                'data-toggle'=>'modal','data-target'=>'#confirmDialog'));
 			?>
 <?php endif ?>
 	</div>
@@ -135,6 +135,20 @@ $this->pageTitle=Yii::app()->name . ' - storage Info';
 
 <?php $this->renderPartial('//site/lookup'); ?>
 <?php $this->renderPartial('//site/supplier'); ?>
+<?php
+$content = "<p>".Yii::t('procurement','confirmed and submitted, it cannot be modified after submission?')."</p>";
+$this->widget('bootstrap.widgets.TbModal', array(
+    'id'=>'confirmDialog',
+    'header'=>Yii::t('misc','Confirm'),
+    'content'=>$content,
+    'footer'=>array(
+        TbHtml::button(Yii::t('dialog','OK'), array('data-dismiss'=>'modal','color'=>TbHtml::BUTTON_COLOR_PRIMARY,
+            'submit'=>Yii::app()->createUrl('storage/storage'))),
+        TbHtml::button(Yii::t('dialog','Cancel'), array('data-dismiss'=>'modal','color'=>TbHtml::BUTTON_COLOR_PRIMARY)),
+    ),
+    'show'=>false,
+));
+?>
 <?php
 if (!$model->getReadonly()) {
     $mesg = Yii::t('dialog','No Record Found');

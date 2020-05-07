@@ -64,6 +64,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery List';
             'goods_name',
             'status',
         ),
+		'hasDateButton'=>true,
 	));
 	?>
 </section>

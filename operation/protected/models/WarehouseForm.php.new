@@ -43,8 +43,6 @@ class WarehouseForm extends CFormModel
             array('name','required'),
             array('classify_id','required'),
             array('unit','required'),
-            array('inventory','required'),
-            array('inventory','numerical','allowEmpty'=>false,'integerOnly'=>false),
             array('min_num','required'),
             array('min_num','numerical','allowEmpty'=>false,'integerOnly'=>false),
 			array('name','validateName'),
@@ -60,8 +58,8 @@ class WarehouseForm extends CFormModel
             $id = $this->id;
         }
         $rows = Yii::app()->db->createCommand()->select("id")->from("opr_warehouse")
-            ->where('name=:name and id!=:id and city = :city', array(':name'=>$this->name,':id'=>$id,':city'=>$city))->queryAll();
-        if(count($rows)>0){
+            ->where('name=:name and id!=:id and city = :city', array(':name'=>$this->name,':id'=>$id,':city'=>$city))->queryRow();
+        if($rows){
             $message = Yii::t('procurement','the name of already exists');
             $this->addError($attribute,$message);
         }
@@ -89,7 +87,7 @@ class WarehouseForm extends CFormModel
 
     //刪除驗證
     public function deleteValidate(){
-        $rs = Yii::app()->db->createCommand()->select()->from("opr_order_goods")->where('goods_id=:goods_id',array(':goods_id'=>$this->id))->queryAll();
+        $rs = Yii::app()->db->createCommand()->select()->from("opr_order_goods")->where('goods_id=:goods_id',array(':goods_id'=>$this->id))->queryRow();
         if($rs){
             return false;
         }else{
@@ -164,7 +162,41 @@ class WarehouseForm extends CFormModel
             }
         }
         if(empty($html)){
-            $html.="<span>该物品没有单价历史</span>";
+            $html.="<tr><td colspan='4'><span>该物品没有单价历史</span></td></tr>";
+        }
+        return array('status'=>1,'html'=>$html);
+    }
+
+    //
+    public function getStorageHistory($id){
+        $suffix = Yii::app()->params['envSuffix'];
+        $html = '';
+        $rs = Yii::app()->db->createCommand()->select("b.id,a.lcd,b.code,b.apply_time,a.add_num,c.name,c.goods_code,d.disp_name")
+            ->from("opr_storage_info a")
+            ->leftJoin('opr_storage b',"a.storage_id=b.id")
+            ->leftJoin("security$suffix.sec_user d","d.username=b.lcu")
+            ->leftJoin('opr_warehouse c',"a.warehouse_id=c.id")
+            ->where('a.warehouse_id =:id and (b.status_type=1 or b.status_type is null)',array(':id'=>$id))->order("b.apply_time desc,a.lcd desc")->queryAll();
+        if($rs){
+            foreach ($rs as $row){
+                $row["code"] = empty($row["code"])?"初始库存":$row["code"];
+                $row["apply_time"] = empty($row["apply_time"])?date("Y-m-d",strtotime($row["lcd"])):$row["apply_time"];
+                $html.="<tr>";
+                if(empty($row["id"])){
+                    $html.="<td>".$row["code"]."</td>";
+                }else{
+                    $html.="<td><a target='_blank' href='".Yii::app()->createUrl('storage/edit',array("index"=>$row["id"]))."'>".$row["code"]."</a></td>";
+                }
+                $html.="<td>".$row["apply_time"]."</td>";
+                $html.="<td>".$row["goods_code"]."</td>";
+                $html.="<td>".$row["name"]."</td>";
+                $html.="<td>".floatval($row["add_num"])."</td>";
+                $html.="<td>".$row["disp_name"]."</td>";
+                $html.="</tr>";
+            }
+        }
+        if(empty($html)){
+            $html.="<tr><td colspan='5'><span>该物品没有入庫記錄</span></td></tr>";
         }
         return array('status'=>1,'html'=>$html);
     }
@@ -208,7 +240,7 @@ class WarehouseForm extends CFormModel
                 $sql = "insert into opr_warehouse(
 							name, unit, inventory, classify_id, lcu, goods_code,city,costing,decimal_num,min_num,z_index
 						) values (
-							:name, :unit, :inventory, :classify_id, :lcu, :goods_code,:city,:costing,:decimal_num,:min_num,:z_index
+							:name, :unit, 0, :classify_id, :lcu, :goods_code,:city,:costing,:decimal_num,:min_num,:z_index
 						)";
                 break;
             case 'edit':
@@ -221,8 +253,7 @@ class WarehouseForm extends CFormModel
 							decimal_num = :decimal_num,
 							z_index = :z_index,
 							min_num = :min_num,
-							luu = :luu,
-							inventory = :inventory
+							luu = :luu
 						where id = :id AND city=:city
 						";
                 break;
@@ -254,8 +285,6 @@ class WarehouseForm extends CFormModel
             $command->bindParam(':min_num',$this->min_num,PDO::PARAM_STR);
         if (strpos($sql,':z_index')!==false)
             $command->bindParam(':z_index',$this->z_index,PDO::PARAM_INT);
-        if (strpos($sql,':inventory')!==false)
-            $command->bindParam(':inventory',$this->inventory,PDO::PARAM_STR);
         if (strpos($sql,':classify_id')!==false)
             $command->bindParam(':classify_id',$this->classify_id,PDO::PARAM_INT);
 

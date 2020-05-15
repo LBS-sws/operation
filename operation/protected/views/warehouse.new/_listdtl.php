@@ -15,6 +15,9 @@
     </td>
     <?php endif ?>
 	<td>
+        <?php echo TbHtml::button(Yii::t('procurement','storage history'), array(
+            'data-id'=>$this->record['id'],'class'=>'clickStorageBtn'));
+        ?>
         <?php echo $this->record['inventory']; ?>
         <span class="fa fa-question-circle goodsHistoryMouse" data-id="<?php echo $this->record['id'];?>"></span>
     </td>

@@ -58,6 +58,8 @@ return array(
                 'access'=>'YD01',
                 'url'=>'/warehouse/index',
             ),
+// 倉庫库存功能 - 暫停
+/*			
             //倉庫库存管理
             'Warehouse storage Info'=>array(
                 'access'=>'YD08',
@@ -68,6 +70,7 @@ return array(
                 'access'=>'YD09',
                 'url'=>'/warehouseBack/index',
             ),
+*/
             //多訂單限制
             'OrderAcc Info'=>array(
                 'access'=>'YD05',
@@ -133,6 +136,8 @@ return array(
                 'access'=>'YB04',
                 'url'=>'/report/pickinglist',
             ),
+// 倉庫库存功能 - 暫停
+/*
             'Backward Warehouse'=>array(
                 'access'=>'YB06',
                 'url'=>'/report/backward',
@@ -141,6 +146,7 @@ return array(
                 'access'=>'YB07',
                 'url'=>'/report/storage',
             ),
+*/
             'Report Manager'=>array(
                 'access'=>'YB01',
                 'url'=>'/queue/index',

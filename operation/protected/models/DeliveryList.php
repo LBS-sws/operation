@@ -26,7 +26,7 @@ class DeliveryList extends CListPageModel
 
     public function rules(){
         return array(
-            array('attr, pageNum, noOfItem, totalRow, searchField, searchValue, orderField, orderType, city, searchTimeStart, searchTimeEnd','safe',),
+            array('attr, pageNum, noOfItem, totalRow, searchField, searchValue, orderField, orderType, city, searchTimeStart, searchTimeEnd, filter, dateRangeValue','safe',),
         );
     }
 
@@ -78,6 +78,11 @@ class DeliveryList extends CListPageModel
             $svalue = str_replace("'","\'",$this->city);
             $clause .= " and a.city ='$svalue' ";
         }
+		if (empty($this->searchTimeStart) && empty($this->searchTimeEnd)) {
+			$clause .= $this->getDateRangeCondition('a.lcd');
+		} else {
+			$this->dateRangeValue = '0';
+		}
 
         $order = "";
         if (!empty($this->orderField)) {

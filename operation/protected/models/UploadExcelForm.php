@@ -218,14 +218,12 @@ class UploadExcelForm extends CFormModel
                         return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."不能为空");
                     }
                     //进口货物品验证
-                    if(!empty($this->update_id)){
-                        $rows = Yii::app()->db->createCommand()->select("*")->from($this->dbName)
-                            ->where($list["value"], array(':name'=>$value,':id'=>$this->update_id))->queryRow();
-                        if($rows){
-                            return array("status"=>0,"error"=>$this->start_title."："."存货名称已存在");
-                        }else{
-                            return array("status"=>1,"data"=>$value);
-                        }
+                    $rows = Yii::app()->db->createCommand()->select("*")->from($this->dbName)
+                        ->where($list["value"], array(':name'=>$value,':id'=>$this->update_id))->queryRow();
+                    if($rows){
+                        return array("status"=>0,"error"=>$this->start_title."："."存货名称已存在");
+                    }else{
+                        return array("status"=>1,"data"=>$value);
                     }
                     break;
                 default:

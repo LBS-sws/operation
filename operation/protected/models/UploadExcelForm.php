@@ -213,6 +213,21 @@ class UploadExcelForm extends CFormModel
                         return array("status"=>0,"error"=>$this->start_title."："."没找到对应的混合规则($value)");
                     }
                     break;
+                case 6:
+                    if(empty($value)){
+                        return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."不能为空");
+                    }
+                    //进口货物品验证
+                    if(!empty($this->update_id)){
+                        $rows = Yii::app()->db->createCommand()->select("*")->from($this->dbName)
+                            ->where($list["value"], array(':name'=>$value,':id'=>$this->update_id))->queryRow();
+                        if($rows){
+                            return array("status"=>0,"error"=>$this->start_title."："."存货名称已存在");
+                        }else{
+                            return array("status"=>1,"data"=>$value);
+                        }
+                    }
+                    break;
                 default:
                     return array("status"=>0,"error"=>$this->start_title."："."404");
             }
@@ -339,7 +354,7 @@ class UploadExcelForm extends CFormModel
                 $this->dbName="opr_goods_im";
                 $arr = array(
                     array("name"=>"物品编号","sqlName"=>"goods_code","value"=>"goods_code=:name","sql"=>"4"),
-                    array("name"=>"物品名称","sqlName"=>"name","value"=>"name=:name","sql"=>"4"),
+                    array("name"=>"物品名称","sqlName"=>"name","value"=>"name=:name and id!=:id","sql"=>"6"),
                     array("name"=>"包装规格","sqlName"=>"type","value"=>"无"),
                     array("name"=>"单位","sqlName"=>"unit","value"=>""),
                     array("name"=>"物品分类","sqlName"=>"classify_id","value"=>"class_type='Import' and name=:name","sql"=>"2"),

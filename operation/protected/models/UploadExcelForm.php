@@ -221,7 +221,7 @@ class UploadExcelForm extends CFormModel
                     $rows = Yii::app()->db->createCommand()->select("*")->from($this->dbName)
                         ->where($list["value"], array(':name'=>$value,':id'=>$this->update_id))->queryRow();
                     if($rows){
-                        return array("status"=>0,"error"=>$this->start_title."："."存货名称已存在");
+                        return array("status"=>0,"error"=>$this->start_title."："."存货名称已存在($value)");
                     }else{
                         return array("status"=>1,"data"=>$value);
                     }

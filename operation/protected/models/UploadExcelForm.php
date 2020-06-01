@@ -17,6 +17,7 @@ class UploadExcelForm extends CFormModel
 	public $bool = true;
 	public $error_list=array();
 	public $start_title="";
+	public $min_num=0;//安全庫存(倉庫專用)
 
 	/**
      *
@@ -61,13 +62,20 @@ class UploadExcelForm extends CFormModel
             if($continue){
                 $city = Yii::app()->user->city();
                 $uid = Yii::app()->user->id;
-                if(!empty($this->update_id)){
+                if(!$bool&&!empty($this->update_id)){
                     $arrList["luu"] = $uid;
+                    //庫存允許導入（不允許導入的邏輯需要配合庫存入庫功能）- 開始
+                    if($this->orderClass == "Warehouse"){
+                        $arrList["inventory"] = floatval($arrList["inventory"])+floatval($this->add_num);
+                        $arrList["z_index"] = $arrList["inventory"]<=$this->min_num?2:1;
+                    }
+                    //庫存允許導入（不允許導入的邏輯需要配合庫存入庫功能）- 結束
                     Yii::app()->db->createCommand()->update($this->dbName,$arrList, 'id=:id', array(':id'=>$this->update_id));
                 }else{
                     //新增
                     $arrList["lcu"] = $uid;
                     if($this->orderClass == "Warehouse"){
+                        $arrList["z_index"] = 2;
                         $arrList["city"] = $city;
                     }
                     Yii::app()->db->createCommand()->insert($this->dbName, $arrList);
@@ -190,10 +198,12 @@ class UploadExcelForm extends CFormModel
                         return array("status"=>0,"error"=>$this->start_title."："."存货编码与存货名称不對應");
                     }else{
                         if($rows){
-                            //$this->add_num = key_exists("inventory",$rows)?$rows["inventory"]:0;
-                            $this->add_num = 0;
+                            $this->min_num = $rows["min_num"];
+                            $this->add_num = key_exists("inventory",$rows)?$rows["inventory"]:0;//庫存允許導入（不允許導入的邏輯需要配合庫存入庫功能）
+                            //$this->add_num = 0;
                             $this->update_id = $rows["id"];
                         }else{
+                            $this->min_num = 0;
                             $this->add_num = 0;
                             $this->update_id = 0;
                         }
@@ -328,7 +338,7 @@ class UploadExcelForm extends CFormModel
                     array("name"=>"参考售价","sqlName"=>"price","value"=>"0.00"),
                     //array("name"=>"成本","sqlName"=>"costing","value"=>"0.00"),
                     array("name"=>"是否允许小数","sqlName"=>"decimal_num","value"=>"否"),
-                    //array("name"=>"现有库存","sqlName"=>"inventory","value"=>"0"),
+                    array("name"=>"现有库存","sqlName"=>"inventory","value"=>"0"), //庫存允許導入（不允許導入的邏輯需要配合庫存入庫功能）
                 );
                 break;
             case "Document":

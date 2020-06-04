@@ -306,5 +306,7 @@ return array(
     'Now Black Number'=>'退回後數量',
     'Black User'=>'退回用戶',
     'Black Time'=>'退回時間',
+    //2020-06-04
+    'Log'=>'流程',
 );
 ?>

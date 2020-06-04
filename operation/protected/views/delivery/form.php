@@ -69,7 +69,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                             'name'=>'btnJect','id'=>'btnJect','data-toggle'=>'modal','data-target'=>'#jectdialog'));
                     }
                     //流程
-                    echo TbHtml::button('<span class="fa fa-file-text-o"></span> '.Yii::t('misc','Flow'), array(
+                    echo TbHtml::button('<span class="fa fa-file-text-o"></span> '.Yii::t('procurement','Log'), array(
                         'name'=>'btnFlow','id'=>'btnFlow','data-toggle'=>'modal','data-target'=>'#flowinfodialog'));
                     //下載
                     echo TbHtml::button('<span class="fa fa-cloud-download"></span> '.Yii::t('procurement','Down'), array(

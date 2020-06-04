@@ -235,6 +235,9 @@ class OrderForm extends CFormModel
         $rows=Yii::app()->db->createCommand()->select()->from("opr_order_goods")->where("order_id=:order_id",array(":order_id"=>$order_id))->queryAll();
         foreach ($rows as $row){
             $goods = OrderForm::getOneGoodsToId($row["goods_id"],$order_class,$city);
+            if(empty($goods)){
+                continue;
+            }
             $list = array(
                 "id"=>$row["id"],
                 "goods_id"=>$row["goods_id"],

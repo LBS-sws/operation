@@ -4,5 +4,7 @@ return array(
     'Start Date'=>'From',
     'End Date'=>'To',
     'Goods'=>'Product',
+    'Picking Records Report'=>'Material Request Report',
+    'Order Person'=>'Staff',
 );
 ?>

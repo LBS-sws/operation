@@ -15,5 +15,6 @@ return array(
     'Add Goods'=>'Add Products',
     'Goods Code'=>'Product code',
     'Price（RMB）'=>'Price (RM)',
+    'Add requisition sheet'=>'Add Request Form',
 );
 ?>

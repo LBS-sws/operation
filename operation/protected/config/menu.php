@@ -53,24 +53,21 @@ return array(
                 'access'=>'YD07',
                 'url'=>'/cargoCost/index',
             ),
-            //倉庫管理
+            //仓库信息
             'Warehouse Info'=>array(
                 'access'=>'YD01',
                 'url'=>'/warehouse/index',
             ),
-// 倉庫库存功能 - 暫停
-/*			
-            //倉庫库存管理
+            //入库管理
             'Warehouse storage Info'=>array(
                 'access'=>'YD08',
                 'url'=>'/storage/index',
             ),
-            //倉庫库存管理
+            //物品退回列表
             'Warehouse Backward List'=>array(
                 'access'=>'YD09',
                 'url'=>'/warehouseBack/index',
             ),
-*/
             //多訂單限制
             'OrderAcc Info'=>array(
                 'access'=>'YD05',
@@ -128,25 +125,22 @@ return array(
                 'access'=>'YB05',
                 'url'=>'/report/business',
             ),
-            'Order Records'=>array(
+            'Order Records'=>array( //订货记录报表
                 'access'=>'YB03',
                 'url'=>'/report/orderlist',
             ),
-            'Picking List'=>array(
+            'Picking List'=>array( //领料记录报表
                 'access'=>'YB04',
                 'url'=>'/report/pickinglist',
             ),
-// 倉庫库存功能 - 暫停
-/*
-            'Backward Warehouse'=>array(
+            'Backward Warehouse'=>array(//仓库退回报表
                 'access'=>'YB06',
                 'url'=>'/report/backward',
             ),
-            'storage Report'=>array(
+            'storage Report'=>array( //仓库入库报表
                 'access'=>'YB07',
                 'url'=>'/report/storage',
             ),
-*/
             'Report Manager'=>array(
                 'access'=>'YB01',
                 'url'=>'/queue/index',
@@ -159,17 +153,17 @@ return array(
         'access'=>'YG',
 		'icon'=>'fa-cubes',
         'items'=>array(
-            //物品管理
+            //进口货物品管理
             'Import Summary Entry'=>array(
                 'access'=>'YG01',
                 'url'=>'/goodsim/index',
             ),
-            //物品管理
+            //国内货物品管理
             'Domestic Summary Entry'=>array(
                 'access'=>'YG04',
                 'url'=>'/goodsdo/index',
             ),
-            //物品管理
+            //快速货物品管理
             'Fast Summary Entry'=>array(
                 'access'=>'YG05',
                 'url'=>'/goodsfa/index',
@@ -184,7 +178,7 @@ return array(
                 'access'=>'YG03',
                 'url'=>'/classify/index',
             ),
-            //分類管理
+            //混合规则管理
             'Goods Hybrid Rules'=>array(
                 'access'=>'YG06',
                 'url'=>'/rules/index',

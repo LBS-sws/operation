@@ -20,6 +20,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
         background-color: #eee;
         min-height: 34px;
     }
+    #table-change td{position: relative;}
 </style>
 <section class="content-header">
 	<h1>
@@ -120,7 +121,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
             <div class="form-group">
                 <?php echo $form->labelEx($model,'goods_list',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-10">
-                    <table class="table table-bordered table-striped disabled" id="table-change">
+                    <table class="table table-bordered table-striped disabled" id="table-change" data-matching="<?php echo Yii::t("procurement","matching")?>" data-matters="<?php echo Yii::t("procurement","matters")?>" data-del="<?php echo Yii::t("misc","Delete")?>">
                         <thead>
                         <tr>
                             <td width="20%"><?php echo Yii::t("procurement","Goods Name")?></td>
@@ -147,11 +148,13 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                                 }
                                 foreach ($model->goods_list as $key =>$goodsList){
                                     echo "<tr data-classify='".$goodsList["classify_id"]."'>";
-                                    echo "<td>";
+                                    echo "<td class='openHindDivToTd'>";
                                     echo TbHtml::hiddenField("TechnicianForm[goods_list][$key][goods_id]",$goodsList["goods_id"],array("class"=>"select_id"));
                                     echo TbHtml::hiddenField("TechnicianForm[goods_list][$key][name]",$goodsList["name"]);
                                     echo TbHtml::hiddenField("TechnicianForm[goods_list][$key][unit]",$goodsList["unit"]);
                                     echo TbHtml::hiddenField("TechnicianForm[goods_list][$key][classify_id]",$goodsList["classify_id"]);
+                                    echo TbHtml::hiddenField("TechnicianForm[goods_list][$key][matching]",isset($goodsList["matching"])?$goodsList["matching"]:"");
+                                    echo TbHtml::hiddenField("TechnicianForm[goods_list][$key][matters]",isset($goodsList["matters"])?$goodsList["matters"]:"");
                                     echo $goodsList["name"];
                                     echo "</td>";
                                     echo "<td>".$goodsList["unit"]."</td>";
@@ -233,6 +236,8 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
          echo "<li data-str='name'>".$goods["name"]."</li>";
          echo "<li data-str='unit'>".$goods["unit"]."</li>";
          echo "<li data-str='id'>".$goods["id"]."</li>";
+         echo "<li data-str='matching'>".$goods["matching"]."</li>";
+         echo "<li data-str='matters'>".$goods["matters"]."</li>";
          echo "</ul>";
      }
      echo "</li>";
@@ -306,7 +311,7 @@ Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_R
 <?php
 $js = Script::genReadonlyField();
 Yii::app()->clientScript->registerScript('readonlyClass',$js,CClientScript::POS_READY);
-Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/goodsChange.js?4", CClientScript::POS_END);
+Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/goodsChange.js?2", CClientScript::POS_END);
 Yii::app()->clientScript->registerCssFile(Yii::app()->baseUrl . "/css/goodsChange.css");
 ?>
 

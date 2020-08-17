@@ -15,6 +15,8 @@ class WarehouseForm extends CFormModel
 	public $luu;
 	public $lcu;
 	public $min_num;
+	public $matters;
+	public $matching;
 	public $z_index=1;
 	private $foreach_num = 0;
 
@@ -30,6 +32,8 @@ class WarehouseForm extends CFormModel
             'costing'=>Yii::t('procurement','Costing（RMB）'),
             'decimal_num'=>Yii::t('procurement','Decimal'),
             'min_num'=>Yii::t('procurement','min inventory'),
+            'matching'=>Yii::t('procurement','matching'),
+            'matters'=>Yii::t('procurement','matters'),
 		);
 	}
 
@@ -39,7 +43,7 @@ class WarehouseForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, goods_code, min_num, name, unit, inventory, classify_id, price, costing, decimal_num, lcu, luu','safe'),
+			array('id, goods_code, min_num, name, unit, inventory, classify_id, price, costing, decimal_num, lcu, luu, matching, matters','safe'),
             array('name','required'),
             array('classify_id','required'),
             array('unit','required'),
@@ -113,6 +117,8 @@ class WarehouseForm extends CFormModel
                 $this->decimal_num = empty($row['decimal_num'])?"否":$row['decimal_num'];
                 $this->price = $row['cost_price'];
                 $this->min_num = $row['min_num'];
+                $this->matters = $row['matters'];
+                $this->matching = $row['matching'];
                 break;
 			}
 		}
@@ -142,7 +148,7 @@ class WarehouseForm extends CFormModel
 
     //根據訂單id查訂單所有物品
     public function getGoodsListToId($order_id){
-        $rs = Yii::app()->db->createCommand()->select("b.id as warehouse_id,a.lcd,b.name,b.inventory,b.goods_code,b.classify_id,b.unit,a.goods_num,a.confirm_num,a.id,a.goods_id,a.remark,a.note")
+        $rs = Yii::app()->db->createCommand()->select("b.id as warehouse_id,a.lcd,b.matching,b.matters,b.name,b.inventory,b.goods_code,b.classify_id,b.unit,a.goods_num,a.confirm_num,a.id,a.goods_id,a.remark,a.note")
             ->from("opr_order_goods a,opr_warehouse b")->where('a.order_id=:order_id and a.goods_id = b.id',array(':order_id'=>$order_id))->queryAll();
         return $rs;
     }
@@ -206,9 +212,9 @@ class WarehouseForm extends CFormModel
                 break;
             case 'new':
                 $sql = "insert into opr_warehouse(
-							name, unit, inventory, classify_id, lcu, goods_code,city,costing,decimal_num,min_num,z_index
+							name, unit, inventory, classify_id, lcu, goods_code,city,costing,decimal_num,min_num,z_index,matching,matters
 						) values (
-							:name, :unit, :inventory, :classify_id, :lcu, :goods_code,:city,:costing,:decimal_num,:min_num,:z_index
+							:name, :unit, :inventory, :classify_id, :lcu, :goods_code,:city,:costing,:decimal_num,:min_num,:z_index,:matching,:matters
 						)";
                 break;
             case 'edit':
@@ -221,6 +227,8 @@ class WarehouseForm extends CFormModel
 							decimal_num = :decimal_num,
 							z_index = :z_index,
 							min_num = :min_num,
+							matching = :matching,
+							matters = :matters,
 							luu = :luu,
 							inventory = :inventory
 						where id = :id AND city=:city
@@ -256,6 +264,10 @@ class WarehouseForm extends CFormModel
             $command->bindParam(':z_index',$this->z_index,PDO::PARAM_INT);
         if (strpos($sql,':inventory')!==false)
             $command->bindParam(':inventory',$this->inventory,PDO::PARAM_STR);
+        if (strpos($sql,':matching')!==false)
+            $command->bindParam(':matching',$this->matching,PDO::PARAM_STR);
+        if (strpos($sql,':matters')!==false)
+            $command->bindParam(':matters',$this->matters,PDO::PARAM_STR);
         if (strpos($sql,':classify_id')!==false)
             $command->bindParam(':classify_id',$this->classify_id,PDO::PARAM_INT);
 
@@ -301,7 +313,7 @@ class WarehouseForm extends CFormModel
 
     public function downExcel(){
         $city = Yii::app()->user->city();
-        $list["head"] = array("存货编码","存货名称","主计量单位","所属分类码","参考售价(成本)","是否允许小数","现有库存");
+        $list["head"] = array("存货编码","存货名称","主计量单位","所属分类码","参考售价(成本)","是否允许小数","现有库存","产品配比","使用注意事项");
         if(Yii::app()->user->validFunction('YN02')){
             $list["head"][]="单价年月";
             $list["head"][]="单价";
@@ -319,7 +331,9 @@ class WarehouseForm extends CFormModel
                     "classify_name"=>$row["classify_name"],
                     "costing"=>$row["costing"],
                     "decimal_num"=>$row["decimal_num"],
-                    "inventory"=>$row["inventory"]
+                    "inventory"=>$row["inventory"],
+                    "matching"=>$row["matching"],
+                    "matters"=>$row["matters"]
                 );
                 if(Yii::app()->user->validFunction('YN02')){
                     $priceList = Yii::app()->db->createCommand()->select("price as cost_price,year,month")->from("opr_warehouse_price")

@@ -153,7 +153,24 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                     ); ?>
                 </div>
             </div>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'matching',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-lg-6">
+                    <?php echo $form->textField($model, 'matching',
+                        array('readonly'=>($model->scenario=='view'))
+                    ); ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'matters',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-lg-6">
+                    <?php echo $form->textField($model, 'matters',
+                        array('readonly'=>($model->scenario=='view'))
+                    ); ?>
+                </div>
+            </div>
 
+            <label data-toggle="tooltip" data-placement="bottom" data-html="1" data-original-title="22222222" >机器评分(14)</label>
 		</div>
 	</div>
 </section>

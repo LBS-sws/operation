@@ -24,6 +24,36 @@ $(function () {
         $("#selectGoods_table").parent("div").css("height",height);
     });
 
+    //物品的提示顯示框
+    function openHindDivWindowEvent(e) {
+        $("#openHindDivWindow").remove();
+        var html = "";
+        var left = $(this).outerWidth()/2;
+        html+="<div class='tooltip fade bottom in' id='openHindDivWindow'>";
+        html+="<div class='tooltip-arrow' style='left: 50%;'></div>";
+        html+="<div class='tooltip-inner'>";
+        html+=$("#table-change").data("matching")+"："+$(this).find("input[name*='matching']").val();
+        html+="<br>"
+        html+=$("#table-change").data("matters")+"："+$(this).find("input[name*='matters']").val();
+        html+="</div></div>";
+        $(this).append(html);
+        left = left-$("#openHindDivWindow").outerWidth()/2;
+        $("#openHindDivWindow").css({
+            "left":left+"px",
+            "top":"100%"
+        });
+        return false;
+    }
+    $("#table-change>tbody").delegate(".openHindDivToTd","click",openHindDivWindowEvent);
+    $("#table-change>tbody").delegate(".openHindDivToTd","mouseover",openHindDivWindowEvent);
+
+    $("body").on("click",function (e) {
+        $("#openHindDivWindow").remove();
+    });
+    $("body").on("mouseover",function (e) {
+        $("#openHindDivWindow").remove();
+    });
+
     //確定物品后，一次性輸入所有選擇物品
     $('#selectGoods_div .btn-primary').on('click', function () {
         var tBody = $("#table-change>tbody");
@@ -37,9 +67,11 @@ $(function () {
                 var id = value["id"];
                 var goods = goodsList[classify_id]["goods"][id];
                 var html = "<tr data-classify='"+classify_id+"'>";
-                html+="<td>";
+                html+="<td class='openHindDivToTd'>";
                 html+="<input type='hidden' name='TechnicianForm[goods_list]["+key+"][goods_id]' class='select_id' value='"+id+"'>";
                 html+="<input type='hidden' name='TechnicianForm[goods_list]["+key+"][name]' value='"+goods["name"]+"'>";
+                html+="<input type='hidden' name='TechnicianForm[goods_list]["+key+"][matching]' value='"+goods["matching"]+"'>";
+                html+="<input type='hidden' name='TechnicianForm[goods_list]["+key+"][matters]' value='"+goods["matters"]+"'>";
                 html+="<input type='hidden' name='TechnicianForm[goods_list]["+key+"][unit]' value='"+goods["unit"]+"'>";
                 html+="<input type='hidden' name='TechnicianForm[goods_list]["+key+"][classify_id]' value='"+classify_id+"'>";
                 html+=goods["name"];
@@ -47,7 +79,7 @@ $(function () {
                 html+="<td>"+goods["unit"]+"</td>";
                 html+="<td><input class='form-control select_remark' name='TechnicianForm[goods_list]["+key+"][note]' type='text' value='"+value["remark"]+"'></td>";
                 html+="<td><input class='form-control select_num' name='TechnicianForm[goods_list]["+key+"][goods_num]' type='number' value='"+value["num"]+"'></td>";
-                html+="<td><a class='btn btn-danger goodsDelete' data-id='"+id+"'>刪除</a></td>";
+                html+="<td><a class='btn btn-danger goodsDelete' data-id='"+id+"'>"+$("#table-change").data("del")+"</a></td>";
                 html+="</tr>";
                 tBody.append(html);
             });

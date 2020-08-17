@@ -334,10 +334,12 @@ class UploadExcelForm extends CFormModel
                     array("name"=>"存货名称","sqlName"=>"name","value"=>"city='$city' and name=:name","sql"=>"4"),
                     array("name"=>"主计量单位","sqlName"=>"unit","value"=>""),
                     array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Warehouse' and name=:name","sql"=>"2"),
-                    array("name"=>"参考售价","sqlName"=>"price","value"=>"0.00"),
+                    //array("name"=>"参考售价","sqlName"=>"price","value"=>"0.00"),
                     //array("name"=>"成本","sqlName"=>"costing","value"=>"0.00"),
                     array("name"=>"是否允许小数","sqlName"=>"decimal_num","value"=>"否"),
                     array("name"=>"现有库存","sqlName"=>"inventory","value"=>"0"), //庫存允許導入（不允許導入的邏輯需要配合庫存入庫功能）
+                    array("name"=>"产品配比","sqlName"=>"matching","value"=>""),
+                    array("name"=>"使用注意事项","sqlName"=>"matters","value"=>""),
                 );
                 break;
             case "Document":

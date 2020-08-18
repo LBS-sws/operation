@@ -170,7 +170,6 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                 </div>
             </div>
 
-            <label data-toggle="tooltip" data-placement="bottom" data-html="1" data-original-title="22222222" >机器评分(14)</label>
 		</div>
 	</div>
 </section>

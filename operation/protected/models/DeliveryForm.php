@@ -356,8 +356,8 @@ class DeliveryForm extends CFormModel
     }
     //
     private function resetZIndex(){
-        Yii::app()->db->createCommand("update opr_warehouse set z_index=1 where inventory>min_num")->execute();
-        Yii::app()->db->createCommand("update opr_warehouse set z_index=2 where inventory<=min_num")->execute();
+        Yii::app()->db->createCommand("update opr_warehouse set z_index=1 where (inventory+0)>(min_num+0)")->execute();
+        Yii::app()->db->createCommand("update opr_warehouse set z_index=2 where (inventory+0)<=(min_num+0)")->execute();
     }
 
     //退回單個物品

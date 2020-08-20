@@ -51,12 +51,37 @@ class WarehouseForm extends CFormModel
             array('inventory','numerical','allowEmpty'=>false,'integerOnly'=>false),
             array('min_num','required'),
             array('min_num','numerical','allowEmpty'=>false,'integerOnly'=>false),
+			array('name','validateId'),
 			array('name','validateName'),
 			array('goods_code','validateCode'),
 			array('price','validatePrice'),
 		);
 	}
 //
+	public function validateId($attribute, $params){
+	    //Yii::app()->user->validFunction('YN04');
+        $city = Yii::app()->user->city();
+        $matching = "";
+        $matters = "";
+        if($this->getScenario() == "edit"){
+            $row = Yii::app()->db->createCommand()->select("matching,matters")->from("opr_warehouse")
+                ->where('id=:id and city=:city', array(':id'=>$this->id,':city'=>$city))->queryRow();
+            if($row){
+                if(Yii::app()->user->validFunction('YN04')){
+                    $matching = $this->matching;
+                    $matters = $this->matters;
+                }else{
+                    $matching =$row["matching"];
+                    $matters =$row["matters"];
+                }
+            }else{
+                $message = "數據異常，請於管理員聯繫";
+                $this->addError($attribute,$message);
+            }
+        }
+        $this->matching = $matching;
+        $this->matters = $matters;
+	}
 	public function validateName($attribute, $params){
         $city = Yii::app()->user->city();
         $id = -1;

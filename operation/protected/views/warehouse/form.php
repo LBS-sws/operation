@@ -157,7 +157,7 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                 <?php echo $form->labelEx($model,'matching',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-lg-6">
                     <?php echo $form->textField($model, 'matching',
-                        array('readonly'=>($model->scenario=='view'))
+                        array('readonly'=>($model->scenario=='view'||!Yii::app()->user->validFunction('YN04')))
                     ); ?>
                 </div>
             </div>
@@ -165,7 +165,7 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                 <?php echo $form->labelEx($model,'matters',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-lg-6">
                     <?php echo $form->textField($model, 'matters',
-                        array('readonly'=>($model->scenario=='view'))
+                        array('readonly'=>($model->scenario=='view'||!Yii::app()->user->validFunction('YN04')))
                     ); ?>
                 </div>
             </div>

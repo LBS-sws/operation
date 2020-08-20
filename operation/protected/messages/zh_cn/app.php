@@ -116,6 +116,7 @@ return array(
     'Backward Warehouse'=>'仓库退回报表',
     'storage Report'=>'仓库入库报表',
     'Warehouse Backward List'=>'物品退回列表',
+    'Warehouse Item description'=>'仓库物品说明',
     //沈超添加結束
 	
 );

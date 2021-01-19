@@ -212,14 +212,14 @@ class DeliveryController extends Controller
     }
 
     //下載全部未發貨訂單
-    public function actionAllDownload(){
+    public function actionAllDownload($downType=0){
         $model = new DeliveryForm("down");
-        if($model->validateAll()){
+        if($model->validateAll($downType)){
             $orderList = $model->allDownload();
             $myExcel = new MyExcelTwo();
             $goodsList = $myExcel->setDeliveryExcel($orderList);
             $myExcel->setDeliveryExcelTwo($goodsList);
-            $myExcel->outDownExcel("全部订单.xls");
+            $myExcel->outDownExcel("外勤领料审批订单.xls");
         }else{
             Dialog::message(Yii::t('dialog','Validation Message'), "沒有待发货的订单");
             $this->redirect(Yii::app()->createUrl('delivery/index'));

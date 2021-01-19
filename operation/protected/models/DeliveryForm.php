@@ -386,11 +386,23 @@ class DeliveryForm extends CFormModel
             'lcu'=>Yii::app()->user->user_display_name(),
         ));
     }
+    public function downTypeList(){
+        $list = array(
+            0=>Yii::t('procurement','All'),
+            1=>Yii::t('procurement','Have read,Drop shipping'),
+            2=>Yii::t('procurement','pending approval')
+        );
+        return $list;
+    }
 
     //檢查是否有未發貨的訂單
-    public function validateAll(){
+    public function validateAll($type=0){
+        $list = array("'read','sent'","'read'","'sent'");
+        if(!key_exists($type,$list)){
+            $type = 0;
+        }
         $city = Yii::app()->user->city();
-        $sql ="city='$city' AND judge=0 AND status in ('read','sent')";
+        $sql ="city='$city' AND judge=0 AND status in (".$list[$type].")";
         if($this->getScenario()=="approved"){
             if(empty($this->checkBoxDown)||!is_array($this->checkBoxDown)){
                 return false;

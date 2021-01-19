@@ -35,7 +35,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery List';
             <div class="btn-group pull-right" role="group">
                 <?php
                 echo TbHtml::button('<span class="fa fa-cloud-download"></span> '.Yii::t('misc','Download'), array(
-                    'submit'=>Yii::app()->createUrl('delivery/allDownload'),
+                    'data-toggle'=>'modal','data-target'=>'#deliveryDownModel'
                 ));
                 ?>
             </div>
@@ -74,6 +74,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery List';
 	echo $form->hiddenField($model,'orderField');
 	echo $form->hiddenField($model,'orderType');
 ?>
+
 <?php $this->endWidget(); ?>
 
 <?php
@@ -89,3 +90,27 @@ Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_R
 	Yii::app()->clientScript->registerScript('rowClick',$js,CClientScript::POS_READY);
 ?>
 
+<form class="form-horizontal" action="<?php echo Yii::app()->createUrl('delivery/allDownload');?>" method="get">
+    <?php
+    $ftrbtn = array();
+    $ftrbtn[] = TbHtml::button(Yii::t('dialog','Close'), array('data-dismiss'=>'modal','color'=>TbHtml::BUTTON_COLOR_DEFAULT,"class"=>"pull-left"));
+    $ftrbtn[] = TbHtml::button(Yii::t('procurement','Submit'), array('data-dismiss'=>'modal','color'=>TbHtml::BUTTON_COLOR_PRIMARY,'submit' => Yii::app()->createUrl('delivery/allDownload')));
+    $this->beginWidget('bootstrap.widgets.TbModal', array(
+        'id'=>'deliveryDownModel',
+        'header'=>Yii::t('misc','Download'),
+        'footer'=>$ftrbtn,
+        'show'=>false,
+    ));
+    ?>
+
+    <div class="form-group">
+        <?php echo TbHtml::label(Yii::t('procurement','Order Status'),"downType",array('class'=>"col-sm-2 control-label")); ?>
+        <div class="col-sm-9">
+            <?php echo TbHtml::dropDownList('downType',0,DeliveryForm::downTypeList(),
+                array('readonly'=>(false))
+            ); ?>
+        </div>
+    </div>
+
+    <?php $this->endWidget(); ?>
+</form>

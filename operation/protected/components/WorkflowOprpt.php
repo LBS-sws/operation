@@ -19,8 +19,14 @@ class WorkflowOprpt extends WorkflowDMS {
 	}
 
 	public function routeToManager() {
-		$user = $this->seekManager();
-		$this->assignRespUser($user);
+		$mgr = $this->seekManager();
+		$this->assignRespUser($mgr);
+		$users = $this->getUserByControlRight(array('YN05'));
+		if (!empty($users)) {
+			foreach ($users as $user) {
+				if ($user!=$mgr) $this->assignRespUser($user);
+			}
+		}
 	}
 
 	protected function getUserByControlRight($access=array()) {

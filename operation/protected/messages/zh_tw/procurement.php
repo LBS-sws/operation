@@ -311,5 +311,6 @@ return array(
     //2020-08-17
     'matching'=>'產品配比',
     'matters'=>'使用注意事項',
+    'judge for visible'=>'是否顯示',
 );
 ?>

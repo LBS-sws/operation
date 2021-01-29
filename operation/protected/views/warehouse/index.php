@@ -67,6 +67,7 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
 							'unit',
 							'classify_id',
 							'inventory',
+							'display',
 						),
 		));
 	?>

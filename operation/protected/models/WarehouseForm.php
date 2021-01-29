@@ -18,7 +18,8 @@ class WarehouseForm extends CFormModel
 	public $matters;
 	public $matching;
 	public $z_index=1;
-	private $foreach_num = 0;
+    public $display = 1;
+    private $foreach_num = 0;
 
 	public function attributeLabels()
 	{
@@ -34,6 +35,7 @@ class WarehouseForm extends CFormModel
             'min_num'=>Yii::t('procurement','min inventory'),
             'matching'=>Yii::t('procurement','matching'),
             'matters'=>Yii::t('procurement','matters'),
+            'display'=>Yii::t('procurement','judge for visible'),
 		);
 	}
 
@@ -43,7 +45,7 @@ class WarehouseForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, goods_code, min_num, name, unit, inventory, classify_id, price, costing, decimal_num, lcu, luu, matching, matters','safe'),
+			array('id, goods_code,display, min_num, name, unit, inventory, classify_id, price, costing, decimal_num, lcu, luu, matching, matters','safe'),
             array('name','required'),
             array('classify_id','required'),
             array('unit','required'),
@@ -144,6 +146,7 @@ class WarehouseForm extends CFormModel
                 $this->min_num = $row['min_num'];
                 $this->matters = $row['matters'];
                 $this->matching = $row['matching'];
+                $this->display = $row['display'];
                 break;
 			}
 		}
@@ -237,15 +240,16 @@ class WarehouseForm extends CFormModel
                 break;
             case 'new':
                 $sql = "insert into opr_warehouse(
-							name, unit, inventory, classify_id, lcu, goods_code,city,costing,decimal_num,min_num,z_index,matching,matters
+							name, unit, display, inventory, classify_id, lcu, goods_code,city,costing,decimal_num,min_num,z_index,matching,matters
 						) values (
-							:name, :unit, :inventory, :classify_id, :lcu, :goods_code,:city,:costing,:decimal_num,:min_num,:z_index,:matching,:matters
+							:name, :unit, :display, :inventory, :classify_id, :lcu, :goods_code,:city,:costing,:decimal_num,:min_num,:z_index,:matching,:matters
 						)";
                 break;
             case 'edit':
                 $sql = "update opr_warehouse set
 							name = :name, 
 							goods_code = :goods_code, 
+							display = :display, 
 							classify_id = :classify_id, 
 							unit = :unit,
 							costing = :costing,
@@ -269,6 +273,8 @@ class WarehouseForm extends CFormModel
         $command=$connection->createCommand($sql);
         if (strpos($sql,':id')!==false)
             $command->bindParam(':id',$this->id,PDO::PARAM_INT);
+        if (strpos($sql,':display')!==false)
+            $command->bindParam(':display',$this->display,PDO::PARAM_INT);
         if (strpos($sql,':name')!==false)
             $command->bindParam(':name',$this->name,PDO::PARAM_STR);
         if (strpos($sql,':goods_code')!==false){

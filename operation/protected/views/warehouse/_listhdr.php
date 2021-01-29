@@ -20,6 +20,11 @@
         ;
         ?>
     </th>
+    <th>
+        <?php echo TbHtml::link($this->getLabelName('display').$this->drawOrderArrow('display'),'#',$this->createOrderLink('warehouse-list','display'))
+        ;
+        ?>
+    </th>
     <?php if (Yii::app()->user->validFunction('YN02')): ?>
     <th>
         <?php echo TbHtml::link($this->getLabelName('price').$this->drawOrderArrow('cost_price'),'#',$this->createOrderLink('warehouse-list','cost_price'))

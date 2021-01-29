@@ -313,5 +313,6 @@ return array(
     //2020-08-17
     'matching'=>'产品配比',
     'matters'=>'使用注意事项',
+    'judge for visible'=>'是否显示',
 );
 ?>

@@ -4,6 +4,7 @@
 	<td><?php echo $this->record['name']; ?></td>
 	<td><?php echo $this->record['classify_id']; ?></td>
 	<td><?php echo $this->record['unit']; ?></td>
+	<td><?php echo $this->record['display']; ?></td>
     <?php if (Yii::app()->user->validFunction('YN02')): ?>
 	<td>
         <?php echo $this->record['price']; ?>

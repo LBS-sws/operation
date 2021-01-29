@@ -13,6 +13,7 @@ class WarehouseList extends CListPageModel
 			'price'=>Yii::t('procurement','Price（RMB）'),
 			'cost_price'=>Yii::t('procurement','price history'),
             'classify_id'=>Yii::t('procurement','Classify'),
+            'display'=>Yii::t('procurement','judge for visible'),
 		);
 	}
 	
@@ -43,6 +44,10 @@ class WarehouseList extends CListPageModel
 					break;
 				case 'name':
 					$clause .= General::getSqlConditionClause('name', $svalue);
+					break;
+				case 'display':
+                    $svalue = (strpos($svalue,Yii::t("misc","No"))!==false)?0:1;
+					$clause .= General::getSqlConditionClause('display', $svalue);
 					break;
 				case 'type':
 					$clause .= General::getSqlConditionClause('type', $svalue);
@@ -89,6 +94,7 @@ class WarehouseList extends CListPageModel
 						'name'=>$record['name'],
 						'unit'=>$record['unit'],
 						'min_num'=>$record['min_num'],
+						'display'=>empty($record['display'])?Yii::t("misc","No"):Yii::t("misc","Yes"),
 						'price'=>$record['cost_price'],
 						'classify_id'=>ClassifyForm::getClassifyToId($record['classify_id']),
 						'inventory'=>$record['inventory'],

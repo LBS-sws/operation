@@ -135,7 +135,7 @@ class ClassifyForm extends CFormModel
             foreach ($rs as $row){
                 if($from == "opr_warehouse"){
                     $goodList = Yii::app()->db->createCommand()->select("*")
-                        ->from($from)->where("classify_id=:classify_id and city=:city",array(":classify_id"=>$row["id"],":city"=>$city))->queryAll();
+                        ->from($from)->where("classify_id=:classify_id and city=:city and display=1",array(":classify_id"=>$row["id"],":city"=>$city))->queryAll();
                 }else{
                     $goodList = Yii::app()->db->createCommand()->select("*")
                         ->from($from)->where("classify_id=:classify_id",array(":classify_id"=>$row["id"]))->queryAll();

@@ -197,7 +197,7 @@ class UploadExcelForm extends CFormModel
                         return array("status"=>0,"error"=>$this->start_title."："."存货编码与存货名称不對應");
                     }else{
                         if($rows){
-                            $this->min_num = $rows["min_num"];
+                            $this->min_num = key_exists("min_num",$rows)?$rows["min_num"]:0;
                             $this->add_num = key_exists("inventory",$rows)?$rows["inventory"]:0;//庫存允許導入（不允許導入的邏輯需要配合庫存入庫功能）
                             //$this->add_num = 0;
                             $this->update_id = $rows["id"];

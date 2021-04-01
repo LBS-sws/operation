@@ -45,7 +45,7 @@ class WarehouseController extends Controller
     }
 
     public static function allowReadWrite() {
-        return Yii::app()->user->validRWFunction('YD01');
+        return Yii::app()->user->validRWFunction('YD01')||Yii::app()->user->validRWFunction('YG01')||Yii::app()->user->validRWFunction('YG04')||Yii::app()->user->validRWFunction('YG05');
     }
 
     public static function allowReadOnly() {

@@ -95,6 +95,7 @@ class WebUser extends CWebUser
 		
 		$session = Yii::app()->session;
 		$this->getUserOption($user);
+		if (Yii::app()->params['showRank']=='on') $ranklevel = $this->getLevel($user->username);
 		$access = $user->accessRights();
 		if (!empty($access)) {
 			$session['ro_func'] = $access['read_only'];
@@ -113,6 +114,7 @@ class WebUser extends CWebUser
 		$session['session_time'] = date("Y-m-d H:i:s");
 		$session['disp_name'] = $user->disp_name;
 		$session['logon_time'] = $user->logon_time;
+		if (Yii::app()->params['showRank']=='on') $session['ranklevel'] = $ranklevel;
 
 		User::model()->updateByPk($this->id,
 			array('logon_time'=>new CDbExpression('NOW()'),
@@ -193,4 +195,17 @@ class WebUser extends CWebUser
 		}
 	}
 
+	public function ranklevel() {
+		return isset(Yii::app()->session['ranklevel']) ? Yii::app()->session['ranklevel'] : '';
+	}
+	
+	protected function getLevel($uid) {
+        $suffix = Yii::app()->params['envSuffix'];
+		$sql = "select b.level from sales$suffix.sal_rank a, sales$suffix.sal_level b 
+				where a.username='$uid' and ifnull(a.now_score,0) >= b.start_fraction and ifnull(a.now_score,0) <= b.end_fraction 
+				order by a.month desc limit 1
+		";
+		$rtn = Yii::app()->db->createCommand($sql)->queryRow();
+		return $rtn===false ? '' : $rtn['level'];
+	}
 }

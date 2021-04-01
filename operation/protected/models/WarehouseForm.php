@@ -349,6 +349,7 @@ class WarehouseForm extends CFormModel
             $list["head"][]="单价年月";
             $list["head"][]="单价";
         }
+        $list["head"][]="是否显示";
         $rs = Yii::app()->db->createCommand()->select("a.*,b.name as classify_name")->from("opr_warehouse a")
             ->leftJoin("opr_classify b","a.classify_id=b.id")
             ->where('a.city=:city',array(':city'=>$city))->queryAll();
@@ -376,6 +377,7 @@ class WarehouseForm extends CFormModel
                     $arr["cost_year_month"] = $priceList["cost_price"]==="无"?"无":$priceList["year"]."/".$priceList["month"];
                     $arr["cost_price"] = $priceList["cost_price"];
                 }
+                $arr["display"] = empty($row["display"])?"不显示":"显示";
                 $list["body"][]=$arr;
             }
         }

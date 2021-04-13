@@ -16,6 +16,8 @@ class MonthlyList extends CListPageModel
 	public function retrieveDataByPage($pageNum=1)
 	{
 		$suffix = Yii::app()->params['envSuffix'];
+		$exlist = Yii::app()->params['cityExclude'];
+		$exclude = empty($exlist) ? '' : " and a.city not in ($exlist) ";
 		$citylist = Yii::app()->user->city_allow();
 		$sql1 = "select a.*, b.name as city_name, 
 					(select case workflow$suffix.RequestStatus('OPRPT',a.id,a.lcd)
@@ -27,11 +29,11 @@ class MonthlyList extends CListPageModel
 					end) as wfstatus,
 					workflow$suffix.RequestStatusDesc('OPRPT',a.id,a.lcd) as wfstatusdesc
 				from opr_monthly_hdr a inner join security$suffix.sec_city b on a.city=b.code 
-				where a.city in ($citylist)
+				where a.city in ($citylist) $exclude
 			";
 		$sql2 = "select count(a.id)
 				from opr_monthly_hdr a, security$suffix.sec_city b 
-				where a.city in ($citylist) and a.city=b.code 
+				where a.city in ($citylist) and a.city=b.code $exclude
 			";
 		$clause = "";
 		if (!empty($this->searchField) && !empty($this->searchValue)) {

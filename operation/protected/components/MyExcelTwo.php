@@ -128,24 +128,26 @@ class MyExcelTwo {
                     $strNum =0;
                     $maxNum = 0;
                 }else{
-                    $strNum =5;
+                    $strNum =6;
                 }
                 $numStart = $this->row;
                 $startRow = $strList[$strNum].$numStart;
-                $endRow = $strList[$strNum+3].($numStart+5);
-                $this->setRowContent($strList[$strNum].$numStart,"订单编号：".$order["order_code"],$strList[$strNum+3].$numStart);
-                $this->setRowContent($strList[$strNum].($numStart+1),"申請日期：".$order["lcd"],$strList[$strNum+3].($numStart+1));
-                $this->setRowContent($strList[$strNum].($numStart+2),"下的用戶：".$order["lcu_name"],$strList[$strNum+3].($numStart+2));
-                $this->setRowContent($strList[$strNum].($numStart+3),"訂單狀態：".$order["status"],$strList[$strNum+3].($numStart+3));
+                $endRow = $strList[$strNum+4].($numStart+5);
+                $this->setRowContent($strList[$strNum].$numStart,"订单编号：".$order["order_code"],$strList[$strNum+4].$numStart);
+                $this->setRowContent($strList[$strNum].($numStart+1),"申請日期：".$order["lcd"],$strList[$strNum+4].($numStart+1));
+                $this->setRowContent($strList[$strNum].($numStart+2),"下的用戶：".$order["lcu_name"],$strList[$strNum+4].($numStart+2));
+                $this->setRowContent($strList[$strNum].($numStart+3),"訂單狀態：".$order["status"],$strList[$strNum+4].($numStart+3));
+                $this->setRowContent($strList[$strNum].($numStart+4),"订单备注：".$order["remark"],$strList[$strNum+4].($numStart+4));
 
-                $this->objActSheet->setCellValue($strList[$strNum].($numStart+5),"物品编号");
-                $this->objActSheet->setCellValue($strList[$strNum+1].($numStart+5),"物品名称");
-                $this->objActSheet->setCellValue($strList[$strNum+2].($numStart+5),"单位");
-                $this->objActSheet->setCellValue($strList[$strNum+3].($numStart+5),"要求数量");
+                $this->objActSheet->setCellValue($strList[$strNum].($numStart+6),"物品编号");
+                $this->objActSheet->setCellValue($strList[$strNum+1].($numStart+6),"物品名称");
+                $this->objActSheet->setCellValue($strList[$strNum+2].($numStart+6),"单位");
+                $this->objActSheet->setCellValue($strList[$strNum+3].($numStart+6),"要求数量");
+                $this->objActSheet->setCellValue($strList[$strNum+4].($numStart+6),"要求说明");
                 if(is_array($order["goodsList"])){
                     $maxNum = $maxNum>count($order["goodsList"])?$maxNum:count($order["goodsList"]);
                     $maxHeight+=$maxNum;
-                    $goodsNum = $numStart+6;
+                    $goodsNum = $numStart+7;
                     foreach ($order["goodsList"] as $goods){
                         $goods["confirm_num"] = $goods["confirm_num"] === null?$goods["goods_num"]:$goods["confirm_num"];
                         if(array_key_exists($goods["goods_id"],$goodsList)){
@@ -160,9 +162,12 @@ class MyExcelTwo {
                         $this->objActSheet->setCellValue($strList[$strNum+1].$goodsNum,$goods["name"]);
                         $this->objActSheet->setCellValue($strList[$strNum+2].$goodsNum,$goods["unit"]);
                         $this->objActSheet->setCellValue($strList[$strNum+3].$goodsNum,$goods["goods_num"]);
-                        $endRow = $strList[$strNum+3].$goodsNum;
+                        $this->objActSheet->setCellValue($strList[$strNum+4].$goodsNum,$goods["note"]);
+                        $endRow = $strList[$strNum+4].$goodsNum;
                         $goodsNum++;
                     }
+                    //$this->objActSheet->setCellValue($strList[$strNum+5].($goodsNum-1),$order["remark"]);
+                    //$this->objActSheet->mergeCells($strList[$strNum+5].($goodsNum-1).':'.$strList[$strNum+5].($goodsNum-1));
                 }
                 if($foreachNum%2 == 0){
                     $this->row +=$maxHeight;

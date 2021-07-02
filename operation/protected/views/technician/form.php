@@ -171,7 +171,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                                         echo "</td>";
                                     }
                                     echo "<td>";
-                                    echo TbHtml::textField( "TechnicianForm[goods_list][$key][goods_num]",$goodsList["goods_num"],
+                                    echo TbHtml::numberField( "TechnicianForm[goods_list][$key][goods_num]",$goodsList["goods_num"],
                                         array('class'=>"select_num $spanInput",'readonly'=>($model->getInputBool()))
                                     );
                                     echo "</td>";

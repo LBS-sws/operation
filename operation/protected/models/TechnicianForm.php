@@ -75,6 +75,7 @@ class TechnicianForm extends CFormModel
             return false;
         }
         foreach ($goods_list as $key =>$goods){
+            $goods_num = trim($goods["goods_num"]);
             if(empty($goods["goods_id"]) && empty($goods["goods_num"])){
                 unset($this->goods_list[$key]);
                 continue;
@@ -91,6 +92,8 @@ class TechnicianForm extends CFormModel
                 $this->addError($attribute,$message);
                 return false;
             }else{
+                $goods["goods_num"] = $goods_num;
+                $this->goods_list[$key]["goods_num"] = $goods_num;
                 $list = WarehouseForm::getGoodsToGoodsId($goods["goods_id"]);
                 if (empty($list)){
                     $message = Yii::t('procurement','Not Font Goods').$goods["goods_id"]."a";
@@ -108,7 +111,6 @@ class TechnicianForm extends CFormModel
             }
 
         }
-
         if(count($this->goods_list)<1){
             $message = Yii::t('procurement','Fill in at least one goods');
             $this->addError($attribute,$message);

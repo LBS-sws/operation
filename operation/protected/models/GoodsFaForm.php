@@ -81,6 +81,34 @@ class GoodsFaForm extends CFormModel
         }
 	}
 
+    public function downExcel(){
+        $list["head"] = array("存货编码","存货名称","所属分类码","来源地","规格型号","主计量单位"
+        ,'参考售价',"数量倍率","最大数量","最小数量","混合規則");
+        $rs = Yii::app()->db->createCommand()->select("a.*,b.name as classify_name,c.name as rules_name")
+            ->from("opr_goods_fa a")
+            ->leftJoin("opr_classify b","a.classify_id=b.id")
+            ->leftJoin("opr_goods_rules c","a.rules_id=c.id")->queryAll();
+        $list["body"] = array();
+        if($rs){
+            foreach ($rs as $row){
+                $list["body"][]=array(
+                    "goods_code"=>$row["goods_code"],
+                    "name"=>$row["name"],
+                    "classify_name"=>$row["classify_name"],
+                    "origin"=>$row["origin"],
+                    "type"=>$row["type"],
+                    "unit"=>$row["unit"],
+                    "price"=>$row["price"],
+                    "multiple"=>$row["multiple"],
+                    "big_num"=>$row["big_num"],
+                    "small_num"=>$row["small_num"],
+                    "rules_name"=>$row["rules_name"]
+                );
+            }
+        }
+        return $list;
+    }
+
 	public function retrieveData($index) {
 		$city = Yii::app()->user->city();
 		$rows = Yii::app()->db->createCommand()->select()

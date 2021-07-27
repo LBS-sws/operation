@@ -172,10 +172,10 @@ class UploadExcelForm extends CFormModel
                         return array("status"=>1,"data"=>"");
                     }
                     //國內貨標籤
-                    $rows = Yii::app()->db->createCommand()->select("*")->from('opr_stickies')
+                    $rows = Yii::app()->db->createCommand()->select("id")->from('opr_stickies')
                         ->where($list["value"], array(':name'=>$value))->queryRow();
                     if ($rows) {
-                        return array("status"=>1,"data"=>$value);
+                        return array("status"=>1,"data"=>$rows["id"]);
                     } else {
                         return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."沒有找到($value)");
                     }
@@ -350,7 +350,7 @@ class UploadExcelForm extends CFormModel
                     array("name"=>"规格型号","sqlName"=>"type","value"=>"无"),
                     array("name"=>"主计量单位","sqlName"=>"unit","value"=>""),
                     array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Domestic' and name=:name","sql"=>"2"),
-                    array("name"=>"标签","sqlName"=>"stickies_id","value"=>"id=:name","sql"=>"3"),
+                    array("name"=>"标签","sqlName"=>"stickies_id","value"=>"name=:name","sql"=>"3"),
                     array("name"=>"参考售价","sqlName"=>"price","value"=>"0.00"),
                     array("name"=>"来源地","sqlName"=>"origin","value"=>""),
                     array("name"=>"混合規則","sqlName"=>"rules_id","value"=>"name=:name","sql"=>"5"),

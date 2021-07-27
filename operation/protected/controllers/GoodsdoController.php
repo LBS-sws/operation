@@ -27,7 +27,7 @@ class GoodsdoController extends Controller
                 'expression'=>array('GoodsdoController','allowReadWrite'),
             ),
             array('allow',
-                'actions'=>array('index','view'),
+                'actions'=>array('index','view','downExcel'),
                 'expression'=>array('GoodsdoController','allowReadOnly'),
             ),
             array('deny',  // deny all users
@@ -43,6 +43,17 @@ class GoodsdoController extends Controller
     public static function allowReadOnly() {
         return Yii::app()->user->validFunction('YG04');
     }
+
+    public function actionDownExcel()
+    {
+        //$model = new WarehouseForm();
+        $warehouseList = GoodsDoForm::downExcel();
+        $myExcel = new MyExcelTwo();
+        $myExcel->setDataHeard($warehouseList["head"],"国内货物品");
+        $myExcel->setDataBody($warehouseList["body"]);
+        $myExcel->outDownExcel("国内货物品.xls");
+    }
+
 	public function actionIndex($pageNum=0)
 	{
 		$model = new GoodsDoList;

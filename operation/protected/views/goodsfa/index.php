@@ -32,6 +32,13 @@ $this->pageTitle=Yii::app()->name . ' - Goods List';
                     'submit'=>Yii::app()->createUrl('goodsfa/new'),
                 ));
             ?>
+            <div class="btn-group pull-right" role="group">
+                <?php
+                echo TbHtml::button('<span class="fa fa-cloud-download"></span> '.Yii::t('misc','Download'), array(
+                    'submit'=>Yii::app()->createUrl('goodsfa/DownExcel'),
+                ));
+                ?>
+            </div>
         </div>
     </div>
 	<?php $this->widget('ext.layout.ListPageWidget', array(

@@ -27,7 +27,7 @@ class GoodsfaController extends Controller
                 'expression'=>array('GoodsfaController','allowReadWrite'),
             ),
             array('allow',
-                'actions'=>array('index','view'),
+                'actions'=>array('index','view','downExcel'),
                 'expression'=>array('GoodsfaController','allowReadOnly'),
             ),
             array('deny',  // deny all users
@@ -43,6 +43,17 @@ class GoodsfaController extends Controller
     public static function allowReadOnly() {
         return Yii::app()->user->validFunction('YG05');
     }
+
+    public function actionDownExcel()
+    {
+        //$model = new WarehouseForm();
+        $warehouseList = GoodsFaForm::downExcel();
+        $myExcel = new MyExcelTwo();
+        $myExcel->setDataHeard($warehouseList["head"],"快速货物品");
+        $myExcel->setDataBody($warehouseList["body"]);
+        $myExcel->outDownExcel("快速货物品.xls");
+    }
+
     public function actionIndex($pageNum=0)
     {
         $model = new GoodsFaList;

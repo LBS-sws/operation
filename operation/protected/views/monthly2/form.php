@@ -53,7 +53,7 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form - ID';
 			'id'=>'btnDenyM'));
 		?>
 <?php endif ?>
-		<?php echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('misc','Export'), array(
+		<?php echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('monthly','Export'), array(
 			'id'=>'btnExcel'));
 		?>
 	</div>

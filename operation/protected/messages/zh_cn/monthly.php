@@ -26,5 +26,6 @@ return array(
 	'Sales Summary Approval - ID - HQ'=>'ID营业报告审核(总部)',
 	'Sales Summary Approval - ID - Manager'=>'ID营业报告审核(经理)',
 	'Sales Summary Approval - ID'=>'ID营业报告审核',
+	'Export'=>'汇出',
 );
 ?>

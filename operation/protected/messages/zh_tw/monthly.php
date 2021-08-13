@@ -26,5 +26,6 @@ return array(
 'Sales Summary Approval - ID - HQ'=>'ID營業報告審核(總部)',
 'Sales Summary Approval - ID - Manager'=>'ID營業報告審核(經理)',
 'Sales Summary Approval - ID'=>'ID營業報告審核',
+'Export'=>'匯出',
 );
 ?>

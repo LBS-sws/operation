@@ -1,6 +1,6 @@
 <?php
 
-class MonthlyApprList extends CListPageModel
+class Monthly2List extends CListPageModel
 {
 	public function attributeLabels()
 	{
@@ -13,28 +13,27 @@ class MonthlyApprList extends CListPageModel
 		);
 	}
 	
-	public function retrieveDataByPage($pageNum=1, $type='P')
+	public function retrieveDataByPage($pageNum=1)
 	{
-		$type = Yii::app()->user->validFunction('YN01') ? 'PA' : 'PH';
-		
-		$wf = new WorkflowOprpt;
-		$wf->connection = Yii::app()->db;
-		$list = $wf->getPendingRequestIdList('OPRPT', $type, Yii::app()->user->id);
-		if (empty($list)) $list = '0';
-		
 		$suffix = Yii::app()->params['envSuffix'];
 		$exlist = Yii::app()->params['cityExclude'];
 		$exclude = empty($exlist) ? '' : " and a.city not in ($exlist) ";
-		$city = Yii::app()->user->city_allow();
-		$sql1 = "select a.*, b.name as city_name 
-				from opr_monthly_hdr a, security$suffix.sec_city b 
-				where a.group_id='1' and a.city in ($city) and a.city=b.code 
-				and a.id in ($list) $exclude
+		$citylist = Yii::app()->user->city_allow();
+		$sql1 = "select a.*, b.name as city_name, 
+					(select case workflow$suffix.RequestStatus('OPRPT2',a.id,a.lcd)
+							when '' then '4DF' 
+							when 'PH' then '1PH' 
+							when 'PA' then '2PA' 
+							when 'PS' then '0PS' 
+							when 'ED' then '3ED' 
+					end) as wfstatus,
+					workflow$suffix.RequestStatusDesc('OPRPT2',a.id,a.lcd) as wfstatusdesc
+				from opr_monthly_hdr a inner join security$suffix.sec_city b on a.city=b.code 
+				where a.group_id='2' and a.city in ($citylist) $exclude
 			";
 		$sql2 = "select count(a.id)
 				from opr_monthly_hdr a, security$suffix.sec_city b 
-				where a.group_id='1' and a.city in ($city) and a.city=b.code 
-				and a.id in ($list) $exclude
+				where a.group_id='2' and a.city in ($citylist) and a.city=b.code $exclude
 			";
 		$clause = "";
 		if (!empty($this->searchField) && !empty($this->searchValue)) {
@@ -66,21 +65,23 @@ class MonthlyApprList extends CListPageModel
 		$sql = $this->sqlWithPageCriteria($sql, $this->pageNum);
 		$records = Yii::app()->db->createCommand($sql)->queryAll();
 		
-		$list = array();
 		$this->attr = array();
 		if (count($records) > 0) {
 			foreach ($records as $k=>$record) {
-				$this->attr[] = array(
+					$wfstatus = (empty($record['wfstatus'])?'0DF':$record['wfstatus']);
+					$this->attr[] = array(
 						'id'=>$record['id'],
 						'year_no'=>$record['year_no'],
 						'month_no'=>$record['month_no'],
 						'city'=>$record['city'],
 						'city_name'=>$record['city_name'],
-				);
+						'wfstatusdesc'=>(empty($record['wfstatusdesc'])?Yii::t('misc','Draft'):$record['wfstatusdesc']) ,
+						'wfstatus'=> $wfstatus,
+					);
 			}
 		}
 		$session = Yii::app()->session;
-		$session['criteria_ya03'] = $this->getCriteria();
+		$session['criteria_ye01'] = $this->getCriteria();
 		return true;
 	}
 

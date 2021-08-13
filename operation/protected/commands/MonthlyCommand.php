@@ -9,7 +9,7 @@ class MonthlyCommand extends CConsoleCommand {
 // Initiate Records in Database for Monthly Report
 // TABLE: swo_monthly_hdr, swo_monthly_dtl
 //	
-	public function actionInitRecord($year='', $month='') {
+	public function actionInitRecord($year='', $month='', $group='1') {
 		$this->year = (empty($year)) ? date('Y') : $year;
 		$this->month = (empty($month)) ? date('m') : $month;
 		echo "YEAR: ".$this->year."\tMONTH: ".$this->month."\n";
@@ -26,7 +26,7 @@ class MonthlyCommand extends CConsoleCommand {
 				$city = $row['code'];
 				echo "CITY: $city\n";
 				$sql = "select count(id) from opr_monthly_hdr 
-						where city='$city' and year_no=".$this->year." and month_no=".$this->month
+						where city='$city' and group_id='$group' and year_no=".$this->year." and month_no=".$this->month
 					;
 				$rc = Yii::app()->db->createCommand($sql)->queryScalar();
 				if ($rc!==false && $rc==0) {
@@ -35,8 +35,8 @@ class MonthlyCommand extends CConsoleCommand {
 					$transaction=$connection->beginTransaction();
 				
 					try {
-						$hid = $this->addHeader($connection, $city);
-						$this->addDetail($connection, $hid);
+						$hid = $this->addHeader($connection, $city, $group);
+						$this->addDetail($connection, $hid, $group);
 						$transaction->commit();
 					} catch(Exception $e) {
 						$transaction->rollback();
@@ -49,9 +49,9 @@ class MonthlyCommand extends CConsoleCommand {
 	}
 	
 	// Add monthly header records
-	protected function addHeader(&$connection, $city) {
-		$sql = "insert into opr_monthly_hdr(city, year_no, month_no, status, lcu, luu) 
-				values(:city, :year, :month, 'Y', :uid, :uid)
+	protected function addHeader(&$connection, $city, $group='1') {
+		$sql = "insert into opr_monthly_hdr(city, year_no, month_no, status, group_id, lcu, luu) 
+				values(:city, :year, :month, 'Y', :group, :uid, :uid)
 			";
 		$uid = 'admin';
 		$command=$connection->createCommand($sql);
@@ -59,14 +59,15 @@ class MonthlyCommand extends CConsoleCommand {
 		if (strpos($sql,':year')!==false) $command->bindParam(':year',$this->year,PDO::PARAM_INT);
 		if (strpos($sql,':month')!==false) $command->bindParam(':month',$this->month,PDO::PARAM_INT);
 		if (strpos($sql,':uid')!==false) $command->bindParam(':uid',$uid,PDO::PARAM_STR);
+		if (strpos($sql,':group')!==false) $command->bindParam(':group',$group,PDO::PARAM_STR);
 		$command->execute();
 		return Yii::app()->db->getLastInsertID();
 	}
 	
 	// Add monthly detail records
-	protected function addDetail(&$connection, $hid) {
+	protected function addDetail(&$connection, $hid, $group='1') {
 		$select = "select code from opr_monthly_field 
-					where status='Y'
+					where status='Y' and group_id='$group'
 					order by code
 				";
 		$rows = Yii::app()->db->createCommand($select)->queryAll();

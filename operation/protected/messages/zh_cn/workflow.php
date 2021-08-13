@@ -33,5 +33,13 @@ return array(
 	'Report Approval'=>'营业报表审核',
 	'Sales Report Approved'=>'营业报表已批准',
 	'Sales Report Denied'=>'营业报表已被拒绝',
+	'You have 1 request for ID report approval' => '您有一个ID营业报表审核請求需要处理',
+	'Sales report - ID has been approved by HQ'=>'总部已批准ID营业报表审核請求',
+	'Sales report - ID has been approved by Manager'=>'经理已批准ID营业报表审核請求',
+	'Sales report - ID has been denied by HQ'=>'总部已拒绝ID营业报表审核請求',
+	'Sales report - ID has been denied by Manager'=>'经理已拒绝ID营业报表审核請求',
+	'ID Report Approval'=>'ID营业报表审核',
+	'Sales Report - ID Approved'=>'ID营业报表已批准',
+	'Sales Report - ID Denied'=>'ID营业报表已被拒绝',
 );
 ?>

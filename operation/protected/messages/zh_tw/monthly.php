@@ -16,5 +16,15 @@ return array(
 'Statement'=>'月結單明細',
 'Please upload'=>'請上傳',
 'Please enter reason'=>'請輸入原因',
+'Air Service Report'=>'空氣服務報表',
+'Machine Selling Report'=>'機器售賣報表',
+'Maintenance Service Report'=>'延長維保報表',
+'Sales Summary - ID'=>'ID營業報告',
+'Sales Summary List - ID'=>'ID營業報告列表',
+'Sales Summary Form - ID'=>'ID營業報告表單',
+'Sales Summary Enquiry - ID'=>'ID營業報告查詢',
+'Sales Summary Approval - ID - HQ'=>'ID營業報告審核(總部)',
+'Sales Summary Approval - ID - Manager'=>'ID營業報告審核(經理)',
+'Sales Summary Approval - ID'=>'ID營業報告審核',
 );
 ?>

@@ -113,6 +113,25 @@ return array(
         ),
     ),
 
+    'Sales Summary - ID'=>array(
+        'access'=>'YE',
+		'icon'=>'fa-bar-chart',
+        'items'=>array(
+            'Sales Summary Entry'=>array(
+                'access'=>'YE01',
+                'url'=>'/monthly2/index',
+            ),
+             'Sales Summary Approval'=>array(
+                'access'=>'YE03',
+                'url'=>'/monthly2/indexa',
+           ),
+           'Sales Summary Enquiry'=>array(
+                'access'=>'YE02',
+                'url'=>'/monthly2/indexc',
+            ),
+        ),
+    ),
+
     'Report'=>array(
         'access'=>'YB',
 		'icon'=>'fa-file-text-o',

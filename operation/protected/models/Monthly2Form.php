@@ -81,9 +81,9 @@ class Monthly2Form extends CFormModel
 		$count1 = $this->no_of_attm['operb1'];
 		$count2 = $this->no_of_attm['operb2'];
 		$count3 = $this->no_of_attm['operb3'];
-		$val_1 = $this->record[0]['datavalue'];
-		$val_2 = $this->record[1]['datavalue'];
-		$val_3 = $this->record[2]['datavalue'];
+		$val_1 = $this->record[1]['datavalue'];
+		$val_2 = $this->record[2]['datavalue'];
+		$val_3 = $this->record[3]['datavalue'];
 		if (($this->scenario=='submit' || $this->scenario=='resubmit') && (!empty($val_1) && $val_1 > 0) && (empty($count1) || $count1==0)) {
 			$this->addError($attribute, Yii::t('monthly','Please upload').' '.Yii::t('monthly','Air Service Report'));
 		}

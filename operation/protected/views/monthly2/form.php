@@ -202,7 +202,7 @@ $('#Monthly2Form_record_1_datavalue, #Monthly2Form_record_2_datavalue, #Monthly2
 	$('#Monthly2Form_record_2_datavalue').val(parseFloat(+$('#Monthly2Form_record_2_datavalue').val() || 0 ).toFixed(2));
 	$('#Monthly2Form_record_3_datavalue').val(parseFloat(+$('#Monthly2Form_record_3_datavalue').val() || 0 ).toFixed(2));
 	var total = parseFloat(document.getElementById('Monthly2Form_record_1_datavalue').value) + parseFloat(document.getElementById('Monthly2Form_record_2_datavalue').value) + parseFloat(document.getElementById('Monthly2Form_record_3_datavalue').value);
-	$('#Monthly2Form_record_4_datavalue').val(total);
+	$('#Monthly2Form_record_4_datavalue').val(total.toFixed(2));
 });
 </script>
 

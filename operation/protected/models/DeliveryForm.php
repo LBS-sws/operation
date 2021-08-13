@@ -97,11 +97,11 @@ class DeliveryForm extends CFormModel
             $idList = Yii::app()->db->createCommand()->select("*")->from("opr_order_goods")->where('id = :id',array(':id'=>$this->black_id))->queryRow();
             if($idList){
                 if(is_numeric($this->num)){
-                    if(floatval($this->num)<0){
-                        $message = "退回數量不能小於零";
-                        $this->addError($attribute,$message);
-                    }else if(floatval($idList["confirm_num"])<floatval($this->num)){
+                    if(floatval($idList["confirm_num"])<floatval($this->num)){
                         $message = "退回數量不能大於實際數量";
+                        $this->addError($attribute,$message);
+                    }elseif (floatval($idList["confirm_num"])>0&&floatval($this->num)<0){
+                        $message = "退回數量不能小于0";
                         $this->addError($attribute,$message);
                     }
                 }else{

@@ -15,7 +15,7 @@ class Monthly2ApprList extends CListPageModel
 	
 	public function retrieveDataByPage($pageNum=1, $type='P')
 	{
-		$type = Yii::app()->user->validFunction('YN01') ? 'PA' : 'PH';
+		$type = Yii::app()->user->validFunction('YN06') ? 'PA' : 'PH';
 		
 		$wf = new WorkflowOprpt2;
 		$wf->connection = Yii::app()->db;

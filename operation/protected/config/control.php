@@ -2,6 +2,7 @@
 
 return array(
 	'Report Approval (HQ)'=>array('access'=>'YN01',),
+	'Report ID Approval (HQ)'=>array('access'=>'YN06',),
 	'Warehouse unit price'=>array('access'=>'YN02',),
     'backward storage'=>array('access'=>'YN03',),//退回庫存
     'Warehouse Item description'=>array('access'=>'YN04',),//仓库物品说明

@@ -30,6 +30,7 @@ return array(
 'Sales Summary Entry'=>'營業報告輸入',
 'Sales Summary Enquiry'=>'營業報告查詢',
 'Report Approval (HQ)'=>'營業報告審核(總部)',
+'Report ID Approval (HQ)'=>'ID營業報告審核(總部)',
 'Sales Summary Approval - HQ'=>'營業報告審核(總部)',
 'Sales Summary Approval - Manager'=>'營業報告審核(經理)',
 'Sales Summary Approval'=>'營業報告審核',

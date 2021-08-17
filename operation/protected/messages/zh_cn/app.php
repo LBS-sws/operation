@@ -30,6 +30,7 @@ return array(
     'Sales Summary Entry'=>'营业报告输入',
     'Sales Summary Enquiry'=>'营业报告查询',
     'Report Approval (HQ)'=>'营业报告审核(总部)',
+    'Report ID Approval (HQ)'=>'ID营业报告审核(总部)',
 	'Sales Summary Approval - HQ'=>'营业报告审核(总部)',
 	'Sales Summary Approval - Manager'=>'营业报告审核(经理)',
 	'Sales Summary Approval'=>'营业报告审核',

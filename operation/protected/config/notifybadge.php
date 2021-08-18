@@ -8,6 +8,7 @@ return array(
 	array('code'=>'YD06','function'=>'Counter::getAreaNum','color'=>'bg-purple'),
 	array('code'=>'YC02','function'=>'Counter::getGoodsNum','color'=>'bg-gray'),
 	array('code'=>'YA03','function'=>'Counter::getRepNum','color'=>'bg-maroon'),
+	array('code'=>'YE03','function'=>'Counter::getRepIDNum','color'=>'bg-maroon'),
 );
 
 ?>

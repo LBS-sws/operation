@@ -69,7 +69,28 @@ class Counter {
 		$cityallow = Yii::app()->user->city_allow();
 		$sql = "select count(a.id)
 				from opr_monthly_hdr a, security$suffix.sec_city b 
-				where a.city in ($cityallow) and a.city=b.code 
+				where a.group_id='1' and a.city in ($cityallow) and a.city=b.code 
+				and a.id in ($list)
+			";
+		$rep_num = Yii::app()->db->createCommand($sql)->queryScalar();
+		
+		return $rep_num;
+    }
+
+	// ID营业报告审核的數量
+    public function getRepIDNum(){
+        $city = Yii::app()->user->city();
+        $uid = Yii::app()->user->id;
+		$suffix = Yii::app()->params['envSuffix'];
+		$type = Yii::app()->user->validFunction('YN06') ? 'PA' : 'PH';
+		$wf = new WorkflowOprpt;
+		$wf->connection = Yii::app()->db;
+		$list = $wf->getPendingRequestIdList('OPRPT2', $type, $uid);
+		if (empty($list)) $list = '0';
+		$cityallow = Yii::app()->user->city_allow();
+		$sql = "select count(a.id)
+				from opr_monthly_hdr a, security$suffix.sec_city b 
+				where a.group_id='2' and a.city in ($cityallow) and a.city=b.code 
 				and a.id in ($list)
 			";
 		$rep_num = Yii::app()->db->createCommand($sql)->queryScalar();

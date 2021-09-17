@@ -14,7 +14,7 @@ class UploadExcelForm extends CFormModel
 	public $dbName;
 	public $add_num;
 	public $update_id = 0;
-	public $bool = true;
+	public $bool = true;//是否允許修改 true：是
 	public $error_list=array();
 	public $start_title="";
 	public $min_num=0;//安全庫存(倉庫專用)
@@ -62,7 +62,7 @@ class UploadExcelForm extends CFormModel
             if($continue){
                 $city = Yii::app()->user->city();
                 $uid = Yii::app()->user->id;
-                if(!$bool&&!empty($this->update_id)){
+                if($bool&&!empty($this->update_id)){
                     $arrList["luu"] = $uid;
                     //庫存允許導入（不允許導入的邏輯需要配合庫存入庫功能）- 開始
                     if($this->orderClass == "Warehouse"){
@@ -152,19 +152,30 @@ class UploadExcelForm extends CFormModel
                     $rows = Yii::app()->db->createCommand()->select("*")->from($this->dbName)
                         ->where($list["value"], array(':name'=>$value))->queryRow();
                     if($rows){
-                        return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."已經存在($value)");
+                        $this->update_id = $rows["id"];
                     }else{
-                        return array("status"=>1,"data"=>$value);
+                        $this->update_id = 0;
                     }
+                    return array("status"=>1,"data"=>$value);
                     break;
                 case 2:
+                    if(empty($value)){
+                        return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."不能为空");
+                    }
                     //物品分類
                     $rows = Yii::app()->db->createCommand()->select("*")->from('opr_classify')
                         ->where($list["value"], array(':name'=>$value))->queryRow();
                     if ($rows) {
                         return array("status"=>1,"data"=>$rows["id"]);
                     } else {
-                        return array("status"=>0,"error"=>$this->start_title."：".$list["name"]."沒有找到($value)");
+                        Yii::app()->db->createCommand()->insert("opr_classify",array(
+                            "name"=>$value,
+                            "class_type"=>$this->orderClass=="Document"?"Domestic":$this->orderClass,
+                            "lcu"=>"导入",
+                            "luu"=>Yii::app()->user->id,
+                        ));
+                        $id = Yii::app()->db->getLastInsertID();
+                        return array("status"=>1,"data"=>$id);
                     }
                     break;
                 case 3:
@@ -187,27 +198,17 @@ class UploadExcelForm extends CFormModel
                     //倉庫物品驗證
                     $rows = Yii::app()->db->createCommand()->select("*")->from($this->dbName)
                         ->where($list["value"], array(':name'=>$value))->queryRow();
-                    if($list["sqlName"] == "name"){
-                        if(empty($this->update_id)&&!$rows){
-                            return array("status"=>1,"data"=>$value);
-                        }
-                        if(!empty($this->update_id)&&$rows){
-                            return array("status"=>1,"data"=>$value);
-                        }
-                        return array("status"=>0,"error"=>$this->start_title."："."存货编码与存货名称不對應");
+                    if($rows){
+                        $this->min_num = key_exists("min_num",$rows)?$rows["min_num"]:0;
+                        $this->add_num = key_exists("inventory",$rows)?$rows["inventory"]:0;//庫存允許導入（不允許導入的邏輯需要配合庫存入庫功能）
+                        //$this->add_num = 0;
+                        $this->update_id = $rows["id"];
                     }else{
-                        if($rows){
-                            $this->min_num = key_exists("min_num",$rows)?$rows["min_num"]:0;
-                            $this->add_num = key_exists("inventory",$rows)?$rows["inventory"]:0;//庫存允許導入（不允許導入的邏輯需要配合庫存入庫功能）
-                            //$this->add_num = 0;
-                            $this->update_id = $rows["id"];
-                        }else{
-                            $this->min_num = 0;
-                            $this->add_num = 0;
-                            $this->update_id = 0;
-                        }
-                        return array("status"=>1,"data"=>$value);
+                        $this->min_num = 0;
+                        $this->add_num = 0;
+                        $this->update_id = 0;
                     }
+                    return array("status"=>1,"data"=>$value);
                     break;
                 case 5:
                     //混合規則驗證
@@ -327,11 +328,10 @@ class UploadExcelForm extends CFormModel
         $arr = array();
         switch ($this->orderClass){
             case "Warehouse":
-                $this->bool = false;
                 $this->dbName="opr_warehouse";
                 $arr = array(
                     array("name"=>"存货编码","sqlName"=>"goods_code","value"=>"city='$city' and goods_code=:name","sql"=>"4"),
-                    array("name"=>"存货名称","sqlName"=>"name","value"=>"city='$city' and name=:name","sql"=>"4"),
+                    array("name"=>"存货名称","sqlName"=>"name","value"=>""),
                     array("name"=>"主计量单位","sqlName"=>"unit","value"=>""),
                     array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Warehouse' and name=:name","sql"=>"2"),
                     //array("name"=>"参考售价","sqlName"=>"price","value"=>"0.00"),
@@ -346,7 +346,7 @@ class UploadExcelForm extends CFormModel
                 $this->dbName="opr_goods_do";
                 $arr = array(
                     array("name"=>"存货编码","sqlName"=>"goods_code","value"=>"goods_code=:name","sql"=>"1"),
-                    array("name"=>"存货名称","sqlName"=>"name","value"=>"name=:name","sql"=>"1"),
+                    array("name"=>"存货名称","sqlName"=>"name","value"=>""),
                     array("name"=>"规格型号","sqlName"=>"type","value"=>"无"),
                     array("name"=>"主计量单位","sqlName"=>"unit","value"=>""),
                     array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Domestic' and name=:name","sql"=>"2"),
@@ -362,8 +362,8 @@ class UploadExcelForm extends CFormModel
             case "Import":
                 $this->dbName="opr_goods_im";
                 $arr = array(
-                    array("name"=>"物品编号","sqlName"=>"goods_code","value"=>"goods_code=:name","sql"=>"4"),
-                    array("name"=>"物品名称","sqlName"=>"name","value"=>"name=:name and id!=:id","sql"=>"6"),
+                    array("name"=>"物品编号","sqlName"=>"goods_code","value"=>"goods_code=:name","sql"=>"1"),
+                    array("name"=>"物品名称","sqlName"=>"name","value"=>""),
                     array("name"=>"包装规格","sqlName"=>"type","value"=>"无"),
                     array("name"=>"单位","sqlName"=>"unit","value"=>""),
                     array("name"=>"物品分类","sqlName"=>"classify_id","value"=>"class_type='Import' and name=:name","sql"=>"2"),
@@ -388,7 +388,7 @@ class UploadExcelForm extends CFormModel
                 $this->dbName="opr_goods_fa";
                 $arr = array(
                     array("name"=>"存货编码","sqlName"=>"goods_code","value"=>"goods_code=:name","sql"=>"1"),
-                    array("name"=>"存货名称","sqlName"=>"name","value"=>"name=:name","sql"=>"1"),
+                    array("name"=>"存货名称","sqlName"=>"name","value"=>""),
                     array("name"=>"规格型号","sqlName"=>"type","value"=>"无"),
                     array("name"=>"主计量单位","sqlName"=>"unit","value"=>""),
                     array("name"=>"所属分类码","sqlName"=>"classify_id","value"=>"class_type='Fast' and name=:name","sql"=>"2"),

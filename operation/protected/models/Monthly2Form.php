@@ -84,13 +84,14 @@ class Monthly2Form extends CFormModel
 		$val_1 = $this->record[1]['datavalue'];
 		$val_2 = $this->record[2]['datavalue'];
 		$val_3 = $this->record[3]['datavalue'];
-		if (($this->scenario=='submit' || $this->scenario=='resubmit') && (!empty($val_1) && $val_1 > 0) && (empty($count1) || $count1==0)) {
+		$val_4 = $this->record[4]['datavalue'];
+		if (($this->scenario=='submit' || $this->scenario=='resubmit') && ((!empty($val_1) && $val_1 > 0) || (!empty($val_2) && $val_2 > 0)) && (empty($count1) || $count1==0)) {
 			$this->addError($attribute, Yii::t('monthly','Please upload').' '.Yii::t('monthly','Air Service Report'));
 		}
-		if (($this->scenario=='submit' || $this->scenario=='resubmit') && (!empty($val_2) && $val_2 > 0) && (empty($count2) || $count2==0)) {
+		if (($this->scenario=='submit' || $this->scenario=='resubmit') && (!empty($val_3) && $val_3 > 0) && (empty($count2) || $count2==0)) {
 			$this->addError($attribute, Yii::t('monthly','Please upload').' '.Yii::t('monthly','Machine Selling Report'));
 		}
-		if (($this->scenario=='submit' || $this->scenario=='resubmit') && (!empty($val_3) && $val_3 > 0) && (empty($count3) || $count3==0)) {
+		if (($this->scenario=='submit' || $this->scenario=='resubmit') && (!empty($val_4) && $val_4 > 0) && (empty($count3) || $count3==0)) {
 			$this->addError($attribute, Yii::t('monthly','Please upload').' '.Yii::t('monthly','Maintenance Service Report'));
 		}
 	}

@@ -1,10 +1,11 @@
 alter table opr_monthly_hdr add column group_id char(1) not null default '1' after status;
 alter table opr_monthly_field add column group_id char(1) not null default '1' after function_name;
 insert into opr_monthly_field(code, name, upd_type, field_type, status, function_name, group_id, lcu, luu)
-values ('20001','ID-空气服务收入','M','N','Y','1','2','admin','admin'),
-('20002','ID-机器售卖收入','M','N','Y','2','2','admin','admin'),
-('20003','ID-延长维保收入','M','N','Y','3','2','admin','admin'),
-('20004','ID收入合计','Y','N','Y','4','2','admin','admin')
+values ('20001','ID-空气服务（随意派）RA系列收入','M','N','Y','1','2','admin','admin'),
+('20002','ID-空气服务（轻松派）RA系列收入','M','N','Y','2','2','admin','admin'),
+('20003','ID-机器售卖（专属派）RA系列收入','M','N','Y','3','2','admin','admin'),
+('20004','ID-RA系列延长维保收入','M','N','Y','4','2','admin','admin'),
+('20005','ID收入合计','Y','N','Y','5','2','admin','admin')
 ;
 
 use workflowuat

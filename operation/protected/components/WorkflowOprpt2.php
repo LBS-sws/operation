@@ -1,5 +1,17 @@
 <?php
 class WorkflowOprpt2 extends WorkflowOprpt {
+	public function routeToApprover() {
+		$users = $this->getUserByControlRight(array('YN06'));
+		if (empty($users)) {
+			$user = $this->getRequestData('REQ_USER');
+			$this->assignRespUser($user);
+		} else {
+			foreach ($users as $user) {
+				$this->assignRespUser($user);
+			}
+		}
+	}
+
 	public function emailPA() {
 		$docId = $this->getDocId();
 		$year = $this->getRequestData('YEAR');

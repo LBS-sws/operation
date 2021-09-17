@@ -9,7 +9,7 @@ class MonthlyCommand extends CConsoleCommand {
 // Initiate Records in Database for Monthly Report
 // TABLE: swo_monthly_hdr, swo_monthly_dtl
 //	
-	public function actionInitRecord($year='', $month='', $group='1') {
+	public function actionInitRecord($group='1', $year='', $month='') {
 		$this->year = (empty($year)) ? date('Y') : $year;
 		$this->month = (empty($month)) ? date('m') : $month;
 		echo "YEAR: ".$this->year."\tMONTH: ".$this->month."\n";

@@ -215,7 +215,7 @@ $('#Monthly2Form_record_1_datavalue, #Monthly2Form_record_2_datavalue, #Monthly2
 	$('#btnExcel').on('click',function(){
 		var output = '<table><tr><td>史伟莎ID营业报告</td><td>地区:'+$('#Monthly2Form_city_name').val()+'</td></tr>';
 		output += '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
-		output += '<tr><td>日期：'+$('#MonthlyForm_year_no').val()+'年'+$('#Monthly2Form_month_no').val()+'月份</td><td>人民币（元）</td></tr>';
+		output += '<tr><td>日期：'+$('#Monthly2Form_year_no').val()+'年'+$('#Monthly2Form_month_no').val()+'月份</td><td>人民币（元）</td></tr>';
 		$("[id^='Monthly2Form_record_'][id$='_datavalue']").each(function(){
 			var id = $(this).attr('id');
 			output += '<tr>';

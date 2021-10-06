@@ -131,8 +131,8 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                         <thead>
                         <tr>
                             <td width="15%"><?php echo Yii::t("procurement","Goods Name")?></td>
-                            <td width="8%"><?php echo Yii::t("procurement","Unit")?></td>
-                            <td width="8%"><?php echo Yii::t("procurement","Inventory")?></td>
+                            <td width="8%" class="hidden-xs"><?php echo Yii::t("procurement","Unit")?></td>
+                            <td width="8%" class="hidden-xs"><?php echo Yii::t("procurement","Inventory")?></td>
                             <td width="12%"><?php echo Yii::t("procurement","Demand Note")?></td>
                             <td width="12%"><?php echo Yii::t("procurement","Headquarters Note")?></td>
                             <td width="8%"><?php echo Yii::t("procurement","Goods Number")?></td>
@@ -152,8 +152,8 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                             $tableTr.="<td><input type='text' class='form-control testInput spanInput' readonly name='DeliveryForm[goods_list][$con_num][name]' value='".$val['name']."'>";
                             $tableTr.="<input type='hidden' name='DeliveryForm[goods_list][$con_num][goods_id]' value='".$val['goods_id']."'>";
                             $tableTr.="<input type='hidden' name='DeliveryForm[goods_list][$con_num][id]' value='".$val['id']."'></td>";
-                            $tableTr.="<td><input type='text' class='form-control unit spanInput' readonly name='DeliveryForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
-                            $tableTr.="<td><input type='text' class='form-control unit spanInput' readonly name='DeliveryForm[goods_list][$con_num][inventory]' value='".$val['inventory']."'></td>";
+                            $tableTr.="<td class='hidden-xs'><input type='text' class='form-control unit spanInput' readonly name='DeliveryForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
+                            $tableTr.="<td class='hidden-xs'><input type='text' class='form-control unit spanInput' readonly name='DeliveryForm[goods_list][$con_num][inventory]' value='".$val['inventory']."'></td>";
                             $tableTr.="<td><input type='text' class='form-control spanInput' readonly name='DeliveryForm[goods_list][$con_num][note]' value='".$val['note']."'></td>";
                             if($model->status == "sent" || $model->status == "read"){
                                 $tableTr.="<td><input type='text' class='form-control' name='DeliveryForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";

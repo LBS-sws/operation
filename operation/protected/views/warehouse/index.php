@@ -96,9 +96,14 @@ if (Yii::app()->user->validFunction('YN02'))
 $js='
     $(".goodsHistoryMouse").on("mousemove",function(e){
         var num = $(this).data("id");
-        var pageX = (e.pageX + 5)+"px";
-        var pageY = (e.pageY + 5)+"px";
-        $(".divHistory"+num).show().css({"left":pageX,"top":pageY});
+        var pageX = (e.pageX + 5);
+        var pageY = (e.pageY + 5);
+        $(".divHistory"+num).show();
+        var width = $(".divHistory"+num).outerWidth(true);
+        if(width+pageX>$(window).outerWidth(true)){
+            pageX = $(window).outerWidth(true)-width-20;
+        }
+        $(".divHistory"+num).css({"left":pageX+"px","top":pageY+"px"});
     });
     $(".goodsHistoryMouse").on("mouseout",function(){
         var num = $(this).data("id");

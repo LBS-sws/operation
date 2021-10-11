@@ -3,12 +3,12 @@
 				TbHtml::button(Yii::t('misc','OK'), array('id'=>'btnRmkOk',
 																'data-dismiss'=>'modal',
 																'color'=>TbHtml::BUTTON_COLOR_PRIMARY,
-																'submit'=>Yii::app()->createUrl('monthly/reject'),
+																'submit'=>Yii::app()->createUrl('monthly2/reject'),
 															)),
 				TbHtml::button(Yii::t('misc','OK'), array('id'=>'btnRmkOkMgr',
 																'data-dismiss'=>'modal',
 																'color'=>TbHtml::BUTTON_COLOR_PRIMARY,
-																'submit'=>Yii::app()->createUrl('monthly/rejectm'),
+																'submit'=>Yii::app()->createUrl('monthly2/rejectm'),
 															)),
 				TbHtml::button(Yii::t('dialog','Close'), array('id'=>'btnRmkClose','data-dismiss'=>'modal','color'=>TbHtml::BUTTON_COLOR_PRIMARY))
 			);

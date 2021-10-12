@@ -63,7 +63,7 @@ class RptPickingList extends CReport {
 				$temp['confirm_num'] = number_format($row['confirm_num'],4,'.','');
 // Percy 2018/2/8 - 报表里面的货品成本价格设置成物品设置里的单价
 //				$temp['goods_sum_price'] = number_format($row['goods_sum_price'],2,'.','');
-                $num = empty($row["confirm_num"])?$row["goods_num"]:$row["confirm_num"];
+                $num = empty($row["confirm_num"])?0:floatval($row["confirm_num"]);
                 $price = floatval($row["goods_price"]);
                 $temp["goods_sum_price"] = sprintf("%.2f", floatval($num)*$price);
 //

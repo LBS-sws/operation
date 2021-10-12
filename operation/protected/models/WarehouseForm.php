@@ -319,6 +319,7 @@ class WarehouseForm extends CFormModel
 		return true;
 	}
 
+	//生成不重复的物品编号
     private function setGoodsCode($id){
         if(empty($this->goods_code)){
             $this->foreach_num++;

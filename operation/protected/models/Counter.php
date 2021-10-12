@@ -83,14 +83,15 @@ class Counter {
         $uid = Yii::app()->user->id;
 		$suffix = Yii::app()->params['envSuffix'];
 		$type = Yii::app()->user->validFunction('YN06') ? 'PA' : 'PH';
-		$wf = new WorkflowOprpt;
+		$wf = new WorkflowOprpt2;
 		$wf->connection = Yii::app()->db;
 		$list = $wf->getPendingRequestIdList('OPRPT2', $type, $uid);
 		if (empty($list)) $list = '0';
 		$cityallow = Yii::app()->user->city_allow();
+		$citycond = Yii::app()->user->validFunction('YN06') ? '' : " and a.city in ($cityallow) ";
 		$sql = "select count(a.id)
 				from opr_monthly_hdr a, security$suffix.sec_city b 
-				where a.group_id='2' and a.city in ($cityallow) and a.city=b.code 
+				where a.group_id='2' $citycond and a.city=b.code 
 				and a.id in ($list)
 			";
 		$rep_num = Yii::app()->db->createCommand($sql)->queryScalar();

@@ -1,6 +1,6 @@
 <tr class='clickable-row' data-href='<?php echo $this->getLink('YE02', 'monthly2/view', 'monthly2/view', array('index'=>$this->record['id'],'rtn'=>'indexc'));?>'>
 	<td><?php echo $this->drawEditButton('YE02', 'monthly2/view', 'monthly2/view', array('index'=>$this->record['id'],'rtn'=>'indexc')); ?></td>
-<?php if (!Yii::app()->user->isSingleCity()) : ?>
+<?php if (!Yii::app()->user->isSingleCity() || Yii::app()->user->validFunction('YN06')) : ?>
 	<td><?php echo $this->record['city_name']; ?></td>
 <?php endif ?>
 	<td><?php echo $this->record['year_no']; ?></td>

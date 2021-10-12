@@ -98,7 +98,7 @@ class Monthly2Form extends CFormModel
 
 	public function retrieveData($index) {
 		$suffix = Yii::app()->params['envSuffix'];
-		$citylist = Yii::app()->user->city_allow();
+		$citylist = Yii::app()->user->validFunction('YN06') ? '' : ' and a.city in ('.Yii::app()->user->city_allow().') ';
 		$sql = "select a.year_no, a.month_no, b.id, b.hdr_id, b.data_field, b.data_value, c.name, c.upd_type, c.field_type, c.function_name, b.manual_input, a.lcd, 
 				a.city, d.name as city_name, workflow$suffix.RequestStatus('OPRPT2',a.id,a.lcd) as wfstatus,
 				workflow$suffix.RequestStatusDesc('OPRPT2',a.id,a.lcd) as wfstatusdesc,
@@ -106,7 +106,7 @@ class Monthly2Form extends CFormModel
 				docman$suffix.countdoc('OPERB2',a.id) as operb2countdoc,
 				docman$suffix.countdoc('OPERB3',a.id) as operb3countdoc
 				from opr_monthly_hdr a, opr_monthly_dtl b, opr_monthly_field c, security$suffix.sec_city d  
-				where a.id=$index and a.city in ($citylist)
+				where a.id=$index $citylist
 				and a.id=b.hdr_id and b.data_field=c.code
 				and a.city=d.code 
 				and c.status='Y'

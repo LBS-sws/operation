@@ -1,7 +1,7 @@
 <?php
 class WorkflowOprpt2 extends WorkflowOprpt {
 	public function routeToApprover() {
-		$users = $this->getUserByControlRight(array('YN06'));
+		$users = $this->getUserByControlRight(array('YN06'), true);
 		if (empty($users)) {
 			$user = $this->getRequestData('REQ_USER');
 			$this->assignRespUser($user);
@@ -10,6 +10,27 @@ class WorkflowOprpt2 extends WorkflowOprpt {
 				$this->assignRespUser($user);
 			}
 		}
+	}
+
+	protected function getUserByControlRight($access=array(), $all=false) {
+		$rtn = array();
+		if (!empty($access)) {
+			$city = $this->getRequestData('CITY');
+			$citylist = City::model()->getAncestorList($city);
+			$citylist = empty($citylist) ? "'$city'" : $citylist.",'$city'";
+			$citycond = $all ? '' : "and a.city in ($citylist)";
+			$suffix = Yii::app()->params['envSuffix'];
+			$clause = '';
+			foreach ($access as $value) $clause .= ($clause=='' ? '' : ' or ')."b.a_control like '%$value%'";
+			$sql = "select a.username
+					from security$suffix.sec_user a, security$suffix.sec_user_access b
+					where a.username=b.username $citycond
+					and ($clause) and a.status='A'
+				";
+			$rows = $this->connection->createCommand($sql)->queryAll();
+			foreach ($rows as $row) $rtn[] = $row['username'];
+		}
+		return $rtn;
 	}
 
 	public function emailPA() {

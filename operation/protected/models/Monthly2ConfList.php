@@ -33,7 +33,7 @@ class Monthly2ConfList extends CListPageModel
 	public function retrieveDataByPage($pageNum=1)
 	{
 		$suffix = Yii::app()->params['envSuffix'];
-		$citylist = Yii::app()->user->city_allow();
+		$citylist = Yii::app()->user->validFunction('YN06') ? '' : ' and a.city in ('.Yii::app()->user->city_allow().')';
 		$exlist = Yii::app()->params['cityExclude'];
 		$exclude = empty($exlist) ? '' : " and a.city not in ($exlist) ";
 //		$year = $this->year_no;
@@ -57,11 +57,11 @@ class Monthly2ConfList extends CListPageModel
 					left outer join opr_monthly_dtl d on a.id=d.hdr_id and d.data_field='20002' 
 					left outer join opr_monthly_dtl e on a.id=e.hdr_id and e.data_field='20003' 
 					left outer join opr_monthly_dtl f on a.id=f.hdr_id and f.data_field='20004' 
-				where a.group_id='2' and a.city in ($citylist) and a.city=b.code and (a.year_no<>year(now()) or a.month_no<>month(now())) $exclude
+				where a.group_id='2' $citylist and a.city=b.code and (a.year_no<>year(now()) or a.month_no<>month(now())) $exclude
 			";
 		$sql2 = "select count(a.id)
 				from opr_monthly_hdr a, security$suffix.sec_city b
-				where a.group_id='2' and a.city in ($citylist) and a.city=b.code $exclude
+				where a.group_id='2' $citylist and a.city=b.code $exclude
 			";
 		$clause = "";
 		if (!empty($this->searchField) && !empty($this->searchValue)) {

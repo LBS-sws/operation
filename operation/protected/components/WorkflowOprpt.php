@@ -32,7 +32,8 @@ class WorkflowOprpt extends WorkflowDMS {
 	protected function getUserByControlRight($access=array()) {
 		$rtn = array();
 		if (!empty($access)) {
-			$city = Yii::app()->user->city();
+//			$city = Yii::app()->user->city();
+			$city = $this->getRequestData('CITY');
 			$citylist = City::model()->getAncestorList($city);
 			$citylist = empty($citylist) ? "'$city'" : $citylist.",'$city'";
 			$suffix = Yii::app()->params['envSuffix'];

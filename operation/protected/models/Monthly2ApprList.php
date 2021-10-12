@@ -25,15 +25,15 @@ class Monthly2ApprList extends CListPageModel
 		$suffix = Yii::app()->params['envSuffix'];
 		$exlist = Yii::app()->params['cityExclude'];
 		$exclude = empty($exlist) ? '' : " and a.city not in ($exlist) ";
-		$city = Yii::app()->user->city_allow();
+		$citylist = Yii::app()->user->validFunction('YN06') ? '' : ' and a.city in ('.Yii::app()->user->city_allow().') ';
 		$sql1 = "select a.*, b.name as city_name 
 				from opr_monthly_hdr a, security$suffix.sec_city b 
-				where a.group_id='2' and a.city in ($city) and a.city=b.code 
+				where a.group_id='2' $citylist and a.city=b.code 
 				and a.id in ($list) $exclude
 			";
 		$sql2 = "select count(a.id)
 				from opr_monthly_hdr a, security$suffix.sec_city b 
-				where a.group_id='2' and a.city in ($city) and a.city=b.code 
+				where a.group_id='2' $citylist and a.city=b.code 
 				and a.id in ($list) $exclude
 			";
 		$clause = "";

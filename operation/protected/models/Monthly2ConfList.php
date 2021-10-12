@@ -51,12 +51,14 @@ class Monthly2ConfList extends CListPageModel
 					d.data_value as val_2,
 					e.data_value as val_3,
 					f.data_value as val_4,
+					g.data_value as val_5,
 					workflow$suffix.RequestStatusDesc('OPRPT2',a.id,a.lcd) as wfstatusdesc
 				from opr_monthly_hdr a inner join security$suffix.sec_city b on a.city=b.code 
 					left outer join opr_monthly_dtl c on a.id=c.hdr_id and c.data_field='20001' 
 					left outer join opr_monthly_dtl d on a.id=d.hdr_id and d.data_field='20002' 
 					left outer join opr_monthly_dtl e on a.id=e.hdr_id and e.data_field='20003' 
 					left outer join opr_monthly_dtl f on a.id=f.hdr_id and f.data_field='20004' 
+					left outer join opr_monthly_dtl g on a.id=g.hdr_id and g.data_field='20005' 
 				where a.group_id='2' $citylist and a.city=b.code and (a.year_no<>year(now()) or a.month_no<>month(now())) $exclude
 			";
 		$sql2 = "select count(a.id)
@@ -110,6 +112,7 @@ class Monthly2ConfList extends CListPageModel
 						'val_2'=>is_numeric($record['val_2']) ? number_format($record['val_2'],2,".","") : $record['val_2'],
 						'val_3'=>is_numeric($record['val_3']) ? number_format($record['val_3'],2,".","") : $record['val_3'],
 						'val_4'=>is_numeric($record['val_4']) ? number_format($record['val_4'],2,".","") : $record['val_4'],
+						'val_5'=>is_numeric($record['val_5']) ? number_format($record['val_5'],2,".","") : $record['val_5'],
 					);
 			}
 		}

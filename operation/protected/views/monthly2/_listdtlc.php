@@ -9,5 +9,6 @@
 	<td><?php echo $this->record['val_2']; ?></td>
 	<td><?php echo $this->record['val_3']; ?></td>
 	<td><?php echo $this->record['val_4']; ?></td>
+	<td><?php echo $this->record['val_5']; ?></td>
 	<td><?php echo $this->record['wfstatusdesc']; ?></td>
 </tr>

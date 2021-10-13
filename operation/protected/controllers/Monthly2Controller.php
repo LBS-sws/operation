@@ -306,7 +306,7 @@ class Monthly2Controller extends Controller
 		$row = Yii::app()->db->createCommand($sql)->queryRow();
 		if ($row!==false) {
 			$citylist = Yii::app()->user->city_allow();
-			if (strpos($citylist, $row['city']) !== false) {
+			if (Yii::app()->user->validFunction('YN06') || strpos($citylist, $row['city']) !== false) {
 				$docman = new DocMan($doctype,$docId,'Monthly2Form');
 				$docman->masterId = $mastId;
 				$docman->fileDownload($fileId);

@@ -23,7 +23,7 @@ class Monthly2ApprList extends CListPageModel
 		if (empty($list)) $list = '0';
 		
 		$suffix = Yii::app()->params['envSuffix'];
-		$exlist = Yii::app()->params['cityExclude'];
+		$exlist = Yii::app()->params['cityExclude2'];
 		$exclude = empty($exlist) ? '' : " and a.city not in ($exlist) ";
 		$citylist = Yii::app()->user->validFunction('YN06') ? '' : ' and a.city in ('.Yii::app()->user->city_allow().') ';
 		$sql1 = "select a.*, b.name as city_name 

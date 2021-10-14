@@ -6,7 +6,7 @@ class RptSalesSummaryID extends CReport {
 		$city = $this->criteria['CITY'];
 				
 		$suffix = Yii::app()->params['envSuffix'];
-		$exlist = Yii::app()->params['cityExclude'];
+		$exlist = Yii::app()->params['cityExclude2'];
 		$exclude = empty($exlist) ? '' : " and a.city not in ($exlist) ";
 
 		$allowcities = City::model()->getDescendantList($city);
@@ -47,7 +47,7 @@ class RptSalesSummaryID extends CReport {
 		$city = $this->criteria['CITY'];
 				
 		$suffix = Yii::app()->params['envSuffix'];
-		$exlist = Yii::app()->params['cityExclude'];
+		$exlist = Yii::app()->params['cityExclude2'];
 		$exclude = empty($exlist) ? '' : " and a.city not in ($exlist) ";
 
 		$allowcities = City::model()->getDescendantList($city);

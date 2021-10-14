@@ -34,7 +34,7 @@ class Monthly2ConfList extends CListPageModel
 	{
 		$suffix = Yii::app()->params['envSuffix'];
 		$citylist = Yii::app()->user->validFunction('YN06') ? '' : ' and a.city in ('.Yii::app()->user->city_allow().')';
-		$exlist = Yii::app()->params['cityExclude'];
+		$exlist = Yii::app()->params['cityExclude2'];
 		$exclude = empty($exlist) ? '' : " and a.city not in ($exlist) ";
 //		$year = $this->year_no;
 //		$month = $this->month_no;

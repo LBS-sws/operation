@@ -140,6 +140,10 @@ return array(
                 'access'=>'YB02',
                 'url'=>'/report/salessummary',
             ),
+            'Sales Summary - ID'=>array(
+                'access'=>'YB08',
+                'url'=>'/report/salessummaryid',
+            ),
             'Business Report'=>array(
                 'access'=>'YB05',
                 'url'=>'/report/business',

@@ -128,6 +128,13 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form - ID';
 				</div>
 			</div>
 <?php endif ?>
+
+				<div class="col-sm-4 text-red">
+					<?php 
+						echo Yii::t('monthly','注：ID专营权费从2022年1月开始收取'); 
+					?>
+				</div>
+
 			<legend>&nbsp;</legend>
 	
 <?php

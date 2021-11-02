@@ -162,12 +162,19 @@ class CargoCostList extends CListPageModel
     }
 
     //倉庫價格導入後，需要修改物品單價
-    public static function resetGoodsPrice(){
+    public static function resetGoodsPrice($year=0,$month=0){
+        $whereSql="";
+        if(!empty($year)){
+            $whereSql.=" and year='{$year}'";
+        }
+        if(!empty($month)){
+            $whereSql.=" and month='{$month}'";
+        }
         $inSql = Yii::app()->db->createCommand()->select("warehouse_id")
-            ->from("opr_warehouse_price")->where("new_num=1")
+            ->from("opr_warehouse_price")->where("new_num=1 $whereSql")
             ->group("warehouse_id")->getText();
         $warehouseRows = Yii::app()->db->createCommand()->select("id,warehouse_id,year,month,price,new_num")
-            ->from("opr_warehouse_price")->where("warehouse_id in ($inSql)")->order("warehouse_id asc,year desc,month desc")->queryAll();
+            ->from("opr_warehouse_price")->where("warehouse_id in ($inSql)$whereSql")->order("warehouse_id asc,year desc,month desc")->queryAll();
         if($warehouseRows){
             $prevRow=array();
             foreach ($warehouseRows as $priceRow){

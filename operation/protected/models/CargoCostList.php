@@ -32,22 +32,27 @@ class CargoCostList extends CListPageModel
         $suffix =  Yii::app()->params['envSuffix'];
         $city_allow = Yii::app()->user->city_allow();
         $userName = Yii::app()->user->name;
-        $sql1 = "select b.username,b.disp_name,c.name AS s_city,ifnull(SUM(costPrice(d.goods_id,d.lud)*CONVERT(d.confirm_num,DECIMAL(8,4))),0) as total_price
+        //查詢列表
+        $sql1 = "select b.username,b.disp_name,c.name AS s_city,ifnull(SUM(f.price*CONVERT(d.confirm_num,DECIMAL(8,4))),0) as total_price
 				from opr_order_goods d 
 				LEFT JOIN opr_order a ON a.id=d.order_id 
+				LEFT JOIN opr_warehouse_price f ON f.warehouse_id=d.goods_id and (date_format(a.lcd,'%Y')>f.year or (date_format(a.lcd,'%Y')=f.year and date_format(a.lcd,'%m')>=f.month)) 
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
 				LEFT JOIN security$suffix.sec_city c ON a.city=c.code 
 				where (b.city in ($city_allow) AND a.judge=0 AND a.status IN ('approve','finished')) 
 			";
+        //總條數用的sql
         $sql2 = "select b.username  
 				from opr_order a 
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
 				LEFT JOIN security$suffix.sec_city c ON a.city=c.code 
 				where (b.city in ($city_allow) AND a.judge=0 AND a.status IN ('approve','finished')) 
 			";
-        $sql3 = "select ifnull(SUM(costPrice(d.goods_id,d.lud)*CONVERT(d.confirm_num,DECIMAL(8,2))),0) as total_price
+        //總價用的sql
+        $sql3 = "select ifnull(SUM(f.price*CONVERT(d.confirm_num,DECIMAL(8,2))),0) as total_price
 				from opr_order_goods d 
 				LEFT JOIN opr_order a ON a.id=d.order_id 
+				LEFT JOIN opr_warehouse_price f ON f.warehouse_id=d.goods_id and (date_format(a.lcd,'%Y')>f.year or (date_format(a.lcd,'%Y')=f.year and date_format(a.lcd,'%m')>=f.month)) 
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
 				LEFT JOIN security$suffix.sec_city c ON a.city=c.code 
 				where (b.city in ($city_allow) AND a.judge=0 AND a.status IN ('approve','finished')) 

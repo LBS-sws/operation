@@ -181,7 +181,7 @@ class CargoCostList extends CListPageModel
                 if($priceRow["new_num"]==1){
                     //修改訂單表的物品價格
                     $price = empty($priceRow["price"])?0:floatval($priceRow["price"]);
-                    Yii::app()->db->createCommand("update opr_order_goods set total_price=ifnull(CONVERT(confirm_num,DECIMAL(8,4)),0)*$price where goods_id='{$priceRow["warehouse_id"]}' $sqlExpr")->execute();
+                    Yii::app()->db->createCommand("update opr_order_goods set total_price=ifnull(CONVERT(confirm_num,DECIMAL(8,2)),0)*$price where goods_id='{$priceRow["warehouse_id"]}' $sqlExpr")->execute();
                     //價格修改完成
                     Yii::app()->db->createCommand()->update('opr_warehouse_price', array(
                         'new_num'=>0,

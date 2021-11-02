@@ -37,21 +37,21 @@ class CargoCostList extends CListPageModel
 				from opr_order a 
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
 				LEFT JOIN security$suffix.sec_city c ON a.city=c.code 
-				where (b.city in ($city_allow) AND a.judge=0 AND a.status IN ('approve','finished')) 
+				where (a.city in ($city_allow) AND a.judge=0 AND a.status IN ('approve','finished')) 
 			";
         //總條數用的sql
         $sql2 = "select b.username  
 				from opr_order a 
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
 				LEFT JOIN security$suffix.sec_city c ON a.city=c.code 
-				where (b.city in ($city_allow) AND a.judge=0 AND a.status IN ('approve','finished')) 
+				where (a.city in ($city_allow) AND a.judge=0 AND a.status IN ('approve','finished')) 
 			";
         //總價用的sql
         $sql3 = "select SUM(a.total_price) as total_price
 				from opr_order a
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
 				LEFT JOIN security$suffix.sec_city c ON a.city=c.code 
-				where (b.city in ($city_allow) AND a.judge=0 AND a.status IN ('approve','finished')) 
+				where (a.city in ($city_allow) AND a.judge=0 AND a.status IN ('approve','finished')) 
 			";
         $clause = "";
         if (!empty($this->searchField) && !empty($this->searchValue)) {

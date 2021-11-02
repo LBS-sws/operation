@@ -195,7 +195,7 @@ class DeliveryForm extends CFormModel
 	}
 
 	protected function saveGoods(&$connection) {
-        $oldOrderStatus = Yii::app()->db->createCommand()->select()->from("opr_order")
+        $oldOrderStatus = Yii::app()->db->createCommand()->select("*")->from("opr_order")
             ->where("id=:id",array(":id"=>$this->id))->queryAll();
 		$sql = '';
         switch ($this->scenario) {
@@ -267,12 +267,16 @@ class DeliveryForm extends CFormModel
             'time'=>date('Y-m-d H:i:s'),
         ));
 
+        $totalPrice = 0;
         //物品的添加、修改
         foreach ($this->goods_list as $goods){
             if(!empty($goods["id"])){
+                $price = Yii::app()->db->createCommand("SELECT costPrice({$goods['goods_id']},'{$oldOrderStatus[0]['lcd']}')")->queryScalar();
+                $totalPrice+=$goods["confirm_num"]*$price;
                 //修改
                 Yii::app()->db->createCommand()->update('opr_order_goods', array(
                     'confirm_num'=>$goods["confirm_num"],
+                    'total_price'=>$goods["confirm_num"]*$price,
                     'remark'=>$goods["remark"],
                     'luu'=>$uid,
                     'lud'=>date('Y-m-d H:i:s'),
@@ -283,6 +287,10 @@ class DeliveryForm extends CFormModel
                 }
             }
         }
+        //修改訂單總價
+        Yii::app()->db->createCommand()->update('opr_order', array(
+            'total_price'=>$totalPrice,
+        ), 'id=:id', array(':id'=>$this->id));
         $this->resetZIndex();
 
         //發送郵件
@@ -452,6 +460,7 @@ class DeliveryForm extends CFormModel
                     'time'=>date('Y-m-d H:i:s'),
                 ));
 
+                $totalPrice=0;//訂單總價
                 //批量減少庫存
                 $rows = Yii::app()->db->createCommand()->select("id,goods_id,goods_num,confirm_num")->from("opr_order_goods")
                     ->where("order_id =:order_id",array(":order_id"=>$order["id"]))->queryAll();
@@ -459,11 +468,14 @@ class DeliveryForm extends CFormModel
                     foreach ($rows as $row){
                         $num = ($row["confirm_num"]===""||$row["confirm_num"]===null)?floatval($row["goods_num"]):floatval($row["confirm_num"]);
                         $goodsId = intval($row["goods_id"]);
+                        $price = Yii::app()->db->createCommand("SELECT costPrice($goodsId,'{$order['lcd']}')")->queryScalar();
+                        $totalPrice+=$num*$price;
                         //減少庫存
                         Yii::app()->db->createCommand("update opr_warehouse set inventory=inventory-$num where id=$goodsId")->execute();
                         //修改物品的實際數量
                         Yii::app()->db->createCommand()->update('opr_order_goods', array(
                             'confirm_num'=>$num,
+                            'total_price'=>$num*$price,
                         ), "id=:id",array(":id"=>$row["id"]));
                     }
                 }
@@ -471,6 +483,7 @@ class DeliveryForm extends CFormModel
                 //修改物品的价格及狀態
                 Yii::app()->db->createCommand()->update('opr_order', array(
                     'status'=>"approve",
+                    'total_price'=>$totalPrice,
                     'audit_time'=>date('Y-m-d H:i:s'),
                     'luu'=>$uid,
                 ), "city='$city' AND judge=0 AND status in ('read','sent') and id=:id",array(":id"=>$order["id"]));

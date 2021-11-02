@@ -23,7 +23,7 @@ class CargoCostController extends Controller
     {
         return array(
             array('allow',
-                'actions'=>array('index','view'),
+                'actions'=>array('index','view','test'),
                 'expression'=>array('CargoCostController','allowReadOnly'),
             ),
             array('deny',  // deny all users
@@ -39,7 +39,17 @@ class CargoCostController extends Controller
     public static function allowReadOnly() {
         return Yii::app()->user->validFunction('YD07');
     }
-	public function actionIndex($pageNum=0) 
+	public function actionTest()
+	{
+        set_time_limit(0);
+	    echo "start<br/>";
+		$model = new CargoCostList;
+        $model->resetGoodsPrice();
+        echo "end";
+        Yii::app()->end();
+	}
+
+	public function actionIndex($pageNum=0)
 	{
 		$model = new CargoCostList;
 		if (isset($_POST['CargoCostList'])) {

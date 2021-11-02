@@ -120,6 +120,7 @@ class UploadExcelForm extends CFormModel
                         "year"=>$arrList["year"],
                         "month"=>$arrList["month"],
                         "price"=>$arrList["price"],
+                        "new_num"=>1,
                         "luu"=>$uid,
                     ), 'id=:id', array(':id'=>$row['id']));
                 }else{

@@ -185,6 +185,7 @@ class WarehouseController extends Controller
     }
 
     public function actionImportPrice(){
+        set_time_limit(0);
         $model = new UploadExcelForm();
         $img = CUploadedFile::getInstance($model,'file');
         if(empty($img)){
@@ -215,6 +216,7 @@ class WarehouseController extends Controller
                     Dialog::message(Yii::t('dialog','Validation Message'), "导入成功！");
                 }
             }
+            CargoCostList::resetGoodsPrice();//更新外勤領料的價格
             $this->redirect(Yii::app()->createUrl('warehouse/index'));
         }else{
             $message = CHtml::errorSummary($model);

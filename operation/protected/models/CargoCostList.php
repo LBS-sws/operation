@@ -162,22 +162,30 @@ class CargoCostList extends CListPageModel
     }
 
     //倉庫價格導入後，需要修改物品單價
-    public static function resetGoodsPrice($year=0,$month=0){
+    public static function resetGoodsPrice($year=0,$month=0,$city=''){
         $whereSql="";
         if(!empty($year)){
-            $whereSql.=" and year='{$year}'";
+            $whereSql.=" and a.year='{$year}'";
         }
         if(!empty($month)){
-            $whereSql.=" and month='{$month}'";
+            $whereSql.=" and a.month='{$month}'";
+        }
+        if(!empty($city)){
+            $whereSql.=" and b.city='{$city}'";
         }
         $inSql = Yii::app()->db->createCommand()->select("warehouse_id")
             ->from("opr_warehouse_price")->where("new_num=1 $whereSql")
             ->group("warehouse_id")->getText();
-        $warehouseRows = Yii::app()->db->createCommand()->select("id,warehouse_id,year,month,price,new_num")
-            ->from("opr_warehouse_price")->where("warehouse_id in ($inSql)$whereSql")->order("warehouse_id asc,year desc,month desc")->queryAll();
+        $warehouseRows = Yii::app()->db->createCommand()->select("a.id,a.warehouse_id,a.year,a.month,a.price,a.new_num,a.lcd")
+            ->from("opr_warehouse_price a")
+            ->leftJoin("opr_warehouse b","a.warehouse_id=b.id")
+            ->where("a.warehouse_id in ($inSql)$whereSql")->order("a.warehouse_id asc,a.year desc,a.month desc")->queryAll();
         if($warehouseRows){
+            $minLcd = "2021/11/01";
             $prevRow=array();
             foreach ($warehouseRows as $priceRow){
+                $lcd = General::toDate($priceRow["lcd"]);
+                $minLcd = $lcd<$minLcd?$lcd:$minLcd;
                 $priceRow["month"] = floatval($priceRow["month"]);
                 $priceRow["month"] = $priceRow["month"]<10?"0".$priceRow["month"]:$priceRow["month"];
                 $maxYear = $priceRow["year"]."/".$priceRow["month"];
@@ -196,11 +204,14 @@ class CargoCostList extends CListPageModel
                         ->where("a.goods_id='{$priceRow['warehouse_id']}' $sqlExpr")->queryAll();
                     if($orderGoods){//查詢所有包含該物品的發貨數量
                         foreach ($orderGoods as $good){
-                            $num = empty($good["confirm_num"])?0:floatval($good["confirm_num"]);
-                            $goodPrice = round($price*$num,4);
-                            Yii::app()->db->createCommand()->update('opr_order_goods', array(
-                                'total_price'=>$goodPrice,
-                            ), "id=:id", array(':id'=>$good["id"]));
+                            if(!empty($good["confirm_num"])){
+                                $num = !is_numeric($good["confirm_num"])?0:floatval($good["confirm_num"]);
+                                $goodPrice = round($price*$num,4);
+                                echo "orderId:{$good['order_id']},orderInfoId:{$good['id']},confirmNum:{$num},goodPrice:{$goodPrice}\n";
+                                Yii::app()->db->createCommand()->update('opr_order_goods', array(
+                                    'total_price'=>$goodPrice>999999?0:$goodPrice,
+                                ), "id=:id", array(':id'=>$good["id"]));
+                            }
                         }
                     }
                     //價格修改完成
@@ -210,7 +221,7 @@ class CargoCostList extends CListPageModel
                 }
             }
             //更新訂單總價
-            Yii::app()->db->createCommand("update opr_order a set a.total_price=(SELECT sum(b.total_price) FROM opr_order_goods b WHERE b.order_id=a.id)")->execute();
+            Yii::app()->db->createCommand("update opr_order a set a.total_price=(SELECT sum(b.total_price) FROM opr_order_goods b WHERE b.order_id=a.id AND date_format(b.lcd,'%Y/%m/%d')>='$minLcd') WHERE date_format(a.lcd,'%Y/%m/%d')>='$minLcd'")->execute();
         }
     }
 }

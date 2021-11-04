@@ -39,12 +39,12 @@ class CargoCostController extends Controller
     public static function allowReadOnly() {
         return Yii::app()->user->validFunction('YD07');
     }
-	public function actionTest($year=0,$month=0)
+	public function actionTest($year=0,$month=0,$city="")
 	{
         set_time_limit(0);
 	    echo "start<br/>";
 		$model = new CargoCostList;
-        $model->resetGoodsPrice($year,$month);
+        $model->resetGoodsPrice($year,$month,$city);
         echo "end";
         Yii::app()->end();
 	}

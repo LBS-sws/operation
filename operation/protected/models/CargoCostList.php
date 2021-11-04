@@ -207,7 +207,7 @@ class CargoCostList extends CListPageModel
                             if(!empty($good["confirm_num"])){
                                 $num = !is_numeric($good["confirm_num"])?0:floatval($good["confirm_num"]);
                                 $goodPrice = round($price*$num,4);
-                                echo "orderId:{$good['order_id']},orderInfoId:{$good['id']},confirmNum:{$num},goodPrice:{$goodPrice}\n";
+                                //echo "orderId:{$good['order_id']},orderInfoId:{$good['id']},confirmNum:{$num},goodPrice:{$goodPrice}\n";
                                 Yii::app()->db->createCommand()->update('opr_order_goods', array(
                                     'total_price'=>$goodPrice>999999?0:$goodPrice,
                                 ), "id=:id", array(':id'=>$good["id"]));

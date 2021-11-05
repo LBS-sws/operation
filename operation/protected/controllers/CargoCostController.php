@@ -45,6 +45,8 @@ class CargoCostController extends Controller
 	    echo "start<br/>";
 		$model = new CargoCostList;
         $model->resetGoodsPrice($year,$month,$city);
+        $minLcd="2020/04/09";
+        Yii::app()->db->createCommand("update opr_order a set a.total_price=(SELECT ifnull(sum(b.total_price),0) FROM opr_order_goods b WHERE b.order_id=a.id AND date_format(b.lcd,'%Y/%m/%d')>='$minLcd') WHERE date_format(a.lcd,'%Y/%m/%d')>='$minLcd'")->execute();
         echo "end";
         Yii::app()->end();
 	}

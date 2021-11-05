@@ -221,7 +221,7 @@ class CargoCostList extends CListPageModel
                 }
             }
             //更新訂單總價
-            Yii::app()->db->createCommand("update opr_order a set a.total_price=(SELECT sum(b.total_price) FROM opr_order_goods b WHERE b.order_id=a.id AND date_format(b.lcd,'%Y/%m/%d')>='$minLcd') WHERE date_format(a.lcd,'%Y/%m/%d')>='$minLcd'")->execute();
+            Yii::app()->db->createCommand("update opr_order a set a.total_price=(SELECT ifnull(sum(b.total_price),0) FROM opr_order_goods b WHERE b.order_id=a.id AND date_format(b.lcd,'%Y/%m/%d')>='$minLcd') WHERE date_format(a.lcd,'%Y/%m/%d')>='$minLcd'")->execute();
         }
     }
 }

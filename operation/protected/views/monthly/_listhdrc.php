@@ -48,6 +48,11 @@
 		?>
 	</th>
 	<th>
+		<?php echo TbHtml::link(Yii::t("monthly",'隔油池收入').$this->drawOrderArrow('val_16'),'#',$this->createOrderLink('monthly-list','val_16'))
+			;
+		?>
+	</th>
+	<th>
 		<?php echo TbHtml::link(Yii::t("monthly",'收入合計').$this->drawOrderArrow('val_11'),'#',$this->createOrderLink('monthly-list','val_11'))
 			;
 		?>

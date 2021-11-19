@@ -314,5 +314,13 @@ return array(
     'matching'=>'产品配比',
     'matters'=>'使用注意事项',
     'judge for visible'=>'是否显示',
+    //2021/11/18
+    'Inventory History'=>'库存记录',
+    'Inventory Update'=>'仓库修改',
+    'Order new'=>'领料审核',
+    'Order Update'=>'物品退回',
+    'Order Delete'=>'订单退回',
+    'old num'=>'修改前数量',
+    'now num'=>'修改后数量',
 );
 ?>

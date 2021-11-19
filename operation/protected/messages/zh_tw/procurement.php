@@ -312,5 +312,13 @@ return array(
     'matching'=>'產品配比',
     'matters'=>'使用注意事項',
     'judge for visible'=>'是否顯示',
+    //2021/11/18
+    'Inventory History'=>'庫存記錄',
+    'Inventory Update'=>'倉庫修改',
+    'Order new'=>'領料審核',
+    'Order Update'=>'物品退回',
+    'Order Delete'=>'訂單退回',
+    'old num'=>'修改前數量',
+    'now num'=>'修改後數量',
 );
 ?>

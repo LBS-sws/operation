@@ -152,6 +152,70 @@ class WarehouseForm extends CFormModel
 		}
 		return true;
 	}
+    //获取select控件
+    public static function getSelectForDataEx($className,$str,$rows,$htmlArr=array()){
+        $selectClass = key_exists("class",$htmlArr)?$htmlArr["class"]:"";
+        $readonly = key_exists("readonly",$htmlArr)&&$htmlArr["readonly"]?"readonly":"";
+        $html = "<select id='{$className}' name='{$className}' {$readonly} class='form-control {$selectClass}'>";
+        $html.="<option value='' data-class=''></option>";
+        if($rows){
+            foreach ($rows as $row){
+                $dataOption = "";
+                foreach ($row as $option=>$value){
+                    if(!in_array($option,array("id","name"))){
+                        $dataOption.=" data-{$option}='{$value}'";
+                    }
+                }
+                $select = $row['id']==$str?"selected":"";
+                $html.="<option value='{$row['id']}'{$dataOption} {$select}>{$row['name']}</option>";
+            }
+        }
+        $html.="</select>";
+        return $html;
+    }
+
+    //获取库存记录HTML
+    public static function getHistoryList($id){
+        $statusList = array(//info,danger,success,warning
+            1=>array("name"=>Yii::t("procurement","Inventory Update"),'style'=>"danger","id"=>1),
+            2=>array("name"=>Yii::t("procurement","Order new"),'style'=>"hidden","id"=>2),
+            3=>array("name"=>Yii::t("procurement","Order Update"),'style'=>"hidden","id"=>3),
+            4=>array("name"=>Yii::t("procurement","Order Delete"),'style'=>"warning hidden","id"=>4),
+            5=>array("name"=>Yii::t("procurement","Import File"),'style'=>"danger","id"=>5),
+            6=>array("name"=>Yii::t("app","Warehouse storage Info"),'style'=>"danger","id"=>6)
+        );
+        $html="<div style='margin: 10px 0px;width: 33%'>".self::getSelectForDataEx("changeStatus",1,$statusList)."</div>";
+        $html.='<table id="tblFlow" class="table table-bordered table-striped table-hover">';
+        $html.="<thead><tr>";
+        $html.="<th>".Yii::t("procurement","Operator Time")."</th>";
+        $html.="<th>".Yii::t("procurement","Goods Name")."</th>";
+        $html.="<th>".Yii::t("procurement","Operator Status")."</th>";
+        $html.="<th>".Yii::t("procurement","Operator User")."</th>";
+        $html.="<th>".Yii::t("procurement","old num")."</th>";
+        $html.="<th>".Yii::t("procurement","now num")."</th>";
+        $html.="</tr></thead><tbody>";
+        $historyList = Yii::app()->db->createCommand()
+            ->select("a.apply_date,a.old_sum,a.now_sum,a.apply_name,a.status_type,a.order_code,b.name")
+            ->from("opr_warehouse_history a")
+            ->leftJoin("opr_warehouse b","a.warehouse_id=b.id")
+            ->where("a.warehouse_id=:id",array(":id"=>$id))->order("a.apply_date desc")->queryAll();
+        if($historyList){
+            foreach ($historyList as $list){
+                $status_type=key_exists($list["status_type"],$statusList)?$statusList[$list["status_type"]]["name"]:"";
+                $style=key_exists($list["status_type"],$statusList)?$statusList[$list["status_type"]]["style"]:"";
+                $html.="<tr class='{$style}' data-type='{$list['status_type']}'>";
+                $html.="<td>".$list["apply_date"]."</td>";
+                $html.="<td>".$list["name"]."</td>";
+                $html.="<td>".$status_type.TbHtml::hiddenField('test',$list["order_code"])."</td>";
+                $html.="<td>".$list["apply_name"]."</td>";
+                $html.="<td>".$list["old_sum"]."</td>";
+                $html.="<td>".$list["now_sum"]."</td>";
+                $html.="</tr>";
+
+            }
+        }
+        return $html."</tbody></table>";
+    }
 
     //獲取物品列表
     public function getGoodsList(){
@@ -161,7 +225,7 @@ class WarehouseForm extends CFormModel
     }
 
     //根據物品id獲取物品信息
-    public function getGoodsToGoodsId($goods_id){
+    public static function getGoodsToGoodsId($goods_id){
         $city = Yii::app()->user->city();
         $rows = Yii::app()->db->createCommand()->select("*")
             ->from("opr_warehouse")
@@ -223,6 +287,7 @@ class WarehouseForm extends CFormModel
 		$connection = Yii::app()->db;
 		$transaction=$connection->beginTransaction();
 		try {
+			$this->saveHistory($connection);
 			$this->saveGoods($connection);
 			$transaction->commit();
 		}
@@ -231,6 +296,38 @@ class WarehouseForm extends CFormModel
 			throw new CHttpException(404,'Cannot update. ('.$e->getMessage().')');
 		}
 	}
+
+	public static function insertWarehouseHistory($id,$inventory,$status_type=1,$bool=false,$order_code=''){
+        $oldRow = self::getGoodsToGoodsId($id);
+        if($bool){
+            $inventory=floatval($oldRow["inventory"])-$inventory;
+        }
+        if($oldRow["inventory"]!=$inventory){
+            Yii::app()->db->createCommand()->insert('opr_warehouse_history',array(
+                'apply_date'=>date("Y-m-d H:i:s"),
+                'warehouse_id'=>$id,
+                'old_sum'=>$oldRow["inventory"],
+                'now_sum'=>$inventory,
+                'apply_name'=>Yii::app()->user->user_display_name(),
+                'status_type'=>$status_type,
+                'order_code'=>$order_code,
+                'lcu'=>Yii::app()->user->id,
+            ));
+        }
+    }
+
+    protected function saveHistory(&$connection) {
+        switch ($this->scenario) {
+            case 'delete':
+                $connection->createCommand()->delete('opr_warehouse_history',"warehouse_id={$this->id}");
+                break;
+            case 'new':
+                break;
+            case 'edit':
+                self::insertWarehouseHistory($this->id,$this->inventory);
+                break;
+        }
+    }
 
 	protected function saveGoods(&$connection) {
 		$sql = '';

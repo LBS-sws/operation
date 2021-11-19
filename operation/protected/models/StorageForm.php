@@ -151,6 +151,9 @@ class StorageForm extends CFormModel
                     ->where('id=:id', array(':id'=>$row["warehouse_id"]))->queryRow();
                 if($goods){
                     $inventory = floatval($goods["inventory"])-floatval($row["add_num"]);
+                    //记录库存数量
+                    WarehouseForm::insertWarehouseHistory($row["warehouse_id"],$inventory,6,false,$this->code);
+                    //修改库存
                     $z_index = $inventory<=floatval($goods["min_num"])?2:1;
                     Yii::app()->db->createCommand()->update('opr_warehouse', array(
                         'inventory'=>$inventory,
@@ -317,6 +320,9 @@ class StorageForm extends CFormModel
             Yii::app()->db->createCommand()->insert("opr_storage_info",$addArr);
             if($this->status_type == 1){ //物品入庫（庫存添加）
                 $inventory = floatval($row["inventory"])+floatval($row["add_num"]);
+                //记录库存数量
+                WarehouseForm::insertWarehouseHistory($row["warehouse_id"],$inventory,6,false,$this->code);
+                //添加库存
                 $z_index = $inventory<=floatval($row["min_num"])?2:1;
                 Yii::app()->db->createCommand()->update('opr_warehouse', array(
                     'inventory'=>$inventory,

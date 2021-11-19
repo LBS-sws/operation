@@ -68,6 +68,8 @@ class UploadExcelForm extends CFormModel
                     if($this->orderClass == "Warehouse"){
                         $arrList["inventory"] = floatval($arrList["inventory"])+floatval($this->add_num);
                         $arrList["z_index"] = $arrList["inventory"]<=$this->min_num?2:1;
+                        //记录库存数量
+                        WarehouseForm::insertWarehouseHistory($this->update_id,$arrList["inventory"],5);
                     }
                     //庫存允許導入（不允許導入的邏輯需要配合庫存入庫功能）- 結束
                     Yii::app()->db->createCommand()->update($this->dbName,$arrList, 'id=:id', array(':id'=>$this->update_id));

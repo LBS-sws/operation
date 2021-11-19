@@ -282,6 +282,8 @@ class DeliveryForm extends CFormModel
                     'lud'=>date('Y-m-d H:i:s'),
                 ), 'id=:id', array(':id'=>$goods["id"]));
                 if ($this->scenario == "audit"){
+                    //记录库存数量
+                    WarehouseForm::insertWarehouseHistory($goods["goods_id"],$goods["confirm_num"],2,true,$this->order_code);
                     //減少庫存 inventory
                     $this->reduceInventory($goods["goods_id"],$goods["confirm_num"]);
                 }
@@ -330,6 +332,9 @@ class DeliveryForm extends CFormModel
                 foreach ($goods_list as $goods){
                     $num = $goods["confirm_num"];
                     $goodsId = $goods["goods_id"];
+                    //记录库存数量
+                    WarehouseForm::insertWarehouseHistory($goodsId,-1*$num,4,true,$this->order_code);
+                    //修改库存
                     Yii::app()->db->createCommand("update opr_warehouse set inventory=inventory+$num where id=$goodsId")->execute();
                 }
                 $this->resetZIndex();
@@ -373,6 +378,8 @@ class DeliveryForm extends CFormModel
         $num = $this->num;
         $goodsId = $this->goods_id;
         $blackId = $this->black_id;
+        //记录库存数量
+        WarehouseForm::insertWarehouseHistory($goodsId,-1*$num,3,true,$this->order_code);
         Yii::app()->db->createCommand("update opr_order_goods set confirm_num=confirm_num-$num where id=$blackId")->execute();
         Yii::app()->db->createCommand("update opr_warehouse set inventory=inventory+$num where id=$goodsId")->execute();
 
@@ -470,6 +477,8 @@ class DeliveryForm extends CFormModel
                         $goodsId = intval($row["goods_id"]);
                         $price = Yii::app()->db->createCommand("SELECT costPrice($goodsId,'{$order['lcd']}')")->queryScalar();
                         $totalPrice+=$num*$price;
+                        //记录库存
+                        WarehouseForm::insertWarehouseHistory($goodsId,$num,2,true,$order["order_code"]);
                         //減少庫存
                         Yii::app()->db->createCommand("update opr_warehouse set inventory=inventory-$num where id=$goodsId")->execute();
                         //修改物品的實際數量

@@ -52,6 +52,11 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
 
 
             <div class="btn-group pull-right" role="group">
+                <?php if ($model->scenario!='new'){
+                    //库存记录
+                    echo TbHtml::button('<span class="fa fa-file-text-o"></span> '.Yii::t('procurement','Inventory History'), array(
+                        'name'=>'btnHistory','id'=>'btnHistory','data-toggle'=>'modal','data-target'=>'#historydialog'));
+                } ?>
                 <?php if ($model->scenario!='view'){
                     //導入
                     echo TbHtml::button('<span class="fa fa-file-text-o"></span> '.Yii::t('procurement','Import File'), array(
@@ -185,6 +190,23 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
 
 
 <?php
+$js = "
+    $('#changeStatus').change(function(){
+        var type = $(this).val();
+        if(type==''||type==undefined){
+            $('#tblFlow>tbody>tr').removeClass('hidden');
+        }else{
+            $('#tblFlow>tbody>tr').each(function(){
+                if(type==$(this).data('type')){
+                    $(this).removeClass('hidden');
+                }else{
+                    $(this).addClass('hidden');
+                }
+            });
+        }
+    });
+";
+Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 $js = Script::genReadonlyField();
 Yii::app()->clientScript->registerScript('readonlyClass',$js,CClientScript::POS_READY);
 ?>
@@ -199,6 +221,9 @@ if ($model->scenario!='view')
     );
 if (Yii::app()->user->validFunction('YN02'))
     $this->renderPartial('//site/priceFlow');
+if($model->scenario!='new'){
+    $this->renderPartial('//site/history',array("tableHtml"=>WarehouseForm::getHistoryList($model->id)));
+}
 ?>
 
 

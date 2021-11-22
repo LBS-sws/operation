@@ -129,11 +129,13 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form - ID';
 			</div>
 <?php endif ?>
 
+<!--
 				<div class="col-sm-4 text-red">
 					<?php 
 						echo Yii::t('monthly','注：ID专营权费从2022年1月开始一并结算2021年费用'); 
 					?>
 				</div>
+-->
 
 			<legend>&nbsp;</legend>
 	

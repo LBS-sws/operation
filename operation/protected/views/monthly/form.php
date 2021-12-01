@@ -232,8 +232,8 @@ function roundNumber(num, scale) {
 			var renaud = ($('#MonthlyForm_record_14_datavalue').length!==0) ? parseFloat(document.getElementById('MonthlyForm_record_14_datavalue').value) : 0;
 //			var paper = parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) - renaud;
 			var paper = parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) + renaud;
-			$('#MonthlyForm_record_8_datavalue').val(roundNumber((total * 8.5 / 100),2));
-			$('#MonthlyForm_record_9_datavalue').val(roundNumber((paper * 3.5 / 100),2));
+			$('#MonthlyForm_record_8_datavalue').val(roundNumber((total * 8.5 / 100),2).toFixed(2));
+			$('#MonthlyForm_record_9_datavalue').val(roundNumber((paper * 3.5 / 100),2).toFixed(2));
 			$('#MonthlyForm_record_10_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_8_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_9_datavalue').value)).toFixed(2));
 			$('#MonthlyForm_record_11_datavalue').val((paper + parseFloat(document.getElementById('MonthlyForm_record_7_datavalue').value)).toFixed(2));
 			$('#MonthlyForm_record_13_datavalue').val(parseFloat(+$('#MonthlyForm_record_13_datavalue').val() || 0 ).toFixed(2));

@@ -268,7 +268,7 @@ class WarehouseForm extends CFormModel
     }
 
     //
-    public function getPriceToIdAndDate($id,$date=''){
+    public static function getPriceToIdAndDate($id,$date=''){
         if(empty($date)){
             $date = date("Y-m");
         }

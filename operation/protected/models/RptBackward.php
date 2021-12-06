@@ -10,6 +10,8 @@ class RptBackward extends CReport {
 			'unit'=>array('label'=>Yii::t('procurement','Unit'),'width'=>15,'align'=>'L'),
 			'goods_class'=>array('label'=>Yii::t('report','Item Class'),'width'=>25,'align'=>'L'),
 			'back_num'=>array('label'=>Yii::t('procurement','Black Number'),'width'=>15,'align'=>'R'),
+			'price'=>array('label'=>Yii::t('procurement','Price（RMB）'),'width'=>15,'align'=>'R'),
+			'total'=>array('label'=>Yii::t('procurement','Total（RMB）'),'width'=>15,'align'=>'R'),
 			'back_user'=>array('label'=>Yii::t('procurement','Black User'),'width'=>15,'align'=>'R'),
 			'lcd'=>array('label'=>Yii::t('procurement','Black Time'),'width'=>15,'align'=>'C'),
 		);
@@ -49,6 +51,8 @@ class RptBackward extends CReport {
 				$temp['goods_class'] = $row['classify_name'];
 //
                 $temp['back_num'] = floatval($row['back_num']);
+                $temp['price'] = WarehouseForm::getPriceToIdAndDate($row["warehouse_id"],$row["order_lcd"]);
+                $temp['total'] = $temp['back_num']*$temp['price'];
 				$temp['lcd'] = $row['lcd'];
 				$temp['back_user'] = $row['back_user'];
 				$this->data[] = $temp;

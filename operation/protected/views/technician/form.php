@@ -125,14 +125,14 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                         <thead>
                         <tr>
                             <td width="20%"><?php echo Yii::t("procurement","Goods Name")?></td>
-                            <td width="11%" ><?php echo Yii::t("procurement","Unit")?></td>
+                            <td width="8%" ><?php echo Yii::t("procurement","Unit")?></td>
                             <td width="12%"><?php echo Yii::t("procurement","Demand Note")?></td>
                             <?php if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished" || $model->status == "read")): ?>
                                 <td width="12%"><?php echo Yii::t("procurement","Headquarters Note")?></td>
                             <?php endif ?>
-                            <td width="8%"><?php echo Yii::t("procurement","Goods Number")?></td>
+                            <td width="12%"><?php echo Yii::t("procurement","Goods Number")?></td>
                             <?php if ($model->scenario=='edit' && ($model->status == "approve" || $model->status == "finished" || $model->status == "read")): ?>
-                                <td width="8%"><?php echo Yii::t("procurement","Actual Number")?></td>
+                                <td width="12%"><?php echo Yii::t("procurement","Actual Number")?></td>
                             <?php endif ?>
                             <?php if (!$model->getInputBool()): ?>
                                 <td width="1%">&nbsp;</td>

@@ -71,6 +71,7 @@ class GoodsDoList extends CListPageModel
 						'unit'=>$record['unit'],
 						'price'=>$record['price'],
 						'goods_code'=>$record['goods_code'],
+                        'img_url'=>empty($record['img_url'])?"":Yii::app()->request->baseUrl."/".$record['img_url'],
 						'stickies_id'=>StickiesForm::getStickiesToId($record['stickies_id'])["name"],
 					);
 			}

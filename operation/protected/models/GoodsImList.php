@@ -85,6 +85,7 @@ class GoodsImList extends CListPageModel
 						'price_two'=>$record['price_two'],
 						'goods_code'=>$record['goods_code'],
 						'net_weight'=>$record['net_weight'],
+                        'img_url'=>empty($record['img_url'])?"":Yii::app()->request->baseUrl."/".$record['img_url'],
 						'gross_weight'=>$record['gross_weight'],
 					);
 			}

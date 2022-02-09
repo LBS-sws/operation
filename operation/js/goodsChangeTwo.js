@@ -57,6 +57,28 @@ function inputDownList(arr,fn){
         return false;
     });
 
+    //圖片懸浮（開啟）
+    $("body").delegate(".showImageLink","mouseover",function (e) {
+        if($(this).children("span:first").length>0){
+            var x=$(this).parents(".dropdown-div").css("left");
+            var y=$(this).parents(".dropdown-div").css("top");
+            x = parseFloat(x)+$(this).outerWidth()+15;
+            y = parseFloat(y);
+            var imgHtml = $(this).children("span:first").html();
+            var divHtml ="<div class='image-div'><span>"+imgHtml+"</span></div>";
+            $("body").append(divHtml);
+            $(".image-div").css({
+                "left":x+"px",
+                "top":y+"px"
+            });
+        }
+    });
+
+    //圖片懸浮（關閉）
+    $("body").delegate(".showImageLink","mouseout",function (e) {
+        $(".image-div").remove();
+    });
+
     //輸入框的驗證
     function validateGoods($element) {
         var id = $element.next("input").val();
@@ -90,6 +112,10 @@ function inputDownList(arr,fn){
                     //去除已經存在的物品
                     return true;
                 }
+                var imageHtml = "";
+                if(val["img_url"]!=""){
+                    imageHtml="<span class='image-span'><img src='"+val["img_url"]+"'></span>";
+                }
                 var li = document.createElement("li");
                 var content = typeof(val["stickies_id"])=="undefined"?"":val["stickies_id"];
                 $(li).attr({
@@ -98,10 +124,11 @@ function inputDownList(arr,fn){
                     "dataname":val["name"],
                     "dataunit":val["unit"],
                     "dataprice":val["price"],
+                    "img_url":val["img_url"],
                     "classify":val["classify_id"],
                     "content":content,
                     "datatype":val["type"]
-                }).append("<a href='javascript:void(0);'>"+val["name"]+"</a>");
+                }).append("<a href='javascript:void(0);' class='showImageLink'>"+val["name"]+imageHtml+"</a>");
                 $(ul).append(li);
             }
         });

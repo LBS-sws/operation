@@ -15,6 +15,7 @@ class GoodsDoForm extends CFormModel
     public $rules_id = 0;
 	public $origin;
 	public $stickies_id;
+	public $img_url;
     public $orderClass = "Document";
 
 	public function attributeLabels()
@@ -32,6 +33,7 @@ class GoodsDoForm extends CFormModel
             'big_num'=>Yii::t('procurement','Max Number'),
             'small_num'=>Yii::t('procurement','Min Number'),
             'origin'=>Yii::t('procurement','Origin'),
+            'img_url'=>Yii::t("procurement","good image"),
 		);
 	}
 
@@ -41,7 +43,7 @@ class GoodsDoForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, goods_code, name, classify_id, type, unit, price, rules_id, multiple, big_num, small_num, stickies_id, origin','safe'),
+			array('id, goods_code, name, img_url, classify_id, type, unit, price, rules_id, multiple, big_num, small_num, stickies_id, origin','safe'),
             array('goods_code','required'),
             array('name','required'),
             array('type','required'),
@@ -100,6 +102,7 @@ class GoodsDoForm extends CFormModel
                 $this->stickies_id = $row['stickies_id'];
                 $this->origin = $row['origin'];
                 $this->big_num = $row['big_num'];
+                $this->img_url = empty($row['img_url'])?"":Yii::app()->request->baseUrl."/".$row['img_url'];
                 $this->small_num = $row['small_num'];
                 $this->rules_id = $row['rules_id'];
                 $this->multiple = $row['multiple'];
@@ -248,6 +251,7 @@ class GoodsDoForm extends CFormModel
             $this->id = Yii::app()->db->getLastInsertID();
             $this->scenario = "edit";
         }
+        GoodsImForm::uploadImg(get_class($this),$this->id,"opr_goods_do");
 		return true;
 	}
 }

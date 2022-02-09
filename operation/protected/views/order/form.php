@@ -311,8 +311,8 @@ Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_R
 <?php
 $js = Script::genReadonlyField();
 Yii::app()->clientScript->registerScript('readonlyClass',$js,CClientScript::POS_READY);
-Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/goodsChangeTwo.js?2", CClientScript::POS_END);
-Yii::app()->clientScript->registerCssFile(Yii::app()->baseUrl . "/css/goodsChange.css");
+Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/goodsChangeTwo.js?4", CClientScript::POS_END);
+Yii::app()->clientScript->registerCssFile(Yii::app()->baseUrl . "/css/goodsChange.css?4");
 ?>
 
 <?php $this->endWidget(); ?>

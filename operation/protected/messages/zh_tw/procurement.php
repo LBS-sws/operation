@@ -320,5 +320,7 @@ return array(
     'Order Delete'=>'訂單退回',
     'old num'=>'修改前數量',
     'now num'=>'修改後數量',
+    //2022-2-7
+    'good image'=>'物品圖片',
 );
 ?>

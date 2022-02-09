@@ -5,4 +5,11 @@
 	<td><?php echo $this->record['type']; ?></td>
 	<td><?php echo $this->record['unit']; ?></td>
 	<td><?php echo sprintf("%.2f", $this->record['price']); ?></td>
+    <td>
+        <?php
+        if(!empty($this->record['img_url'])){
+            echo "<span class='fa fa-file-image-o'></span>";
+        }
+        ?>
+    </td>
 </tr>

@@ -289,10 +289,11 @@ class OrderForm extends CFormModel
                 break;
         }
         $rs = Yii::app()->db->createCommand()->select()->from($from)->queryAll();
-        if($bool){
-            foreach ($rs as &$r){
+        foreach ($rs as &$r){
+            if($bool){
                 $r["price"]=$r["price_two"];
             }
+            $r["img_url"]=empty($r["img_url"])?"":Yii::app()->request->baseUrl."/".$r["img_url"];
         }
         return $rs;
     }

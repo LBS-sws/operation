@@ -9,6 +9,7 @@ $this->pageTitle=Yii::app()->name . ' - Goods Summary Form';
 'enableClientValidation'=>true,
 'clientOptions'=>array('validateOnSubmit'=>true,),
 'layout'=>TbHtml::FORM_LAYOUT_HORIZONTAL,
+    'htmlOptions'=>array('enctype' => 'multipart/form-data')
 )); ?>
 
 <section class="content-header">
@@ -114,6 +115,15 @@ $this->pageTitle=Yii::app()->name . ' - Goods Summary Form';
                 </div>
             </div>
             <div class="form-group">
+                <?php echo $form->labelEx($model,'img_url',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-10">
+                    <?php echo $form->hiddenField($model, 'img_url',array("id"=>"img_url")); ?>
+                    <?php
+                    echo TbHtml::fileField("img_url","",array('readonly'=>($model->scenario=='view'),"id"=>"img_url_up"));
+                    ?>
+                </div>
+            </div>
+            <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-4 radio-change" id="radio-change">
                     <label class="radio-inline">
                         <input type="radio" name="inlineRadioOptions" checked id="inlineRadio1" value="option1"> <?php echo Yii::t("procurement","Independent Rules"); ?>
@@ -191,6 +201,7 @@ $("#radio-change input").eq('.$rulesType.').trigger("change");
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 $js = Script::genReadonlyField();
 Yii::app()->clientScript->registerScript('readonlyClass',$js,CClientScript::POS_READY);
+Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/showImages.js?2", CClientScript::POS_END);
 ?>
 
 <?php $this->endWidget(); ?>

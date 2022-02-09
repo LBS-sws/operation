@@ -8,4 +8,11 @@
 	<td><?php echo sprintf("%.2f", $this->record['price_two']); ?></td>
     <td><?php echo $this->record['net_weight']; ?></td>
     <td><?php echo $this->record['gross_weight']; ?></td>
+    <td>
+        <?php
+        if(!empty($this->record['img_url'])){
+            echo "<span class='fa fa-file-image-o'></span>";
+        }
+        ?>
+    </td>
 </tr>

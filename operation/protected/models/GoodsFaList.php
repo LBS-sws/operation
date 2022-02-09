@@ -69,6 +69,7 @@ class GoodsFaList extends CListPageModel
 						'type'=>$record['type'],
 						'unit'=>$record['unit'],
 						'price'=>$record['price'],
+						'img_url'=>empty($record['img_url'])?"":Yii::app()->request->baseUrl."/".$record['img_url'],
 						'goods_code'=>$record['goods_code'],
 					);
 			}

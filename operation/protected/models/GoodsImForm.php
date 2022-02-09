@@ -23,6 +23,7 @@ class GoodsImForm extends CFormModel
 	public $inspection;
 	public $customs_code;
 	public $customs_name;
+	public $img_url;
     public $orderClass = "Import";
 
 	public function attributeLabels()
@@ -46,6 +47,7 @@ class GoodsImForm extends CFormModel
             'net_weight'=>Yii::t('procurement','Net Weight（kg）'),
             'gross_weight'=>Yii::t('procurement','Gross Weight（kg）'),
             'volume'=>Yii::t('procurement','Length×Width×Height（cm）'),
+            'img_url'=>Yii::t("procurement","good image"),
 		);
 	}
 
@@ -55,7 +57,7 @@ class GoodsImForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, goods_code, name, customs_name, customs_code, inspection, classify_id, type, unit, price, price_two, rules_id, multiple, big_num, small_num, net_weight, gross_weight, origin, len, width, height','safe'),
+			array('id, goods_code, img_url, name, customs_name, customs_code, inspection, classify_id, type, unit, price, price_two, rules_id, multiple, big_num, small_num, net_weight, gross_weight, origin, len, width, height','safe'),
             array('goods_code','required'),
             array('name','required'),
             array('type','required'),
@@ -108,6 +110,7 @@ class GoodsImForm extends CFormModel
                 $this->id = $row['id'];
                 $this->name = $row['name'];
                 $this->type = $row['type'];
+                $this->img_url = empty($row['img_url'])?"":Yii::app()->request->baseUrl."/".$row['img_url'];
                 $this->unit = $row['unit'];
                 $this->price = sprintf("%.2f", $row['price']);
                 $this->price_two = sprintf("%.2f", $row['price_two']);
@@ -191,6 +194,51 @@ class GoodsImForm extends CFormModel
 			throw new CHttpException(404,'Cannot update. ('.$e->getMessage().')');
 		}
 	}
+
+    public static function uploadImg($className,$id,$sqlName){
+        $upload = CUploadedFile::getInstanceByName("img_url");
+        if($upload){
+            $fileType = $upload->extensionName;
+            if(in_array($fileType,array("png","jpg","jpeg"))){
+                $upload_url ="upload/images/{$className}/";
+                $upload_url.= "id_{$id}". '.' . $fileType;
+                $upload->saveAs($upload_url);
+                $fileUrl = dirname(Yii::app()->basePath)."/".$upload_url;
+                self::resizeImage($fileUrl,900);
+                Yii::app()->db->createCommand()->update($sqlName, array(
+                    'img_url'=>$upload_url,
+                ), 'id=:id', array(':id'=>$id));
+            }
+        }
+    }
+
+//縮放圖片
+    public static function resizeImage($fileUrl,$width=2000){
+        $fileInfo = getimagesize($fileUrl);
+        $fileType = $fileInfo[2];
+        $newWidth = $fileInfo[0];
+        $newHeight= $fileInfo[1];
+        // 根据文件类型获取后缀名
+        $extension = image_type_to_extension($fileType);
+        $extension = str_replace(".","",$extension);
+        if($fileInfo[0]>$width){ //寬度最大700
+            $newWidth = $width;
+            $newHeight = ($fileInfo[1]/$fileInfo[0])*$width;
+        }
+        if($fileInfo[1]>1000){ //高度最大1000
+            $newHeight = 1000;
+            $newWidth = ($fileInfo[0]/$fileInfo[1])*$newHeight;
+        }
+        $newImg = imagecreatetruecolor($newWidth,$newHeight);
+        $fun = "imagecreatefrom".$extension;
+        $source = $fun($fileUrl);
+        imagecopyresampled($newImg, $source, 0, 0, 0, 0, $newWidth,$newHeight, $fileInfo[0], $fileInfo[1]);
+        imagedestroy($source);
+        //圖片保存為jpg
+        imagejpeg($newImg,$fileUrl,100);
+        // 释放内存
+        imagedestroy($newImg);
+    }
 
 	protected function saveGoods(&$connection) {
 		$sql = '';
@@ -303,6 +351,7 @@ class GoodsImForm extends CFormModel
             $this->id = Yii::app()->db->getLastInsertID();
             $this->scenario = "edit";
         }
+        self::uploadImg(get_class($this),$this->id,"opr_goods_im");
 		return true;
 	}
 }

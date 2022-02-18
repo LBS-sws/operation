@@ -1,0 +1,1 @@
+alter table opr_order modify column total_price decimal(15,4);

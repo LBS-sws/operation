@@ -281,6 +281,9 @@ if($model->status == "pending" || $model->status == "cancelled"||$model->scenari
     $tableBool = 0;
 }
 $js = '
+$("body").on("click",function(){
+    $(".image-div").remove();
+});
 var orderClass = "'.$model->order_class.'";
 inputDownList('.$goodList.',tableGoodsChange,true);
 $("#addGoods").on("click",{btnStr:"'.Yii::t("misc","Delete").'"},addGoodsTable);

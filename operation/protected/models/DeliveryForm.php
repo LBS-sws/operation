@@ -119,7 +119,15 @@ class DeliveryForm extends CFormModel
 
 	//驗證訂單內的物品
     public function validateGoods($attribute, $params){
-	    $goods_list = $this->goods_list;
+        $city_allow = Yii::app()->user->city_allow();
+        $orderRow = Yii::app()->db->createCommand()->select("*")
+            ->from("opr_order")->where("id=:id AND judge=0 AND city in ($city_allow)",array(":id"=>$this->id))->queryRow();
+	    if(!$orderRow){
+            $message = "订单异常，请刷新重试";
+            $this->addError($attribute,$message);
+            return false;
+        }
+        $goods_list = $this->goods_list;
         if(count($this->goods_list)<1){
             $message = Yii::t('procurement','Fill in at least one goods');
             $this->addError($attribute,$message);
@@ -148,7 +156,17 @@ class DeliveryForm extends CFormModel
                     $this->addError($attribute,$message);
                     return false;
                 }
+
+                //物品价格过高，限制审核
+                $price = Yii::app()->db->createCommand("SELECT costPrice({$goods["goods_id"]},'{$orderRow['lcd']}')")->queryScalar();
+                $price*=floatval($goods["confirm_num"]);
+                if($price>999999){
+                    $message = $list["name"]."价格过高，无法保存。计算后价格:{$price}";
+                    $this->addError($attribute,$message);
+                    return false;
+                }
             }
+
         }
         if(count($this->goods_list)<1){
             $message = Yii::t('procurement','Fill in at least one goods');

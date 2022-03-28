@@ -223,4 +223,39 @@ return array(
 //			),
 //		),
 //	),
+
+    'Technical Overall leaderboard'=>array( //技术部综合排行榜
+        'access'=>'TL',
+        'icon'=>'fa-beer',
+        'items'=>array(
+            'Technical Month leaderboard'=>array(//技术部综合排行榜(月度)
+                'access'=>'TL01',
+                'url'=>'/rankingMonth/index',
+            ),
+            'Technical Quarter leaderboard'=>array(//技术部综合排行榜(季度)
+                'access'=>'TL02',
+                'url'=>'/rankingQuarter/index',
+            ),
+            'Technical Half leaderboard'=>array(//技术部综合排行榜(半年度)
+                'access'=>'TL03',
+                'url'=>'/rankingHalf/index',
+            ),
+            'Technical Year leaderboard'=>array(//技术部综合排行榜(年度)
+                'access'=>'TL04',
+                'url'=>'/rankingYear/index',
+            ),
+            'Technical Service Money'=>array(//技术部服務金額
+                'access'=>'TL05',
+                'url'=>'/serviceMoney/index',
+            ),
+            'Technical Service new'=>array(//介绍新生意
+                'access'=>'TL06',
+                'url'=>'/serviceNew/index',
+            ),
+            'Technical Deduct Marks'=>array(//技术部扣分
+                'access'=>'TL07',
+                'url'=>'/serviceDeduct/index',
+            ),
+        ),
+    ),
 );

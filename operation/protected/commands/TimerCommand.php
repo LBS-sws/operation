@@ -9,7 +9,18 @@ class TimerCommand extends CConsoleCommand {
         }
         //外勤領料總覽列表速度優化
         CargoCostList::resetGoodsPrice();
+        //技术部综合排行榜更新
+        $this->resetTechnicianRank();
+
         echo "end\n";
+    }
+
+    //技术部综合排行榜更新
+    private function resetTechnicianRank(){
+        $year = date("Y");
+        $month = date("n");
+        $model = new RankingMonthForm();
+        $model->insertTechnician($year,$month,true);
     }
 }
 ?>

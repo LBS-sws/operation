@@ -120,6 +120,15 @@ return array(
 'storage Report'=>'倉庫入庫報表',
 'Warehouse Backward List'=>'物品退回列表',
 'Warehouse Item description'=>'倉庫物品說明',
+    'Technical Overall leaderboard'=>'技術部綜合排行榜',
+    'Technical Month leaderboard'=>'技術部每月排行榜',
+    'Technical Quarter leaderboard'=>'技術部季度排行榜',
+    'Technical Half leaderboard'=>'技術部半年排行榜',
+    'Technical Year leaderboard'=>'技術部年度排行榜',
+    'Technical Service Money'=>'技術員服務金額',
+    'Technical Deduct Marks'=>'技術員扣分',
+    'Technical Service new'=>'介紹新生意',
+    'Technical Overall leaderboard(all city)'=>'技術部綜合排行榜(全國)',
 //沈超添加結束
 );
 ?>

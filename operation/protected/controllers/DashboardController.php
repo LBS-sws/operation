@@ -38,7 +38,6 @@ class DashboardController extends Controller
         $model = $this->getModelForType($oneType);
         $model->year = date("Y");
         $model->month = date("n");
-        $model->month = 2;
         $model->allCity=0;
         $model->noOfItem=10;
         $model->retrieveDataByPage(1);
@@ -51,7 +50,6 @@ class DashboardController extends Controller
         $model = $this->getModelForType($allType);
         $model->year = date("Y");
         $model->month = date("n");
-        $model->month = 2;
         $model->allCity=1;//全部城市
         $model->noOfItem=30;
         $model->retrieveDataByPage(1);

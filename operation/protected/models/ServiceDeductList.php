@@ -130,6 +130,7 @@ class ServiceDeductList extends CListPageModel
 	    $list = array(
 	        1=>Yii::t("rank","warning letter"),
 	        2=>Yii::t("rank","claim compensation"),
+	        3=>Yii::t("rank","warning book"),
         );
 	    if($bool){
             if(key_exists($key,$list)){

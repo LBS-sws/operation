@@ -91,8 +91,14 @@ $this->pageTitle=Yii::app()->name . ' - ServiceDeduct Form';
                 <?php echo $form->labelEx($model,'deduct_type',array('class'=>"col-lg-2 control-label")); ?>
                 <div class="col-lg-3">
                     <?php echo $form->dropDownList($model, 'deduct_type',ServiceDeductList::getDeductType(),
-                        array('id'=>'name','readonly'=>($model->scenario=='view'))
+                        array('id'=>'deduct_type','readonly'=>($model->scenario=='view'))
                     ); ?>
+                </div>
+                <?php echo TbHtml::label(Yii::t("rank","deduct score"),"deduct_type",array('class'=>"col-lg-2 control-label"));?>
+                <div class="col-lg-2">
+                    <?php
+                    echo TbHtml::textField("deduct_num","",array('id'=>'deduct_num','readonly'=>(true)))
+                    ?>
                 </div>
             </div>
 
@@ -107,22 +113,30 @@ $this->pageTitle=Yii::app()->name . ' - ServiceDeduct Form';
 		</div>
 	</div>
 </section>
-
 <?php $this->renderPartial('//site/removedialog'); ?>
-
 <?php
-/*
-$disabled = $model->scenario=='view'?"true":"false";
-$clientData = ServiceDeductForm::getEmployeeJson($model->employee_id);
+
 $js = "
-$('#client_id').select2({
-    placeholder: '',
-    data:{$clientData},
-    disabled: $disabled,
+$('#deduct_type').change(function(){
+    var deduct_type = $(this).val()*1;
+    switch(deduct_type){
+        case 1:
+            $('#deduct_num').val('-1000/封');
+            break;
+        case 2:
+            $('#deduct_num').val('-500/次');
+            break;
+        case 3:
+            $('#deduct_num').val('-300/封');
+            break;
+        default:
+            $('#deduct_num').val('');
+    }
 });
+$('#deduct_type').trigger('change');
 ";
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
-*/
+
 if ($model->scenario!='view') {
     $js = Script::genDatePicker(array(
         'ServiceDeductForm_deduct_date'

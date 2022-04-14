@@ -169,7 +169,7 @@ class RankingMonthForm extends CFormModel
         $score=Yii::app()->db->createCommand()->select("count(id)")->from("hr{$suffix}.hr_prize")
             ->where("status=3 and lud between '$this->startDate' and '$this->endDate' and employee_id=:id",
                 array(":id"=>$employee_id))->queryScalar();
-        return $score?count($score)*100:0;
+        return is_numeric($score)?floatval($score)*100:0;
     }
 
     //表揚信得分table
@@ -207,7 +207,7 @@ class RankingMonthForm extends CFormModel
         $score=Yii::app()->db->createCommand()->select("count(id)")->from("swoper{$suffix}.swo_followup")
             ->where("entry_dt between '$this->startDate' and '$this->endDate' and follow_staff=:name and resp_tech!=:name",
                 array(":name"=>$name))->queryScalar();
-        return $score?count($score)*100:0;
+        return is_numeric($score)?floatval($score)*100:0;
     }
 
     //客诉跟进得分table

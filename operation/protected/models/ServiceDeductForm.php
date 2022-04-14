@@ -71,10 +71,22 @@ class ServiceDeductForm extends CFormModel
 	    if($row){
 	        $old_date = date("Ym",strtotime($row["deduct_date"]));
         }
-        $this->score_num=$this->deduct_type==1?-1000:-500;
-        $deduct_date = date("Ym",strtotime($deduct_date));
+        switch ($this->deduct_type){
+            case 1:
+                $this->score_num = -1000;
+                break;
+            case 2:
+                $this->score_num = -500;
+                break;
+            case 3:
+                $this->score_num = -300;
+                break;
+            default:
+                $this->score_num = 0;
+        }
 	    $this->service_year = date("Y",strtotime($deduct_date));
 	    $this->service_month = date("n",strtotime($deduct_date));
+        $deduct_date = date("Ym",strtotime($deduct_date));
         $date = date("Ym",strtotime(" - 2 months"));
         if($date>=$deduct_date||$date>=$old_date){
             $this->addError($attribute, "不允许修改两个月以前的数据");

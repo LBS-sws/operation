@@ -41,7 +41,7 @@ class RankingMonthForm extends CFormModel
     //學分
     private function integral_num($year,$month,$employee_id){
         $suffix = Yii::app()->params['envSuffix'];
-        $score=Yii::app()->db->createCommand()->select("sum(credit_point)")->from("gr{$suffix}.gr_credit_request")
+        $score=Yii::app()->db->createCommand()->select("sum(credit_point)")->from("spoint{$suffix}.gr_credit_request")
             ->where("state=3 and audit_date between '$this->startDate' and '$this->endDate' and employee_id=:id",
                 array(":id"=>$employee_id))->queryScalar();
         return is_numeric($score)?floatval($score)*50:0;
@@ -51,8 +51,8 @@ class RankingMonthForm extends CFormModel
     private function integral_num_table(){
         $suffix = Yii::app()->params['envSuffix'];
         $rows=Yii::app()->db->createCommand()->select("b.credit_code,b.credit_name,a.id,a.credit_point,a.audit_date")
-            ->from("gr{$suffix}.gr_credit_request a")
-            ->leftJoin("gr{$suffix}.gr_credit_type b","a.credit_type=b.id")
+            ->from("spoint{$suffix}.gr_credit_request a")
+            ->leftJoin("spoint{$suffix}.gr_credit_type b","a.credit_type=b.id")
             ->where("a.state=3 and a.audit_date between '$this->startDate' and '$this->endDate' and a.employee_id=:id",
                 array(":id"=>$this->employee_id))->queryAll();
         $html = "<thead>";

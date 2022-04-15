@@ -236,33 +236,39 @@ class RankingMonthForm extends CFormModel
     private function quality_num($year,$month,$employee_id){
         $suffix = Yii::app()->params['envSuffix'];
         $name = " ".$this->employee_name." ({$this->employee_code})";
-        $count=Yii::app()->db->createCommand()->select("count(id)")->from("swoper{$suffix}.swo_qc")
+        $row=Yii::app()->db->createCommand()->select("count(id) as sum_qc,AVG(qc_result) as avg_qc")->from("swoper{$suffix}.swo_qc")
             ->where("qc_dt between '$this->startDate' and '$this->endDate' and job_staff=:name",
-                array(":name"=>$name))->queryScalar();
-        $list = $this->qualityScoreCompute($count);
-        return $list["score"];
+                array(":name"=>$name))->queryRow();
+        if($row){
+            $list = $this->qualityScoreCompute($row["sum_qc"],$row["avg_qc"]);
+            return $list["score"];
+        }
+        return 0;
     }
 
     //質檢得分table
     private function quality_num_table(){
         $suffix = Yii::app()->params['envSuffix'];
         $name = " ".$this->employee_name." ({$this->employee_code})";
-        $rows=Yii::app()->db->createCommand()->select("id,qc_dt,qc_staff,company_name")->from("swoper{$suffix}.swo_qc")
+        $rows=Yii::app()->db->createCommand()->select("id,qc_dt,qc_staff,qc_result,company_name")->from("swoper{$suffix}.swo_qc")
             ->where("qc_dt between '$this->startDate' and '$this->endDate' and job_staff=:name",
                 array(":name"=>$name))->queryAll();
         $count = 0;
+        $avg = 0;
         $html = "<thead>";
-        $html.="<tr><th>员工编号</th><th>员工姓名</th><th>质检日期</th><th>客户名称</th><th>质检部同事</th></tr>";
+        $html.="<tr><th>员工编号</th><th>员工姓名</th><th>质检日期</th><th>客户名称</th><th>质检部同事</th><th>	质检成绩</th></tr>";
         $html.= "</thead><tbody>";
         if($rows){
             foreach ($rows as $row){
+                $avg+=floatval($row["qc_result"]);
                 $count++;
-                $html.="<tr data-id='{$row["id"]}'><td>{$this->employee_code}</td><td>{$this->employee_name}</td><td>{$row['qc_dt']}</td><td>{$row['company_name']}</td><td>{$row['qc_staff']}</td></tr>";
+                $html.="<tr data-id='{$row["id"]}'><td>{$this->employee_code}</td><td>{$this->employee_name}</td><td>{$row['qc_dt']}</td><td>{$row['company_name']}</td><td>{$row['qc_staff']}</td><td>{$row['qc_result']}</td></tr>";
             }
-            $list = $this->qualityScoreCompute($count);
-            $html.= "</tbody><tfoot><tr><td colspan='4' class='text-right'>公式：{$list['compute']}</td><td>得分：{$list['score']}</td></tr></tfoot>";
+            $avg = $avg/$count;
+            $list = $this->qualityScoreCompute($count,$avg);
+            $html.= "</tbody><tfoot><tr><td colspan='5' class='text-right'>公式：{$list['compute']}</td><td>得分：{$list['score']}</td></tr></tfoot>";
         }else{
-            $html.="<tr><td colspan='5'>无</td></tr>";
+            $html.="<tr><td colspan='6'>无</td></tr>";
             $html.= "</tbody>";
         }
 
@@ -809,9 +815,8 @@ class RankingMonthForm extends CFormModel
         return $review_num;
     }
     //质检计算公式
-    private function qualityScoreCompute($count){
-        $count = $count?$count:0;
-        $rate = $count;
+    private function qualityScoreCompute($sum,$avg){
+        $rate = $avg;
         if($rate<=80){
             $rate=0;
         }elseif ($rate<=85){
@@ -823,7 +828,7 @@ class RankingMonthForm extends CFormModel
         }else{
             $rate=500;
         }
-        $score = $rate*(1+$count*0.02);
-        return array("rate"=>$rate,"score"=>$score,"compute"=>"(1+{$count}×0.02)×{$rate}");
+        $score = $rate*(1+$sum*0.02);
+        return array("rate"=>$rate,"score"=>$score,"compute"=>"(1+{$sum}×0.02)×{$rate}");
     }
 }

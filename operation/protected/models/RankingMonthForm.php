@@ -235,7 +235,7 @@ class RankingMonthForm extends CFormModel
     //質檢得分
     private function quality_num($year,$month,$employee_id){
         $suffix = Yii::app()->params['envSuffix'];
-        $name = $this->employee_name." ({$this->employee_code})";
+        $name = " ".$this->employee_name." ({$this->employee_code})";
         $count=Yii::app()->db->createCommand()->select("count(id)")->from("swoper{$suffix}.swo_qc")
             ->where("qc_dt between '$this->startDate' and '$this->endDate' and job_staff=:name",
                 array(":name"=>$name))->queryScalar();
@@ -246,7 +246,7 @@ class RankingMonthForm extends CFormModel
     //質檢得分table
     private function quality_num_table(){
         $suffix = Yii::app()->params['envSuffix'];
-        $name = $this->employee_name." ({$this->employee_code})";
+        $name = " ".$this->employee_name." ({$this->employee_code})";
         $rows=Yii::app()->db->createCommand()->select("id,qc_dt,qc_staff,company_name")->from("swoper{$suffix}.swo_qc")
             ->where("qc_dt between '$this->startDate' and '$this->endDate' and job_staff=:name",
                 array(":name"=>$name))->queryAll();

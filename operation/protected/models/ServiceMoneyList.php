@@ -128,7 +128,9 @@ class ServiceMoneyList extends CListPageModel
 	    $arr = array();
 	    $year = date("Y");
 	    for($i=$year-4;$i<$year+2;$i++){
-	        $arr[$i] = $i.Yii::t("rank","year unit");
+	        if($i>2021){
+                $arr[$i] = $i.Yii::t("rank","year unit");
+            }
         }
 	    return $arr;
     }

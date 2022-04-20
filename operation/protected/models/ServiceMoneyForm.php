@@ -139,6 +139,55 @@ class ServiceMoneyForm extends CFormModel
         return $scoreNum;
     }
 
+    public function curlJobFee($year,$month){
+        $year = is_numeric($year)?$year:date("Y");
+        $month = is_numeric($month)?$month:date("n");
+        $jobFeeList =JobFee::getData($year,$month);
+        /* 模擬curl數據
+        $jobFeeList ='{"code":1,"data":[
+            {"code":"400002","name":"修改名字","sum_money":4444},
+            {"code":"400003","name":"测试3","sum_money":6666}
+            ],"msg":"消息"}';
+        $jobFeeList = json_decode($jobFeeList,true);
+        */
+        if($jobFeeList["code"]==1){
+            $staffList = self::getEmployeeCodeList();
+            foreach ($jobFeeList["data"] as $row){
+                if(key_exists($row["code"],$staffList)){
+                    $this->saveCurlData($year,$month,$staffList[$row["code"]],$row);
+                }
+            }
+        }
+        return $jobFeeList;
+    }
+
+    private function saveCurlData($year,$month,$staff,$data){
+        $row = Yii::app()->db->createCommand()->select("id")->from("opr_service_money")
+            ->where("employee_id=:id and service_year={$year} and service_month={$month}",array(":id"=>$staff["id"]))->queryRow();
+        if($row){//存在就覆蓋
+            Yii::app()->db->createCommand()->update("opr_service_money",array(
+                'service_money'=>round($data["sum_money"],2),
+                "score_num"=>self::computeScore($data["sum_money"]),
+                "remark"=>"系統自動刷新：".date("Y-m-d H:i:s"),
+                "luu"=>"系統"
+            ),"id={$row['id']}");
+        }else{//不存在則新增
+            Yii::app()->db->createCommand()->insert("opr_service_money",array(
+                "employee_id"=>$staff["id"],
+                "service_date"=>date("Y-m-d",strtotime("{$year}-{$month}-1")),
+                "service_year"=>$year,
+                "service_month"=>$month,
+                "service_money"=>round($data["sum_money"],2),
+                "score_num"=>self::computeScore($data["sum_money"]),
+                "remark"=>"系統自動刷新：".date("Y-m-d H:i:s"),
+                "luu"=>"系統"
+            ));
+            $this->id = Yii::app()->db->getLastInsertID();
+            $this->resetServiceCode();
+            Yii::app()->db->createCommand()->update("opr_service_money",array('service_code'=>$this->service_code),"id={$this->id}");
+        }
+    }
+
 	public function retrieveData($index)
 	{
         $suffix = Yii::app()->params['envSuffix'];
@@ -172,6 +221,20 @@ class ServiceMoneyForm extends CFormModel
         if($rows){
             foreach ($rows as $row){
                 $list[$row["id"]] = $row["name"]." ({$row["code"]})";
+            }
+        }
+        return $list;
+    }
+
+    public static function getEmployeeCodeList(){
+        $suffix = Yii::app()->params['envSuffix'];
+        $list = array();
+        $rows = Yii::app()->db->createCommand()->select("a.id,a.code,a.name")->from("hr$suffix.hr_employee a")
+            ->leftJoin("hr$suffix.hr_dept b","a.position=b.id")
+            ->where("b.review_status=1 and b.review_type=2")->queryAll();
+        if($rows){
+            foreach ($rows as $row){
+                $list[$row["code"]] = array("code"=>$row["code"],"name"=>$row["name"],"id"=>$row["id"]);
             }
         }
         return $list;

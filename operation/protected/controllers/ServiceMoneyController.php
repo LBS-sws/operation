@@ -28,7 +28,7 @@ class ServiceMoneyController extends Controller
 				'expression'=>array('ServiceMoneyController','allowReadWrite'),
 			),
 			array('allow', 
-				'actions'=>array('index','view'),
+				'actions'=>array('index','view','test'),
 				'expression'=>array('ServiceMoneyController','allowReadOnly'),
 			),
 			array('deny',  // deny all users
@@ -89,6 +89,19 @@ class ServiceMoneyController extends Controller
 		$model->service_month = date("n");
 		$model->service_year = date("Y");
 		$this->render('form',array('model'=>$model,));
+	}
+
+	public function actionTest($year,$month)
+	{
+		$model = new ServiceMoneyForm('new');
+        $arr = $model->curlJobFee($year,$month);
+        if($arr["code"]==1){
+            echo "success !!!!!<br/>";
+        }else{
+            echo "error:<br/>";
+        }
+        var_dump($arr);
+        Yii::app()->end();
 	}
 	
 	public function actionEdit($index)

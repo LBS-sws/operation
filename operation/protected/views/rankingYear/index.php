@@ -59,6 +59,26 @@ $js = "
 $('.submitBtn').change(function(){
     $('form:first').submit();
 });
+$('select[id$=\"List_searchField\"]').hide();
+$('input[id$=\"List_searchValue\"]').attr('placeholder','仅限页内搜索');
+$('#yt0').hide();
+$('input[id$=\"List_searchValue\"]').keyup(function(){
+    var search = $(this).val();
+    var username,city;
+    if(search!=''){
+        $('#tblData>tbody>tr').each(function(){
+            username = $(this).find('td').eq(2).text();
+            city = $(this).find('td').eq(3).text();
+            if(username.indexOf(search)>=0||city.indexOf(search)>=0){
+                $(this).show();
+            }else{
+                $(this).hide();
+            }
+        });
+    }else{
+        $('#tblData>tbody>tr').show();
+    }
+});
 ";
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 	$js = Script::genTableRowClick();

@@ -40,7 +40,7 @@ class DashboardController extends Controller
         $model->month = date("n");
         $model->allCity=0;
         $model->noOfItem=10;
-        $model->retrieveDataByPage(1);
+        $model->retrieveDataByPage(1,false);
         $rtn = $model->attr;
 		echo json_encode($rtn);
 	}
@@ -52,7 +52,7 @@ class DashboardController extends Controller
         $model->month = date("n");
         $model->allCity=1;//全部城市
         $model->noOfItem=30;
-        $model->retrieveDataByPage(1);
+        $model->retrieveDataByPage(1,false);
         $rtn = $model->attr;
         echo json_encode($rtn);
 	}

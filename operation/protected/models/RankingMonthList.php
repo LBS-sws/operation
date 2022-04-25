@@ -47,7 +47,7 @@ class RankingMonthList extends CListPageModel
 		);
 	}
 	
-	public function retrieveDataByPage($pageNum=1)
+	public function retrieveDataByPage($pageNum=1,$bool=true)
 	{
 	    if(empty($this->year)||!is_numeric($this->year)){
 	        $this->year = date("Y");
@@ -122,8 +122,11 @@ class RankingMonthList extends CListPageModel
                 );
 			}
 		}
-		$session = Yii::app()->session;
-		$session['rankingMonth_c01'] = $this->getCriteria();
+        $this->searchValue='';
+		if($bool){
+            $session = Yii::app()->session;
+            $session['rankingMonth_c01'] = $this->getCriteria();
+        }
 		return true;
 	}
 

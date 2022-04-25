@@ -47,7 +47,7 @@ class RankingQuarterList extends CListPageModel
 		);
 	}
 	
-	public function retrieveDataByPage($pageNum=1)
+	public function retrieveDataByPage($pageNum=1,$bool=true)
 	{
 	    if(empty($this->year)||!is_numeric($this->year)){
 	        $this->year = date("Y");
@@ -109,8 +109,11 @@ class RankingQuarterList extends CListPageModel
                 );
 			}
 		}
-		$session = Yii::app()->session;
-		$session['rankingQuarter_c01'] = $this->getCriteria();
+        $this->searchValue='';
+		if($bool){
+            $session = Yii::app()->session;
+            $session['rankingQuarter_c01'] = $this->getCriteria();
+        }
 		return true;
 	}
 

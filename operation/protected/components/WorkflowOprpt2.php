@@ -1,7 +1,7 @@
 <?php
 class WorkflowOprpt2 extends WorkflowOprpt {
 	public function routeToApprover() {
-		$users = $this->getUserByControlRight(array('YN06'), true);
+		$users = $this->getUserByControlRight(array('YN07'), true);
 		if (empty($users)) {
 			$user = $this->getRequestData('REQ_USER');
 			$this->assignRespUser($user);

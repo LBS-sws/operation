@@ -62,7 +62,15 @@ class DeliveryForm extends CFormModel
 	}
 	public function validatePriceOverTime($attribute='', $params='')
     {
-		// Percy: 解決台灣不執行此檢查的問題
+        $city_allow = Yii::app()->user->city_allow();
+        $rows = Yii::app()->db->createCommand()->select("id")
+            ->from("opr_order")->where("id=:id AND status in ('sent','read') AND judge=0 AND city in ($city_allow)",array(":id"=>$this->id))->queryRow();
+        if(!$rows){
+            $message = "订单不存在，请刷新重试";
+            $this->addError($attribute,$message);
+        }
+
+        // Percy: 解決台灣不執行此檢查的問題
 		if ((isset(Yii::app()->params['checkPriceOverTime']) && Yii::app()->params['checkPriceOverTime']==false)) {
 			return true;
 		}

@@ -244,6 +244,10 @@ return array(
                 'access'=>'TL04',
                 'url'=>'/rankingYear/index',
             ),
+            'Technical Other leaderboard'=>array(//分类项目排行榜
+                'access'=>'TL08',
+                'url'=>'/rankingOther/index',
+            ),
             'Technical Service Money'=>array(//技术部服務金額
                 'access'=>'TL05',
                 'url'=>'/serviceMoney/index',

@@ -1,19 +1,26 @@
 <div class="box box-primary" >
     <div class="box-header with-border">
-        <h3 class="box-title"><?php echo Yii::t('app','Technical Overall leaderboard');?> - <?php echo Yii::t("rank","local")?></h3>
+        <h3 class="box-title"><?php echo Yii::t('app','Technical Other leaderboard');?> - <?php echo Yii::t("rank","all city")?></h3>
 
         <div class="pull-right">
             <?php
-            $oneType = key_exists("oneType",$_GET)?$_GET["oneType"]:0;
-            $rankAction = RankingMonthList::getIndexAction($oneType);
-            echo TbHtml::dropDownList("oneType",$oneType,RankingMonthList::getIndexTypeList(),array("id"=>"oneType"));
+            //季度
+            $yearTypeAll = key_exists("yearTypeAll",$_GET)?$_GET["yearTypeAll"]:0;
+            echo TbHtml::dropDownList("yearTypeAll",$yearTypeAll,RankingMonthList::getIndexTypeList(),array("id"=>"yearTypeAll"));
+            ?>
+        </div>
+        <div class="pull-right">
+            <?php
+            //按照哪项排名
+            $rankNameAll = key_exists("rankNameAll",$_GET)?$_GET["rankNameAll"]:"integral_num";
+            echo TbHtml::dropDownList("rankNameAll",$rankNameAll,RankingOtherList::getRankTypeList(),array("id"=>"rankNameAll"));
             ?>
         </div>
     </div>
     <!-- /.box-header -->
 
     <div class="box-body">
-        <div id='rankOneList' class="direct-chat-messages" style="height: 250px;">
+        <div id='rankOtherAllList' class="direct-chat-messages" style="height: 250px;">
             <div class="overlay">
                 <i class="fa fa-refresh fa-spin"></i>
             </div>
@@ -23,7 +30,7 @@
 
     <div class="box-footer">
         <small><?php echo Yii::t('rank','Refresh every day at 6');?></small>
-        <?php echo TbHtml::link(Yii::t("rank","detail"),Yii::app()->createUrl($rankAction.'/index'),array("class"=>"pull-right"))?>
+        <?php echo TbHtml::link(Yii::t("rank","detail"),Yii::app()->createUrl('rankingOther/index'),array("class"=>"pull-right"))?>
     </div>
     <!-- /.box-footer -->
 </div>
@@ -34,7 +41,7 @@
 
 
 <?php
-$link = Yii::app()->createAbsoluteUrl("dashboard/rankOneList",array("oneType"=>$oneType));
+$link = Yii::app()->createAbsoluteUrl("dashboard/rankOtherAllList",array("rankNameAll"=>$rankNameAll,"yearTypeAll"=>$yearTypeAll));
 $paiming= Yii::t('rank','rank');
 $staff= Yii::t('rank','employee name');
 $city= Yii::t('rank','city');
@@ -64,7 +71,7 @@ $js = <<<EOF
 				}	
 				
 				line += '</table>';
-				$('#rankOneList').html(line);
+				$('#rankOtherAllList').html(line);
 			}
 		},
 		error: function(xhr, status, error) { // if error occured
@@ -74,6 +81,6 @@ $js = <<<EOF
 		dataType:'json'
 	});
 EOF;
-Yii::app()->clientScript->registerScript('rankOneListDisplay',$js,CClientScript::POS_READY);
+Yii::app()->clientScript->registerScript('rankOtherAllListDisplay',$js,CClientScript::POS_READY);
 
 ?>

@@ -24,7 +24,7 @@ class DashboardController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('RankOneList','RankAllList'),
+				'actions'=>array('RankOneList','RankAllList','RankOtherList','RankOtherAllList'),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -56,6 +56,36 @@ class DashboardController extends Controller
         $rtn = $model->attr;
         echo json_encode($rtn);
 	}
+
+    public function actionRankOtherList() {
+        $rankNameOne = key_exists("rankNameOne",$_GET)?$_GET["rankNameOne"]:"integral_num";
+        $yearTypeOne = key_exists("yearTypeOne",$_GET)?$_GET["yearTypeOne"]:0;
+        $model = new RankingOtherList();
+        $model->year = date("Y");
+        $model->month = date("n");
+        $model->rank_type=$rankNameOne;
+        $model->resetMonth($yearTypeOne);
+        $model->allCity=0;
+        $model->noOfItem=10;
+        $model->retrieveDataByPage(1,false);
+        $rtn = $model->attr;
+        echo json_encode($rtn);
+    }
+
+    public function actionRankOtherAllList() {
+        $rankNameAll = key_exists("rankNameAll",$_GET)?$_GET["rankNameAll"]:"integral_num";
+        $yearTypeAll = key_exists("yearTypeAll",$_GET)?$_GET["yearTypeAll"]:0;
+        $model = new RankingOtherList();
+        $model->year = date("Y");
+        $model->month = date("n");
+        $model->rank_type=$rankNameAll;
+        $model->resetMonth($yearTypeAll);
+        $model->allCity=1;
+        $model->noOfItem=30;
+        $model->retrieveDataByPage(1,false);
+        $rtn = $model->attr;
+        echo json_encode($rtn);
+    }
 
 	public function actionShowRankOneList() {
 		$this->layout = "main_nm";

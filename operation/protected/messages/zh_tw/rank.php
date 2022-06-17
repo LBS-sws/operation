@@ -64,6 +64,11 @@ return array(
     "now year"=>"本年",
 
     'Refresh every day at 6'=>'每天六點刷新',
-    'aaa'=>'bbbb',
+    'monthly'=>'月度',
+    'quarter'=>'季度',
+    'semi-annual'=>'半年度',
+    'annual'=>'年度',
+    'user quality score'=>'質檢得分',
+    'follow-up score'=>'客訴跟進得分',
 );
 ?>

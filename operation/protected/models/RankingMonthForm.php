@@ -22,19 +22,19 @@ class RankingMonthForm extends CFormModel
 	public $arrList;//数据列表
 
     public static $sqlDate=array( //add:是否疊加  reset:月排行是否显示
-        "integral_num"=>array("add"=>true,"reset"=>true,"label"=>"integral score"),//學分
-        "charity_num"=>array("add"=>true,"reset"=>true,"label"=>"charity score"),//慈善分
-        "pin_num"=>array("add"=>false,"reset"=>true,"label"=>"pin score"),//襟章得分
+        "integral_num"=>array("add"=>true,"reset"=>true,"label"=>"integral score","otherRank"=>true),//學分
+        "charity_num"=>array("add"=>true,"reset"=>true,"label"=>"charity score","otherRank"=>true),//慈善分
+        "pin_num"=>array("add"=>false,"reset"=>true,"label"=>"pin score","otherRank"=>true),//襟章得分
         "service_num"=>array("add"=>true,"reset"=>true,"label"=>"service score"),//服務得分
-        "prize_num"=>array("add"=>true,"reset"=>true,"label"=>"prize score"),//表揚信得分
-        "complain_num"=>array("add"=>true,"reset"=>true,"label"=>"complain score"),//客诉跟进得分
-        "quality_num"=>array("add"=>true,"reset"=>true,"label"=>"quality score"),//質檢得分
-        "review_num"=>array("add"=>false,"reset"=>false,"label"=>"review score"),//考核得分
-        "letter_num"=>array("add"=>true,"reset"=>true,"label"=>"letter score"),//心意信得分
-        "recommend_num"=>array("add"=>true,"reset"=>true,"label"=>"recommend score"),//推薦人得分
+        "prize_num"=>array("add"=>true,"reset"=>true,"label"=>"prize score","otherRank"=>true),//表揚信得分
+        "complain_num"=>array("add"=>true,"reset"=>true,"label"=>"complain score","otherRank"=>true,"minName"=>"follow-up score"),//客诉跟进得分
+        "quality_num"=>array("add"=>true,"reset"=>true,"label"=>"quality score","otherRank"=>true,"minName"=>"user quality score"),//質檢得分
+        "review_num"=>array("add"=>false,"reset"=>false,"label"=>"review score","otherRank"=>true),//考核得分
+        "letter_num"=>array("add"=>true,"reset"=>true,"label"=>"letter score","otherRank"=>true),//心意信得分
+        "recommend_num"=>array("add"=>true,"reset"=>true,"label"=>"recommend score","otherRank"=>true),//推薦人得分
         "two_num"=>array("add"=>false,"reset"=>true,"label"=>"two score"),//兩項得分
-        "new_num"=>array("add"=>true,"reset"=>true,"label"=>"new score"),//介绍新生意得分
-        "sales_num"=>array("add"=>true,"reset"=>true,"label"=>"sales score"),//洗地易销售得分
+        "new_num"=>array("add"=>true,"reset"=>true,"label"=>"new score","otherRank"=>true),//介绍新生意得分
+        "sales_num"=>array("add"=>true,"reset"=>true,"label"=>"sales score","otherRank"=>true),//洗地易销售得分
         "deduct_num"=>array("add"=>true,"reset"=>true,"label"=>"deduct score"),//扣分分數
     );
 

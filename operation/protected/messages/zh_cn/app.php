@@ -129,6 +129,7 @@ return array(
     'Technical Deduct Marks'=>'技术员扣分',
     'Technical Service new'=>'介绍新生意',
     'Technical Overall leaderboard(all city)'=>'技术部综合排行榜(全国)',
+    'Technical Other leaderboard'=>'分类项目排行榜',
     //沈超添加結束
 	
 );

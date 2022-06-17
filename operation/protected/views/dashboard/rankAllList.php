@@ -2,7 +2,7 @@
     <div class="box-header with-border">
         <h3 class="box-title"><?php echo Yii::t('app','Technical Overall leaderboard');?> - <?php echo Yii::t("rank","all city")?></h3>
 
-        <div class="box-tools pull-right">
+        <div class="pull-right">
             <?php
             $allType = key_exists("allType",$_GET)?$_GET["allType"]:0;
             $rankAction = RankingMonthList::getIndexAction($allType);
@@ -30,10 +30,14 @@
 <!-- /.box -->
 <script>
     $(function () {
-        $('#oneType,#allType').change(function(){
+        $('#oneType,#allType,#rankNameOne,#yearTypeOne,#rankNameAll,#yearTypeAll').change(function(){
             var oneType = $('#oneType').val();
             var allType = $('#allType').val();
-            window.location.href='<?php echo Yii::app()->createUrl('site/index');?>?oneType='+oneType+'&allType='+allType;
+            var rankNameOne = $('#rankNameOne').val();
+            var yearTypeOne = $('#yearTypeOne').val();
+            var rankNameAll = $('#rankNameAll').val();
+            var yearTypeAll = $('#yearTypeAll').val();
+            window.location.href='<?php echo Yii::app()->createUrl('site/index');?>?oneType='+oneType+'&allType='+allType+'&rankNameOne='+rankNameOne+'&rankNameAll='+rankNameAll+'&yearTypeOne='+yearTypeOne+'&yearTypeAll='+yearTypeAll;
         });
     })
 </script>

@@ -55,6 +55,8 @@ $this->pageTitle=Yii::app()->name . ' - RankingYear Form';
                         array('readonly'=>(true))
                     ); ?>
                 </div>
+            </div>
+            <div class="form-group">
                 <?php echo $form->labelEx($model,'rank_month',array('class'=>"col-lg-2 control-label")); ?>
                 <div class="col-lg-3">
                     <?php echo $form->textField($model, 'rank_month',
@@ -134,6 +136,7 @@ $this->pageTitle=Yii::app()->name . ' - RankingYear Form';
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 <?php $this->renderPartial('//site/removedialog'); ?>
+<?php $this->renderPartial('//site/rankingNote'); ?>
 
 <?php
 $ajaxUrl = Yii::app()->createUrl('rankingMonth/ajaxDetail');

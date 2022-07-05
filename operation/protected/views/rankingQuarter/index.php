@@ -26,7 +26,7 @@ $this->pageTitle=Yii::app()->name . ' - RankingQuarter';
 	<?php
     $modelClass=get_class($model);
     $search_add_html="";
-    if(Yii::app()->user->validFunction('YN06')) {
+    if(Yii::app()->user->validFunction('YN10')) {
         $search_add_html .= TbHtml::dropDownList("{$modelClass}[allCity]", $model->allCity, RankingMonthList::getAllCityTypeList(),
             array("class" => "form-control submitBtn"));
         $search_add_html .= "<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>";

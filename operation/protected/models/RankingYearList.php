@@ -56,7 +56,7 @@ class RankingYearList extends CListPageModel
 		$suffix = Yii::app()->params['envSuffix'];
         $city_allow = Yii::app()->user->city_allow();
         $searchSql = "b.city in ($city_allow)";
-        if(Yii::app()->user->validFunction('YN06')&&$this->allCity==1){
+        if(Yii::app()->user->validFunction('YN10')&&$this->allCity==1){
             $searchSql = "a.id>0";
         }else{
             $this->allCity=0;

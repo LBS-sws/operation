@@ -1,6 +1,6 @@
 <tr>
 	<th></th>
-<?php if (!Yii::app()->user->isSingleCity() || Yii::app()->user->validFunction('YN06')) : ?>
+<?php if (!Yii::app()->user->isSingleCity() || Yii::app()->user->validFunction('YN07')) : ?>
 	<th>
 		<?php echo TbHtml::link($this->getLabelName('city_name').$this->drawOrderArrow('city_name'),'#',$this->createOrderLink('monthly-list','city_name'))
 			;

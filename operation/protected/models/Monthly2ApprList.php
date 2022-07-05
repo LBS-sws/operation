@@ -15,7 +15,7 @@ class Monthly2ApprList extends CListPageModel
 	
 	public function retrieveDataByPage($pageNum=1, $type='P')
 	{
-		$type = Yii::app()->user->validFunction('YN06') ? 'PA' : 'PH';
+		$type = Yii::app()->user->validFunction('YN07') ? 'PA' : 'PH';
 		
 		$wf = new WorkflowOprpt2;
 		$wf->connection = Yii::app()->db;
@@ -25,7 +25,7 @@ class Monthly2ApprList extends CListPageModel
 		$suffix = Yii::app()->params['envSuffix'];
 		$exlist = Yii::app()->params['cityExclude2'];
 		$exclude = empty($exlist) ? '' : " and a.city not in ($exlist) ";
-		$citylist = Yii::app()->user->validFunction('YN06') ? '' : ' and a.city in ('.Yii::app()->user->city_allow().') ';
+		$citylist = Yii::app()->user->validFunction('YN07') ? '' : ' and a.city in ('.Yii::app()->user->city_allow().') ';
 		$sql1 = "select a.*, b.name as city_name 
 				from opr_monthly_hdr a, security$suffix.sec_city b 
 				where a.group_id='2' $citylist and a.city=b.code 

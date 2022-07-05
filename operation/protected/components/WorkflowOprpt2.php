@@ -1,7 +1,7 @@
 <?php
 class WorkflowOprpt2 extends WorkflowOprpt {
 	public function routeToApprover() {
-		$users = $this->getUserByControlRight(array('YN06'), true);//權限問題，07還原成06（沈超修改）
+		$users = $this->getUserByControlRight(array('YN07'), true);//權限問題，07還原成06（沈超修改）, Percy再修改, 07才是正確數值
 		if (empty($users)) {
 			$user = $this->getRequestData('REQ_USER');
 			$this->assignRespUser($user);

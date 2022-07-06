@@ -651,7 +651,7 @@ class RankingMonthForm extends CFormModel
 	public function retrieveData($index,$rank=0)
 	{
         $suffix = Yii::app()->params['envSuffix'];
-        $row = Yii::app()->db->createCommand()->select("a.*,b.code as employee_code,b.name as employee_name")->from("opr_technician_rank a")
+        $row = Yii::app()->db->createCommand()->select("a.*,b.city as employee_city,b.code as employee_code,b.name as employee_name")->from("opr_technician_rank a")
             ->leftJoin("hr$suffix.hr_employee b","a.employee_id=b.id")
             ->where("a.id=:id",array(":id"=>$index))->queryRow();
 		if ($row) {
@@ -660,6 +660,7 @@ class RankingMonthForm extends CFormModel
 			$this->rank = $rank;
 			$this->name = $row['employee_name']."({$row['employee_code']})";
 			$this->employee_id = $row['employee_id'];
+			$this->city = $row['employee_city'];
 			$this->employee_code = $row['employee_code'];
 			$this->employee_name = $row['employee_name'];
 			$this->rank_year = $row['rank_year'];

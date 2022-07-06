@@ -72,6 +72,12 @@ $this->pageTitle=Yii::app()->name . ' - RankingYear Form';
                     ); ?>
                 </div>
             </div>
+            <div class="form-group">
+                <?php echo TbHtml::label(Yii::t("rank","city"),"",array('class'=>"col-lg-2 control-label")); ?>
+                <div class="col-lg-3">
+                    <?php echo TbHtml::textField("city",General::getCityName($model->city),array('readonly'=>(true)));?>
+                </div>
+            </div>
             <?php
             foreach (RankingMonthForm::$sqlDate as $item=>$rule){
                 echo '<div class="form-group">';

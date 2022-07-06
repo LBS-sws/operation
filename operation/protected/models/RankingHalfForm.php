@@ -67,7 +67,7 @@ class RankingHalfForm extends CFormModel
             }
         }
         $row=Yii::app()->db->createCommand()
-            ->select("a.employee_id,sum(a.other_score) as other_score,b.code,b.name,f.name as city_name{$selectSql}")
+            ->select("a.employee_id,sum(a.other_score) as other_score,b.city as employee_city,b.code,b.name,f.name as city_name{$selectSql}")
             ->from("opr_technician_rank a")
             ->leftJoin("hr$suffix.hr_employee b","a.employee_id = b.id")
             ->leftJoin("security$suffix.sec_city f","b.city = f.code")
@@ -80,6 +80,7 @@ class RankingHalfForm extends CFormModel
 			$this->employee_id = $row['employee_id'];
 			$this->employee_code = $row['code'];
 			$this->employee_name = $row['name'];
+            $this->city = $row['employee_city'];
 			$this->rank_year = $year;
 			$this->rank_month = $month;
 			$this->score_sum = 0;

@@ -98,5 +98,6 @@ return array(
     "13. Xidiyi sales: 100 cents per barrel (free delivery does not count)"=>"13、洗地易销售:每桶100分 (免费送的不算)",
     "12, introduce new business: order: 500 points/order"=>"12、介绍新生意:成单: 500分/单",
 
+    'go back'=>'返回排行榜',
 );
 ?>

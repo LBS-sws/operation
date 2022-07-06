@@ -23,6 +23,15 @@ $this->pageTitle=Yii::app()->name . ' - RankingMonth';
 </section>
 
 <section class="content">
+    <div class="box">
+        <div class="box-body">
+            <div class="btn-group pull-right" role="group">
+                <?php
+                echo TbHtml::link(Yii::t("rank","go back"),Yii::app()->createUrl(''),array("class"=>"btn btn-default"));
+                ?>
+            </div>
+        </div>
+    </div>
 	<?php
     $modelClass=get_class($model);
     $search_add_html="";

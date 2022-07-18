@@ -25,6 +25,6 @@ class ReportY06Form extends CReportForm
 		$this->fields = 'year_no,month_no';
 		$this->year = date("Y");
 		$this->month = date("m");
-		$this->hq = Yii::app()->user->validFunction('YN06') ? 'Y' : 'N';
+		$this->hq = Yii::app()->user->validFunction('YN07') ? 'Y' : 'N';
 	}
 }

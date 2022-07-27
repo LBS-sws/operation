@@ -24,11 +24,11 @@ class ServiceDeductController extends Controller
 	{
 		return array(
 			array('allow', 
-				'actions'=>array('new','edit','delete','save'),
+				'actions'=>array('new','edit','delete','save','fileupload','fileRemove'),
 				'expression'=>array('ServiceDeductController','allowReadWrite'),
 			),
 			array('allow', 
-				'actions'=>array('index','view'),
+				'actions'=>array('index','view','fileDownload'),
 				'expression'=>array('ServiceDeductController','allowReadOnly'),
 			),
 			array('deny',  // deny all users
@@ -116,8 +116,50 @@ class ServiceDeductController extends Controller
 			}
 		}
 	}
-	
-	public static function allowReadWrite() {
+
+    public function actionFileupload($doctype) {
+        $model = new ServiceDeductForm();
+        if (isset($_POST['ServiceDeductForm'])) {
+            $model->attributes = $_POST['ServiceDeductForm'];
+
+            $id = ($_POST['ServiceDeductForm']['scenario']=='new') ? 0 : $model->id;
+            $docman = new DocMan($doctype,$id,get_class($model));
+            $docman->masterId = $model->docMasterId[strtolower($doctype)];
+            if (isset($_FILES[$docman->inputName])) $docman->files = $_FILES[$docman->inputName];
+            $docman->fileUpload();
+            echo $docman->genTableFileList(false);
+        } else {
+            echo "NIL";
+        }
+    }
+
+    public function actionFileRemove($doctype) {
+        $model = new ServiceDeductForm();
+        if (isset($_POST['ServiceDeductForm'])) {
+            $model->attributes = $_POST['ServiceDeductForm'];
+
+            $docman = new DocMan($doctype,$model->id,'ServiceDeductForm');
+            $docman->masterId = $model->docMasterId[strtolower($doctype)];
+            $docman->fileRemove($model->removeFileId[strtolower($doctype)]);
+            echo $docman->genTableFileList(false);
+        } else {
+            echo "NIL";
+        }
+    }
+
+    public function actionFileDownload($mastId, $docId, $fileId, $doctype) {
+        $sql = "select id from opr_service_deduct where id = $docId";
+        $row = Yii::app()->db->createCommand($sql)->queryRow();
+        if ($row!==false) {
+            $docman = new DocMan($doctype,$docId,'ServiceDeductForm');
+            $docman->masterId = $mastId;
+            $docman->fileDownload($fileId);
+        } else {
+            throw new CHttpException(404,'Record not found.');
+        }
+    }
+
+    public static function allowReadWrite() {
 		return Yii::app()->user->validRWFunction('TL07');
 	}
 	

@@ -14,6 +14,18 @@ class ServiceDeductForm extends CFormModel
 	public $score_num;
 	public $remark;
 
+    public $no_of_attm = array(
+        'dedu'=>0
+    );
+    public $docType = 'DEDU';
+    public $docMasterId = array(
+        'dedu'=>0
+    );
+    public $files;
+    public $removeFileId = array(
+        'dedu'=>0
+    );
+
 	/**
 	 * Declares customized attribute labels.
 	 * If not declared here, an attribute would have a label that is
@@ -45,6 +57,7 @@ class ServiceDeductForm extends CFormModel
 			array('employee_id,deduct_date,deduct_type','required'),
             array('id','validateID','on'=>array("delete")),
             array('deduct_date','validateDate'),
+            array('files, removeFileId, docMasterId, no_of_attm','safe'),
 		);
 	}
 
@@ -97,7 +110,9 @@ class ServiceDeductForm extends CFormModel
 	{
         $suffix = Yii::app()->params['envSuffix'];
         $city_allow = Yii::app()->user->city_allow();
-        $row = Yii::app()->db->createCommand()->select("a.*")->from("opr_service_deduct a")
+        $row = Yii::app()->db->createCommand()
+            ->select("a.*,docman$suffix.countdoc('DEDU',a.id) as dedudoc")
+            ->from("opr_service_deduct a")
             ->leftJoin("hr$suffix.hr_employee b","a.employee_id=b.id")
             ->where("a.id=:id and b.city in ($city_allow)",array(":id"=>$index))->queryRow();
 		if ($row) {
@@ -109,6 +124,7 @@ class ServiceDeductForm extends CFormModel
 			$this->deduct_date = CGeneral::toDate($row['deduct_date']);
 			$this->deduct_type = $row['deduct_type'];
 			$this->remark = $row['remark'];
+            $this->no_of_attm['dedu'] = $row['dedudoc'];
             return true;
 		}else{
 		    return false;
@@ -121,6 +137,7 @@ class ServiceDeductForm extends CFormModel
 		$transaction=$connection->beginTransaction();
 		try {
 			$this->saveDataForSql($connection);
+            $this->updateDocman($connection,'DEDU');
 			$transaction->commit();
 		}
 		catch(Exception $e) {
@@ -129,6 +146,18 @@ class ServiceDeductForm extends CFormModel
 			throw new CHttpException(404,'Cannot update.');
 		}
 	}
+
+    protected function updateDocman(&$connection, $doctype) {
+        if ($this->scenario=='new') {
+            $docidx = strtolower($doctype);
+            if ($this->docMasterId[$docidx] > 0) {
+                $docman = new DocMan($doctype,$this->id,get_class($this));
+                $docman->masterId = $this->docMasterId[$docidx];
+                $docman->updateDocId($connection, $this->docMasterId[$docidx]);
+            }
+            $this->scenario = "edit";
+        }
+    }
 
 	protected function saveDataForSql(&$connection)
 	{

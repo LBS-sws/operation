@@ -49,6 +49,14 @@ $this->pageTitle=Yii::app()->name . ' - ServiceDeduct Form';
 	?>
 <?php endif ?>
 	</div>
+            <div class="btn-group pull-right" role="group">
+                <?php
+                $counter = ($model->no_of_attm['dedu'] > 0) ? ' <span id="docdedu" class="label label-info">'.$model->no_of_attm['dedu'].'</span>' : ' <span id="docdedu"></span>';
+                echo TbHtml::button('<span class="fa  fa-file-text-o"></span> '.Yii::t('misc','Attachment').$counter, array(
+                        'name'=>'btnFile','id'=>'btnFile','data-toggle'=>'modal','data-target'=>'#fileuploaddedu',)
+                );
+                ?>
+            </div>
 	</div></div>
 
 	<div class="box box-info">
@@ -113,8 +121,18 @@ $this->pageTitle=Yii::app()->name . ' - ServiceDeduct Form';
 		</div>
 	</div>
 </section>
+<?php $this->renderPartial('//site/fileupload',array('model'=>$model,
+    'form'=>$form,
+    'doctype'=>'DEDU',
+    'header'=>Yii::t('misc','Attachment'),
+    'ronly'=>($model->scenario=='view'),
+    //'delBtn'=>($model->scenario=='new'),
+));
+//$model->getInputBool()
+?>
 <?php $this->renderPartial('//site/removedialog'); ?>
 <?php
+Script::genFileUpload($model,$form->id,'DEDU');
 
 $js = "
 $('#deduct_type').change(function(){

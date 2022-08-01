@@ -12,7 +12,7 @@ class TimerCommand extends CConsoleCommand {
         //技术部综合排行榜更新
         $this->resetTechnicianRank();
         //技术员综合排行榜数据输入邮件提醒
-        //$this->hintRankToEmail();
+        $this->hintRankToEmail();
 
         echo "end\n";
     }

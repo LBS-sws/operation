@@ -1,5 +1,12 @@
+
+
+<?php if ($this->record['show']): ?>
 <tr class='clickable-row' data-href='<?php echo $this->getLink('TL01', 'rankingMonth/edit', 'rankingMonth/view', array('index'=>$this->record['id'],'rank'=>$this->record['rank']));?>'>
-	<td><?php echo $this->drawEditButton('TL01', 'rankingMonth/edit', 'rankingMonth/view', array('index'=>$this->record['id'],'rank'=>$this->record['rank'])); ?></td>
+    <td><?php echo $this->drawEditButton('TL01', 'rankingMonth/edit', 'rankingMonth/view', array('index'=>$this->record['id'],'rank'=>$this->record['rank'])); ?></td>
+<?php else: ?>
+<tr>
+    <td>&nbsp;</td>
+<?php endif ?>
 	<td><?php echo $this->record['rank']; ?></td>
 	<td><?php echo $this->record['name']; ?></td>
 	<td><?php echo $this->record['city_name']; ?></td>

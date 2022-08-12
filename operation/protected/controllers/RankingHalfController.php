@@ -49,6 +49,7 @@ class RankingHalfController extends Controller
 				$model->setCriteria($criteria);
 			}
 		}
+        RankingMonthList::setEmployeeToModel($model,$this->function_id);//唯獨權限只能看自己的列表
 		$model->determinePageNum($pageNum);
 		$model->retrieveDataByPage($model->pageNum);
 		$this->render('index',array('model'=>$model));

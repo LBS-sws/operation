@@ -5,6 +5,7 @@ class RankingMonthList extends CListPageModel
     public $year;
     public $month;
     public $allCity=0;
+    public $staff_id;
 
 
     public function rules()
@@ -113,6 +114,7 @@ class RankingMonthList extends CListPageModel
                 $rank++;
                 $this->attr[] = array(
                     'id'=>$record['id'],
+                    'show'=>$this->staff_id===0||$this->staff_id==$record["employee_id"]?true:false,
                     'rank'=>$rank,
                     'rank_year'=>$record['rank_year'].Yii::t("rank","year unit"),
                     'rank_month'=>$record['rank_month'].Yii::t("rank","month unit"),
@@ -149,6 +151,22 @@ class RankingMonthList extends CListPageModel
             return $arr[$type];
         }else{
 	        return "rankingMonth";
+        }
+    }
+
+    public static function setEmployeeToModel(&$model,$function_id){
+        $model->staff_id=-1;
+        if(Yii::app()->user->validRWFunction($function_id)){ //讀寫權限
+            $model->staff_id=0;
+        }else{//唯獨權限
+            $suffix = Yii::app()->params['envSuffix'];
+            $uid = Yii::app()->user->id;
+            $row = Yii::app()->db->createCommand()->select("employee_id")
+                ->from("hr$suffix.hr_binding")
+                ->where('user_id=:user_id',array(':user_id'=>$uid))->queryRow();
+            if($row){
+                $model->staff_id=$row["employee_id"];
+            }
         }
     }
 }

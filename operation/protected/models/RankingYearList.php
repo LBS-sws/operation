@@ -5,6 +5,7 @@ class RankingYearList extends CListPageModel
     public $year;
     public $month;
     public $allCity=0;
+    public $staff_id;
 
 
     public function rules()
@@ -94,6 +95,7 @@ class RankingYearList extends CListPageModel
 			foreach ($records as $k=>$record) {
                 $this->attr[] = array(
                     'id'=>$record['employee_id'],
+                    'show'=>$this->staff_id===0||$this->staff_id==$record["employee_id"]?true:false,
                     'year'=>$this->year,
                     'month'=>$this->month,
                     'rank'=>$rank+$k+1,

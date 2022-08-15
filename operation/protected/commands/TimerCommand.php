@@ -30,6 +30,13 @@ class TimerCommand extends CConsoleCommand {
         }
         $model = new RankingMonthForm();
         $model->insertTechnician($year,$month,true);//刷新技術員排行榜
+        //还需要刷新上个月的数据
+        $month--;
+        if($month==0){
+            $month=12;
+            $year--;
+        }
+        $model->insertTechnician($year,$month,true);//刷新技術員排行榜
     }
 
     //技术员综合排行榜数据输入邮件提醒

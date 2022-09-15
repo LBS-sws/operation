@@ -90,6 +90,7 @@ return array(
 '6 months'=>'6個月內',
 '1 year'=>'1年內',
 'Your ranking is:'=>'你當前的段位為:',
+'Rollback'=>'退回草稿',
 );
 
 ?>

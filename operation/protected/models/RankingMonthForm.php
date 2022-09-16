@@ -165,21 +165,23 @@ class RankingMonthForm extends CFormModel
 
     //表揚信得分
     private function prize_num($year,$month,$employee_id){
+        //錦旗的日期由嘉許日期改成錄入日期（2022-09-16修改）prize_date改成lcd
         $suffix = Yii::app()->params['envSuffix'];
         $score=Yii::app()->db->createCommand()->select("count(id)")->from("hr{$suffix}.hr_prize")
-            ->where("status=3 and prize_date between '$this->startDate' and '$this->endDate' and employee_id=:id",
+            ->where("status=3 and lcd between '$this->startDate' and '$this->endDate' and employee_id=:id",
                 array(":id"=>$employee_id))->queryScalar();
         return is_numeric($score)?floatval($score)*100:0;
     }
 
     //表揚信得分table
     private function prize_num_table(){
+        //錦旗的日期由嘉許日期改成錄入日期（2022-09-16修改）prize_date改成lcd
         $suffix = Yii::app()->params['envSuffix'];
-        $rows=Yii::app()->db->createCommand()->select("id,prize_date,prize_pro,prize_type")->from("hr{$suffix}.hr_prize")
-            ->where("status=3 and prize_date between '$this->startDate' and '$this->endDate' and employee_id=:id",
+        $rows=Yii::app()->db->createCommand()->select("id,lcd,prize_pro,prize_type")->from("hr{$suffix}.hr_prize")
+            ->where("status=3 and lcd between '$this->startDate' and '$this->endDate' and employee_id=:id",
                 array(":id"=>$this->employee_id))->queryAll();
         $html = "<thead>";
-        $html.="<tr><th>员工编号</th><th>员工姓名</th><th>嘉许项目</th><th>客户奖励</th><th>嘉许日期</th><th>得分</th></tr>";
+        $html.="<tr><th>员工编号</th><th>员工姓名</th><th>嘉许项目</th><th>客户奖励</th><th>录入日期</th><th>得分</th></tr>";
         $html.= "</thead><tbody>";
         if($rows){
             $list = array(
@@ -190,8 +192,9 @@ class RankingMonthForm extends CFormModel
             foreach ($rows as $row){
                 $row["prize_pro"] = key_exists($row["prize_pro"],$list)?$list[$row["prize_pro"]]:"";
                 $row["prize_type"] = $row["prize_type"]==1?"锦旗":"表扬信";
+                $row["lcd"] = CGeneral::toMyDate($row["lcd"]);
                 $row["score_num"] = 100;
-                $html.="<tr data-id='{$row["id"]}'><td>{$this->employee_code}</td><td>{$this->employee_name}</td><td>{$row['prize_pro']}</td><td>{$row['prize_type']}</td><td>{$row['prize_date']}</td><td>{$row['score_num']}</td></tr>";
+                $html.="<tr data-id='{$row["id"]}'><td>{$this->employee_code}</td><td>{$this->employee_name}</td><td>{$row['prize_pro']}</td><td>{$row['prize_type']}</td><td>{$row['lcd']}</td><td>{$row['score_num']}</td></tr>";
             }
         }else{
             $html.="<tr><td colspan='6'>无</td></tr>";

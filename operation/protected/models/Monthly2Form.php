@@ -285,7 +285,7 @@ class Monthly2Form extends CFormModel
 		$connection = $wf->openConnection();
 		try {
 			if ($wf->startProcess('OPRPT2',$this->id,$this->lcd)) {
-				$wf->clearWorkflow();
+				$wf->clearFlow();
 			}
 			$wf->transaction->commit();
 		}

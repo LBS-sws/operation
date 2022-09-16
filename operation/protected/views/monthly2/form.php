@@ -37,6 +37,11 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form - ID';
 			'submit'=>Yii::app()->createUrl('monthly2/resubmit'))); 
 		?>
 <?php endif ?>
+<?php if ($model->wfstatus=='ED' && Yii::app()->user->validFunction('YN01')): ?>
+		<?php echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('misc','Rollback'), array(
+			'submit'=>Yii::app()->createUrl('monthly2/rollback'),)); 
+		?>
+<?php endif ?>
 <?php if ($model->wfstatus=='PA' && Yii::app()->user->validFunction('YN07')): ?>
 		<?php echo TbHtml::button('<span class="fa fa-check"></span> '.Yii::t('misc','Approve'), array(
 			'submit'=>Yii::app()->createUrl('monthly2/accept')));

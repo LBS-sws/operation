@@ -280,6 +280,21 @@ class Monthly2Form extends CFormModel
 		}
 	}
 
+	public function clearWorkflow() {
+		$wf = new WorkflowOprpt2;
+		$connection = $wf->openConnection();
+		try {
+			if ($wf->startProcess('OPRPT2',$this->id,$this->lcd)) {
+				$wf->clearFlow();
+			}
+			$wf->transaction->commit();
+		}
+		catch(Exception $e) {
+			$wf->transaction->rollback();
+			throw new CHttpException(404,'Cannot update.'.$e->getMessage());
+		}
+	}
+
 	public function saveData()
 	{
 		$connection = Yii::app()->db;

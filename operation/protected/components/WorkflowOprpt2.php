@@ -228,5 +228,14 @@ class WorkflowOprpt2 extends WorkflowOprpt {
 		$rtn[] = $this->emailGeneric($v);
 		return $rtn;
 	}
+	
+	public function clearFlow() {
+		$suffix = Yii::app()->params['envSuffix'];
+		$reqId = $this->request_id;
+		$this->connection->createCommand("delete from workflow$suffix.wf_request_data where request_id=$reqId")->execute();
+		$this->connection->createCommand("delete from workflow$suffix.wf_request_resp_user where request_id=$reqId")->execute();
+		$this->connection->createCommand("delete from workflow$suffix.wf_request_transit_log where request_id=$reqId")->execute();
+		$this->connection->createCommand("delete from workflow$suffix.wf_request where id=$reqId")->execute();
+	}
 }
 ?>

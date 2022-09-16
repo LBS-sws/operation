@@ -22,7 +22,7 @@ class Monthly2Controller extends Controller
 	{
 		return array(
 			array('allow', 
-				'actions'=>array('edit','save','submit','resubmit','fileupload','fileremove'),
+				'actions'=>array('edit','save','submit','resubmit','fileupload','fileremove','rollback'),
 				'expression'=>array('Monthly2Controller','allowReadWrite'),
 			),
 			array('allow', 
@@ -120,6 +120,17 @@ class Monthly2Controller extends Controller
 		$model->determinePageNum($pageNum);
 		$model->retrieveDataByPage($model->pageNum);
 		$this->render('indexa',array('model'=>$model));
+	}
+
+	public function actionRollback()
+	{
+		if (isset($_POST['Monthly2Form'])) {
+			$model = new Monthly2Form($_POST['Monthly2Form']['scenario']);
+			$model->attributes = $_POST['Monthly2Form'];
+			$model->clearWorkflow();
+			Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Rollback Done'));
+			$this->redirect(Yii::app()->createUrl('monthly2/view',array('index'=>$model->id,'rtn'=>$model->listform)));
+		}
 	}
 
 	public function actionAccept()

@@ -69,7 +69,7 @@ $this->pageTitle=Yii::app()->name . ' - ServiceNew Form';
 			<div class="form-group">
 				<?php echo $form->labelEx($model,'employee_id',array('class'=>"col-lg-2 control-label")); ?>
 				<div class="col-lg-5">
-				<?php echo $form->dropDownList($model, 'employee_id',ServiceMoneyForm::getEmployeeList($model->employee_id),
+				<?php echo $form->dropDownList($model, 'employee_id',ServiceMoneyForm::getEmployeeListNow($model->employee_id),
 					array('id'=>'name','readonly'=>($model->scenario!='new'))
 				); ?>
 				</div>

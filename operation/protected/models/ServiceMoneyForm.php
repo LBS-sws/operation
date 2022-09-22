@@ -226,6 +226,22 @@ class ServiceMoneyForm extends CFormModel
         return $list;
     }
 
+    public static function getEmployeeListNow($id=0){
+        $suffix = Yii::app()->params['envSuffix'];
+        $city_allow = Yii::app()->user->city_allow();
+        $id = empty($id)?0:$id;
+        $list = array(""=>"");
+        $rows = Yii::app()->db->createCommand()->select("a.id,a.code,a.name")->from("hr$suffix.hr_employee a")
+            ->leftJoin("hr$suffix.hr_dept b","a.position=b.id")
+            ->where("(a.staff_status=0 and b.review_status=1 and b.review_type=2 and a.city in ($city_allow)) or a.id=:id",array(":id"=>$id))->order("a.name asc")->queryAll();
+        if($rows){
+            foreach ($rows as $row){
+                $list[$row["id"]] = $row["name"]." ({$row["code"]})";
+            }
+        }
+        return $list;
+    }
+
     public static function getEmployeeCodeList(){
         $suffix = Yii::app()->params['envSuffix'];
         $list = array();

@@ -38,6 +38,7 @@ $this->pageTitle=Yii::app()->name . ' - RankingHalf Form';
 		<div class="box-body">
 			<?php echo $form->hiddenField($model, 'scenario'); ?>
 			<?php echo $form->hiddenField($model, 'id'); ?>
+			<?php echo $form->hiddenField($model, 'rank_month'); ?>
 
             <div class="form-group">
                 <?php echo $form->labelEx($model,'rank',array('class'=>"col-lg-2 control-label")); ?>
@@ -57,11 +58,15 @@ $this->pageTitle=Yii::app()->name . ' - RankingHalf Form';
                 </div>
             </div>
             <div class="form-group">
-                <?php echo $form->labelEx($model,'rank_month',array('class'=>"col-lg-2 control-label")); ?>
+                <?php
+                echo TbHtml::label(Yii::t("rank","semi-annual"),'rank_month',array('class'=>"col-lg-2 control-label"));
+                ?>
                 <div class="col-lg-3">
-                    <?php echo $form->textField($model, 'rank_month',
+                    <?php
+                    echo TbHtml::textField("rank_month",RankingHalfList::getHalfList($model->rank_month,true),
                         array('readonly'=>(true))
-                    ); ?>
+                    );
+                    ?>
                 </div>
             </div>
             <div class="form-group">

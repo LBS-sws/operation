@@ -101,7 +101,7 @@ class RankingYearList extends CListPageModel
                     'rank'=>$rank+$k+1,
                     'rank_year'=>$this->year.Yii::t("rank","year unit"),
                     'rank_month'=>"1-12".Yii::t("rank","month unit"),
-                    'score_sum'=>floatval($record['score_sum']),
+                    'score_sum'=>round($record['score_sum'],2),
                     'name'=>$record['name']." ({$record['code']})",
                     'city_name'=>$record['city_name'],
                 );

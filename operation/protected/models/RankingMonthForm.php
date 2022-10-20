@@ -386,11 +386,14 @@ class RankingMonthForm extends CFormModel
 
     //推薦人得分
     private function recommend_num($year,$month,$employee_id){
+        //新入职的员工必须满足：1、职位类别：服务 2、技术员：是 3、评核类型：技术员（2022-10-20新加的逻辑）
         $startDate = date("Y/m/d",strtotime($this->startDate."-3 months"));
         $endDate = date("Y/m/d",strtotime($this->endDate."-3 months"));
         $suffix = Yii::app()->params['envSuffix'];
-        $score = Yii::app()->db->createCommand()->select("count(id)")->from("hr{$suffix}.hr_employee")
-            ->where("staff_status!=-1 and recommend_user=:id and replace(entry_time,'-', '/') between '$startDate' and '$endDate'",
+        $score = Yii::app()->db->createCommand()->select("count(a.id)")
+            ->from("hr{$suffix}.hr_employee a")
+            ->leftJoin("hr{$suffix}.hr_dept b","a.position=b.id")
+            ->where("b.dept_class='Technician' and b.technician=1 and b.review_type=2 and a.recommend_user=:id and replace(a.entry_time,'-', '/') between '$startDate' and '$endDate'",
                 array(":id"=>$employee_id))->queryScalar();
         return is_numeric($score)?floatval($score)*500:0;
     }

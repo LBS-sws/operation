@@ -403,8 +403,10 @@ class RankingMonthForm extends CFormModel
         $startDate = date("Y/m/d",strtotime($this->startDate."-3 months"));
         $endDate = date("Y/m/d",strtotime($this->endDate."-3 months"));
         $suffix = Yii::app()->params['envSuffix'];
-        $rows = Yii::app()->db->createCommand()->select("id,code,name,entry_time")->from("hr{$suffix}.hr_employee")
-            ->where("staff_status!=-1 and recommend_user=:id and replace(entry_time,'-', '/') between '$startDate' and '$endDate'",
+        $rows = Yii::app()->db->createCommand()->select("a.id,a.code,a.name,a.entry_time")
+            ->from("hr{$suffix}.hr_employee a")
+            ->leftJoin("hr{$suffix}.hr_dept b","a.position=b.id")
+            ->where("b.dept_class='Technician' and b.technician=1 and b.review_type=2 and a.recommend_user=:id and replace(a.entry_time,'-', '/') between '$startDate' and '$endDate'",
                 array(":id"=>$this->employee_id))->queryAll();
         $html = "<thead>";
         $html.="<tr><th>推荐人编号</th><th>推荐人姓名</th><th>员工编号</th><th>员工姓名</th><th>入职时间</th><th>得分</th></tr>";

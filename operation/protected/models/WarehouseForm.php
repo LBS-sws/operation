@@ -157,7 +157,7 @@ class WarehouseForm extends CFormModel
         $selectClass = key_exists("class",$htmlArr)?$htmlArr["class"]:"";
         $readonly = key_exists("readonly",$htmlArr)&&$htmlArr["readonly"]?"readonly":"";
         $html = "<select id='{$className}' name='{$className}' {$readonly} class='form-control {$selectClass}'>";
-        $html.="<option value='' data-class=''></option>";
+        $html.="<option value='' data-class=''>".Yii::t("misc","All")."</option>";
         if($rows){
             foreach ($rows as $row){
                 $dataOption = "";

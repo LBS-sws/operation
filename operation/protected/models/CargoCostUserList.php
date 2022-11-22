@@ -96,7 +96,7 @@ class CargoCostUserList extends CListPageModel
         $this->attr = array();
         if (count($records) > 0) {
             foreach ($records as $k=>$record) {
-                $this->attr[] = array(
+                $row = array(
                     'id'=>$record['id'],
                     'order_code'=>$record['order_code'],
                     'goods_list'=>WarehouseForm::getGoodsListToId($record['id']),
@@ -108,6 +108,10 @@ class CargoCostUserList extends CListPageModel
                     'lcu'=>$record['disp_name'],
                     'lcd'=>date("Y-m-d",strtotime($record['lcd'])),
                 );
+                Yii::app()->db->createCommand()->update("opr_order",array(
+                    "total_price"=>$row["total_price"]
+                ),"id=:id",array("id"=>$row["id"]));//2022/11/22修改（由于价格可以随意变动，所以需要刷新)
+                $this->attr[]=$row;
             }
         }
         $session = Yii::app()->session;

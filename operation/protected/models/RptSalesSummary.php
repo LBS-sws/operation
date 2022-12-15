@@ -58,7 +58,7 @@ class RptSalesSummary extends CReport {
 					left outer join opr_monthly_dtl e on a.id=e.hdr_id and e.data_field='10004'
 					left outer join opr_monthly_dtl f on a.id=f.hdr_id and f.data_field='10005'
 					left outer join opr_monthly_dtl g on a.id=g.hdr_id and g.data_field='10006'
-					left outer join opr_monthly_dtl h on a.id=g.hdr_id and g.data_field='100055'
+					left outer join opr_monthly_dtl h on a.id=h.hdr_id and h.data_field='100055'
 				where a.year_no=$year and a.month_no<=$month and a.group_id=1 and
 					a.city in ($list)
 				order by h.region, a.city, a.year_no, a.month_no 
@@ -119,7 +119,7 @@ class RptSalesSummary extends CReport {
 		$this->excel->start();
 		
 		$this->excel->newFile();
-		for ($sht=1; $sht<=12; $sht++) {
+		for ($sht=1; $sht<=5; $sht++) {
 			if ($sht>1) {
 				$this->excel->createSheet();
 				$this->excel->setActiveSheet($sht-1);
@@ -131,6 +131,7 @@ class RptSalesSummary extends CReport {
 			if ($sht==5) $sheetname = $this->labels['gres'];
 
             //$val = $cln(10001)+$pc(10002)+$misc(10003)+$ppr(10006)+$gres(100055)+$puri(10004)+$meth(10005);
+            //调试专用（开始）
 			if ($sht==6) $sheetname = "10001(清洁)";
 			if ($sht==7) $sheetname = "10002(灭虫)";
 			if ($sht==8) $sheetname = "10003(杂项及其他)";
@@ -138,6 +139,7 @@ class RptSalesSummary extends CReport {
 			if ($sht==10) $sheetname = "100055(隔油池)";
 			if ($sht==11) $sheetname = "10004(飘盈香)";
 			if ($sht==12) $sheetname = "10005(甲醛)";
+            //调试专用（结束）
 
 			$this->excel->getActiveSheet()->setTitle($sheetname);
 			$this->excel->setReportDefaultFormat();

@@ -48,7 +48,7 @@ class RptSalesSummary extends CReport {
 		$sql = "select a.*, h.region, h.name as city_name, 
 					b.data_value as cln, c.data_value as pc, d.data_value as misc,
 					e.data_value as puri, f.data_value as meth, g.data_value as ppr,
-					h.data_value as gres,
+					h.data_value as gres,i.data_value as name10008,j.data_value as name10011,
 					workflow$suffix.RequestStatus('OPRPT',a.id,a.lcd) as wfstatus
 				from opr_monthly_hdr a 
 					inner join security$suffix.sec_city h on a.city=h.code 
@@ -59,6 +59,8 @@ class RptSalesSummary extends CReport {
 					left outer join opr_monthly_dtl f on a.id=f.hdr_id and f.data_field='10005'
 					left outer join opr_monthly_dtl g on a.id=g.hdr_id and g.data_field='10006'
 					left outer join opr_monthly_dtl h on a.id=h.hdr_id and h.data_field='100055'
+					left outer join opr_monthly_dtl i on a.id=i.hdr_id and i.data_field='10008' 
+					left outer join opr_monthly_dtl j on a.id=j.hdr_id and j.data_field='10011'
 				where a.year_no=$year and a.month_no<=$month and a.group_id=1 and
 					a.city in ($list)
 				order by h.region, a.city, a.year_no, a.month_no 
@@ -87,6 +89,8 @@ class RptSalesSummary extends CReport {
 					$row['meth'] = 0;
 					$row['gres'] = 0;
 					$row['ppr'] = 0;
+					$row['name10008'] = 0;
+					$row['name10011'] = 0;
 				}
 				
 				$detail[] = $row;
@@ -219,9 +223,12 @@ class RptSalesSummary extends CReport {
 				$meth = empty($row['meth']) ? 0 : $row['meth'];
 				$ppr = empty($row['ppr']) ? 0 : $row['ppr'];
 				$gres = empty($row['gres']) ? 0 : $row['gres'];
-			
-				if ($type==1) $val = $cln + $pc + $misc + $puri + $meth + $ppr + $gres;
-				if ($type==2) $val = $cln + $pc + $misc + $ppr + $gres;
+				$name10008 = empty($row['name10008']) ? 0 : $row['name10008'];
+				$name10011 = empty($row['name10011']) ? 0 : $row['name10011'];
+
+				if ($type==1) $val = $name10011;
+				//if ($type==2) $val = $cln + $pc + $misc + $ppr + $gres;
+				if ($type==2) $val = $cln + $pc + $misc + $name10008;
 				if ($type==3) $val = $puri;
 				if ($type==4) $val = $meth;
 				if ($type==5) $val = $gres;

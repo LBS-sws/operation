@@ -119,7 +119,7 @@ class RptSalesSummary extends CReport {
 		$this->excel->start();
 		
 		$this->excel->newFile();
-		for ($sht=1; $sht<=5; $sht++) {
+		for ($sht=1; $sht<=12; $sht++) {
 			if ($sht>1) {
 				$this->excel->createSheet();
 				$this->excel->setActiveSheet($sht-1);

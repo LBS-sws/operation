@@ -18,12 +18,14 @@ class RptSalesSummary extends CReport {
 				'clean'=>Yii::t('report','Clean_PC_Misc_Paper'),
 				'puri'=>Yii::t('report','Puriscent'),
 				'meth'=>Yii::t('report','Formaldehye'),
+				'gres'=>Yii::t('report','Grease trap'),
 				'rptname'=>Yii::t('report','Sales Summary Report'),
 			);
 		$this->retrieveData();
 		return $this->printReport();
 	}
-		public function retrieveData() {
+	
+	public function retrieveData() {
 		$this->year = $this->criteria['YEAR'];
 		$year = $this->year;
 		$this->month = $this->criteria['MONTH'];
@@ -84,6 +86,7 @@ class RptSalesSummary extends CReport {
 					$row['misc'] = 0;
 					$row['puri'] = 0;
 					$row['meth'] = 0;
+					$row['gres'] = 0;
 					$row['ppr'] = 0;
 				}
 				
@@ -95,7 +98,8 @@ class RptSalesSummary extends CReport {
 			
 			$this->data = $temp;
 		}
-		return (count($rows) > 0);	}
+		return (count($rows) > 0);
+	}
 
 	public function getReportName() {
 		$city_name = isset($this->criteria) ? ' - '.General::getCityName($this->criteria['CITY']) : '';
@@ -116,7 +120,7 @@ class RptSalesSummary extends CReport {
 		$this->excel->start();
 		
 		$this->excel->newFile();
-		for ($sht=1; $sht<=4; $sht++) {
+		for ($sht=1; $sht<=5; $sht++) {
 			if ($sht>1) {
 				$this->excel->createSheet();
 				$this->excel->setActiveSheet($sht-1);
@@ -125,6 +129,7 @@ class RptSalesSummary extends CReport {
 			if ($sht==2) $sheetname = $this->labels['clean'];
 			if ($sht==3) $sheetname = $this->labels['puri'];
 			if ($sht==4) $sheetname = $this->labels['meth'];
+			if ($sht==5) $sheetname = $this->labels['gres'];
 
 			$this->excel->getActiveSheet()->setTitle($sheetname);
 			$this->excel->setReportDefaultFormat();
@@ -209,7 +214,8 @@ class RptSalesSummary extends CReport {
 				if ($type==2) $val = $cln + $pc + $misc + $ppr + $gres;
 				if ($type==3) $val = $puri;
 				if ($type==4) $val = $meth;
-			
+				if ($type==5) $val = $gres;
+
 				$this->excel->writeCell($x, $y, $val, array('align'=>'R'));
 				$this->excel->setCellStyle($x, $y, array('numberformat'=>'#,##0.00'));
 			}

@@ -40,6 +40,7 @@ return array(
 'Clean_PC_Misc_Paper'=>'清潔_滅蟲_雜項_紙品',
 'Puriscent'=>'飄盈香',
 'Formaldehye'=>'甲醛',
+    'Grease trap'=>'隔油池',
 
 'Goods'=>'物品',
 'HQ Approved Date'=>'總部審批日期',

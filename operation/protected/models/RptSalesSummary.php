@@ -60,7 +60,7 @@ class RptSalesSummary extends CReport {
 					left outer join opr_monthly_dtl f on a.id=f.hdr_id and f.data_field='10005'
 					left outer join opr_monthly_dtl g on a.id=g.hdr_id and g.data_field='10006'
 					left outer join opr_monthly_dtl h on a.id=g.hdr_id and g.data_field='100055'
-				where a.year_no=$year and a.month_no<=$month and
+				where a.year_no=$year and a.month_no<=$month and group_id=1 and
 					a.city in ($list)
 				order by h.region, a.city, a.year_no, a.month_no 
 			";

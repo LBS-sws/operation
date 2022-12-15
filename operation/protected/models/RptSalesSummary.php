@@ -45,7 +45,6 @@ class RptSalesSummary extends CReport {
 		foreach ($citylist as $key=>$value) {
 			$list .= (empty($list) ? '' : ',')."'".$key."'";
 		}
-		
 		$sql = "select a.*, h.region, h.name as city_name, 
 					b.data_value as cln, c.data_value as pc, d.data_value as misc,
 					e.data_value as puri, f.data_value as meth, g.data_value as ppr,
@@ -60,7 +59,7 @@ class RptSalesSummary extends CReport {
 					left outer join opr_monthly_dtl f on a.id=f.hdr_id and f.data_field='10005'
 					left outer join opr_monthly_dtl g on a.id=g.hdr_id and g.data_field='10006'
 					left outer join opr_monthly_dtl h on a.id=g.hdr_id and g.data_field='100055'
-				where a.year_no=$year and a.month_no<=$month and group_id=1 and
+				where a.year_no=$year and a.month_no<=$month and a.group_id=1 and
 					a.city in ($list)
 				order by h.region, a.city, a.year_no, a.month_no 
 			";
@@ -130,6 +129,15 @@ class RptSalesSummary extends CReport {
 			if ($sht==3) $sheetname = $this->labels['puri'];
 			if ($sht==4) $sheetname = $this->labels['meth'];
 			if ($sht==5) $sheetname = $this->labels['gres'];
+
+            //$val = $cln(10001)+$pc(10002)+$misc(10003)+$ppr(10006)+$gres(100055)+$puri(10004)+$meth(10005);
+			if ($sht==6) $sheetname = "10001(清洁)";
+			if ($sht==7) $sheetname = "10002(灭虫)";
+			if ($sht==8) $sheetname = "10003(杂项及其他)";
+			if ($sht==9) $sheetname = "10006(服务费收入合共)";
+			if ($sht==10) $sheetname = "100055(隔油池)";
+			if ($sht==11) $sheetname = "10004(飘盈香)";
+			if ($sht==12) $sheetname = "10005(甲醛)";
 
 			$this->excel->getActiveSheet()->setTitle($sheetname);
 			$this->excel->setReportDefaultFormat();
@@ -215,6 +223,14 @@ class RptSalesSummary extends CReport {
 				if ($type==3) $val = $puri;
 				if ($type==4) $val = $meth;
 				if ($type==5) $val = $gres;
+                //$val = $cln(10001)+$pc(10002)+$misc(10003)+$ppr(10006)+$gres(100055)+$puri(10004)+$meth(10005);
+                if ($type==6) $val = $cln;
+                if ($type==7) $val = $pc;
+                if ($type==8) $val = $misc;
+                if ($type==9) $val = $ppr;
+                if ($type==10) $val = $gres;
+                if ($type==11) $val = $puri;
+                if ($type==12) $val = $meth;
 
 				$this->excel->writeCell($x, $y, $val, array('align'=>'R'));
 				$this->excel->setCellStyle($x, $y, array('numberformat'=>'#,##0.00'));

@@ -58,11 +58,25 @@
                 </dl>
                 <?php echo Yii::t("rank","Computation by business forehead layer, if have 35500, mark should be");?><br/>20000*0.1+5000*0.08+5000*0.07+5500*0.05
             </dd>
+            <?php
+            $sqlDate = RankingMonthForm::getSqlDate($model->rank_year,$model->rank_month);
+            if(count($sqlDate)>=15){
+                echo "<dt>".Yii::t("rank","5, night score title")."</dt>";
+                echo "<dd>".Yii::t("rank","night score body")."</dd>";
+                echo "<dd>".Yii::t("rank","night score body two")."</dd>";
+                echo "<dt>".Yii::t("rank","6, create score title")."</dt>";
+                echo "<dd>".Yii::t("rank","create score body")."</dd>";
+                echo "<dd>".Yii::t("rank","create score body two")."</dd>";
+                $i=6;
+            }else{
+                $i=4;
+            }
+            ?>
 
-            <dt><?php echo Yii::t("rank","5, praise letters: 100 points for each letter");?></dt>
-            <dt><?php echo Yii::t("rank","6, customer complaint follow-up (not their own customers) : 100 points/order");?></dt>
+            <dt><?php echo ($i+1).Yii::t("rank",", praise letters: 100 points for each letter");?></dt>
+            <dt><?php echo ($i+2).Yii::t("rank",", customer complaint follow-up (not their own customers) : 100 points/order");?></dt>
 
-            <dt class="dt-click"><?php echo Yii::t("rank","7. Quality inspection (monthly average score, at least one quality inspection of our own customer)");?></dt>
+            <dt class="dt-click"><?php echo ($i+3).Yii::t("rank",". Quality inspection (monthly average score, at least one quality inspection of our own customer)");?></dt>
             <dd><?php echo Yii::t("rank","Score calculation");?>：<br/>
                 <dl class="dl-horizontal" style="margin: 0px;">
                     <dt><?php echo Yii::t("rank","80 the following");?>：</dt>
@@ -78,7 +92,7 @@
                 </dl>
                 <?php echo Yii::t("rank","(1+ Number of customers *0.02) * Tiered conversion points");?>
             </dd>
-            <dt class="dt-click"><?php echo Yii::t("rank","8. Optimize talent evaluation scores");?></dt>
+            <dt class="dt-click"><?php echo ($i+4).Yii::t("rank",". Optimize talent evaluation scores");?></dt>
             <dd>
                 <table class="table table-bordered table-condensed" style="width: 380px !important;margin: 0 auto;">
                     <tbody>
@@ -106,17 +120,17 @@
                 </table>
                 <?php echo Yii::t("rank","Note: This score will be added to the semiannual and annual leaderboards only after the evaluation of january-June of the current year is completed. The corresponding score will be displayed to the corresponding year after the evaluation of July to December of the current year is completed in the next year (shown in the semiannual and annual leaderboards).");?>
             </dd>
-            <dt class="dt-click"><?php echo Yii::t("rank","9. Envelopes of appreciation");?></dt>
+            <dt class="dt-click"><?php echo ($i+5).Yii::t("rank",". Envelopes of appreciation");?></dt>
             <dd>
                 <span><?php echo Yii::t("rank","1 star: 50 points per piece");?></span><br/>
                 <span><?php echo Yii::t("rank","2 star: 100 points per piece");?></span><br/>
                 <span><?php echo Yii::t("rank","3 star: 200 points per piece");?></span><br/>
                 <span><?php echo Yii::t("rank","Four stars and five stars have no score");?></span>
             </dd>
-            <dt><?php echo Yii::t("rank","10. Introduction of new technicians: 500 points per technician after 3 months");?></dt>
-            <dt><?php echo Yii::t("rank","11. Two services (IA+IB): 300 extra points per month");?></dt>
-            <dt><?php echo Yii::t("rank","12, introduce new business: order: 500 points/order");?></dt>
-            <dt><?php echo Yii::t("rank","13. Xidiyi sales: 100 cents per barrel (free delivery does not count)");?></dt>
+            <dt><?php echo ($i+6).Yii::t("rank",". Introduction of new technicians: 500 points per technician after 3 months");?></dt>
+            <dt><?php echo ($i+7).Yii::t("rank",". Two services (IA+IB): 300 extra points per month");?></dt>
+            <dt><?php echo ($i+8).Yii::t("rank",", introduce new business: order: 500 points/order");?></dt>
+            <dt><?php echo ($i+9).Yii::t("rank",". Xidiyi sales: 100 cents per barrel (free delivery does not count)");?></dt>
         </dl>
     </div>
 </div>

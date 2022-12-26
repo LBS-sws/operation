@@ -14,7 +14,7 @@ $this->pageTitle=Yii::app()->name . ' - ServiceMoney Form';
 
 <section class="content-header">
 	<h1>
-		<strong><?php echo Yii::t('rank','ServiceMoney Form'); ?></strong>
+		<strong><?php echo Yii::t('rank','Synchronization Form'); ?></strong>
 	</h1>
 <!--
 	<ol class="breadcrumb">
@@ -95,26 +95,76 @@ $this->pageTitle=Yii::app()->name . ' - ServiceMoney Form';
 
 			<div class="form-group">
 				<?php echo $form->labelEx($model,'service_money',array('class'=>"col-lg-2 control-label")); ?>
-				<div class="col-lg-3">
+				<div class="col-lg-2">
 				<?php
                 echo $form->numberField($model, 'service_money',
 					array('readonly'=>($model->scenario=='view'),'min'=>0)
 				); ?>
 				</div>
-			</div>
-
-			<div class="form-group">
-				<?php echo $form->labelEx($model,'score_num',array('class'=>"col-lg-2 control-label")); ?>
-				<div class="col-lg-3">
-				<?php
-                echo $form->numberField($model, 'score_num',
-					array('readonly'=>(true))
-				); ?>
+                <?php echo $form->labelEx($model,'score_num',array('class'=>"col-lg-2 control-label")); ?>
+                <div class="col-lg-2">
+                    <?php
+                    echo $form->numberField($model, 'score_num',
+                        array('readonly'=>(true))
+                    ); ?>
                 </div>
-                <div class="col-lg-5">
+                <div class="col-lg-4">
                     <p class="form-control-static">保存后刷新得分</p>
                 </div>
 			</div>
+
+			<div class="form-group">
+				<?php echo $form->labelEx($model,'night_money',array('class'=>"col-lg-2 control-label")); ?>
+				<div class="col-lg-2">
+				<?php
+                echo $form->numberField($model, 'night_money',
+					array('readonly'=>($model->scenario=='view'),'min'=>0)
+				); ?>
+				</div>
+                <?php echo $form->labelEx($model,'night_score',array('class'=>"col-lg-2 control-label")); ?>
+                <div class="col-lg-2">
+                    <?php
+                    echo $form->numberField($model, 'night_score',
+                        array('readonly'=>(true))
+                    ); ?>
+                </div>
+                <div class="col-lg-4">
+                    <p class="form-control-static">保存后刷新得分</p>
+                </div>
+			</div>
+
+			<div class="form-group">
+				<?php echo $form->labelEx($model,'create_money',array('class'=>"col-lg-2 control-label")); ?>
+				<div class="col-lg-2">
+				<?php
+                echo $form->numberField($model, 'create_money',
+					array('readonly'=>($model->scenario=='view'),'min'=>0)
+				); ?>
+				</div>
+                <?php echo $form->labelEx($model,'create_score',array('class'=>"col-lg-2 control-label")); ?>
+                <div class="col-lg-2">
+                    <?php
+                    echo $form->numberField($model, 'create_score',
+                        array('readonly'=>(true))
+                    ); ?>
+                </div>
+                <div class="col-lg-4">
+                    <p class="form-control-static">保存后刷新得分</p>
+                </div>
+			</div>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'update_u',array('class'=>"col-lg-2 control-label")); ?>
+                <div class="col-lg-4">
+                    <?php echo $form->inlineRadioButtonList($model, 'update_u',array("1"=>Yii::t("misc","Yes"),"0"=>Yii::t("misc","No")),
+                        array('readonly'=>($model->scenario=='view'))
+                    ); ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-lg-10 col-lg-offset-2">
+                    <p class="form-control-static text-warning">如果手动修改，请将自动同步U系统设置为“否”，否则修改后的数据会在另一天同步为U系统数据</p>
+                </div>
+            </div>
 
             <?php if (!empty($model->remark)): ?>
             <div class="form-group">

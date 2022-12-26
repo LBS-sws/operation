@@ -35,4 +35,24 @@
 			;
 		?>
 	</th>
+	<th>
+		<?php echo TbHtml::link($this->getLabelName('night_money').$this->drawOrderArrow('a.night_money'),'#',$this->createOrderLink('serviceMoney-list','a.night_money'))
+			;
+		?>
+	</th>
+	<th>
+		<?php echo TbHtml::link($this->getLabelName('night_score').$this->drawOrderArrow('a.night_score'),'#',$this->createOrderLink('serviceMoney-list','a.night_score'))
+			;
+		?>
+	</th>
+	<th>
+		<?php echo TbHtml::link($this->getLabelName('create_money').$this->drawOrderArrow('a.create_money'),'#',$this->createOrderLink('serviceMoney-list','a.create_money'))
+			;
+		?>
+	</th>
+	<th>
+		<?php echo TbHtml::link($this->getLabelName('create_score').$this->drawOrderArrow('a.create_score'),'#',$this->createOrderLink('serviceMoney-list','a.create_score'))
+			;
+		?>
+	</th>
 </tr>

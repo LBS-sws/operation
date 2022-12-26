@@ -145,7 +145,7 @@ class RankingOtherList extends CListPageModel
     }
 
 	public static function getRankTypeList(){
-        $list = RankingMonthForm::$sqlDate;
+        $list = RankingMonthForm::getSqlDate(2023,1);
         $arr = array();
         foreach ($list as $key=>$item){
             $name = Yii::t("rank",$item["label"]);

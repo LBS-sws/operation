@@ -21,22 +21,32 @@ class RankingMonthForm extends CFormModel
 
 	public $arrList;//数据列表
 
-    public static $sqlDate=array( //add:是否疊加  reset:月排行是否显示
-        "integral_num"=>array("add"=>true,"reset"=>true,"label"=>"integral score","otherRank"=>true),//學分
-        "charity_num"=>array("add"=>true,"reset"=>true,"label"=>"charity score","otherRank"=>true),//慈善分
-        "pin_num"=>array("add"=>false,"reset"=>true,"label"=>"pin score","otherRank"=>true),//襟章得分
-        "service_num"=>array("add"=>true,"reset"=>true,"label"=>"service score"),//服務得分
-        "prize_num"=>array("add"=>true,"reset"=>true,"label"=>"prize score","otherRank"=>true),//表揚信得分
-        "complain_num"=>array("add"=>true,"reset"=>true,"label"=>"complain score","otherRank"=>true,"minName"=>"follow-up score"),//客诉跟进得分
-        "quality_num"=>array("add"=>true,"reset"=>true,"label"=>"quality score","otherRank"=>true,"minName"=>"user quality score"),//質檢得分
-        "review_num"=>array("add"=>false,"reset"=>false,"label"=>"review score","otherRank"=>true),//考核得分
-        "letter_num"=>array("add"=>true,"reset"=>true,"label"=>"letter score","otherRank"=>true),//心意信得分
-        "recommend_num"=>array("add"=>true,"reset"=>true,"label"=>"recommend score","otherRank"=>true),//推薦人得分
-        "two_num"=>array("add"=>false,"reset"=>true,"label"=>"two score"),//兩項得分
-        "new_num"=>array("add"=>true,"reset"=>true,"label"=>"new score","otherRank"=>true),//介绍新生意得分
-        "sales_num"=>array("add"=>true,"reset"=>true,"label"=>"sales score","otherRank"=>true),//洗地易销售得分
-        "deduct_num"=>array("add"=>true,"reset"=>true,"label"=>"deduct score"),//扣分分數
-    );
+    //由于后续添加了夜单及创新服务需要改成判断(2023/01/01开始）
+    public static function getSqlDate($rankYear,$rankMonth){
+        $arrOne=array( //add:是否疊加  reset:月排行是否显示
+            "integral_num"=>array("add"=>true,"reset"=>true,"label"=>"integral score","otherRank"=>true),//學分
+            "charity_num"=>array("add"=>true,"reset"=>true,"label"=>"charity score","otherRank"=>true),//慈善分
+            "pin_num"=>array("add"=>false,"reset"=>true,"label"=>"pin score","otherRank"=>true),//襟章得分
+            "service_num"=>array("add"=>true,"reset"=>true,"label"=>"service score"),//服務得分
+        );
+        if(strtotime("{$rankYear}/{$rankMonth}/01")>=strtotime("2023/01/01")){
+            $arrOne["night_num"]=array("add"=>true,"reset"=>true,"label"=>"night score");//夜单得分
+            $arrOne["create_num"]=array("add"=>true,"reset"=>true,"label"=>"create score");//创新服务得分
+        }
+        $arrTwo=array(
+            "prize_num"=>array("add"=>true,"reset"=>true,"label"=>"prize score","otherRank"=>true),//表揚信得分
+            "complain_num"=>array("add"=>true,"reset"=>true,"label"=>"complain score","otherRank"=>true,"minName"=>"follow-up score"),//客诉跟进得分
+            "quality_num"=>array("add"=>true,"reset"=>true,"label"=>"quality score","otherRank"=>true,"minName"=>"user quality score"),//質檢得分
+            "review_num"=>array("add"=>false,"reset"=>false,"label"=>"review score","otherRank"=>true),//考核得分
+            "letter_num"=>array("add"=>true,"reset"=>true,"label"=>"letter score","otherRank"=>true),//心意信得分
+            "recommend_num"=>array("add"=>true,"reset"=>true,"label"=>"recommend score","otherRank"=>true),//推薦人得分
+            "two_num"=>array("add"=>false,"reset"=>true,"label"=>"two score"),//兩項得分
+            "new_num"=>array("add"=>true,"reset"=>true,"label"=>"new score","otherRank"=>true),//介绍新生意得分
+            "sales_num"=>array("add"=>true,"reset"=>true,"label"=>"sales score","otherRank"=>true),//洗地易销售得分
+            "deduct_num"=>array("add"=>true,"reset"=>true,"label"=>"deduct score"),//扣分分數
+        );
+        return array_merge($arrOne,$arrTwo);
+    }
 
     //學分
     private function integral_num($year,$month,$employee_id){
@@ -150,11 +160,67 @@ class RankingMonthForm extends CFormModel
             ->where("service_date between '$this->startDate' and '$this->endDate' and employee_id=:id",
                 array(":id"=>$this->employee_id))->queryAll();
         $html = "<thead>";
-        $html.="<tr><th>员工编号</th><th>员工姓名</th><th>金额编号</th><th>时间</th><th>服务金额</th><th>得分</th></tr>";
+        $html.="<tr><th>员工编号</th><th>员工姓名</th><th>同步编号</th><th>时间</th><th>服务金额</th><th>得分</th></tr>";
         $html.= "</thead><tbody>";
         if($rows){
             foreach ($rows as $row){
                 $html.="<tr data-id='{$row["id"]}'><td>{$this->employee_code}</td><td>{$this->employee_name}</td><td>{$row['service_code']}</td><td>{$row['service_year']}年{$row['service_month']}月</td><td class='text-right'>{$row['service_money']}</td><td class='text-right'>{$row['score_num']}</td></tr>";
+            }
+        }else{
+            $html.="<tr><td colspan='6'>无</td></tr>";
+        }
+        $html.= "</tbody>";
+        return $html;
+    }
+
+    //夜单得分
+    private function night_num($year,$month,$employee_id){
+        $score=Yii::app()->db->createCommand()->select("sum(night_score)")->from("opr_service_money")
+            ->where("service_year=:year and service_month=:month and employee_id=:id",
+                array(":year"=>$year,":month"=>$month,":id"=>$employee_id))->queryScalar();
+        return is_numeric($score)?floatval($score):0;
+    }
+
+    //夜单得分table
+    private function night_num_table(){
+        $rows=Yii::app()->db->createCommand()->select("service_code,service_year,id,service_month,night_money,night_score")
+            ->from("opr_service_money")
+            ->where("service_date between '$this->startDate' and '$this->endDate' and employee_id=:id",
+                array(":id"=>$this->employee_id))->queryAll();
+        $html = "<thead>";
+        $html.="<tr><th>员工编号</th><th>员工姓名</th><th>同步编号</th><th>时间</th><th>服务金额</th><th>得分</th></tr>";
+        $html.= "</thead><tbody>";
+        if($rows){
+            foreach ($rows as $row){
+                $html.="<tr data-id='{$row["id"]}'><td>{$this->employee_code}</td><td>{$this->employee_name}</td><td>{$row['service_code']}</td><td>{$row['service_year']}年{$row['service_month']}月</td><td class='text-right'>{$row['night_money']}</td><td class='text-right'>{$row['night_score']}</td></tr>";
+            }
+        }else{
+            $html.="<tr><td colspan='6'>无</td></tr>";
+        }
+        $html.= "</tbody>";
+        return $html;
+    }
+
+    //创新服务得分
+    private function create_num($year,$month,$employee_id){
+        $score=Yii::app()->db->createCommand()->select("sum(create_score)")->from("opr_service_money")
+            ->where("service_year=:year and service_month=:month and employee_id=:id",
+                array(":year"=>$year,":month"=>$month,":id"=>$employee_id))->queryScalar();
+        return is_numeric($score)?floatval($score):0;
+    }
+
+    //创新服务得分table
+    private function create_num_table(){
+        $rows=Yii::app()->db->createCommand()->select("service_code,service_year,id,service_month,create_money,create_score")
+            ->from("opr_service_money")
+            ->where("service_date between '$this->startDate' and '$this->endDate' and employee_id=:id",
+                array(":id"=>$this->employee_id))->queryAll();
+        $html = "<thead>";
+        $html.="<tr><th>员工编号</th><th>员工姓名</th><th>同步编号</th><th>时间</th><th>服务金额</th><th>得分</th></tr>";
+        $html.= "</thead><tbody>";
+        if($rows){
+            foreach ($rows as $row){
+                $html.="<tr data-id='{$row["id"]}'><td>{$this->employee_code}</td><td>{$this->employee_name}</td><td>{$row['service_code']}</td><td>{$row['service_year']}年{$row['service_month']}月</td><td class='text-right'>{$row['create_money']}</td><td class='text-right'>{$row['create_score']}</td></tr>";
             }
         }else{
             $html.="<tr><td colspan='6'>无</td></tr>";
@@ -675,7 +741,8 @@ class RankingMonthForm extends CFormModel
 			$this->rank_month = $row['rank_month'];
 			$this->score_sum = floatval($row['score_sum']);
 			$this->other_score = floatval($row['other_score']);
-			foreach (self::$sqlDate as $item=>$rule){
+			$sqlDate = self::getSqlDate($this->rank_year,$this->rank_month);
+			foreach ($sqlDate as $item=>$rule){
                 $this->arrList[$item] = key_exists($item,$row)?floatval($row[$item]):"";
             }
             return true;
@@ -694,18 +761,18 @@ class RankingMonthForm extends CFormModel
 	    $value = key_exists("value",$_GET)?$_GET["value"]:0;
         $row = Yii::app()->db->createCommand()->select("id,name,code")->from("hr$suffix.hr_employee")
             ->where("id=:id",array(":id"=>$id))->queryRow();
-	    $list = self::$sqlDate;
-	    $list["month_detail"]=array();
-	    $list["half_detail"]=array();
-	    $list["year_detail"]=array();
-	    if(empty($id)||empty($year)||empty($month)||empty($type)||!key_exists($value,$list)||!$row){
-	        return "<p>数据异常，请刷新重试</p>";
-        }
         $this->employee_id = $row["id"];
         $this->employee_code = $row["code"];
         $this->employee_name = $row["name"];
-	    $this->rank_year = $year;
-	    $this->rank_month = $month>=1&&$month<=12?$month:date("n");
+        $this->rank_year = $year;
+        $this->rank_month = $month>=1&&$month<=12?$month:date("n");
+        $list = self::getSqlDate($this->rank_year,$this->rank_month);
+        $list["month_detail"]=array();
+        $list["half_detail"]=array();
+        $list["year_detail"]=array();
+	    if(empty($id)||empty($year)||empty($month)||empty($type)||!key_exists($value,$list)||!$row){
+	        return "<p>数据异常，请刷新重试</p>";
+        }
         $this->resetStartDateEndDate($year,$month,$type);
         $value.="_table";
         $html = "<table class='table table-bordered table-striped table-hover'>";
@@ -767,7 +834,8 @@ class RankingMonthForm extends CFormModel
                 $this->id = $id;
                 if($resetBool){ //刷新分数
                     $arr=array("score_sum"=>0,"other_score"=>0);
-                    foreach (self::$sqlDate as $item=>$rule){
+                    $sqlDate = self::getSqlDate($year,$month);
+                    foreach ($sqlDate as $item=>$rule){
                         $arr[$item] = $this->$item($year,$month,$row["id"]);
                         $arr["score_sum"]+=$arr[$item];
                         if($rule["add"]){
@@ -780,6 +848,24 @@ class RankingMonthForm extends CFormModel
             if ($resetBool){
                 $this->updateRankNum($year,$month);//修改排名
             }
+        }
+    }
+
+    public function resetOneRank($year,$month,$employee_id){
+        $id = Yii::app()->db->createCommand()->select("id")->from("opr_technician_rank")
+            ->where("rank_year=:year and rank_month=:month and employee_id=:id",
+                array(":year"=>$year,":month"=>$month,":id"=>$employee_id))->queryScalar();
+        if($id){
+            $arr=array("score_sum"=>0,"other_score"=>0);
+            $sqlDate = self::getSqlDate($year,$month);
+            foreach ($sqlDate as $item=>$rule){
+                $arr[$item] = $this->$item($year,$month,$employee_id);
+                $arr["score_sum"]+=$arr[$item];
+                if($rule["add"]){
+                    $arr["other_score"]+=$arr[$item];
+                }
+            }
+            Yii::app()->db->createCommand()->update("opr_technician_rank",$arr,"id=:id",array(":id"=>$id));
         }
     }
 

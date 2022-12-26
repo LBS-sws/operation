@@ -79,7 +79,7 @@ $this->pageTitle=Yii::app()->name . ' - RankingMonth Form';
                 </div>
             </div>
             <?php
-            foreach (RankingMonthForm::$sqlDate as $item=>$rule){
+            foreach (RankingMonthForm::getSqlDate($model->rank_year,$model->rank_month) as $item=>$rule){
                 if($rule["reset"]){
                     echo '<div class="form-group">';
                     echo TbHtml::label(Yii::t("rank",$rule["label"]),"",array('class'=>"col-lg-2 control-label"));
@@ -130,7 +130,7 @@ $this->pageTitle=Yii::app()->name . ' - RankingMonth Form';
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 <?php $this->renderPartial('//site/removedialog'); ?>
-<?php $this->renderPartial('//site/rankingNote'); ?>
+<?php $this->renderPartial('//site/rankingNote',array("model"=>$model)); ?>
 
 <?php
 $ajaxUrl = Yii::app()->createUrl('rankingMonth/ajaxDetail');

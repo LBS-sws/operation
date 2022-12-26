@@ -59,7 +59,7 @@ class RankingHalfForm extends CFormModel
         $monthScope =RankingHalfList::quarterHalf($month);
         $searchSql.=" and a.rank_month in ({$monthScope}) ";
         $selectSql="";
-        foreach (RankingMonthForm::$sqlDate as $item=>$rule){
+        foreach (RankingMonthForm::getSqlDate($year,$month) as $item=>$rule){
             if($rule["add"]){
                 $selectSql.=",sum(a.{$item}) as {$item}";
             }else{
@@ -85,7 +85,7 @@ class RankingHalfForm extends CFormModel
 			$this->rank_month = $month;
 			$this->score_sum = 0;
             $this->other_score = $row['other_score'];
-			foreach (RankingMonthForm::$sqlDate as $item=>$rule){
+			foreach (RankingMonthForm::getSqlDate($this->rank_year,$this->rank_month) as $item=>$rule){
                 if($rule["reset"]){
                     $this->score_sum+= key_exists($item,$row)?floatval($row[$item]):0;
                 }

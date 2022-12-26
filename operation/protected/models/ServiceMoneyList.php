@@ -35,7 +35,7 @@ class ServiceMoneyList extends CListPageModel
 	public function attributeLabels()
 	{
 		return array(
-            'service_code'=>Yii::t('rank','money code'),
+            'service_code'=>Yii::t('rank','syn code'),
 			'code'=>Yii::t('rank','employee code'),
 			'name'=>Yii::t('rank','employee name'),
 			'city_name'=>Yii::t('rank','city'),
@@ -43,6 +43,10 @@ class ServiceMoneyList extends CListPageModel
 			'service_year'=>Yii::t('rank','year'),
 			'service_money'=>Yii::t('rank','service money'),
 			'score_num'=>Yii::t('rank','service score'),
+            'night_money'=>Yii::t('rank','night money'),
+            'night_score'=>Yii::t('rank','night score'),
+            'create_money'=>Yii::t('rank','create money'),
+            'create_score'=>Yii::t('rank','create score'),
 		);
 	}
 	
@@ -113,6 +117,10 @@ class ServiceMoneyList extends CListPageModel
 						'service_month'=>$record['service_month'].Yii::t("rank","month unit"),
 						'service_money'=>floatval($record['service_money']),
 						'score_num'=>floatval($record['score_num']),
+						'night_money'=>floatval($record['night_money']),
+						'night_score'=>floatval($record['night_score']),
+						'create_money'=>floatval($record['create_money']),
+						'create_score'=>floatval($record['create_score']),
 						'service_code'=>$record['service_code'],
 						'name'=>$record['name']." ({$record['code']})",
 						'city_name'=>$record['city_name'],

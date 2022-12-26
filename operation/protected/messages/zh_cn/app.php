@@ -130,6 +130,11 @@ return array(
     'Technical Service new'=>'介绍新生意',
     'Technical Overall leaderboard(all city)'=>'技术部综合排行榜(全国)',
     'Technical Other leaderboard'=>'分类项目排行榜',
+    'Progress leaderboard'=>'最佳进步排行榜',
+    'Progress Month leaderboard'=>'每月最佳进步排行榜',
+    'Progress Quarter leaderboard'=>'季度最佳进步排行榜',
+    'Progress Year leaderboard'=>'年度最佳进步排行榜',
+    'U system synchronization'=>'U系统同步汇总',
     //沈超添加結束
 	
 );

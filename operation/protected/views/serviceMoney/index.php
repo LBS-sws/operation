@@ -11,7 +11,7 @@ $this->pageTitle=Yii::app()->name . ' - ServiceMoney';
 
 <section class="content-header">
 	<h1>
-		<strong><?php echo Yii::t('app','Technical Service Money'); ?></strong>
+		<strong><?php echo Yii::t('app','U system synchronization'); ?></strong>
 	</h1>
 <!--
 	<ol class="breadcrumb">
@@ -43,7 +43,7 @@ $this->pageTitle=Yii::app()->name . ' - ServiceMoney';
         array("class"=>"form-control submitBtn"));
 
     $this->widget('ext.layout.ListPageWidget', array(
-        'title'=>Yii::t('rank','ServiceMoney List'),
+        'title'=>Yii::t('rank','Synchronization List'),
         'model'=>$model,
         'viewhdr'=>'//serviceMoney/_listhdr',
         'viewdtl'=>'//serviceMoney/_listdtl',

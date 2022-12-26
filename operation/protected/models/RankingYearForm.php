@@ -57,7 +57,7 @@ class RankingYearForm extends CFormModel
         $suffix = Yii::app()->params['envSuffix'];
         $searchSql= " a.employee_id='{$index}' and a.rank_year='{$year}' ";
         $selectSql="";
-        foreach (RankingMonthForm::$sqlDate as $item=>$rule){
+        foreach (RankingMonthForm::getSqlDate($year,$month) as $item=>$rule){
             if($rule["add"]){
                 $selectSql.=",sum(a.{$item}) as {$item}";
             }elseif ($item=="review_num"){
@@ -85,7 +85,7 @@ class RankingYearForm extends CFormModel
 			$this->rank_month = $month;
 			$this->score_sum = 0;
             $this->other_score = $row['other_score'];
-			foreach (RankingMonthForm::$sqlDate as $item=>$rule){
+			foreach (RankingMonthForm::getSqlDate($year,$month) as $item=>$rule){
                 if($rule["reset"]){
                     $this->score_sum+= key_exists($item,$row)?floatval($row[$item]):0;
                 }

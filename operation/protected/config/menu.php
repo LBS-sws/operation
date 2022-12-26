@@ -248,7 +248,7 @@ return array(
                 'access'=>'TL08',
                 'url'=>'/rankingOther/index',
             ),
-            'Technical Service Money'=>array(//技术部服務金額
+            'U system synchronization'=>array(//技术部服務金額（2022/12/20改为U系统同步汇总）
                 'access'=>'TL05',
                 'url'=>'/serviceMoney/index',
             ),
@@ -259,6 +259,25 @@ return array(
             'Technical Deduct Marks'=>array(//技术部扣分
                 'access'=>'TL07',
                 'url'=>'/serviceDeduct/index',
+            ),
+        ),
+    ),
+
+    'Progress leaderboard'=>array( //最佳进步排行榜
+        'access'=>'PL',
+        'icon'=>'fa-coffee',
+        'items'=>array(
+            'Progress Month leaderboard'=>array(//最佳进步排行榜(月度)
+                'access'=>'PL01',
+                'url'=>'/progressMonth/index',
+            ),
+            'Progress Quarter leaderboard'=>array(//最佳进步排行榜(季度)
+                'access'=>'PL02',
+                'url'=>'/progressQuarter/index',
+            ),
+            'Progress Year leaderboard'=>array(//最佳进步排行榜(年度)
+                'access'=>'PL03',
+                'url'=>'/progressYear/index',
             ),
         ),
     ),

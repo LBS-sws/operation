@@ -7,4 +7,8 @@
 	<td><?php echo $this->record['service_month']; ?></td>
 	<td><?php echo $this->record['service_money']; ?></td>
 	<td><?php echo $this->record['score_num']; ?></td>
+	<td><?php echo $this->record['night_money']; ?></td>
+	<td><?php echo $this->record['night_score']; ?></td>
+	<td><?php echo $this->record['create_money']; ?></td>
+	<td><?php echo $this->record['create_score']; ?></td>
 </tr>

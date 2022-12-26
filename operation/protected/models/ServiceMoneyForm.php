@@ -10,8 +10,17 @@ class ServiceMoneyForm extends CFormModel
 	public $service_month;
 	public $service_date;
 	public $service_year;
-	public $service_money;
-	public $score_num;
+	public $service_money;//服务金额
+	public $score_num;//服务金额得分
+
+	public $night_money;//夜单金额
+	public $night_score;//夜单得分
+
+	public $create_money;//创新服务金额
+	public $create_score;//创新服务得分
+
+	public $update_u=1;//u系统自动同步 1：同步 0：不同步
+    public $companyRank=false;//是否刷新排行榜的值
 	public $remark;
 
 	/**
@@ -26,12 +35,17 @@ class ServiceMoneyForm extends CFormModel
             'name'=>Yii::t('rank','employee name'),
             'employee_id'=>Yii::t('rank','employee name'),
             'city_name'=>Yii::t('rank','city'),
-            'service_code'=>Yii::t('rank','money code'),
+            'service_code'=>Yii::t('rank','syn code'),
             'service_month'=>Yii::t('rank','month'),
             'service_year'=>Yii::t('rank','year'),
             'service_money'=>Yii::t('rank','service money'),
             'score_num'=>Yii::t('rank','service score'),
+            'night_money'=>Yii::t('rank','night money'),
+            'night_score'=>Yii::t('rank','night score'),
+            'create_money'=>Yii::t('rank','create money'),
+            'create_score'=>Yii::t('rank','create score'),
             'remark'=>Yii::t('rank','history'),
+            'update_u'=>Yii::t('rank','Update For U'),
 		);
 	}
 
@@ -41,8 +55,8 @@ class ServiceMoneyForm extends CFormModel
 	public function rules()
 	{
 		return array(
-            array('id,employee_id,service_code,remark,service_month,service_year,service_money,score_num','safe'),
-			array('employee_id,service_money','required'),
+            array('id,employee_id,update_u,service_code,remark,service_month,service_year,service_money,score_num,night_money,night_score,create_money,create_score','safe'),
+			array('employee_id,service_money,night_money,create_money,update_u','required'),
             array('service_year,service_month','numerical','allowEmpty'=>true,'integerOnly'=>true),
             array('id','validateID','on'=>array("delete")),
             array('service_money','validateMoney'),
@@ -70,11 +84,19 @@ class ServiceMoneyForm extends CFormModel
             $this->addError($attribute, "服务金额不能为负数");
             return false;
         }
+	    if($this->night_money<0){
+            $this->addError($attribute, "夜单金额不能为负数");
+            return false;
+        }
+	    if($this->create_money<0){
+            $this->addError($attribute, "创新服务金额不能为负数");
+            return false;
+        }
         $id = $this->id;
         $row = Yii::app()->db->createCommand()->select("service_code,id")->from("opr_service_money")
             ->where("employee_id=:id and service_year='{$this->service_year}' and service_month='{$this->service_month}' and id!='{$id}'",array(":id"=>$this->employee_id))->queryRow();
 	    if($row){
-            $this->addError($attribute, "该员工在{$this->service_year}年{$this->service_month}月已存在服务金额，不允许重复添加(金额编号:{$row["service_code"]})");
+            $this->addError($attribute, "该员工在{$this->service_year}年{$this->service_month}月已存在服务金额，不允许重复添加(同步编号:{$row["service_code"]})");
             return false;
         }else{
             $date = date("Ym",strtotime(" - 2 months"));
@@ -82,7 +104,11 @@ class ServiceMoneyForm extends CFormModel
                 $this->addError($attribute, "不允许修改两个月以前的数据");
             }else{
                 $this->service_money = round($this->service_money,2);
-                $this->score_num = self::computeScore($this->service_money);
+                $this->night_money = round($this->night_money,2);
+                $this->create_money = round($this->create_money,2);
+                $this->score_num = self::computeScore($this->service_money,"score_num");
+                $this->night_score = self::computeScore($this->night_money,"night_score");
+                $this->create_score = self::computeScore($this->create_money,"create_score");
             }
         }
     }
@@ -97,12 +123,23 @@ class ServiceMoneyForm extends CFormModel
             if(empty($errorMsg)){
                 $this->remark = $row["remark"];
                 if($this->service_money!=$row["service_money"]){
+                    $this->companyRank = true;//金额有变动，需要刷新排行榜
                     $row["service_money"] = floatval($row["service_money"]);
                     $this->remark.=empty($this->remark)?"":"\r\n";
-                    $this->remark.="用户（{$uid}）修改了金额：{$row["service_money"]} -> {$this->service_money} | 时间:".date("Y/m/d H:i:s");
+                    $this->remark.="用户（{$uid}）修改了服务金额：{$row["service_money"]} -> {$this->service_money} | 时间:".date("Y/m/d H:i:s");
                 }
-                $this->service_money = round($this->service_money,2);
-                $this->score_num = self::computeScore($this->service_money);
+                if($this->night_money!=$row["night_money"]){
+                    $this->companyRank = true;//金额有变动，需要刷新排行榜
+                    $row["night_money"] = floatval($row["night_money"]);
+                    $this->remark.=empty($this->remark)?"":"\r\n";
+                    $this->remark.="用户（{$uid}）修改了夜单金额：{$row["night_money"]} -> {$this->night_money} | 时间:".date("Y/m/d H:i:s");
+                }
+                if($this->create_money!=$row["create_money"]){
+                    $this->companyRank = true;//金额有变动，需要刷新排行榜
+                    $row["create_money"] = floatval($row["create_money"]);
+                    $this->remark.=empty($this->remark)?"":"\r\n";
+                    $this->remark.="用户（{$uid}）修改了创新服务金额：{$row["create_money"]} -> {$this->create_money} | 时间:".date("Y/m/d H:i:s");
+                }
             }
         }else{
             $this->addError($attribute, "数据异常，请刷新重试");
@@ -110,8 +147,40 @@ class ServiceMoneyForm extends CFormModel
         }
     }
 
+    //根据类型计算得分
+    public static function computeScore($money,$str="score_num"){
+	    switch ($str){
+            case "score_num"://服务金额得分
+                return self::computeScoreMoney($money);
+            case "night_score"://夜单金额得分
+                return self::computeNightMoney($money);
+            case "create_score"://创新服务金额得分
+                return self::computeCreateMoney($money);
+        }
+        return $money;
+    }
+    //根据夜单金额计算得分
+    public static function computeNightMoney($money){
+        if($money<2000){
+            $score = $money/200;
+        }else{
+            $score = 2000/200 + ($money-2000)/500;
+            $score = round($score,2);
+        }
+        return $score;
+    }
+    //根据创新服务金额计算得分
+    public static function computeCreateMoney($money){
+        if($money<1000){
+            $score = $money/100;
+        }else{
+            $score = 1000/100 + ($money-1000)/400;
+            $score = round($score,2);
+        }
+        return $score;
+    }
     //根据服务金额计算得分
-    public static function computeScore($money){
+    public static function computeScoreMoney($money){
         $arr = array(
             array('money'=>20000,'rate'=>0.1),
             array('money'=>25000,'rate'=>0.08),
@@ -143,17 +212,36 @@ class ServiceMoneyForm extends CFormModel
         $year = is_numeric($year)?$year:date("Y");
         $month = is_numeric($month)?$month:date("n");
         $jobFeeList =JobFee::getData($year,$month);
-        /* 模擬curl數據
-        $jobFeeList ='{"code":1,"data":[
-            {"code":"400002","name":"修改名字","sum_money":4444},
-            {"code":"400003","name":"测试3","sum_money":6666}
-            ],"msg":"消息"}';
+/*        $jobFeeList ='{
+            "code":1,
+            "data":[
+                {
+                "code":"400002",
+                "name":"修改名字",
+                "sum_money":4444,
+                "night_money":333,
+                "type_money_data":[
+                    {"type_id":1,"type_name":"甲醛","type_money":123},
+                    {"type_id":2,"type_name":"隔油池清洁服务","type_money":456},
+                    {"type_id":5,"type_name":"服务","type_money":666}
+                ]},
+                {
+                "code":"400003",
+                "name":"测试3",
+                "sum_money":6666,
+                "night_money":555,
+                "type_money_data":[
+                    {"type_id":1,"type_name":"甲醛","type_money":152},
+                    {"type_id":2,"type_name":"隔油池清洁服务","type_money":485},
+                    {"type_id":3,"type_name":"清洁服务","type_money":666}
+                ]}
+            ],"msg":"消息"}';*/
         $jobFeeList = json_decode($jobFeeList,true);
-        */
         if($jobFeeList["code"]==1){
             $staffList = self::getEmployeeCodeList();
             foreach ($jobFeeList["data"] as $row){
                 if(key_exists($row["code"],$staffList)){
+                    $row["create_money"]=$this->getDateCreateMoney($row);
                     $this->saveCurlData($year,$month,$staffList[$row["code"]],$row);
                 }
             }
@@ -161,16 +249,39 @@ class ServiceMoneyForm extends CFormModel
         return $jobFeeList;
     }
 
+    private function getDateCreateMoney($row){
+        $sum = 0;
+        $list = array("甲醛","隔油池清洁服务","雾化消毒","厨房油烟清洁服务",
+            "RA空气净化-延长维保","RA空气净化-随意派","RA空气净化-轻松派");
+        if(key_exists("type_money_data",$row)&&!empty($row["type_money_data"])){
+            foreach ($row["type_money_data"] as $item){
+                if(in_array($item["type_name"],$list)){
+                    $sum+=floatval($item["type_money"]);
+                }
+            }
+        }
+        return $sum;
+    }
+
+
     private function saveCurlData($year,$month,$staff,$data){
-        $row = Yii::app()->db->createCommand()->select("id")->from("opr_service_money")
+        $data["night_money"] = key_exists("night_money",$data)?$data["night_money"]:0;
+        $data["create_money"] = key_exists("create_money",$data)?$data["create_money"]:0;
+        $row = Yii::app()->db->createCommand()->select("id,update_u")->from("opr_service_money")
             ->where("employee_id=:id and service_year={$year} and service_month={$month}",array(":id"=>$staff["id"]))->queryRow();
         if($row){//存在就覆蓋
-            Yii::app()->db->createCommand()->update("opr_service_money",array(
-                'service_money'=>round($data["sum_money"],2),
-                "score_num"=>self::computeScore($data["sum_money"]),
-                "remark"=>"系統自動刷新：".date("Y-m-d H:i:s"),
-                "luu"=>"系統"
-            ),"id={$row['id']}");
+            if($row["update_u"]==1){ //设置为允许自动同步
+                Yii::app()->db->createCommand()->update("opr_service_money",array(
+                    'night_money'=>round($data["night_money"],2),
+                    'service_money'=>round($data["sum_money"],2),
+                    'create_money'=>round($data["create_money"],2),
+                    "score_num"=>self::computeScore($data["sum_money"],"score_num"),
+                    "night_score"=>self::computeScore($data["night_money"],"night_score"),
+                    "create_score"=>self::computeScore($data["create_money"],"create_score"),
+                    "remark"=>"系統自動刷新：".date("Y-m-d H:i:s"),
+                    "luu"=>"系統"
+                ),"id={$row['id']}");
+            }
         }else{//不存在則新增
             Yii::app()->db->createCommand()->insert("opr_service_money",array(
                 "employee_id"=>$staff["id"],
@@ -178,9 +289,13 @@ class ServiceMoneyForm extends CFormModel
                 "service_year"=>$year,
                 "service_month"=>$month,
                 "service_money"=>round($data["sum_money"],2),
-                "score_num"=>self::computeScore($data["sum_money"]),
+                "night_money"=>round($data["night_money"],2),
+                "create_money"=>round($data["create_money"],2),
+                "score_num"=>self::computeScore($data["sum_money"],"score_num"),
+                "night_score"=>self::computeScore($data["night_money"],"night_score"),
+                "create_score"=>self::computeScore($data["create_money"],"create_score"),
                 "remark"=>"系統自動刷新：".date("Y-m-d H:i:s"),
-                "luu"=>"系統"
+                "lcu"=>"系統"
             ));
             $this->id = Yii::app()->db->getLastInsertID();
             $this->resetServiceCode();
@@ -203,7 +318,12 @@ class ServiceMoneyForm extends CFormModel
 			$this->service_month = $row['service_month'];
 			$this->service_money = floatval($row['service_money']);
 			$this->score_num = floatval($row['score_num']);
+			$this->night_money = floatval($row['night_money']);
+			$this->night_score = floatval($row['night_score']);
+			$this->create_money = floatval($row['create_money']);
+			$this->create_score = floatval($row['create_score']);
 			$this->remark = $row['remark'];
+			$this->update_u = $row['update_u'];
             return true;
 		}else{
 		    return false;
@@ -281,13 +401,18 @@ class ServiceMoneyForm extends CFormModel
 				break;
 			case 'new':
 				$sql = "insert into opr_service_money(
-						employee_id, service_date, service_year, service_month, service_money, score_num, lcu, lcd) values (
-						:employee_id, :service_date, :service_year, :service_month, :service_money, :score_num, :lcu, :lcd)";
+						employee_id, update_u, service_date, service_year, service_month, service_money, night_money, night_score, create_money, create_score, score_num, lcu, lcd) values (
+						:employee_id, :update_u, :service_date, :service_year, :service_month, :service_money, :night_money, :night_score, :create_money, :create_score, :score_num, :lcu, :lcd)";
 				break;
 			case 'edit':
 				$sql = "update opr_service_money set 
 					service_money = :service_money,
 					score_num = :score_num,
+					night_money = :night_money,
+					night_score = :night_score,
+					create_money = :create_money,
+					create_score = :create_score,
+					update_u = :update_u,
 					remark = :remark,
 					luu = :luu
 					where id = :id";
@@ -301,12 +426,22 @@ class ServiceMoneyForm extends CFormModel
 			$command->bindParam(':id',$this->id,PDO::PARAM_INT);
 		if (strpos($sql,':employee_id')!==false)
 			$command->bindParam(':employee_id',$this->employee_id,PDO::PARAM_INT);
+		if (strpos($sql,':update_u')!==false)
+			$command->bindParam(':update_u',$this->update_u,PDO::PARAM_INT);
 		if (strpos($sql,':service_year')!==false)
 			$command->bindParam(':service_year',$this->service_year,PDO::PARAM_INT);
 		if (strpos($sql,':service_month')!==false)
 			$command->bindParam(':service_month',$this->service_month,PDO::PARAM_INT);
 		if (strpos($sql,':service_money')!==false)
 			$command->bindParam(':service_money',$this->service_money,PDO::PARAM_INT);
+		if (strpos($sql,':night_money')!==false)
+			$command->bindParam(':night_money',$this->night_money,PDO::PARAM_INT);
+		if (strpos($sql,':night_score')!==false)
+			$command->bindParam(':night_score',$this->night_score,PDO::PARAM_INT);
+		if (strpos($sql,':create_money')!==false)
+			$command->bindParam(':create_money',$this->create_money,PDO::PARAM_INT);
+		if (strpos($sql,':create_score')!==false)
+			$command->bindParam(':create_score',$this->create_score,PDO::PARAM_INT);
 		if (strpos($sql,':score_num')!==false)
 			$command->bindParam(':score_num',$this->score_num,PDO::PARAM_INT);
 		if (strpos($sql,':remark')!==false)
@@ -331,6 +466,7 @@ class ServiceMoneyForm extends CFormModel
             $this->resetServiceCode();
             Yii::app()->db->createCommand()->update("opr_service_money",array('service_code'=>$this->service_code),"id={$this->id}");
         }
+        $this->companyRankValue();
 
 		return true;
 	}
@@ -338,5 +474,12 @@ class ServiceMoneyForm extends CFormModel
 	protected function resetServiceCode(){
         $str="S";
         $this->service_code = $str.(100000+$this->id);
+    }
+
+    protected function companyRankValue(){
+        if($this->companyRank&&$this->getScenario()!="delete"){
+            $model = new RankingMonthForm();
+            $model->resetOneRank($this->service_year,$this->service_month,$this->employee_id);
+        }
     }
 }

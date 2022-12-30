@@ -235,8 +235,9 @@ class ServiceMoneyForm extends CFormModel
                     {"type_id":2,"type_name":"隔油池清洁服务","type_money":485},
                     {"type_id":3,"type_name":"清洁服务","type_money":666}
                 ]}
-            ],"msg":"消息"}';*/
+            ],"msg":"消息"}';
         $jobFeeList = json_decode($jobFeeList,true);
+*/
         if($jobFeeList["code"]==1){
             $staffList = self::getEmployeeCodeList();
             foreach ($jobFeeList["data"] as $row){

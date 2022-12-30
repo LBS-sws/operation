@@ -24,5 +24,5 @@ alter table opr_service_money add update_u int(1) NOT NULL DEFAULT 1 COMMENT 'u�
 -- ----------------------------
 -- Table structure for opr_technician_rank
 -- ----------------------------
-alter table opr_technician_rank add night_num float(11,2) NULL DEFAULT 0.00 COMMENT '夜单得分' after score_num;
-alter table opr_technician_rank add create_num float(11,2) NULL DEFAULT 0.00 COMMENT '创新服务得分'  after score_num;
+alter table opr_technician_rank add night_num float(11,2) NULL DEFAULT 0.00 COMMENT '夜单得分' after service_num;
+alter table opr_technician_rank add create_num float(11,2) NULL DEFAULT 0.00 COMMENT '创新服务得分'  after service_num;

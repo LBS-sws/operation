@@ -26,6 +26,15 @@ $this->pageTitle=Yii::app()->name . ' - ProgressYear';
 </section>
 
 <section class="content">
+    <div class="box">
+        <div class="box-body">
+            <div>
+                <p>注：</p>
+                <p>1、上次得分最低门槛为2000</p>
+                <p>2、计算公式：（本次得分-上次得分）/ 上次得分 *100%</p>
+            </div>
+        </div>
+    </div>
     <!--
     <div class="box">
         <div class="box-body">
@@ -45,7 +54,7 @@ $this->pageTitle=Yii::app()->name . ' - ProgressYear';
             array("class" => "form-control submitBtn"));
         $search_add_html .= "<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>";
     }
-    $search_add_html .= TbHtml::dropDownList("{$modelClass}[year]",$model->year,ServiceMoneyList::getYearList(),
+    $search_add_html .= TbHtml::dropDownList("{$modelClass}[year]",$model->year,ProgressMonthList::getYearList(),
         array("class"=>"form-control submitBtn"));
 
     $this->widget('ext.layout.ListPageWidget', array(

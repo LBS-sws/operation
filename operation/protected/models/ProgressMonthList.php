@@ -169,4 +169,15 @@ class ProgressMonthList extends CListPageModel
 	        return "progressMonth";
         }
     }
+
+    public static function getYearList(){
+        $arr = array();
+        $year = date("Y");
+        for($i=$year-4;$i<$year+2;$i++){
+            if($i>2022){
+                $arr[$i] = $i.Yii::t("rank","year unit");
+            }
+        }
+        return $arr;
+    }
 }

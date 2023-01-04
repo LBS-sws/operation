@@ -5,7 +5,7 @@ class JobFee {
 		
 		$key = Yii::app()->params['unitedKey'];
 		$root = Yii::app()->params['unitedRootURL'];
-		$url = $root.'/remote/getStaffJobFee.php';
+		$url = $root.'/remote/getStaffJobFee2.php';
 		$data = array(
 			"key"=>$key,
 			"year"=>$year,

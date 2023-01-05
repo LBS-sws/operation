@@ -252,7 +252,7 @@ class ServiceMoneyForm extends CFormModel
 
     private function getDateCreateMoney($row){
         $sum = 0;
-        $list = array("甲醛","隔油池清洁服务","雾化消毒","厨房油烟清洁服务",
+        $list = array("甲醛","隔油池清洗服务","雾化消毒","厨房油烟清洁服务",
             "RA空气净化-延长维保","RA空气净化-随意派","RA空气净化-轻松派");
         if(key_exists("type_money_data",$row)&&!empty($row["type_money_data"])){
             foreach ($row["type_money_data"] as $item){

@@ -267,6 +267,10 @@ class ServiceMoneyForm extends CFormModel
 
     private function saveCurlData($year,$month,$staff,$data){
         $data["night_money"] = key_exists("night_money",$data)?$data["night_money"]:0;
+        //夜单暂时不同步
+        if(strtotime("{$year}/{$month}/01")<strtotime("2033/01/0")){
+            $data["night_money"] = 0;
+        }
         $data["create_money"] = key_exists("create_money",$data)?$data["create_money"]:0;
         $row = Yii::app()->db->createCommand()->select("id,update_u")->from("opr_service_money")
             ->where("employee_id=:id and service_year={$year} and service_month={$month}",array(":id"=>$staff["id"]))->queryRow();

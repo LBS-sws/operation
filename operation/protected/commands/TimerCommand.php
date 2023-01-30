@@ -21,6 +21,7 @@ class TimerCommand extends CConsoleCommand {
     private function resetTechnicianRank(){
         $year = date("Y");
         $month = date("n");
+        $day = date("j");
         $serviceMoneyModel = new ServiceMoneyForm('new');
         $arr = $serviceMoneyModel->curlJobFee($year,$month);//同步U系統的服務金額
         if($arr["code"]==1){
@@ -31,12 +32,14 @@ class TimerCommand extends CConsoleCommand {
         $model = new RankingMonthForm();
         $model->insertTechnician($year,$month,true);//刷新技術員排行榜
         //还需要刷新上个月的数据
-        $month--;
-        if($month==0){
-            $month=12;
-            $year--;
+        if($day<5){ //5號以後不刷新上個月的數據
+            $month--;
+            if($month==0){
+                $month=12;
+                $year--;
+            }
+            $model->insertTechnician($year,$month,true);//刷新技術員排行榜
         }
-        $model->insertTechnician($year,$month,true);//刷新技術員排行榜
     }
 
     //技术员综合排行榜数据输入邮件提醒

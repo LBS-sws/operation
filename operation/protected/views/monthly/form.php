@@ -146,7 +146,9 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 <?php
 	$modelName = get_class($model);
 	$cnt=0;
+	$item16 = false;
 	foreach ($model->record as $key=>$data) {
+		if ($data['code']=='10014') $item16 = true;
 		$cnt++;
 		$id_prefix = $modelName.'_record_'.$key;
 		$name_prefix = $modelName.'[record]['.$key.']';
@@ -169,6 +171,16 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 		echo '</div>';
 	}
 ?>
+<?php if ($item16) : ?>
+			<div class="form-group">
+				<div class="col-sm-10">
+					<span class="text-red">
+						第16项填写说明：<br>
+						T3收入减去税控开票给关联公司发票=T3主营业务收入金额-从税控系统导出明细筛选史伟莎及瑞洛后的合计不含税金额（注意开票给加盟商如长沙等地区的不扣）
+					</span>
+				</div>
+			</div>
+<?php endif ?>
 		</div>
 	</div>
 </section>

@@ -319,7 +319,7 @@ class RankingMonthForm extends CFormModel
     private function quality_num_table(){
         $suffix = Yii::app()->params['envSuffix'];
         $name = " ".$this->employee_name." ({$this->employee_code})";
-        $rows=Yii::app()->db->createCommand()->select("id,qc_dt,qc_staff,qc_result,company_name")->from("swoper{$suffix}.swo_qc")
+        $rows=Yii::app()->db->createCommand()->select("id,qc_dt,qc_staff,qc_result,company_name,lcd,lud")->from("swoper{$suffix}.swo_qc")
             ->where("qc_dt between '$this->startDate' and '$this->endDate' and job_staff=:name",
                 array(":name"=>$name))->queryAll();
         $count = 0;
@@ -331,7 +331,7 @@ class RankingMonthForm extends CFormModel
             foreach ($rows as $row){
                 $avg+=floatval($row["qc_result"]);
                 $count++;
-                $html.="<tr data-id='{$row["id"]}'><td>{$this->employee_code}</td><td>{$this->employee_name}</td><td>{$row['qc_dt']}</td><td>{$row['company_name']}</td><td>{$row['qc_staff']}</td><td>{$row['qc_result']}</td></tr>";
+                $html.="<tr data-id='{$row["id"]}'><td>{$this->employee_code}</td><td>{$this->employee_name}</td><td data-lcd='{$row['lcd']}' data-lud='{$row['lud']}'>{$row['qc_dt']}</td><td>{$row['company_name']}</td><td>{$row['qc_staff']}</td><td>{$row['qc_result']}</td></tr>";
             }
             $avg = $avg/$count;
             $list = $this->qualityScoreCompute($count,$avg);

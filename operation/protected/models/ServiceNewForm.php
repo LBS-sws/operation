@@ -13,6 +13,7 @@ class ServiceNewForm extends CFormModel
 	public $service_num;
 	public $score_num;
 	public $remark;
+	public $user_remark;
 
 	/**
 	 * Declares customized attribute labels.
@@ -31,6 +32,7 @@ class ServiceNewForm extends CFormModel
             'service_year'=>Yii::t('rank','year'),
             'service_num'=>Yii::t('rank','service number'),
             'remark'=>Yii::t('rank','history'),
+            'user_remark'=>Yii::t('rank','remark'),
 		);
 	}
 
@@ -40,7 +42,7 @@ class ServiceNewForm extends CFormModel
 	public function rules()
 	{
 		return array(
-            array('id,employee_id,service_code,remark,service_month,service_year,service_num','safe'),
+            array('id,employee_id,service_code,user_remark,remark,service_month,service_year,service_num','safe'),
 			array('employee_id,service_num','required'),
             array('service_year,service_month','numerical','allowEmpty'=>true,'integerOnly'=>true),
             array('id','validateID','on'=>array("delete")),
@@ -119,6 +121,7 @@ class ServiceNewForm extends CFormModel
 			$this->service_month = $row['service_month'];
 			$this->service_num = $row['service_num'];
 			$this->remark = $row['remark'];
+			$this->user_remark = $row['user_remark'];
 			$this->score_num = $row['score_num'];
             return true;
 		}else{
@@ -151,14 +154,15 @@ class ServiceNewForm extends CFormModel
 				break;
 			case 'new':
 				$sql = "insert into opr_service_new(
-						employee_id, service_date, service_year, service_month, service_num, score_num, lcu, lcd) values (
-						:employee_id, :service_date, :service_year, :service_month, :service_num, :score_num, :lcu, :lcd)";
+						employee_id, service_date, service_year, service_month, service_num, score_num, user_remark, lcu, lcd) values (
+						:employee_id, :service_date, :service_year, :service_month, :service_num, :score_num, :user_remark, :lcu, :lcd)";
 				break;
 			case 'edit':
 				$sql = "update opr_service_new set 
 					service_num = :service_num,
 					score_num = :score_num,
 					remark = :remark,
+					user_remark = :user_remark,
 					luu = :luu
 					where id = :id";
 				break;
@@ -181,6 +185,8 @@ class ServiceNewForm extends CFormModel
 			$command->bindParam(':score_num',$this->score_num,PDO::PARAM_INT);
 		if (strpos($sql,':remark')!==false)
 			$command->bindParam(':remark',$this->remark,PDO::PARAM_STR);
+		if (strpos($sql,':user_remark')!==false)
+			$command->bindParam(':user_remark',$this->user_remark,PDO::PARAM_STR);
 		if (strpos($sql,':service_date')!==false){
             $this->service_date = date("Y-m-d",strtotime($this->service_year."-{$this->service_month}-01"));
             $command->bindParam(':service_date',$this->service_date,PDO::PARAM_STR);

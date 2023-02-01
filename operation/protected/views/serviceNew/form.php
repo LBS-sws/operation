@@ -102,6 +102,14 @@ $this->pageTitle=Yii::app()->name . ' - ServiceNew Form';
 				); ?>
 				</div>
 			</div>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'user_remark',array('class'=>"col-lg-2 control-label")); ?>
+                <div class="col-lg-7">
+                    <?php echo $form->textArea($model, 'user_remark',
+                        array('rows'=>'4','readonly'=>($model->scenario=='view'))
+                    ); ?>
+                </div>
+            </div>
 
             <?php if (!empty($model->remark)): ?>
             <div class="form-group">

@@ -30,7 +30,7 @@ $this->pageTitle=Yii::app()->name . ' - ProgressYear';
         <div class="box-body">
             <div>
                 <p>注：</p>
-                <p>1、上次得分最低门槛为2000</p>
+                <p>1、上年度平均分数最低门槛需求为2000，即上次总分不低于24000</p>
                 <p>2、计算公式：（本次得分-上次得分）/ 上次得分 *100%</p>
             </div>
         </div>

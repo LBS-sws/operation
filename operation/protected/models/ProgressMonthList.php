@@ -130,6 +130,7 @@ class ProgressMonthList extends CListPageModel
                     'progress_date'=>$record['rank_year'].Yii::t("rank","year unit").$record['rank_month'].Yii::t("rank","month unit"),
                     'score_sum'=>$scoreSum,
                     'last_sum'=>$lastSum,
+                    'color'=>$lastSum>2000?"":"text-danger",
                     'progress_rate'=>$progress_rate,
                     'name'=>$record['name']." ({$record['code']})",
                     'city_name'=>$record['city_name'],

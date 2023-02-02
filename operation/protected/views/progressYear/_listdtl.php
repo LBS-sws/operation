@@ -1,5 +1,5 @@
 
-<tr>
+<tr class="<?php echo $this->record['color']; ?>">
     <td><?php echo $this->recordptr+1; ?></td>
     <td><?php echo $this->record['name']; ?></td>
     <td><?php echo $this->record['city_name']; ?></td>

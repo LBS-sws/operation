@@ -100,7 +100,7 @@ class ProgressYearList extends CListPageModel
 			foreach ($records as $k=>$record) {
                 $scoreSum = floatval($record['now_sum']);
                 $lastSum = floatval($record['last_sum']);
-                $progress_rate = $lastSum>2000?round(($scoreSum-$lastSum)/$lastSum*100,2):0;
+                $progress_rate = $lastSum>24000?round(($scoreSum-$lastSum)/$lastSum*100,2):0;
                 $arr[] = array(
                     'id'=>$record['employee_id'],
                     'show'=>true,
@@ -109,6 +109,7 @@ class ProgressYearList extends CListPageModel
                     'name'=>$record['name']." ({$record['code']})",
                     'city_name'=>$record['city_name'],
                     'progress_rate'=>$progress_rate,
+                    'color'=>$lastSum>24000?"":"text-danger",
                     'progress_date'=>$this->year.Yii::t("rank","year unit")."1-12".Yii::t("rank","month unit"),
                     'score_sum'=>$scoreSum,
                     'last_sum'=>$lastSum,

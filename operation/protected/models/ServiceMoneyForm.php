@@ -60,9 +60,26 @@ class ServiceMoneyForm extends CFormModel
             array('service_year,service_month','numerical','allowEmpty'=>true,'integerOnly'=>true),
             array('id','validateID','on'=>array("delete")),
             array('service_money','validateMoney'),
+            array('service_year','validateYear'),
             array('id','validateRemark','on'=>array("edit")),
 		);
 	}
+
+    public function validateYear($attribute, $params) {
+        $day = date("j");
+        $date = date("Ym",strtotime(" - 1 months"));
+        $longDate = date("Ym",strtotime(" - 2 months"));
+        $serviceDate = date("Ym",strtotime($this->service_year."/".$this->service_month."/01"));
+        if($day<5){
+            if($longDate>=$serviceDate){
+                $this->addError($attribute, "不允许修改兩个月以前的数据");
+            }
+        }else{
+            if($date>=$serviceDate){
+                $this->addError($attribute, "不允许修改上个月以前的数据");
+            }
+        }
+    }
 
     public function validateID($attribute, $params) {
         $date = date("Ym",strtotime(" - 1 months"));
@@ -99,17 +116,12 @@ class ServiceMoneyForm extends CFormModel
             $this->addError($attribute, "该员工在{$this->service_year}年{$this->service_month}月已存在服务金额，不允许重复添加(同步编号:{$row["service_code"]})");
             return false;
         }else{
-            $date = date("Ym",strtotime(" - 2 months"));
-            if($date>=date("Ym",strtotime($this->service_year."/".$this->service_month."/01"))){
-                $this->addError($attribute, "不允许修改两个月以前的数据");
-            }else{
-                $this->service_money = round($this->service_money,2);
-                $this->night_money = round($this->night_money,2);
-                $this->create_money = round($this->create_money,2);
-                $this->score_num = self::computeScore($this->service_money,"score_num");
-                $this->night_score = self::computeScore($this->night_money,"night_score");
-                $this->create_score = self::computeScore($this->create_money,"create_score");
-            }
+            $this->service_money = round($this->service_money,2);
+            $this->night_money = round($this->night_money,2);
+            $this->create_money = round($this->create_money,2);
+            $this->score_num = self::computeScore($this->service_money,"score_num");
+            $this->night_score = self::computeScore($this->night_money,"night_score");
+            $this->create_score = self::computeScore($this->create_money,"create_score");
         }
     }
 

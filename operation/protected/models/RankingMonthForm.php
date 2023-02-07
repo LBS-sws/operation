@@ -856,6 +856,7 @@ class RankingMonthForm extends CFormModel
             ->where("rank_year=:year and rank_month=:month and employee_id=:id",
                 array(":year"=>$year,":month"=>$month,":id"=>$employee_id))->queryScalar();
         if($id){
+            $this->resetStartDateEndDate($year,$month);
             $arr=array("score_sum"=>0,"other_score"=>0);
             $sqlDate = self::getSqlDate($year,$month);
             foreach ($sqlDate as $item=>$rule){

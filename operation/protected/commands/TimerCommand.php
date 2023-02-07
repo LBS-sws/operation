@@ -1,7 +1,7 @@
 <?php
 class TimerCommand extends CConsoleCommand {
     public function run() {
-        echo "start:\n";
+        echo "start:".date("Y-m-d")."\n";
         if(date("Y-m-d")=="2021-11-05"){//由於多次更新或許有遺漏，所以重新更新
             Yii::app()->db->createCommand()->update('opr_warehouse_price', array(
                 'new_num'=>1,
@@ -31,6 +31,9 @@ class TimerCommand extends CConsoleCommand {
         }
         $model = new RankingMonthForm();
         $model->insertTechnician($year,$month,true);//刷新技術員排行榜
+        echo "year:{$year}\n";
+        echo "month:{$month}\n";
+        echo "day:{$day}\n";
         //还需要刷新上个月的数据
         if($day<5){ //5號以後不刷新上個月的數據
             $month--;
@@ -38,6 +41,9 @@ class TimerCommand extends CConsoleCommand {
                 $month=12;
                 $year--;
             }
+            echo "Last month:{$year}-{$month}\n";
+            unset($model);
+            $model = new RankingMonthForm();
             $model->insertTechnician($year,$month,true);//刷新技術員排行榜
         }
     }

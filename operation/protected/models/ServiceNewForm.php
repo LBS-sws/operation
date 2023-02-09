@@ -47,9 +47,17 @@ class ServiceNewForm extends CFormModel
             array('service_year,service_month','numerical','allowEmpty'=>true,'integerOnly'=>true),
             array('id','validateID','on'=>array("delete")),
             array('service_num','validateMoney'),
+            array('service_year','validateYear'),
             array('id','validateRemark','on'=>array("edit")),
 		);
 	}
+
+    public function validateYear($attribute, $params) {
+        $arr = ServiceMoneyForm::updateLongDate($this->service_year,$this->service_month);
+        if($arr["status"]===true){
+            $this->addError($attribute, $arr["message"]);
+        }
+    }
 
     public function validateID($attribute, $params) {
         $date = date("Ym",strtotime(" - 1 months"));
@@ -77,11 +85,6 @@ class ServiceNewForm extends CFormModel
 	    if($row){
             $this->addError($attribute, "该员工在{$this->service_year}年{$this->service_month}月已存在服务单数，不允许重复添加(单数编号:{$row["service_code"]})");
             return false;
-        }else{
-            $date = date("Ym",strtotime(" - 2 months"));
-            if($date>=date("Ym",strtotime($this->service_year."/".$this->service_month."/01"))){
-                $this->addError($attribute, "不允许修改两个月以前的数据");
-            }
         }
         $this->score_num = $this->service_num*500;
     }

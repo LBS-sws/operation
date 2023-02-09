@@ -57,9 +57,17 @@ class ServiceDeductForm extends CFormModel
 			array('employee_id,deduct_date,deduct_type','required'),
             array('id','validateID','on'=>array("delete")),
             array('deduct_date','validateDate'),
+            array('service_year','validateYear'),
             array('files, removeFileId, docMasterId, no_of_attm','safe'),
 		);
 	}
+
+    public function validateYear($attribute, $params) {
+        $arr = ServiceMoneyForm::updateLongDate($this->service_year,$this->service_month);
+        if($arr["status"]===true){
+            $this->addError($attribute, $arr["message"]);
+        }
+    }
 
     public function validateID($attribute, $params) {
         $date = date("Ym",strtotime(" - 1 months"));
@@ -78,11 +86,10 @@ class ServiceDeductForm extends CFormModel
 
     public function validateDate($attribute, $params) {
         $deduct_date = $this->deduct_date;
-        $old_date = date("Ym");
         $row = Yii::app()->db->createCommand()->select("deduct_date")->from("opr_service_deduct")
             ->where("id=:id",array(":id"=>$this->id))->queryRow();
 	    if($row){
-	        $old_date = date("Ym",strtotime($row["deduct_date"]));
+            $deduct_date = $row["deduct_date"];
         }
         switch ($this->deduct_type){
             case 1:
@@ -99,11 +106,6 @@ class ServiceDeductForm extends CFormModel
         }
 	    $this->service_year = date("Y",strtotime($deduct_date));
 	    $this->service_month = date("n",strtotime($deduct_date));
-        $deduct_date = date("Ym",strtotime($deduct_date));
-        $date = date("Ym",strtotime(" - 2 months"));
-        if($date>=$deduct_date||$date>=$old_date){
-            $this->addError($attribute, "不允许修改两个月以前的数据");
-        }
     }
 
 	public function retrieveData($index)

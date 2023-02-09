@@ -65,19 +65,28 @@ class ServiceMoneyForm extends CFormModel
 		);
 	}
 
-    public function validateYear($attribute, $params) {
+	public static function updateLongDate($year,$month){
+	    $arr = array("status"=>false,"message"=>"");
         $day = date("j");
         $date = date("Ym",strtotime(" - 1 months"));
         $longDate = date("Ym",strtotime(" - 2 months"));
-        $serviceDate = date("Ym",strtotime($this->service_year."/".$this->service_month."/01"));
+        $serviceDate = date("Ym",strtotime($year."/".$month."/01"));
         if($day<5){
             if($longDate>=$serviceDate){
-                $this->addError($attribute, "不允许修改兩个月以前的数据");
+                $arr = array("status"=>true,"message"=>"不允许修改兩个月以前的数据");
             }
         }else{
             if($date>=$serviceDate){
-                $this->addError($attribute, "不允许修改上个月以前的数据");
+                $arr = array("status"=>true,"message"=>"不允许修改上个月以前的数据");
             }
+        }
+        return $arr;
+    }
+
+    public function validateYear($attribute, $params) {
+	    $arr = ServiceMoneyForm::updateLongDate($this->service_year,$this->service_month);
+        if($arr["status"]===true){
+            $this->addError($attribute, $arr["message"]);
         }
     }
 

@@ -580,7 +580,8 @@ class RankingMonthForm extends CFormModel
         $score = Yii::app()->db->createCommand()->select("sum(a.qty)")
             ->from("swoper{$suffix}.swo_logistic_dtl a")
             ->leftJoin("swoper{$suffix}.swo_logistic b","a.log_id=b.id")
-            ->where("a.money>0 and b.salesman=:name and b.log_dt between '$this->startDate' and '$this->endDate'",
+            ->leftJoin("swoper{$suffix}.swo_task f","a.task=f.id")
+            ->where("a.money>0 and f.task_type='FLOOR' and b.salesman=:name and b.log_dt between '$this->startDate' and '$this->endDate'",
                 array(":name"=>$name))->queryScalar();
         return is_numeric($score)?floatval($score)*100:0;
     }
@@ -592,7 +593,8 @@ class RankingMonthForm extends CFormModel
         $rows = Yii::app()->db->createCommand()->select("b.id,b.log_dt,b.company_name,a.qty")
             ->from("swoper{$suffix}.swo_logistic_dtl a")
             ->leftJoin("swoper{$suffix}.swo_logistic b","a.log_id=b.id")
-            ->where("a.money>0 and b.salesman=:name and b.log_dt between '$this->startDate' and '$this->endDate'",
+            ->leftJoin("swoper{$suffix}.swo_task f","a.task=f.id")
+            ->where("a.money>0 and f.task_type='FLOOR' and b.salesman=:name and b.log_dt between '$this->startDate' and '$this->endDate'",
                 array(":name"=>$name))->queryAll();
         $html = "<thead>";
         $html.="<tr><th>员工编号</th><th>员工姓名</th><th>出单日期</th><th>客户名称</th><th>任务数量</th><th>得分</th></tr>";

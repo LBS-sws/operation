@@ -461,9 +461,9 @@ class ServiceMoneyForm extends CFormModel
 		if (strpos($sql,':service_money')!==false)
 			$command->bindParam(':service_money',$this->service_money,PDO::PARAM_INT);
 		if (strpos($sql,':night_money')!==false)
-			$command->bindParam(':night_money',$this->night_money,PDO::PARAM_INT);
+			$command->bindParam(':night_money',0,PDO::PARAM_INT);
 		if (strpos($sql,':night_score')!==false)
-			$command->bindParam(':night_score',$this->night_score,PDO::PARAM_INT);
+			$command->bindParam(':night_score',0,PDO::PARAM_INT);
 		if (strpos($sql,':create_money')!==false)
 			$command->bindParam(':create_money',$this->create_money,PDO::PARAM_INT);
 		if (strpos($sql,':create_score')!==false)
@@ -507,5 +507,16 @@ class ServiceMoneyForm extends CFormModel
             $model = new RankingMonthForm();
             $model->resetOneRank($this->service_year,$this->service_month,$this->employee_id);
         }
+    }
+
+    public function resetThisNight(){
+        $this->companyRank = "start";
+        $this->setScenario("edit");
+        Yii::app()->db->createCommand()->update("opr_service_money",
+            array(
+                'night_money'=>0,
+                'night_score'=>0,
+            ),"id={$this->id}");
+        $this->companyRankValue();
     }
 }

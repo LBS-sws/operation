@@ -28,7 +28,7 @@ class ServiceMoneyController extends Controller
 				'expression'=>array('ServiceMoneyController','allowReadWrite'),
 			),
 			array('allow', 
-				'actions'=>array('index','view','test'),
+				'actions'=>array('index','view','test','reset'),
 				'expression'=>array('ServiceMoneyController','allowReadOnly'),
 			),
 			array('deny',  // deny all users
@@ -36,6 +36,21 @@ class ServiceMoneyController extends Controller
 			),
 		);
 	}
+
+    public function actionReset($index)
+    {
+        $model = new ServiceMoneyForm('view');
+        if (!$model->retrieveData($index)) {
+            throw new CHttpException(404,'The requested page does not exist.');
+        } else {
+            echo "year:{$model->service_year}<br/>";
+            echo "month:{$model->service_month}<br/>";
+            echo "employee_id:{$model->employee_id}<br/>";
+            $model->resetThisNight();
+            echo "end";
+            die();
+        }
+    }
 
 	public function actionIndex($pageNum=0) 
 	{

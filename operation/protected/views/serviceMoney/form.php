@@ -113,7 +113,7 @@ $this->pageTitle=Yii::app()->name . ' - ServiceMoney Form';
                 </div>
 			</div>
 
-			<div class="form-group">
+			<div class="form-group hide">
 				<?php echo $form->labelEx($model,'night_money',array('class'=>"col-lg-2 control-label")); ?>
 				<div class="col-lg-2">
 				<?php

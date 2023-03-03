@@ -854,6 +854,14 @@ class RankingMonthForm extends CFormModel
     }
 
     public function resetOneRank($year,$month,$employee_id){
+        $suffix = Yii::app()->params['envSuffix'];
+	    $staffRow = Yii::app()->db->createCommand()->select("id,code,name")->from("hr{$suffix}.hr_employee")
+            ->where("id=:id",array(":id"=>$employee_id))->queryRow();
+	    if($staffRow){
+	        $this->employee_id = $employee_id;
+            $this->employee_code = $staffRow["code"];
+            $this->employee_name = $staffRow["name"];
+        }
         $id = Yii::app()->db->createCommand()->select("id")->from("opr_technician_rank")
             ->where("rank_year=:year and rank_month=:month and employee_id=:id",
                 array(":year"=>$year,":month"=>$month,":id"=>$employee_id))->queryScalar();

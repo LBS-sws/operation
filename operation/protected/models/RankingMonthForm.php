@@ -274,7 +274,7 @@ class RankingMonthForm extends CFormModel
         $suffix = Yii::app()->params['envSuffix'];
         $name = $this->employee_name." ({$this->employee_code})";
         $score=Yii::app()->db->createCommand()->select("count(id)")->from("swoper{$suffix}.swo_followup")
-            ->where("entry_dt between '$this->startDate' and '$this->endDate' and follow_staff=:name and resp_tech!=:name",
+            ->where("entry_dt between '$this->startDate' and '$this->endDate' and follow_staff like '%{$name}%' and resp_tech!=:name",
                 array(":name"=>$name))->queryScalar();
         return is_numeric($score)?floatval($score)*100:0;
     }
@@ -283,19 +283,19 @@ class RankingMonthForm extends CFormModel
     private function complain_num_table(){
         $suffix = Yii::app()->params['envSuffix'];
         $name = $this->employee_name." ({$this->employee_code})";
-        $rows=Yii::app()->db->createCommand()->select("id,company_name,entry_dt,resp_tech")->from("swoper{$suffix}.swo_followup")
-            ->where("entry_dt between '$this->startDate' and '$this->endDate' and follow_staff=:name and resp_tech!=:name",
+        $rows=Yii::app()->db->createCommand()->select("id,company_name,entry_dt,resp_tech,follow_staff")->from("swoper{$suffix}.swo_followup")
+            ->where("entry_dt between '$this->startDate' and '$this->endDate' and follow_staff like '%{$name}%' and resp_tech!=:name",
                 array(":name"=>$name))->queryAll();
         $html = "<thead>";
-        $html.="<tr><th>员工编号</th><th>员工姓名</th><th>客诉日期</th><th>客户名称</th><th>负责技术员</th><th>得分</th></tr>";
+        $html.="<tr><th>员工编号</th><th>员工姓名</th><th>客诉日期</th><th>客户名称</th><th>负责技术员</th><th>跟进(此投诉)技术员</th><th>得分</th></tr>";
         $html.= "</thead><tbody>";
         if($rows){
             foreach ($rows as $row){
                 $row['score_num']=100;
-                $html.="<tr data-id='{$row["id"]}'><td>{$this->employee_code}</td><td>{$this->employee_name}</td><td>{$row['entry_dt']}</td><td>{$row['company_name']}</td><td>{$row['resp_tech']}</td><td>{$row['score_num']}</td></tr>";
+                $html.="<tr data-id='{$row["id"]}'><td>{$this->employee_code}</td><td>{$this->employee_name}</td><td>{$row['entry_dt']}</td><td>{$row['company_name']}</td><td>{$row['resp_tech']}</td><td>{$row['follow_staff']}</td><td>{$row['score_num']}</td></tr>";
             }
         }else{
-            $html.="<tr><td colspan='6'>无</td></tr>";
+            $html.="<tr><td colspan='7'>无</td></tr>";
         }
         $html.= "</tbody>";
         return $html;

@@ -67,9 +67,10 @@ class ServiceMoneyForm extends CFormModel
 
 	public static function updateLongDate($year,$month){
 	    $arr = array("status"=>false,"message"=>"");
+	    $oneDate = date("Y/m/01");
         $day = date("j");
-        $date = date("Ym",strtotime(" - 1 months"));
-        $longDate = date("Ym",strtotime(" - 2 months"));
+        $date = date("Ym",strtotime("{$oneDate} - 1 months"));
+        $longDate = date("Ym",strtotime("{$oneDate} - 2 months"));
         $serviceDate = date("Ym",strtotime($year."/".$month."/01"));
         if($day<5){
             if($longDate>=$serviceDate){

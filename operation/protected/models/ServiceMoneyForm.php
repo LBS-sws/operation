@@ -13,8 +13,8 @@ class ServiceMoneyForm extends CFormModel
 	public $service_money;//服务金额
 	public $score_num;//服务金额得分
 
-	public $night_money;//夜单金额
-	public $night_score;//夜单得分
+	public $night_money=0;//夜单金额
+	public $night_score=0;//夜单得分
 
 	public $create_money;//创新服务金额
 	public $create_score;//创新服务得分
@@ -461,10 +461,14 @@ class ServiceMoneyForm extends CFormModel
 			$command->bindParam(':service_month',$this->service_month,PDO::PARAM_INT);
 		if (strpos($sql,':service_money')!==false)
 			$command->bindParam(':service_money',$this->service_money,PDO::PARAM_INT);
-		if (strpos($sql,':night_money')!==false)
-			$command->bindParam(':night_money',0,PDO::PARAM_INT);
-		if (strpos($sql,':night_score')!==false)
-			$command->bindParam(':night_score',0,PDO::PARAM_INT);
+        if (strpos($sql,':night_money')!==false){
+            $this->night_money = 0;
+            $command->bindParam(':night_money',$this->night_money,PDO::PARAM_INT);
+        }
+        if (strpos($sql,':night_score')!==false){
+            $this->night_score = 0;
+            $command->bindParam(':night_score',$this->night_score,PDO::PARAM_INT);
+        }
 		if (strpos($sql,':create_money')!==false)
 			$command->bindParam(':create_money',$this->create_money,PDO::PARAM_INT);
 		if (strpos($sql,':create_score')!==false)

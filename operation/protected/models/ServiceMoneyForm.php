@@ -289,8 +289,8 @@ class ServiceMoneyForm extends CFormModel
 
     private function saveCurlData($year,$month,$staff,$data){
         $data["night_money"] = key_exists("night_money",$data)?$data["night_money"]:0;
-        //夜单暂时不同步
-        if(strtotime("{$year}/{$month}/01")<strtotime("2033/01/0")){
+        //夜单暂时不同步(2023年4月1号开始生效)
+        if(strtotime("{$year}/{$month}/01")<strtotime("2023/04/01")){
             $data["night_money"] = 0;
         }
         $data["create_money"] = key_exists("create_money",$data)?$data["create_money"]:0;
@@ -449,6 +449,7 @@ class ServiceMoneyForm extends CFormModel
 		$uid = Yii::app()->user->id;
 
 		$command=$connection->createCommand($sql);
+		$thisTime = strtotime($this->service_year."/".$this->service_month."/1");
 		if (strpos($sql,':id')!==false)
 			$command->bindParam(':id',$this->id,PDO::PARAM_INT);
 		if (strpos($sql,':employee_id')!==false)
@@ -462,11 +463,11 @@ class ServiceMoneyForm extends CFormModel
 		if (strpos($sql,':service_money')!==false)
 			$command->bindParam(':service_money',$this->service_money,PDO::PARAM_INT);
         if (strpos($sql,':night_money')!==false){
-            $this->night_money = 0;
+            $this->night_money = $thisTime>=strtotime("2023/04/01")?$this->night_money:0;
             $command->bindParam(':night_money',$this->night_money,PDO::PARAM_INT);
         }
         if (strpos($sql,':night_score')!==false){
-            $this->night_score = 0;
+            $this->night_score = $thisTime>=strtotime("2023/04/01")?$this->night_score:0;
             $command->bindParam(':night_score',$this->night_score,PDO::PARAM_INT);
         }
 		if (strpos($sql,':create_money')!==false)

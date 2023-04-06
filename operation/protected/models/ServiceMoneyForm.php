@@ -60,7 +60,7 @@ class ServiceMoneyForm extends CFormModel
             array('service_year,service_month','numerical','allowEmpty'=>true,'integerOnly'=>true),
             array('id','validateID','on'=>array("delete")),
             array('service_money','validateMoney'),
-            //array('service_year','validateYear'),
+            array('service_year','validateYear'),
             array('id','validateRemark','on'=>array("edit")),
 		);
 	}

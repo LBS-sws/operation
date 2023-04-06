@@ -60,7 +60,7 @@ class ServiceMoneyForm extends CFormModel
             array('service_year,service_month','numerical','allowEmpty'=>true,'integerOnly'=>true),
             array('id','validateID','on'=>array("delete")),
             array('service_money','validateMoney'),
-            array('service_year','validateYear'),
+            //array('service_year','validateYear'),
             array('id','validateRemark','on'=>array("edit")),
 		);
 	}
@@ -145,18 +145,21 @@ class ServiceMoneyForm extends CFormModel
             if(empty($errorMsg)){
                 $this->remark = $row["remark"];
                 if($this->service_money!=$row["service_money"]){
+                    $this->update_u = 0;//手动修改后默认不同步U系统数据
                     $this->companyRank = true;//金额有变动，需要刷新排行榜
                     $row["service_money"] = floatval($row["service_money"]);
                     $this->remark.=empty($this->remark)?"":"\r\n";
                     $this->remark.="用户（{$uid}）修改了服务金额：{$row["service_money"]} -> {$this->service_money} | 时间:".date("Y/m/d H:i:s");
                 }
                 if($this->night_money!=$row["night_money"]){
+                    $this->update_u = 0;//手动修改后默认不同步U系统数据
                     $this->companyRank = true;//金额有变动，需要刷新排行榜
                     $row["night_money"] = floatval($row["night_money"]);
                     $this->remark.=empty($this->remark)?"":"\r\n";
                     $this->remark.="用户（{$uid}）修改了夜单金额：{$row["night_money"]} -> {$this->night_money} | 时间:".date("Y/m/d H:i:s");
                 }
                 if($this->create_money!=$row["create_money"]){
+                    $this->update_u = 0;//手动修改后默认不同步U系统数据
                     $this->companyRank = true;//金额有变动，需要刷新排行榜
                     $row["create_money"] = floatval($row["create_money"]);
                     $this->remark.=empty($this->remark)?"":"\r\n";

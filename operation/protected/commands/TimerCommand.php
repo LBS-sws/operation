@@ -35,7 +35,7 @@ class TimerCommand extends CConsoleCommand {
         echo "month:{$month}\n";
         echo "day:{$day}\n";
         //还需要刷新上个月的数据
-        if($day<=10){ //5號以後不刷新上個月的數據(2023年3月13改成10號)
+        if($day<=5||($month==5&&$day<=10)||($month==10&&$day<=10)){ //5號以後不刷新上個月的數據
             $month--;
             if($month==0){
                 $month=12;

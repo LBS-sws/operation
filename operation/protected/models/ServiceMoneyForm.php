@@ -233,7 +233,7 @@ class ServiceMoneyForm extends CFormModel
         return $scoreNum;
     }
 
-    public function curlJobFee($year,$month){
+    public function curlJobFee($year,$month,$bool=true){
         $year = is_numeric($year)?$year:date("Y");
         $month = is_numeric($month)?$month:date("n");
         $jobFeeList =JobFee::getData($year,$month);
@@ -263,7 +263,7 @@ class ServiceMoneyForm extends CFormModel
             ],"msg":"消息"}';
         $jobFeeList = json_decode($jobFeeList,true);
 */
-        if($jobFeeList["code"]==1){
+        if($jobFeeList["code"]==1&&$bool){
             $staffList = self::getEmployeeCodeList();
             foreach ($jobFeeList["data"] as $row){
                 if(key_exists($row["code"],$staffList)){
@@ -293,7 +293,7 @@ class ServiceMoneyForm extends CFormModel
     private function saveCurlData($year,$month,$staff,$data){
         $data["night_money"] = key_exists("night_money",$data)?$data["night_money"]:0;
         //夜单暂时不同步(2023年4月1号开始生效)
-        if(strtotime("{$year}/{$month}/01")<strtotime("2023/04/01")){
+        if(strtotime("{$year}/{$month}/01")<strtotime("2023/04/01")||true){//由於夜單金額異常，暫時設置成0
             $data["night_money"] = 0;
         }
         $data["create_money"] = key_exists("create_money",$data)?$data["create_money"]:0;

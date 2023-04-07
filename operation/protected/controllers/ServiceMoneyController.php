@@ -106,10 +106,10 @@ class ServiceMoneyController extends Controller
 		$this->render('form',array('model'=>$model,));
 	}
 
-	public function actionTest($year,$month)
+	public function actionTest($year,$month,$bool=false)
 	{
 		$model = new ServiceMoneyForm('new');
-        $arr = $model->curlJobFee($year,$month);
+        $arr = $model->curlJobFee($year,$month,$bool);
         if($arr["code"]==1){
             echo "success !!!!!<br/>";
         }else{

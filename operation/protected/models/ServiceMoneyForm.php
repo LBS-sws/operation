@@ -293,7 +293,7 @@ class ServiceMoneyForm extends CFormModel
     private function saveCurlData($year,$month,$staff,$data){
         $data["night_money"] = key_exists("night_money",$data)?$data["night_money"]:0;
         //夜单暂时不同步(2023年4月1号开始生效)
-        if(strtotime("{$year}/{$month}/01")<strtotime("2023/04/01")||true){//由於夜單金額異常，暫時設置成0
+        if(strtotime("{$year}/{$month}/01")<strtotime("2023/04/01")){//由於夜單金額異常，暫時設置成0
             $data["night_money"] = 0;
         }
         $data["create_money"] = key_exists("create_money",$data)?$data["create_money"]:0;

@@ -98,7 +98,7 @@ return array(
     ". Xidiyi sales: 100 cents per barrel (free delivery does not count)"=>"、洗地易销售:每桶100分 (免费送的不算)",
     ", introduce new business: order: 500 points/order"=>"、介绍新生意:成单: 500分/单",
     "5, night score title"=>"5、夜单",
-    "night score body"=>"如果技术员在当月，他有单超过22:00之服务单，则加分，计算公式如下：2000（技术员首2000夜单金额）/200 + (技术员夜单金额-2000）/500",
+    "night score body"=>"如果技术员在当月有单超过20:00服务，则加分(判断夜班的逻辑:U系统已完成的工作单有勾选加班的即为夜单)，计算公式如下：2000（技术员首2000夜单金额）/200 + (技术员夜单金额-2000）/500",
     "night score body two"=>"夜单金额不满2000时，计算公式为：夜单金额/200",
     "6, create score title"=>"6、创新服务",
     "create score body"=>"如服务类型为：甲醛、隔油池清洁服务、雾化消毒、厨房油烟清洁服务、RA空气净化-延长维保、RA空气净化-随意派、RA空气净化-轻松派则视为创新服务，计算公式如下：

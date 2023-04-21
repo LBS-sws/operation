@@ -110,7 +110,7 @@ class ServiceMoneyController extends Controller
 	{
 		$model = new ServiceMoneyForm('new');
         $arr = $model->curlJobFee($year,$month,$bool);
-        if($arr["code"]==1){
+        if(!empty($arr)){
             echo "success !!!!!<br/>";
         }else{
             echo "error:<br/>";

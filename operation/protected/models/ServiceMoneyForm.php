@@ -236,8 +236,10 @@ class ServiceMoneyForm extends CFormModel
     public function curlJobFee($year,$month,$bool=true){
         $year = is_numeric($year)?$year:date("Y");
         $month = is_numeric($month)?$month:date("n");
+        $jobFeeList =self::getUServiceMoney($year,$month);
+/*  2023/04/21（棄用）
         $jobFeeList =JobFee::getData($year,$month);
-/*        $jobFeeList ='{
+        $jobFeeList ='{
             "code":1,
             "data":[
                 {
@@ -263,16 +265,52 @@ class ServiceMoneyForm extends CFormModel
             ],"msg":"消息"}';
         $jobFeeList = json_decode($jobFeeList,true);
 */
-        if($jobFeeList["code"]==1&&$bool){
+        if(!empty($jobFeeList)&&$bool){
             $staffList = self::getEmployeeCodeList();
-            foreach ($jobFeeList["data"] as $row){
+            foreach ($jobFeeList as $row){
                 if(key_exists($row["code"],$staffList)){
-                    $row["create_money"]=$this->getDateCreateMoney($row);
                     $this->saveCurlData($year,$month,$staffList[$row["code"]],$row);
                 }
             }
         }
         return $jobFeeList;
+    }
+
+    public static function getUServiceMoney($year,$month){
+        $whereDate = date("Y/m/01",strtotime("{$year}/{$month}/01"));
+        $suffix = Yii::app()->params['envSuffix'];
+        $rows = Yii::app()->db->createCommand()->select("a.OT,a.Fee,a.TermCount,a.Staff01,f.ServiceName")
+            ->from("service{$suffix}.joborder a")
+            ->leftJoin("service{$suffix}.service f","a.ServiceType = f.ServiceType")
+            ->where("a.Status=3 and date_format(a.JobDate,'%Y/%m/01') = '{$whereDate}'")
+            ->queryAll();
+        $list = array();
+        $createList = array("甲醛","隔油池清洗服务","雾化消毒","厨房油烟清洁服务",
+            "RA空气净化-延长维保","RA空气净化-随意派","RA空气净化-轻松派");
+        if($rows){
+            foreach ($rows as $row){
+                if(!key_exists($row["Staff01"],$list)){
+                    $list[$row["Staff01"]]=array(
+                        "code"=>$row["Staff01"],//員工編號
+                        "sum_money"=>0,//服務金額
+                        "night_money"=>0,//夜單金額
+                        "create_money"=>0,//創新金額
+                    );
+                }
+                $row["Fee"] = is_numeric($row["Fee"])?floatval($row["Fee"]):0;
+                $row["TermCount"] = is_numeric($row["TermCount"])?floatval($row["TermCount"]):0;
+                $money = empty($row["TermCount"])?0:$row["Fee"]/$row["TermCount"];
+                $money = round($money,2);
+                $list[$row["Staff01"]]["sum_money"]+=$money;
+                if(!empty($row["OT"])){
+                    $list[$row["Staff01"]]["night_money"]+=$money;
+                }
+                if(in_array($row["ServiceName"],$createList)){
+                    $list[$row["Staff01"]]["create_money"]+=$money;
+                }
+            }
+        }
+        return $list;
     }
 
     private function getDateCreateMoney($row){

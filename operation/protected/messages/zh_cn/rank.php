@@ -119,5 +119,6 @@ return array(
     'night score'=>'夜单得分',
     'create score'=>'创新服务得分',
     'Update For U'=>'自动同步U系统',
+    'Update Date Last'=>'最后更新时间',
 );
 ?>

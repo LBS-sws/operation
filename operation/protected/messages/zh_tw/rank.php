@@ -120,5 +120,6 @@ return array(
     'night score'=>'夜單得分',
     'create score'=>'創新服務得分',
     'Update For U'=>'自動同步U系統',
+    'Update Date Last'=>'最後更新時間',
 );
 ?>

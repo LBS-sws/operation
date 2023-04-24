@@ -46,6 +46,12 @@ $this->pageTitle=Yii::app()->name . ' - RankingMonth Form';
                         array('readonly'=>(true))
                     ); ?>
                 </div>
+                <?php echo $form->labelEx($model,'lud',array('class'=>"col-lg-2 control-label")); ?>
+                <div class="col-lg-3">
+                    <?php echo $form->textField($model, 'lud',
+                        array('readonly'=>(true))
+                    ); ?>
+                </div>
             </div>
 
             <div class="form-group">

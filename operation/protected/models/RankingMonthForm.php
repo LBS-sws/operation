@@ -19,6 +19,8 @@ class RankingMonthForm extends CFormModel
 	public $startDate;
 	public $endDate;
 
+	public $lud;
+
 	public $arrList;//数据列表
 
     //由于后续添加了夜单及创新服务需要改成判断(2023/01/01开始）
@@ -711,6 +713,7 @@ class RankingMonthForm extends CFormModel
             'rank_month'=>Yii::t('rank','month'),
             'rank_year'=>Yii::t('rank','year'),
             'score_sum'=>Yii::t('rank','Score Sum'),
+            'lud'=>Yii::t('rank','Update Date Last'),
 		);
 	}
 
@@ -743,6 +746,7 @@ class RankingMonthForm extends CFormModel
 			$this->rank_month = $row['rank_month'];
 			$this->score_sum = floatval($row['score_sum']);
 			$this->other_score = floatval($row['other_score']);
+			$this->lud = $row['lud'];
 			$sqlDate = self::getSqlDate($this->rank_year,$this->rank_month);
 			foreach ($sqlDate as $item=>$rule){
                 $this->arrList[$item] = key_exists($item,$row)?floatval($row[$item]):"";
@@ -835,7 +839,7 @@ class RankingMonthForm extends CFormModel
                 }
                 $this->id = $id;
                 if($resetBool){ //刷新分数
-                    $arr=array("score_sum"=>0,"other_score"=>0);
+                    $arr=array("score_sum"=>0,"other_score"=>0,"lud"=>date("Y-m-d H:i:s"));
                     $sqlDate = self::getSqlDate($year,$month);
                     foreach ($sqlDate as $item=>$rule){
                         $arr[$item] = $this->$item($year,$month,$row["id"]);

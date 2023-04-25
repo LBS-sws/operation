@@ -23,12 +23,7 @@ class TimerCommand extends CConsoleCommand {
         $month = date("n");
         $day = date("j");
         $serviceMoneyModel = new ServiceMoneyForm('new');
-        $arr = $serviceMoneyModel->curlJobFee($year,$month);//同步U系統的服務金額
-        if($arr["code"]==1){
-            echo "curl success\n";
-        }else{
-            echo "curl error\n";
-        }
+        $serviceMoneyModel->curlJobFee($year,$month);//同步U系統的服務金額
         $model = new RankingMonthForm();
         $model->insertTechnician($year,$month,true);//刷新技術員排行榜
         echo "year:{$year}\n";

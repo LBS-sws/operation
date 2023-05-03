@@ -279,7 +279,7 @@ class ServiceMoneyForm extends CFormModel
     public static function getUServiceMoney($year,$month){
         $whereDate = date("Y/m/01",strtotime("{$year}/{$month}/01"));
         $suffix = Yii::app()->params['envSuffix'];
-        $rows = Yii::app()->db->createCommand()->select("a.OT,a.Fee,a.TermCount,a.Staff01,a.Staff02,a.Staff03,f.ServiceName")
+        $rows = Yii::app()->db->createCommand()->select("a.OT,a.JobTime,a.Fee,a.TermCount,a.Staff01,a.Staff02,a.Staff03,f.ServiceName")
             ->from("service{$suffix}.joborder a")
             ->leftJoin("service{$suffix}.service f","a.ServiceType = f.ServiceType")
             ->where("a.Status=3 and date_format(a.JobDate,'%Y/%m/01') = '{$whereDate}'")
@@ -310,7 +310,7 @@ class ServiceMoneyForm extends CFormModel
                             );
                         }
                         $list[$staff]["sum_money"]+=$money;
-                        if(!empty($row["OT"])){
+                        if(!empty($row["OT"])&&!empty($row["JobTime"])&&($row["JobTime"]>="20:00:00"||$row["JobTime"]<="03:00:00")){
                             $list[$staff]["night_money"]+=$money;
                         }
                         if(in_array($row["ServiceName"],$createList)){

@@ -72,6 +72,7 @@ class ServiceMoneyForm extends CFormModel
         $date = date("Ym",strtotime("{$oneDate} - 1 months"));
         $longDate = date("Ym",strtotime("{$oneDate} - 2 months"));
         $serviceDate = date("Ym",strtotime($year."/".$month."/01"));
+        $day-= $month==9||$month==4?5:0;//5月份或10月份延遲五天
         if($day<5){
             if($longDate>=$serviceDate){
                 $arr = array("status"=>true,"message"=>"不允许修改兩个月以前的数据");

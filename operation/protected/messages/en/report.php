@@ -6,5 +6,6 @@ return array(
     'Goods'=>'Product',
     'Picking Records Report'=>'Material Request Report',
     'Order Person'=>'Staff',
+	'China & Franchise'=>'South East Asia',
 );
 ?>

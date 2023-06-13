@@ -457,12 +457,15 @@ class RankingMonthForm extends CFormModel
         //新入职的员工必须满足：1、职位类别：服务 2、技术员：是 3、评核类型：技术员（2022-10-20新加的逻辑）
         $startDate = date("Y/m/d",strtotime($this->startDate."-3 months"));
         $endDate = date("Y/m/d",strtotime($this->endDate."-3 months"));
+        $date = date("Y/m/d",strtotime($this->endDate));
         $suffix = Yii::app()->params['envSuffix'];
         $score = Yii::app()->db->createCommand()->select("count(a.id)")
             ->from("hr{$suffix}.hr_employee a")
             ->leftJoin("hr{$suffix}.hr_dept b","a.position=b.id")
-            ->where("b.dept_class='Technician' and b.technician=1 and b.review_type=2 and a.recommend_user=:id and replace(a.entry_time,'-', '/') between '$startDate' and '$endDate'",
-                array(":id"=>$employee_id))->queryScalar();
+            ->where("b.dept_class='Technician' and b.technician=1 and b.review_type=2 and a.recommend_user=:id 
+            and replace(a.entry_time,'-', '/') between '$startDate' and '$endDate'
+            and TIMESTAMPDIFF(MONTH,a.entry_time,if(a.staff_status = -1,a.leave_time,'{$date}'))>=3
+            ",array(":id"=>$employee_id))->queryScalar();
         return is_numeric($score)?floatval($score)*500:0;
     }
 
@@ -470,12 +473,15 @@ class RankingMonthForm extends CFormModel
     private function recommend_num_table(){
         $startDate = date("Y/m/d",strtotime($this->startDate."-3 months"));
         $endDate = date("Y/m/d",strtotime($this->endDate."-3 months"));
+        $date = date("Y/m/d",strtotime($this->endDate));
         $suffix = Yii::app()->params['envSuffix'];
         $rows = Yii::app()->db->createCommand()->select("a.id,a.code,a.name,a.entry_time")
             ->from("hr{$suffix}.hr_employee a")
             ->leftJoin("hr{$suffix}.hr_dept b","a.position=b.id")
-            ->where("b.dept_class='Technician' and b.technician=1 and b.review_type=2 and a.recommend_user=:id and replace(a.entry_time,'-', '/') between '$startDate' and '$endDate'",
-                array(":id"=>$this->employee_id))->queryAll();
+            ->where("b.dept_class='Technician' and b.technician=1 and b.review_type=2 and a.recommend_user=:id 
+            and replace(a.entry_time,'-', '/') between '$startDate' and '$endDate'
+            and TIMESTAMPDIFF(MONTH,a.entry_time,if(a.staff_status = -1,a.leave_time,'{$date}'))>=3
+            ",array(":id"=>$this->employee_id))->queryAll();
         $html = "<thead>";
         $html.="<tr><th>推荐人编号</th><th>推荐人姓名</th><th>员工编号</th><th>员工姓名</th><th>入职时间</th><th>得分</th></tr>";
         $html.= "</thead><tbody>";

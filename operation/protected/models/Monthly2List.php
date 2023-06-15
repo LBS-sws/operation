@@ -29,11 +29,11 @@ class Monthly2List extends CListPageModel
 					end) as wfstatus,
 					workflow$suffix.RequestStatusDesc('OPRPT2',a.id,a.lcd) as wfstatusdesc
 				from opr_monthly_hdr a inner join security$suffix.sec_city b on a.city=b.code 
-				where a.group_id='2' $citylist $exclude
+				where a.group_id='2' AND b.ka_bool=0 $citylist $exclude
 			";
 		$sql2 = "select count(a.id)
 				from opr_monthly_hdr a, security$suffix.sec_city b 
-				where a.group_id='2' $citylist and a.city=b.code $exclude
+				where a.group_id='2' AND b.ka_bool=0 $citylist and a.city=b.code $exclude
 			";
 		$clause = "";
 		if (!empty($this->searchField) && !empty($this->searchValue)) {

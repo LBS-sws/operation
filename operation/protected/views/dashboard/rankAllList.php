@@ -44,7 +44,7 @@
 
 
 
-
+<a target="_blank"></a>
 
 <?php
 $link = Yii::app()->createAbsoluteUrl("dashboard/rankAllList",array("allType"=>$allType));
@@ -73,7 +73,13 @@ $js = <<<EOF
 						case 2: style = 'style="color:#0000FF"'; break;
 					}
 					rank = i+1;
-					line += '<td '+style+'>'+rank+'</td><td '+style+'>'+data[i].name+'</td><td '+style+'>'+data[i].city_name+'</td><td '+style+'>'+data[i].rank_year+'</td><td '+style+'>'+data[i].rank_month+'</td><td '+style+'>'+data[i].score_sum+'</td>';
+				    var a_link = data[i].url+'&rank='+rank;
+					line += '<td '+style+'>'+rank+'</td>';
+					line +='<td '+style+'>'+data[i].name+'</td>';
+					line +='<td '+style+'>'+data[i].city_name+'</td>';
+					line +='<td '+style+'>'+data[i].rank_year+'</td>';
+					line +='<td '+style+'>'+data[i].rank_month+'</td>';
+					line +='<td '+style+'><a href="'+a_link+'" target="_blank">'+data[i].score_sum+'</a></td>';
 					line += '</tr>';
 				}	
 				

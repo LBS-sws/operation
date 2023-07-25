@@ -111,6 +111,7 @@ class RankingMonthList extends CListPageModel
 		$this->attr = array();
 		if (count($records) > 0) {
 			foreach ($records as $k=>$record) {
+                $url = Yii::app()->createAbsoluteUrl("rankingMonth/edit",array("index"=>$record['id']));
                 $rank++;
                 $this->attr[] = array(
                     'id'=>$record['id'],
@@ -121,6 +122,7 @@ class RankingMonthList extends CListPageModel
                     'score_sum'=>floatval($record['score_sum']),
                     'name'=>$record['name']." ({$record['code']})",
                     'city_name'=>$record['city_name'],
+                    'url'=>$url,
                 );
 			}
 		}

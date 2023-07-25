@@ -8,6 +8,7 @@ class RankingOtherList extends CListPageModel
     public $rank_type;
     public $allCity=0;
 
+    private $monthScope=0;
     private $monthStr="";
     private $eprSql="";
 
@@ -105,6 +106,7 @@ class RankingOtherList extends CListPageModel
 		$this->attr = array();
 		if (count($records) > 0) {
 			foreach ($records as $k=>$record) {
+                $url = $this->getLinkForRow($record);
                 $this->attr[] = array(
                     'id'=>$record['employee_id'],
                     'year'=>$this->year,
@@ -115,6 +117,7 @@ class RankingOtherList extends CListPageModel
                     'score_sum'=>floatval($record['score_sum']),
                     'name'=>$record['name']." ({$record['code']})",
                     'city_name'=>$record['city_name'],
+                    'url'=>$url,
                 );
 			}
 		}
@@ -125,6 +128,34 @@ class RankingOtherList extends CListPageModel
         }
 		return true;
 	}
+
+	private function getLinkForRow($row){
+        $url="";
+        switch ($this->year_type){
+            case 1: //月度
+                $id = Yii::app()->db->createCommand()->select("id")->from("opr_technician_rank")
+                    ->where("employee_id=:id and year=:year and month=:month",
+                        array(':id'=>$row['employee_id'],':year'=>$this->year,':month'=>$this->monthScope)
+                    )->queryScalar();
+                $url = Yii::app()->createAbsoluteUrl("rankingMonth/edit",array("index"=>$id));
+                break;
+            case 2: //本季度
+                $url = Yii::app()->createAbsoluteUrl("rankingQuarter/edit",
+                    array("index"=>$row['employee_id'],"year"=>$this->year,"month"=>$this->monthScope)
+                );
+                break;
+            case 3: //半年度
+                $url = Yii::app()->createAbsoluteUrl("rankingHalf/edit",
+                    array("index"=>$row['employee_id'],"year"=>$this->year,"month"=>$this->monthScope)
+                );
+                break;
+            case 4: //年度
+                $url = Yii::app()->createAbsoluteUrl("rankingYear/edit",
+                    array("index"=>$row['employee_id'],"year"=>$this->year,"month"=>$this->monthScope)
+                );
+        }
+        return $url;
+    }
 
 	//營運系統首頁需要調用（顯示本月、本季度、半年度、年度排行）
     public function resetMonth($year_type){
@@ -212,6 +243,7 @@ class RankingOtherList extends CListPageModel
             $monthScope=$this->month;
         }
         $this->monthStr=$list[$this->month];
+        $this->monthScope=$monthScope;
 	    if(!empty($monthScope)){
             $this->eprSql.=" and a.rank_month in ({$monthScope}) ";
         }

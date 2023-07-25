@@ -93,6 +93,9 @@ class RankingYearList extends CListPageModel
 		$this->attr = array();
 		if (count($records) > 0) {
 			foreach ($records as $k=>$record) {
+                $url = Yii::app()->createAbsoluteUrl("rankingYear/edit",
+                    array("index"=>$record['employee_id'],"year"=>$this->year,"month"=>$this->month)
+                );
                 $this->attr[] = array(
                     'id'=>$record['employee_id'],
                     'show'=>$this->staff_id===0||$this->staff_id==$record["employee_id"]?true:false,
@@ -104,6 +107,7 @@ class RankingYearList extends CListPageModel
                     'score_sum'=>round($record['score_sum'],2),
                     'name'=>$record['name']." ({$record['code']})",
                     'city_name'=>$record['city_name'],
+                    'url'=>$url,
                 );
 			}
 		}

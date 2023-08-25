@@ -134,7 +134,7 @@ class RankingOtherList extends CListPageModel
         switch ($this->year_type){
             case 1: //月度
                 $id = Yii::app()->db->createCommand()->select("id")->from("opr_technician_rank")
-                    ->where("employee_id=:id and year=:year and month=:month",
+                    ->where("employee_id=:id and rank_year=:year and rank_month=:month",
                         array(':id'=>$row['employee_id'],':year'=>$this->year,':month'=>$this->monthScope)
                     )->queryScalar();
                 $url = Yii::app()->createAbsoluteUrl("rankingMonth/edit",array("index"=>$id));

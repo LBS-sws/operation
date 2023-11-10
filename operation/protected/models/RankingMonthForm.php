@@ -276,8 +276,8 @@ class RankingMonthForm extends CFormModel
         $suffix = Yii::app()->params['envSuffix'];
         $name = $this->employee_name." ({$this->employee_code})";
         $score=Yii::app()->db->createCommand()->select("count(id)")->from("swoper{$suffix}.swo_followup")
-            ->where("entry_dt between '$this->startDate' and '$this->endDate' and follow_staff like '%{$name}%' and resp_tech!=:name",
-                array(":name"=>$name))->queryScalar();
+            ->where("entry_dt between '$this->startDate' and '$this->endDate' and follow_staff like '%{$name}%' and resp_tech not like '%{$name}%'"
+            )->queryScalar();
         return is_numeric($score)?floatval($score)*100:0;
     }
 
@@ -286,8 +286,8 @@ class RankingMonthForm extends CFormModel
         $suffix = Yii::app()->params['envSuffix'];
         $name = $this->employee_name." ({$this->employee_code})";
         $rows=Yii::app()->db->createCommand()->select("id,company_name,entry_dt,resp_tech,follow_staff")->from("swoper{$suffix}.swo_followup")
-            ->where("entry_dt between '$this->startDate' and '$this->endDate' and follow_staff like '%{$name}%' and resp_tech!=:name",
-                array(":name"=>$name))->queryAll();
+            ->where("entry_dt between '$this->startDate' and '$this->endDate' and follow_staff like '%{$name}%' and resp_tech not like '%{$name}%'"
+            )->queryAll();
         $html = "<thead>";
         $html.="<tr><th>员工编号</th><th>员工姓名</th><th>客诉日期</th><th>客户名称</th><th>负责技术员</th><th>跟进(此投诉)技术员</th><th>得分</th></tr>";
         $html.= "</thead><tbody>";

@@ -31,7 +31,7 @@ class WarehouseController extends Controller
                 'expression'=>array('WarehouseController','allowImportPrice'),
             ),
             array('allow',
-                'actions'=>array('index','view'),
+                'actions'=>array('index','view','ajaxGoodHistory'),
                 'expression'=>array('WarehouseController','allowReadOnly'),
             ),
             array('deny',  // deny all users
@@ -232,6 +232,18 @@ class WarehouseController extends Controller
             $model = new WarehouseForm();
             $rs =$model->getPriceHistory($id);
             echo CJSON::encode($rs);//Yii 的方法将数组处理成json数据
+        }else{
+            $this->redirect(Yii::app()->createUrl('warehouse/index'));
+        }
+    }
+
+    //物品的異步請求
+    public function actionAjaxGoodHistory(){
+        if(Yii::app()->request->isAjaxRequest) {//是否ajax请求
+            $id = $_GET['id'];
+            $model = new WarehouseList();
+            $html =$model->getGoodsHistory($id);
+            echo CJSON::encode(array('status'=>1,'html'=>$html));//Yii 的方法将数组处理成json数据
         }else{
             $this->redirect(Yii::app()->createUrl('warehouse/index'));
         }

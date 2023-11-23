@@ -20,12 +20,13 @@ class WarehouseList extends CListPageModel
 	public function retrieveDataByPage($pageNum=1)
 	{
 		$city = Yii::app()->user->city();
-		$sql1 = "select *,ifnull(costPrice(id,now()),0) as cost_price 
-				from opr_warehouse
+		$sql1 = "select a.*,b.name as classify_name,ifnull(costPrice(a.id,now()),0) as cost_price 
+				from opr_warehouse a
+				LEFT JOIN opr_classify b ON a.classify_id=b.id
 				where city = '$city' 
 			";
-		$sql2 = "select count(id)
-				from opr_warehouse
+		$sql2 = "select count(a.id) from opr_warehouse a
+				LEFT JOIN opr_classify b ON a.classify_id=b.id
 				where city = '$city' 
 			";
 		$clause = "";
@@ -40,30 +41,30 @@ class WarehouseList extends CListPageModel
 			$svalue = str_replace("'","\'",$this->searchValue);
 			switch ($this->searchField) {
 				case 'goods_code':
-					$clause .= General::getSqlConditionClause('goods_code', $svalue);
+					$clause .= General::getSqlConditionClause('a.goods_code', $svalue);
 					break;
 				case 'name':
-					$clause .= General::getSqlConditionClause('name', $svalue);
+					$clause .= General::getSqlConditionClause('a.name', $svalue);
 					break;
 				case 'display':
                     $svalue = (strpos($svalue,Yii::t("misc","No"))!==false)?0:1;
-					$clause .= General::getSqlConditionClause('display', $svalue);
+					$clause .= General::getSqlConditionClause('a.display', $svalue);
 					break;
 				case 'type':
-					$clause .= General::getSqlConditionClause('type', $svalue);
+					$clause .= General::getSqlConditionClause('a.type', $svalue);
 					break;
 				case 'unit':
-					$clause .= General::getSqlConditionClause('unit', $svalue);
+					$clause .= General::getSqlConditionClause('a.unit', $svalue);
 					break;
 				case 'price':
-					$clause .= General::getSqlConditionClause('price', $svalue);
+					$clause .= General::getSqlConditionClause('a.price', $svalue);
 					break;
 				case 'inventory':
 					//$clause .= General::getSqlConditionClause('inventory', $svalue);
-					$clause .= "and inventory = '$svalue' ";
+					$clause .= "and a.inventory = '$svalue' ";
 					break;
 				case 'classify_id':
-					$clause .= $this->getClassifyToSql($svalue);
+                    $clause .= General::getSqlConditionClause('b.name', $svalue);
 					break;
 			}
 		}
@@ -73,7 +74,7 @@ class WarehouseList extends CListPageModel
 		    if("inventory" === $this->orderField){
                 $order .= " order by CAST(inventory AS DECIMAL) ";
             }else{
-                $order .= " order by ".$this->orderField." ";
+                $order .= " order by a.".$this->orderField." ";
             }
 			if ($this->orderType=='D') $order .= "desc ";
 		} else
@@ -96,11 +97,12 @@ class WarehouseList extends CListPageModel
 						'min_num'=>$record['min_num'],
 						'display'=>empty($record['display'])?Yii::t("misc","No"):Yii::t("misc","Yes"),
 						'price'=>$record['cost_price'],
-						'classify_id'=>ClassifyForm::getClassifyToId($record['classify_id']),
+						'classify_id'=>$record['classify_name'],
+						//'classify_id'=>ClassifyForm::getClassifyToId($record['classify_id']),
 						'inventory'=>$record['inventory'],
 						'goods_code'=>$record['goods_code'],
 						'color'=>$record['z_index'] == 1?"":" text-danger",
-						'goodsHistory'=>$this->getGoodsHistory($record['id']),
+						//'goodsHistory'=>self::getGoodsHistory($record['id']),
 					);
 			}
 		}
@@ -110,19 +112,24 @@ class WarehouseList extends CListPageModel
 	}
 
 	//獲取物品由訂單扣減的歷史 (最多顯示5條)
-	private function getGoodsHistory($goods_id){
-	    if (empty($goods_id)){
-	        return "";
-        }
+	public static function getGoodsHistory($goods_id){
+	    $html="";
         $rows = Yii::app()->db->createCommand()->select("*")
             ->from("opr_order_goods")
             ->where('goods_id=:goods_id and order_status="finished"',array(':goods_id'=>$goods_id))
             ->order('lud desc')->limit(5)->queryAll();
 	    if($rows){
-	        return $rows;
+            foreach ($rows as $historyList){
+                $html.= "<tr>";
+                $html.= "<td>".$historyList["lud"]."</td>";
+                $html.= "<td>".$historyList["lcu"]."</td>";
+                $html.= "<td>".$historyList["confirm_num"]."</td>";
+                $html.= "</tr>";
+            }
         }else{
-	        return "";
+            $html = "<tr><td colspan='3' class='text-center'>沒有记录</td></tr>";
         }
+        return $html;
     }
 
     //分類的模糊查詢

@@ -85,10 +85,16 @@ if (Yii::app()->user->validFunction('YN02')){
     $this->renderPartial('//site/importPrice',array('name'=>"UploadExcelForm","model"=>$model));
 }
 ?>
+<div class="goodsHistoryDiv" id="divHistory">
+    <table class="table table-bordered table-striped table-hover" style="margin-bottom: 0px;">
+        <thead>
+        <tr><th>领货日期</th><th>领货同事</th><th>领货数量</th></tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
 <?php
-$this->renderPartial('//site/goodsHistory',array(
-        'model'=>$model)
-);
 if (Yii::app()->user->validFunction('YN02'))
     $this->renderPartial('//site/priceFlow');
 ?>
@@ -98,16 +104,42 @@ $js='
         var num = $(this).data("id");
         var pageX = (e.pageX + 5);
         var pageY = (e.pageY + 5);
-        $(".divHistory"+num).show();
-        var width = $(".divHistory"+num).outerWidth(true);
+        var divData = $("#divHistory").data("id");
+        if(divData!="load"&&divData!=num){
+            $("#divHistory").data("id","load");
+            $("#divHistory tbody").html("<tr><td colspan=\'3\'>加载中...</td></tr>");
+            $.ajax({
+                type: "GET",
+                url: "'.Yii::app()->createUrl('warehouse/ajaxGoodHistory').'",
+                data: {
+                    "id":num
+                },
+                dataType: "json",
+                success: function(data) {
+                    $("#divHistory").data("id",num);
+                    if(data.status == 1){
+                        $("#divHistory tbody").html(data.html);
+                    }else{
+                        alert("數據異常");
+                    }
+                },
+                error: function(data) { // if error occured
+                    $("#divHistory").data("id","");
+                    alert("Error occured.please try again");
+                }
+            });
+        
+        }
+        $("#divHistory").show();
+        var width = $("#divHistory").outerWidth(true);
         if(width+pageX>$(window).outerWidth(true)){
             pageX = $(window).outerWidth(true)-width-20;
         }
-        $(".divHistory"+num).css({"left":pageX+"px","top":pageY+"px"});
+        $("#divHistory").css({"left":pageX+"px","top":pageY+"px"});
     });
     $(".goodsHistoryMouse").on("mouseout",function(){
         var num = $(this).data("id");
-        $(".divHistory"+num).hide();
+        $("#divHistory").hide();
     });
 ';
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);

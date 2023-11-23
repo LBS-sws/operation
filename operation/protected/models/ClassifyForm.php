@@ -149,7 +149,7 @@ class ClassifyForm extends CFormModel
     }
 
     //根據訂單id查分類名字
-    public function getClassifyToId($classify_id){
+    public static function getClassifyToId($classify_id){
         $rs = Yii::app()->db->createCommand()->select("name")
             ->from("opr_classify")->where('id=:id',array(':id'=>$classify_id))->queryAll();
         if($rs){

@@ -33,7 +33,7 @@
         ?>
     </th>
     <th>
-        <?php echo TbHtml::link($this->getLabelName('total_price').$this->drawOrderArrow('total_price'),'#',$this->createOrderLink('cargoCostUser-list','total_price'))
+        <?php echo TbHtml::link($this->getLabelName('total_price').$this->drawOrderArrow('a.total_price'),'#',$this->createOrderLink('cargoCostUser-list','a.total_price'))
         ;
         ?>
     </th>

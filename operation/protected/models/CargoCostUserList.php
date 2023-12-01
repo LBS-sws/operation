@@ -37,7 +37,7 @@ class CargoCostUserList extends CListPageModel
         $suffix =  Yii::app()->params['envSuffix'];
         $city_allow = Yii::app()->user->city_allow();
         $username = str_replace("'","\'",$this->username);
-        $sql1 = "select a.id,a.order_code,a.order_user,a.technician,a.status,a.lcu,a.lcd,ifnull(SUM(costPrice(c.goods_id,a.lcd)*CONVERT(c.confirm_num,DECIMAL(8,4))),0) as total_price,b.disp_name,b.city 
+        $sql1 = "select a.id,a.order_code,a.order_user,a.technician,a.status,a.lcu,a.lcd,a.total_price,b.disp_name,b.city 
 				from opr_order_goods c
 				LEFT JOIN opr_order a ON c.order_id = a.id
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
@@ -54,6 +54,7 @@ class CargoCostUserList extends CListPageModel
             switch ($this->searchField) {
                 case 'lcd':
                     $clause .= General::getSqlConditionClause('a.lcd', $svalue);
+                    break;
                 case 'order_code':
                     $clause .= General::getSqlConditionClause('a.order_code', $svalue);
                     break;

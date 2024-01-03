@@ -28,7 +28,7 @@ class ServiceMoneyController extends Controller
 				'expression'=>array('ServiceMoneyController','allowReadWrite'),
 			),
 			array('allow', 
-				'actions'=>array('index','view','test','reset'),
+				'actions'=>array('index','view','test','reset','getData'),
 				'expression'=>array('ServiceMoneyController','allowReadOnly'),
 			),
 			array('deny',  // deny all users
@@ -36,6 +36,16 @@ class ServiceMoneyController extends Controller
 			),
 		);
 	}
+
+    public function actionGetData($year,$month)
+    {
+        echo "Year:{$year}"."<br/>";
+        echo "Month:{$month}"."<br/>";
+        echo "data:"."<br/>";
+        $json = ServiceMoneyForm::getUServiceMoney($year,$month);
+        var_dump($json);
+        die();
+    }
 
     public function actionReset($index)
     {

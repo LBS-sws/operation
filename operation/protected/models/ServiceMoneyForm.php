@@ -280,7 +280,7 @@ class ServiceMoneyForm extends CFormModel
     public static function getUServiceMoney($year,$month){
         $whereDate = date("Y/m/01",strtotime("{$year}/{$month}/01"));
         $suffix = Yii::app()->params['envSuffix'];
-        $rows = Yii::app()->db->createCommand()->select("a.OT,a.JobTime,a.Fee,a.TermCount,a.Staff01,a.Staff02,a.Staff03,f.ServiceName")
+        $rows = Yii::app()->db->createCommand()->select("a.OT,a.JobTime,a.AddFirst,a.Fee,a.TermCount,a.Staff01,a.Staff02,a.Staff03,f.ServiceName")
             ->from("service{$suffix}.joborder a")
             ->leftJoin("service{$suffix}.service f","a.ServiceType = f.ServiceType")
             ->where("a.Status=3 and date_format(a.JobDate,'%Y/%m/01') = '{$whereDate}'")
@@ -291,9 +291,10 @@ class ServiceMoneyForm extends CFormModel
         $staffStrList = array("Staff01","Staff02","Staff03");
         if($rows){
             foreach ($rows as $row){
+                $row["AddFirst"] = is_numeric($row["AddFirst"])?floatval($row["AddFirst"]):0;
                 $row["Fee"] = is_numeric($row["Fee"])?floatval($row["Fee"]):0;
                 $row["TermCount"] = is_numeric($row["TermCount"])?floatval($row["TermCount"]):0;
-                $money = empty($row["TermCount"])?0:$row["Fee"]/$row["TermCount"];
+                $money = empty($row["TermCount"])?0:($row["Fee"]+$row["AddFirst"])/$row["TermCount"];
                 $staffCount = 1;
                 $staffCount+= empty($row["Staff02"])?0:1;
                 $staffCount+= empty($row["Staff03"])?0:1;

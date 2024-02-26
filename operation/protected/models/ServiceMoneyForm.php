@@ -279,9 +279,10 @@ class ServiceMoneyForm extends CFormModel
 
     public static function getUServiceMoney($year,$month){
         //由于2024年1月29日使用了新的U系统，所以使用新代码
+        /*
         $list = SystemU::getTechnicianSNC($year,$month);
         return isset($list["data"])?$list["data"]:array();
-
+*/
         //由于2024年1月29日使用了新的U系统，所以不使用以下代码
         $whereDate = date("Y/m/01",strtotime("{$year}/{$month}/01"));
         $suffix = Yii::app()->params['envSuffix'];

@@ -1,5 +1,8 @@
 <?php
-class RptOrderList extends CReport {	protected function fields() {		return array(			'city_name'=>array('label'=>Yii::t('misc','City'),'width'=>15,'align'=>'L'),
+class RptOrderList extends CReport {
+	protected function fields() {
+		return array(
+			'city_name'=>array('label'=>Yii::t('misc','City'),'width'=>15,'align'=>'L'),
 			'goods_code'=>array('label'=>Yii::t('procurement','Order Code'),'width'=>22,'align'=>'L'),
 			'goods_name'=>array('label'=>Yii::t('procurement','Goods Name'),'width'=>30,'align'=>'L'),
 			'class_name'=>array('label'=>Yii::t('procurement','Goods Class'),'width'=>25,'align'=>'L'),
@@ -10,7 +13,9 @@ class RptOrderList extends CReport {	protected function fields() {		return arr
 			'appr_dt'=>array('label'=>Yii::t('report','HQ Approved Date'),'width'=>15,'align'=>'C'),
 			'activity_code'=>array('label'=>Yii::t('report','Activity Info'),'width'=>40,'align'=>'L'),
 			'req_user'=>array('label'=>Yii::t('report','Requestor'),'width'=>30,'align'=>'L'),
-		);	}	
+		);
+	}
+	
 	public function genReport() {
 		$this->retrieveData();
 		$stslist = ReportY02Form::OrderStatusList();
@@ -21,6 +26,11 @@ class RptOrderList extends CReport {	protected function fields() {		return arr
 			.Yii::t('procurement','Order Status').':'.$status.' / '
 			.Yii::t('report','Goods').':'.$this->criteria['GOODSDESC']
 			;
+        if (isset($this->criteria['CITY'])&&!empty($this->criteria['CITY'])) {
+            $this->subtitle.= empty($this->subtitle)?"":" ；";
+            $this->subtitle.= Yii::t('report','City').': ';
+            $this->subtitle.= General::getCityNameForList($this->criteria['CITY']);
+        }
 		return $this->exportExcel();
 	}
 
@@ -30,10 +40,13 @@ class RptOrderList extends CReport {	protected function fields() {		return arr
 		$city = $this->criteria['CITY'];
 		$goods_id = $this->criteria['GOODS'];
 		$order_status = $this->criteria['ORDERSTATUS'];
-		
-		$citymodel = new City();
-		$citylist = $citymodel->getDescendantList($city);
-		$citylist = empty($citylist) ? "'$city'" : "$citylist,'$city'";
+
+        if(!General::isJSON($city)){
+            $citylist = strpos($city,"'")!==false?$city:"'{$city}'";
+        }else{
+            $citylist = json_decode($city,true);
+            $citylist = "'".implode("','",$citylist)."'";
+        }
 		
 		$suffix = Yii::app()->params['envSuffix'];
 		
@@ -86,7 +99,8 @@ class RptOrderList extends CReport {	protected function fields() {		return arr
 				$this->data[] = $temp;
 			}
 		}
-		return true;	}
+		return true;
+	}
 
 	protected function getHQApproveInfo($id, $type, $status) {
 		$rtn = array('appr_dt'=>'', 'appr_user'=>'');
@@ -131,8 +145,8 @@ class RptOrderList extends CReport {	protected function fields() {		return arr
 	}
 	
 	public function getReportName() {
-		$city_name = isset($this->criteria) ? ' - '.General::getCityName($this->criteria['CITY']) : '';
-		return (isset($this->criteria) ? Yii::t('report',$this->criteria['RPT_NAME']) : Yii::t('report','Nil')).$city_name;
+		//$city_name = isset($this->criteria) ? ' - '.General::getCityName($this->criteria['CITY']) : '';
+		return (isset($this->criteria) ? Yii::t('report',$this->criteria['RPT_NAME']) : Yii::t('report','Nil'));
 	}
 }
 ?>

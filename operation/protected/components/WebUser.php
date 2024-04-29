@@ -89,9 +89,9 @@ class WebUser extends CWebUser
 
 		$user=User::model()->find('LOWER(username)=?',array($this->name));
 		$city = City::model()->find('code=?',array($user->city));
-		$city_allow = City::model()->getDescendantList($user->city);
-		$cstr = $user->city;
-		$city_allow .= (empty($city_allow)) ? "'$cstr'" : ",'$cstr'";
+        $cstr = $user->city;
+        $city_allow = str_replace(",","','",$user->look_city);//将,号替换成','
+        $city_allow = empty($city_allow)? "'$cstr'" : "'{$city_allow}'";
 		
 		$session = Yii::app()->session;
 		$this->getUserOption($user);

@@ -31,6 +31,7 @@ $this->pageTitle=Yii::app()->name . ' - AreaAudit Info';
 				'search'=>array(
                     'order_code',
                     'activity_id',
+                    'city',
                 ),
 		));
 	?>

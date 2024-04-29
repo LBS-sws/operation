@@ -21,14 +21,15 @@ class AreaAuditList extends CListPageModel
     {
         //order_user = '$userName' OR technician = '$userName'
         $city = Yii::app()->user->city();
+        $city_allow = Yii::app()->user->city_allow();
         $userName = Yii::app()->user->name;
         $sql1 = "select *
 				from opr_order
-				where (city = '$city' AND judge=1 AND status != 'pending' AND status != 'cancelled' AND status != 'finished' AND status != 'approve') 
+				where (city in ({$city_allow}) AND judge=1 AND status != 'pending' AND status != 'cancelled' AND status != 'finished' AND status != 'approve') 
 			";
         $sql2 = "select count(id)
 				from opr_order
-				where (city = '$city' AND judge=1 AND status != 'pending' AND status != 'cancelled' AND status != 'finished' AND status != 'approve') 
+				where (city in ({$city_allow}) AND judge=1 AND status != 'pending' AND status != 'cancelled' AND status != 'finished' AND status != 'approve') 
 			";
         $clause = "";
         if (!empty($this->searchField) && !empty($this->searchValue)) {
@@ -42,6 +43,10 @@ class AreaAuditList extends CListPageModel
                 case 'activity_id':
                     $activityIdSql = OrderList::getActivityIdSql($svalue);
                     $clause .= " and activity_id in ($activityIdSql)";
+                    break;
+                case 'city':
+                    $citySql = OrderList::getCitySql($svalue);
+                    $clause .= " and city in ($citySql)";
                     break;
             }
         }
@@ -72,7 +77,7 @@ class AreaAuditList extends CListPageModel
                     'order_user'=>$record['order_user'],
                     'technician'=>$record['technician'],
                     'status'=>$this->getListStatus($record['status'],$record['status_type']),
-                    'city'=>$record['city'],
+                    'city'=>CGeneral::getCityName($record['city']),
                     'lcd'=>date("Y-m-d",strtotime($record['lcd'])),
                 );
             }

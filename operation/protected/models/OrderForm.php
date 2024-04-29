@@ -228,7 +228,7 @@ class OrderForm extends CFormModel
     }
 
     //根據訂單id查訂單所有物品
-    public function getGoodsListToId($order_id,$city=''){
+    public static function getGoodsListToId($order_id,$city=''){
         $arr=array();
         $order_class=Yii::app()->db->createCommand()->select("order_class")->from("opr_order")->where("id=:id",array(":id"=>$order_id))->queryAll();
         $order_class=$order_class[0]["order_class"];

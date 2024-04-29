@@ -1,5 +1,6 @@
 <tr class='clickable-row <?php echo $this->record["status"]["style"]?>' data-href='<?php echo $this->getLink('YD06', 'areaAudit/edit', 'areaAudit/view', array('index'=>$this->record['id']));?>'>
     <td><?php echo $this->drawEditButton('YD06', 'areaAudit/edit', 'areaAudit/view', array('index'=>$this->record['id'])); ?></td>
+    <td><?php echo $this->record['city']; ?></td>
     <td><?php echo $this->record['lcd']; ?></td>
     <td><?php echo $this->record['order_code']; ?></td>
     <td><?php echo $this->record['activity_id']; ?></td>

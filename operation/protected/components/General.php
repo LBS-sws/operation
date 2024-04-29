@@ -65,6 +65,43 @@ class General extends CGeneral {
             }
         }
     }
+
+    public static function getCityListWithCityAllow($city_allow='') {
+        $list = array();
+        $suffix = Yii::app()->params['envSuffix'];
+        $clause = !empty($city_allow) ? "code in ($city_allow)" : "1>1";
+        $sql = "select code, name from security$suffix.sec_city WHERE {$clause} order by name";
+        $rows = Yii::app()->db->createCommand($sql)->queryAll();
+        if (count($rows) > 0) {
+            foreach ($rows as $row) {
+                $list[$row['code']] = $row['name'];
+            }
+        }
+        return $list;
+    }
+
+    public static function getCityNameForList($code) {
+        if(empty($code)){
+            return "";
+        }
+        if (self::isJSON($code)){
+            $list = json_decode($code,true);
+            $cityList = array();
+            foreach ($list as $city){
+                $cityList[]=self::getCityName($city);
+            }
+            return implode("、",$cityList);
+        }elseif(strpos($code,",")!==false){
+            $suffix = Yii::app()->params['envSuffix'];
+            $sql = "select name from security$suffix.sec_city where code in ({$code})";
+            $rows = Yii::app()->db->createCommand($sql)->queryAll();
+            $cityList = array_column($rows,"name");
+            return implode("、",$cityList);
+        }else{
+            return self::getCityName($code);
+        }
+    }
+
 }
 
 ?>

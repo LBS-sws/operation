@@ -1,6 +1,11 @@
 <tr>
     <th></th>
     <th>
+        <?php echo TbHtml::link($this->getLabelName('city').$this->drawOrderArrow('city'),'#',$this->createOrderLink('areaAudit-list','city'))
+        ;
+        ?>
+    </th>
+    <th>
         <?php echo TbHtml::link($this->getLabelName('lcd').$this->drawOrderArrow('lcd'),'#',$this->createOrderLink('areaAudit-list','lcd'))
         ;
         ?>

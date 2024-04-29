@@ -33,7 +33,7 @@ class ReportY02Form extends CReportForm
 		$this->name = Yii::t('report','Order Records Report');
 		$this->format = 'EXCEL';
 		$this->city = Yii::app()->user->city();
-		$this->fields = 'start_dt,end_dt,goods,goods_desc';
+		$this->fields = 'city,start_dt,end_dt,goods,goods_desc';
 		$this->start_dt = date("Y/m/d");
 		$this->end_dt = date("Y/m/d");
 		$this->goods = '';
@@ -41,7 +41,7 @@ class ReportY02Form extends CReportForm
 		$this->order_status = 'all';
 	}
 	
-	public function OrderStatusList(){
+	public static function OrderStatusList(){
 		return array(
 			"all"=>Yii::t('misc','All'),
 			"1:sent"=>Yii::t("procurement","Waiting for central audit"),

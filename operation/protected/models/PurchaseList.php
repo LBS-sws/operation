@@ -118,7 +118,7 @@ class PurchaseList extends CListPageModel
      * @param string $username    管理員的username
      * @return array
      */
-    public function getOrderListSearch($city_allow,$user_code='',$start_date='',$end_date='',$username=''){
+    public static function getOrderListSearch($city_allow,$user_code='',$start_date='',$end_date='',$username=''){
         $suffix = Yii::app()->params['envSuffix'];
         $systemId = Yii::app()->params['systemId'];
         if(empty($city_allow)){

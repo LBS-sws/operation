@@ -34,15 +34,16 @@ class OrderList extends CListPageModel
 	{
 	    //order_user = '$userName' OR technician = '$userName'
 		$city = Yii::app()->user->city();
+        $city_allow = Yii::app()->user->city_allow();
 		$userName = Yii::app()->user->name;
 		if($activity_id === "yes"){
             $sql1 = "select *
 				from opr_order
-				where (city = '$city' AND judge=1) 
+				where (city in ({$city_allow}) AND judge=1) 
 			";
             $sql2 = "select count(id)
 				from opr_order
-				where (city = '$city' AND judge=1) 
+				where (city in ({$city_allow}) AND judge=1) 
 			";
         }else{
             $this->activity_id = $activity_id;
@@ -103,7 +104,7 @@ class OrderList extends CListPageModel
 						'technician'=>$record['technician'],
 						'status'=>$record['status'],
 						'status_type'=>$record['status_type'],
-						'city'=>$record['city'],
+						'city'=>CGeneral::getCityName($record['city']),
 						'lcd'=>date("Y-m-d",strtotime($record['lcd'])),
 					);
 			}
@@ -113,7 +114,7 @@ class OrderList extends CListPageModel
 		return true;
 	}
 
-	public function printOrderStatus($status,$status_type = 1){
+	public static function printOrderStatus($status,$status_type = 1){
         if($status_type == 1){
             switch ($status){
                 case "sent":
@@ -194,7 +195,7 @@ class OrderList extends CListPageModel
         }
     }
 
-    public function getCitySql($str){
+    public static function getCitySql($str){
         $citySql = "";
         $suffix = Yii::app()->params['envSuffix'];
         $suffix = "security".$suffix.".sec_city";
@@ -260,7 +261,7 @@ class OrderList extends CListPageModel
             ->from("opr_order")->where('status="approve" and judge=0 and city=:city and lcu=:lcu',array(":city"=>$city,":lcu"=>$uid))->queryScalar();
 
 		// 营业报告审核的數量
-		$suffix = Yii::app()->params['envSuffix'];
+/*		$suffix = Yii::app()->params['envSuffix'];
 		$type = Yii::app()->user->validFunction('YN01') ? 'PA' : 'PH';
 		$wf = new WorkflowOprpt;
 		$wf->connection = Yii::app()->db;
@@ -272,8 +273,8 @@ class OrderList extends CListPageModel
 				where a.city in ($cityallow) and a.city=b.code 
 				and a.id in ($list)
 			";
-		$rep_num = Yii::app()->db->createCommand($sql)->queryScalar();
-        //$rep_num = 0;
+		$rep_num = Yii::app()->db->createCommand($sql)->queryScalar();*/
+        $rep_num = 0;
 		// 营业报告审核的數量 -- END
 		
 		return array(

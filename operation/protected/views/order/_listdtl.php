@@ -24,6 +24,7 @@ switch ($this->record['status']){
 }
 ?>
 	<td><?php echo $this->drawEditButton('YD03', 'order/edit', 'order/view', array('index'=>$this->record['id'])); ?></td>
+	<td><?php echo $this->record['city']; ?></td>
 	<td><?php echo $this->record['lcd']; ?></td>
 	<td><?php echo $this->record['order_code']; ?></td>
 	<td><?php echo $this->record['activity_id']; ?></td>

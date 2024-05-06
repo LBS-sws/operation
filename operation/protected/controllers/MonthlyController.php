@@ -75,7 +75,7 @@ class MonthlyController extends Controller
             echo "code:{$code} ，name:{$typeRow['name']}</br>";
             $rows = Yii::app()->db->createCommand()->select("a.id,a.city")->from("opr_monthly_hdr a")
                 ->leftJoin("opr_monthly_dtl b","b.data_field='{$code}' and a.id=b.hdr_id")
-                ->where("b.id is null")->queryAll();
+                ->where("b.id is null and a.year_no='{$year}' and a.month_no='{$month}'")->queryAll();
             if($rows){
                 foreach ($rows as $row){
                     Yii::app()->db->createCommand()->insert('opr_monthly_dtl', array(

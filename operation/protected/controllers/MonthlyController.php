@@ -22,7 +22,7 @@ class MonthlyController extends Controller
 	{
 		return array(
 			array('allow', 
-				'actions'=>array('edit','save','submit','resubmit','fileupload','fileremove'),
+				'actions'=>array('edit','save','submit','resubmit','fileupload','fileremove','addDtlForCode'),
 				'expression'=>array('MonthlyController','allowReadWrite'),
 			),
 			array('allow', 
@@ -47,7 +47,7 @@ class MonthlyController extends Controller
 		);
 	}
 
-	// To override the checking in components/Controller.php
+    // To override the checking in components/Controller.php
 	public function beforeAction($action) {
 		$index_id = $action->getId();
 		if (strpos('index/indexa/indexc/edit/view/', $index_id.'/')!==false) {
@@ -60,6 +60,38 @@ class MonthlyController extends Controller
 		} else {
 			return true;
 		}
+	}
+
+    //add opr_monthly_field mysql
+	public function actionAddDtlForCode($year="2024",$month="4",$code="100069") {
+	    $code = is_numeric($code)?$code:0;
+        $year = is_numeric($year)?$year:2024;
+        $month = is_numeric($month)?$month:4;
+        $sql = "select code,name from opr_monthly_field WHERE code='{$code}'";
+        $typeRow = Yii::app()->db->createCommand($sql)->queryRow();
+        if($typeRow){
+            echo "start:</br>";
+            echo "year:{$year} ，month:{$month}</br>";
+            echo "code:{$code} ，name:{$typeRow['name']}</br>";
+            $rows = Yii::app()->db->createCommand()->select("a.id,a.city")->from("opr_monthly_hdr a")
+                ->leftJoin("opr_monthly_dtl b","b.data_field='{$code}' and a.id=b.hdr_id")
+                ->where("b.id is null")->queryAll();
+            if($rows){
+                foreach ($rows as $row){
+                    Yii::app()->db->createCommand()->insert('opr_monthly_dtl', array(
+                        'hdr_id'=>$row["id"],
+                        'data_field'=>$code,
+                        'lcu'=>"Y"
+                    ));
+                    echo "city:{$row['city']},add success!</br>";
+                }
+            }else{
+                echo "success! </br>";
+            }
+        }else{
+            echo "code:{$code} ,error:not find code</br>";
+        }
+        Yii::app()->end();
 	}
 
 	public function actionIndex($pageNum=0) 

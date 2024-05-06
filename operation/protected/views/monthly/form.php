@@ -175,7 +175,7 @@ $this->pageTitle=Yii::app()->name . ' - Sales Summary Form';
 			<div class="form-group">
 				<div class="col-sm-10">
 					<span class="text-red">
-						第16项填写说明：<br>
+						第17项填写说明：<br>
 						T3收入减去税控开票给关联公司发票=T3主营业务收入金额-从税控系统导出明细筛选史伟莎及瑞洛后的合计不含税金额（注意开票给加盟商如长沙等地区的不扣）
 					</span>
 				</div>
@@ -229,7 +229,7 @@ function roundNumber(num, scale) {
     return +(Math.round(+arr[0] + "e" + sig + (+arr[1] + scale)) + "e-" + scale);
   }
 }		
-		$('#MonthlyForm_record_1_datavalue, #MonthlyForm_record_2_datavalue, #MonthlyForm_record_3_datavalue, #MonthlyForm_record_4_datavalue, #MonthlyForm_record_5_datavalue, #MonthlyForm_record_6_datavalue, #MonthlyForm_record_12_datavalue, #MonthlyForm_record_14_datavalue').focusout(function() {
+		$('#MonthlyForm_record_1_datavalue, #MonthlyForm_record_2_datavalue, #MonthlyForm_record_3_datavalue, #MonthlyForm_record_4_datavalue, #MonthlyForm_record_5_datavalue, #MonthlyForm_record_6_datavalue, #MonthlyForm_record_12_datavalue, #MonthlyForm_record_14_datavalue, #MonthlyForm_record_16_datavalue, #MonthlyForm_record_18_datavalue').focusout(function() {
 			$('#MonthlyForm_record_1_datavalue').val(parseFloat(+$('#MonthlyForm_record_1_datavalue').val() || 0 ).toFixed(2));
 			$('#MonthlyForm_record_2_datavalue').val(parseFloat(+$('#MonthlyForm_record_2_datavalue').val() || 0 ).toFixed(2));
 			$('#MonthlyForm_record_3_datavalue').val(parseFloat(+$('#MonthlyForm_record_3_datavalue').val() || 0 ).toFixed(2));
@@ -239,8 +239,9 @@ function roundNumber(num, scale) {
 			$('#MonthlyForm_record_12_datavalue').val(parseFloat(+$('#MonthlyForm_record_12_datavalue').val() || 0 ).toFixed(2));
 			$('#MonthlyForm_record_14_datavalue').val(parseFloat(+$('#MonthlyForm_record_14_datavalue').val() || 0 ).toFixed(2));
 			$('#MonthlyForm_record_16_datavalue').val(parseFloat(+$('#MonthlyForm_record_16_datavalue').val() || 0 ).toFixed(2));
+			$('#MonthlyForm_record_18_datavalue').val(parseFloat(+$('#MonthlyForm_record_18_datavalue').val() || 0 ).toFixed(2));
 			$('#MonthlyForm_record_7_datavalue').val((parseFloat(document.getElementById('MonthlyForm_record_1_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_2_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_3_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_4_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_5_datavalue').value) + parseFloat($('#MonthlyForm_record_16_datavalue').val() || 0)).toFixed(2));
-			var total = parseFloat(document.getElementById('MonthlyForm_record_7_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_12_datavalue').value);
+			var total = parseFloat(document.getElementById('MonthlyForm_record_7_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_12_datavalue').value) + parseFloat(document.getElementById('MonthlyForm_record_18_datavalue').value);
 			var renaud = ($('#MonthlyForm_record_14_datavalue').length!==0) ? parseFloat(document.getElementById('MonthlyForm_record_14_datavalue').value) : 0;
 //			var paper = parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) - renaud;
 			var paper = parseFloat(document.getElementById('MonthlyForm_record_6_datavalue').value) + renaud;

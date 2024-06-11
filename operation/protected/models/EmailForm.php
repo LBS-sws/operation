@@ -71,7 +71,7 @@ class EmailForm extends CFormModel
 	}
 
     //獲取郵箱列表
-    public function getEmailList(){
+    public static function getEmailList(){
 	    $arr = array();
         $rs = Yii::app()->db->createCommand()->select()->from("opr_email")->queryAll();
         if($rs){
@@ -94,10 +94,10 @@ class EmailForm extends CFormModel
     }
 
     //獲取郵箱列表(總管)
-    public function getCityEmailList(){
+    public static function getCityEmailList($city=""){
         $suffix = Yii::app()->params['envSuffix'];
         $systemId = Yii::app()->params['systemId'];
-        $city = Yii::app()->user->city();
+        $city = empty($city)?Yii::app()->user->city():$city;
 	    $arr = array();
         $rs = Yii::app()->db->createCommand()->select("username")->from("security$suffix.sec_user_access")
             ->where("system_id='$systemId' and a_read_write like '%YD06%'")
@@ -115,13 +115,14 @@ class EmailForm extends CFormModel
         return $arr;
     }
 
-    public function getCityUserList(){
+    public static function getCityUserList($city=""){
         $suffix = Yii::app()->params['envSuffix'];
         $systemId = Yii::app()->params['systemId'];
-        $city = Yii::app()->user->city();
+        $city = empty($city)?Yii::app()->user->city():$city;
 	    $arr = array();
-        $rs = Yii::app()->db->createCommand()->select("username")->from("security$suffix.sec_user_access")
-            ->where("system_id='$systemId' and a_read_write like '%YD06%'")
+        $rs = Yii::app()->db->createCommand()->select("a.username")->from("security$suffix.sec_user_access a")
+            ->leftJoin("security$suffix.sec_user b","a.username=b.username")
+            ->where("a.system_id='$systemId' and a.a_read_write like '%YD06%' and b.city='{$city}'")
             ->queryAll();
         if($rs){
             foreach ($rs as $row){

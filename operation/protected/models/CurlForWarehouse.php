@@ -79,7 +79,7 @@ class CurlForWareHouse extends CurlForJD{
             "costing"=>is_numeric($row["costing"])?floatval($row["costing"]):0,//成本
             "inventory"=>is_numeric($row["inventory"])?floatval($row["inventory"]):0,//库存
             "min_num"=>is_numeric($row["min_num"])?floatval($row["min_num"]):0,//安全库存
-            "jd_warehouse_no"=>$row["jd_warehouse_no"],
+            //"jd_warehouse_no"=>$row["jd_warehouse_no"],
             "jd_good_no"=>$row["jd_good_no"],
         );
         return $data;

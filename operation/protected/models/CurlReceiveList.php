@@ -130,6 +130,7 @@ class CurlReceiveList extends CListPageModel
 	public static function getInfoTypeList($key="",$bool=false){
         $list = array(
             "Warehouse"=>"仓库信息",
+            "UpdateJDNO"=>"修改金蝶物料编号",
             //"T"=>"外勤领料",
         );
         if($bool){
@@ -205,8 +206,18 @@ class CurlReceiveList extends CListPageModel
     }
 
     public function testWarehouseOne(){
-	    $data = self::warehouseData(1);
-	    $this->sendCurl("/JDSync/WarehouseOne",$data);
+        $data = self::warehouseData(1);
+        $this->sendCurl("/JDSync/WarehouseOne",$data);
+    }
+
+    public function testUpdateJDNO(){
+        $data = array(
+            array("city"=>"HK","lbs_good_no"=>"W00001","jd_good_no"=>"jd00001"),
+            array("city"=>"HK","lbs_good_no"=>"W00002","jd_good_no"=>"jd00002"),
+            array("city"=>"HK","lbs_good_no"=>"W00003","jd_good_no"=>"jd00003"),
+            array("city"=>"HK","lbs_good_no"=>"W00004","jd_good_no"=>"jd00004"),
+        );
+        $this->sendCurl("/JDSync/UpdateJDNO",$data);
     }
 
     public function testWarehouseFull($index){

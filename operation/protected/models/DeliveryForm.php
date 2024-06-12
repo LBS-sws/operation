@@ -174,7 +174,7 @@ class DeliveryForm extends CFormModel
         }
         $storeList = StoreForm::getStoreListForCity($this->city);
         foreach ($goods_list as $key =>$goods){
-            if(empty($goods["store_list"])){
+            if(empty($goods["store_list"]["store_id"])){
                 $this->addError($attribute,"仓库不存在，请刷新重试");
                 return false;
             }else{

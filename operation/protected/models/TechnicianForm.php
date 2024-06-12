@@ -13,6 +13,7 @@ class TechnicianForm extends CFormModel
     public $order_code;
     public $goods_list;
     public $ject_remark;
+    public $city;
 
     public function init()
     {
@@ -57,8 +58,9 @@ class TechnicianForm extends CFormModel
     public function rules()
     {
         return array(
-            array('id, order_code, order_user, order_class, technician, status, remark, luu, lcu, lud, lcd, goods_list','safe'),
+            array('id, order_code, order_user, order_class, technician, status, remark, luu, lcu, lud, lcd, goods_list,city','safe'),
             array('goods_list','required'),
+            array('city','validateCity'),
             array('goods_list','validateGoods'),
             array('remark','validateActivity','on'=>'audit'),
             //array('order_num','numerical','allowEmpty'=>true,'integerOnly'=>true),
@@ -94,9 +96,13 @@ class TechnicianForm extends CFormModel
             }else{
                 $goods["goods_num"] = $goods_num;
                 $this->goods_list[$key]["goods_num"] = $goods_num;
-                $list = WarehouseForm::getGoodsToGoodsId($goods["goods_id"]);
+				$list = Yii::app()->db->createCommand()->select("*")
+				->from("opr_warehouse")
+				->where('id = :id and city=:city',array(':id'=>$goods["goods_id"],':city'=>$this->city))
+				->queryRow();
+                //$list = WarehouseForm::getGoodsToGoodsId($goods["goods_id"]);
                 if (empty($list)){
-                    $message = Yii::t('procurement','Not Font Goods').$goods["goods_id"]."a";
+                    $message = Yii::t('procurement','Not Font Goods').$goods["goods_id"];
                     $this->addError($attribute,$message);
                     return false;
                 }elseif ($list["decimal_num"] != "是"&& floor($goods["goods_num"])!=$goods["goods_num"]){
@@ -117,13 +123,27 @@ class TechnicianForm extends CFormModel
         }
     }
 
-    public function validateActivity($attribute, $params){
+    public function validateCity($attribute, $params){
         $city = Yii::app()->user->city();
+        $city_allow = Yii::app()->user->city_allow();
+		if(empty($this->city)){
+			$this->city=$city;
+		}else{
+			if (strpos("'{$city_allow}'","'{$this->city}'")===false){
+				$this->city=$city;
+                $message = "城市异常，请刷新重试";
+                $this->addError($attribute, $message);
+                return false;
+			}
+		}
+    }
+
+    public function validateActivity($attribute, $params){
         $userName = Yii::app()->user->name;
         if ($this->scenario == "audit") {
             $rows = Yii::app()->db->createCommand()->select("count(id)")
-                ->from("opr_order")->where("judge=0 and city=:city and status = 'approve' and lcu=:lcu",
-                    array( ":city" => $city, ":lcu" => $userName))->queryScalar();
+                ->from("opr_order")->where("judge=0 and status = 'approve' and lcu=:lcu",
+                    array( ":lcu" => $userName))->queryScalar();
             if ($rows > 0) {
                 $message = "您有订单没有收货，请收货后继续操作。";
                 $this->addError($attribute, $message);
@@ -134,14 +154,15 @@ class TechnicianForm extends CFormModel
 
 
     public function retrieveData($index) {
-        $city = Yii::app()->user->city();
+        $city_allow = Yii::app()->user->city_allow();
         $uid = Yii::app()->user->id;
         $rows = Yii::app()->db->createCommand()->select("*")
-            ->from("opr_order")->where("id=:id and city=:city and judge=0 and lcu=:lcu",
-                array(":id"=>$index,":city"=>$city,":lcu"=>$uid))->queryAll();
+            ->from("opr_order")->where("id=:id and judge=0 and lcu=:lcu",
+                array(":id"=>$index,":lcu"=>$uid))->queryAll();
         if (count($rows) > 0) {
             foreach ($rows as $row) {
                 $this->id = $row['id'];
+                $this->city = $row['city'];
                 $this->order_code = $row['order_code'];
                 $this->goods_list = WarehouseForm::getGoodsListToId($row['id']);
                 $this->order_user = $row['order_user'];
@@ -274,7 +295,7 @@ class TechnicianForm extends CFormModel
             Yii::app()->db->createCommand()->update('opr_order', array(
                 'order_code'=>$this->order_code,
                 'judge'=>0,
-                'city'=>$city,
+                'city'=>$this->city,
                 'lcu_email'=>Yii::app()->user->email(),
             ), 'id=:id', array(':id'=>$this->id));
         }
@@ -332,4 +353,19 @@ class TechnicianForm extends CFormModel
             return true;
         }
     }
+    //獲取物品列表(按分類生成二維數組）
+    public static function getWarehouseGoodsListToCity($city){
+        $arr = array(array("id"=>0,"name"=>Yii::t("procurement","All Goods Class"),"list"=>array()));
+        $rs = Yii::app()->db->createCommand()->select()->from("opr_classify")->where("class_type=:class_type",array(":class_type"=>"Warehouse"))->order('level desc')->queryAll();
+        if($rs){
+            foreach ($rs as $row){
+				$goodList = Yii::app()->db->createCommand()->select("*")
+					->from("opr_warehouse")->where("classify_id=:classify_id and city=:city and display=1",array(":classify_id"=>$row["id"],":city"=>$city))->queryAll();
+                if($goodList){
+                    array_push($arr,array("id"=>$row["id"],"name"=>$row["name"],"list"=>$goodList));
+                }
+            }
+        }
+        return $arr;
+	}
 }

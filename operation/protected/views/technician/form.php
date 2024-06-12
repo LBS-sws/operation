@@ -86,6 +86,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
 			<?php echo $form->hiddenField($model, 'scenario'); ?>
 			<?php echo $form->hiddenField($model, 'id'); ?>
 			<?php echo $form->hiddenField($model, 'status'); ?>
+			<?php echo $form->hiddenField($model, 'city'); ?>
 
 
             <div class="form-group">
@@ -221,7 +222,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
 </section>
 <!--選擇物品彈框-->
 <?php
- $goodsListToClassify = ClassifyForm::getGoodsListToClassify("Warehouse");
+ $goodsListToClassify = TechnicianForm::getWarehouseGoodsListToCity($model->city);
  $classifyList = array();
  echo "<ul class='hide' id='goodsListToClassify'>";
  foreach ($goodsListToClassify as $classify){

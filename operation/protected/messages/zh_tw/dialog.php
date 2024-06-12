@@ -68,5 +68,7 @@ return array(
 'Invalid file type.'=>'無效的文件類型.',
 'Advice'=>'温馨提示',
 'Rollback Done'=>'退回草稿完成',
+	'City'=>'城市',
+	'Select City'=>'选择城市',
 );
 ?>

@@ -31,15 +31,14 @@ class TechnicianList extends CListPageModel
     public function retrieveDataByPage($pageNum=1)
     {
         //order_user = '$userName' OR technician = '$userName'
-        $city = Yii::app()->user->city();
         $userName = Yii::app()->user->name;
         $sql1 = "select *
 				from opr_order
-				where (city = '$city' AND judge=0 AND lcu='$userName') 
+				where ( judge=0 AND lcu='$userName') 
 			";
         $sql2 = "select count(id)
 				from opr_order
-				where (city = '$city' AND judge=0 AND lcu='$userName') 
+				where ( judge=0 AND lcu='$userName') 
 			";
         $clause = "";
         if (!empty($this->searchField) && !empty($this->searchValue)) {

@@ -122,9 +122,11 @@ class TechnicianController extends Controller
         }
     }
 
-    public function actionNew()
+    public function actionNew($city='')
     {
         $model = new TechnicianForm('new');
+		$city = empty($city)?Yii::app()->user->city():$city;
+		$model->city=$city;
         $this->render('form',array('model'=>$model,));
     }
 

@@ -92,9 +92,11 @@ class DeliveryController extends Controller
 			$model = new DeliveryForm("audit");
 			$model->attributes = $_POST['DeliveryForm'];
 			if ($model->validate()) {
-				$model->saveData();
+				$bool=$model->saveData();
 				$model->scenario = "edit";
-				Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
+				if($bool){
+                    Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
+                }
 				$this->redirect(Yii::app()->createUrl('delivery/edit',array('index'=>$model->id)));
 			} else {
                 $model->scenario = "edit";
@@ -150,12 +152,13 @@ class DeliveryController extends Controller
             $model = new DeliveryForm("backward");
             $model->attributes = $_POST['DeliveryForm'];
             if($model->backward()){
-                Dialog::message(Yii::t('dialog','Information'), Yii::t('procurement','Backward Done'));
+                $model->scenario = "edit";
+                $this->redirect(Yii::app()->createUrl('delivery/edit',array('index'=>$model->id)));
             }else{
                 Dialog::message(Yii::t('dialog','Validation Message'), Yii::t('procurement','Backward Error'));
+                $model->scenario = "edit";
+                $this->redirect(Yii::app()->createUrl('delivery/edit',array('index'=>$model->id)));
             }
-            $model->scenario = "edit";
-            $this->redirect(Yii::app()->createUrl('delivery/edit',array('index'=>$model->id)));
         }
     }
 
@@ -182,8 +185,10 @@ class DeliveryController extends Controller
         $model = new DeliveryForm("black");
         $model->attributes = $arr;
         if($model->validate()){
-            $model->blackGoods($arr["name"]);
-            Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
+            $bool = $model->blackGoods($arr["name"]);
+            if($bool){
+                Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
+            }
         }else{
             $message = CHtml::errorSummary($model);
             Dialog::message(Yii::t('dialog','Validation Message'), $message);
@@ -196,9 +201,12 @@ class DeliveryController extends Controller
         $model = new DeliveryForm("approved");
         $model->setAttributes($_POST['DeliveryList']);
         if($model->validateAll()){
+            $model->id = $model->checkBoxDown[0];
             if($model->validatePriceOverTime('id')){
-                $model->allApproved();
-                Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
+                $bool = $model->allApproved();
+                if($bool){
+                    Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
+                }
                 $this->redirect(Yii::app()->createUrl('delivery/index'));
             }else{
                 $message = CHtml::errorSummary($model);

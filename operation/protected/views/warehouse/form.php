@@ -59,8 +59,10 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                 } ?>
                 <?php if ($model->scenario!='view'){
                     //導入
+                    /*
                     echo TbHtml::button('<span class="fa fa-file-text-o"></span> '.Yii::t('procurement','Import File'), array(
                         'name'=>'btnFlow','id'=>'btnFlow','data-toggle'=>'modal','data-target'=>'#importGoods'));
+                    */
                 } ?>
             </div>
 	</div></div>
@@ -183,7 +185,15 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                     ); ?>
                 </div>
             </div>
-
+            <legend><?php echo Yii::t("procurement","JD System Curl");?></legend>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'jd_good_no',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-3">
+                    <?php echo $form->textField($model, 'jd_good_no',
+                        array('readonly'=>($model->scenario=='view'),'autocomplete'=>'off')
+                    ); ?>
+                </div>
+            </div>
 		</div>
 	</div>
 </section>

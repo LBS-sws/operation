@@ -58,6 +58,16 @@ return array(
                 'access'=>'YD01',
                 'url'=>'/warehouse/index',
             ),
+            //仓库信息(金蝶)
+            'Store Info'=>array(
+                'access'=>'YD10',
+                'url'=>'/store/index',
+            ),
+            //对比金蝶仓库库存
+            'Store Comparison'=>array(
+                'access'=>'YD11',
+                'url'=>'/storeComparison/index',
+            ),
             //入库管理
             'Warehouse storage Info'=>array(
                 'access'=>'YD08',
@@ -278,6 +288,20 @@ return array(
             'Progress Year leaderboard'=>array(//最佳进步排行榜(年度)
                 'access'=>'PL03',
                 'url'=>'/progressYear/index',
+            ),
+        ),
+    ),
+    'JD Curl Notes'=>array(//金蝶同步记录
+        'access'=>'ZC',
+        'icon'=>'fa-exchange',
+        'items'=>array(
+            'LBS To JD'=>array(//LBS发送给金蝶
+                'access'=>'ZC01',
+                'url'=>'/curlNotes/index',
+            ),
+            'JD To LBS'=>array(//金蝶发送给LBS
+                'access'=>'ZC02',
+                'url'=>'/curlReceive/index',
             ),
         ),
     ),

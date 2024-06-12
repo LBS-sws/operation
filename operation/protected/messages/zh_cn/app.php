@@ -24,7 +24,6 @@ return array(
 	'Service Report'=>'服务报告系统',
     'Investment'=>'投资管理系统',
     'Project progress'=>'项目跟进系统',
-	'New United'=>'派单系统',
 
     'Data Entry'=>'数据输入',
     'Misc'=>'其他',
@@ -107,7 +106,7 @@ return array(
     'Fast Summary Entry'=>'快速货物品管理',
     'Order Activity'=>'采购周期明细',
     'Technician take Goods'=>'外勤领料审批',
-    'Warehouse Info'=>'仓库信息',
+    'Warehouse Info'=>'仓库物品信息',
     'Stickies Summary Entry'=>'标签管理',
     'Classify Summary Entry'=>'分类管理',
     'Goods Hybrid Rules'=>'混合规则管理',
@@ -138,6 +137,11 @@ return array(
     'Progress Quarter leaderboard'=>'季度最佳进步排行榜',
     'Progress Year leaderboard'=>'年度最佳进步排行榜',
     'U system synchronization'=>'U系统同步汇总',
+    'JD Curl Notes'=>'金蝶同步记录',
+    'LBS To JD'=>'LBS发送给金蝶',
+    'JD To LBS'=>'金蝶发送给LBS',
+    'Store Info'=>'金蝶仓库信息',
+    'Store Comparison'=>'金蝶库存对比',
     //沈超添加結束
 	
 );

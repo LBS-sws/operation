@@ -21,6 +21,8 @@ class WarehouseForm extends CFormModel
     public $display = 1;
     private $foreach_num = 0;
 
+    public $jd_good_no;
+
 	public function attributeLabels()
 	{
 		return array(
@@ -36,6 +38,7 @@ class WarehouseForm extends CFormModel
             'matching'=>Yii::t('procurement','matching'),
             'matters'=>Yii::t('procurement','matters'),
             'display'=>Yii::t('procurement','judge for visible'),
+            'jd_good_no'=>Yii::t('procurement','JD good no'),
 		);
 	}
 
@@ -45,7 +48,8 @@ class WarehouseForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, goods_code,display, min_num, name, unit, inventory, classify_id, price, costing, decimal_num, lcu, luu, matching, matters','safe'),
+			array('id, goods_code,display, min_num, name, unit, inventory, classify_id, price, costing, decimal_num, lcu, luu, matching, matters,
+			jd_good_no','safe'),
             array('name','required'),
             array('classify_id','required'),
             array('unit','required'),
@@ -147,6 +151,7 @@ class WarehouseForm extends CFormModel
                 $this->matters = $row['matters'];
                 $this->matching = $row['matching'];
                 $this->display = $row['display'];
+                $this->jd_good_no = $row['jd_good_no'];
                 break;
 			}
 		}
@@ -182,7 +187,9 @@ class WarehouseForm extends CFormModel
             3=>array("name"=>Yii::t("procurement","Order Update"),'style'=>"hidden","id"=>3),
             4=>array("name"=>Yii::t("procurement","Order Delete"),'style'=>"warning hidden","id"=>4),
             5=>array("name"=>Yii::t("procurement","Import File"),'style'=>"danger","id"=>5),
-            6=>array("name"=>Yii::t("app","Warehouse storage Info"),'style'=>"danger","id"=>6)
+            6=>array("name"=>Yii::t("app","Warehouse storage Info"),'style'=>"danger","id"=>6),
+            7=>array("name"=>Yii::t("procurement","Add For JD"),'style'=>"text-yellow","id"=>7),
+            8=>array("name"=>Yii::t("procurement","Update For JD"),'style'=>"text-yellow","id"=>8),
         );
         $html="<div style='margin: 10px 0px;width: 33%'>".self::getSelectForDataEx("changeStatus",1,$statusList)."</div>";
         $html.='<table id="tblFlow" class="table table-bordered table-striped table-hover">';
@@ -287,9 +294,13 @@ class WarehouseForm extends CFormModel
 		$connection = Yii::app()->db;
 		$transaction=$connection->beginTransaction();
 		try {
+		    $oldGoodList = $this->getGoodsToGoodsId($this->id);
 			$this->saveHistory($connection);
 			$this->saveGoods($connection);
 			$transaction->commit();
+
+			$this->sendCurlJD($oldGoodList);//发送数据到金蝶
+			$this->setScenario("edit");
 		}
 		catch(Exception $e) {
 			$transaction->rollback();
@@ -337,9 +348,9 @@ class WarehouseForm extends CFormModel
                 break;
             case 'new':
                 $sql = "insert into opr_warehouse(
-							name, unit, display, inventory, classify_id, lcu, goods_code,city,costing,decimal_num,min_num,z_index,matching,matters
+							name, unit, display, inventory, classify_id, lcu, goods_code,city,costing,decimal_num,min_num,z_index,matching,matters,jd_good_no
 						) values (
-							:name, :unit, :display, :inventory, :classify_id, :lcu, :goods_code,:city,:costing,:decimal_num,:min_num,:z_index,:matching,:matters
+							:name, :unit, :display, :inventory, :classify_id, :lcu, :goods_code,:city,:costing,:decimal_num,:min_num,:z_index,:matching,:matters,:jd_good_no
 						)";
                 break;
             case 'edit':
@@ -355,6 +366,7 @@ class WarehouseForm extends CFormModel
 							min_num = :min_num,
 							matching = :matching,
 							matters = :matters,
+							jd_good_no = :jd_good_no,
 							luu = :luu,
 							inventory = :inventory
 						where id = :id AND city=:city
@@ -396,6 +408,10 @@ class WarehouseForm extends CFormModel
             $command->bindParam(':matching',$this->matching,PDO::PARAM_STR);
         if (strpos($sql,':matters')!==false)
             $command->bindParam(':matters',$this->matters,PDO::PARAM_STR);
+        if (strpos($sql,':jd_good_no')!==false){
+            $this->jd_good_no = $this->jd_good_no===""?null:$this->jd_good_no;
+            $command->bindParam(':jd_good_no',$this->jd_good_no,PDO::PARAM_STR);
+        }
         if (strpos($sql,':classify_id')!==false)
             $command->bindParam(':classify_id',$this->classify_id,PDO::PARAM_INT);
 
@@ -410,7 +426,6 @@ class WarehouseForm extends CFormModel
 
         if ($this->scenario=='new'){
             $this->id = Yii::app()->db->getLastInsertID();
-            $this->scenario = "edit";
         }
         $this->setGoodsCode($this->id);
 		return true;
@@ -418,7 +433,7 @@ class WarehouseForm extends CFormModel
 
 	//生成不重复的物品编号
     private function setGoodsCode($id){
-        if(empty($this->goods_code)){
+        if($this->getScenario()=="new"){
             $this->foreach_num++;
             $city = Yii::app()->user->city();
             $code = strval($id);
@@ -480,5 +495,13 @@ class WarehouseForm extends CFormModel
             }
         }
         return $list;
+    }
+
+    protected function sendCurlJD($oldGoodList){
+        if($this->getScenario()=="new"){
+            CurlForWareHouse::addGood($this->id);
+        }else{
+            CurlForWareHouse::editGood($this->id,$oldGoodList);
+        }
     }
 }

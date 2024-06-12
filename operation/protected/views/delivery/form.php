@@ -18,6 +18,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
         background-color: #eee;
         min-height: 34px;
     }
+    #table-change td{vertical-align: middle;}
 </style>
 
 <section class="content-header">
@@ -83,6 +84,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
             <?php echo $form->hiddenField($model, 'scenario'); ?>
             <?php echo $form->hiddenField($model, 'id'); ?>
             <?php echo $form->hiddenField($model, 'status'); ?>
+            <?php echo $form->hiddenField($model, 'city'); ?>
 
 
             <?php if (!empty($model->ject_remark)): ?>
@@ -126,56 +128,79 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
 
             <div class="form-group">
                 <?php echo $form->labelEx($model,'goods_list',array('class'=>"col-sm-2 control-label")); ?>
-                <div class="col-sm-10">
-                    <table class="table table-bordered table-striped disabled" id="table-change">
+                <div class="col-sm-12">
+                    <table class="table table-bordered disabled" id="table-change">
                         <thead>
                         <tr>
-                            <td width="15%"><?php echo Yii::t("procurement","Goods Name")?></td>
-                            <td width="8%" class="hidden-xs"><?php echo Yii::t("procurement","Unit")?></td>
-                            <td width="8%" class="hidden-xs"><?php echo Yii::t("procurement","Inventory")?></td>
-                            <td width="12%"><?php echo Yii::t("procurement","Demand Note")?></td>
-                            <td width="12%"><?php echo Yii::t("procurement","Headquarters Note")?></td>
-                            <td width="8%"><?php echo Yii::t("procurement","Goods Number")?></td>
-                            <td width="8%"><?php echo Yii::t("procurement","Actual Number")?></td>
-                            <?php if ($model->status == "finished"): ?>
-                                <td width="1%">&nbsp;</td>
-                            <?php endif ?>
+                            <td width="13%"><?php echo Yii::t("procurement","Goods Name")?></td>
+                            <td width="7%" class="hidden-xs"><?php echo Yii::t("procurement","Unit")?></td>
+                            <td width="7%" class="hidden-xs"><?php echo Yii::t("procurement","Inventory")?></td>
+                            <td width="11%"><?php echo Yii::t("procurement","Demand Note")?></td>
+                            <td width="11%"><?php echo Yii::t("procurement","Headquarters Note")?></td>
+                            <td width="7%"><?php echo Yii::t("procurement","Goods Number")?></td>
+                            <td width="7%"><?php echo Yii::t("procurement","send store")?></td>
+                            <td width="7%"><?php echo Yii::t("procurement","send number")?></td>
+                            <td width="1%">&nbsp;</td>
                         </tr>
                         </thead>
                         <tbody>
 
                         <?php
+                        $storeList = StoreForm::getStoreListForCity($model->city);
+                        $readyOnly = $model->status == "sent" || $model->status == "read";
+                        $storeClass = $readyOnly?"numChange":"numChange spanInput";
                         foreach ($model->goods_list as $key => $val){
+                            $orderStore = StoreForm::getStoreListForOrder($val);
+                            $colNum = count($orderStore["store_id"]);
+                            $colNum = empty($colNum)?1:$colNum;
                             $con_num = empty($val['id'])?$key:$val['id'];
-                            $tableTr = "<tr datanum='$con_num'>";
+                            $tableTr = "<tr datanum='$con_num' data-max='".count($storeList)."'>";
                             $val['confirm_num'] = (empty($val['confirm_num']) && $val['confirm_num'] !== "0")?$val['goods_num']:$val['confirm_num'];
-                            $tableTr.="<td><input type='text' class='form-control testInput spanInput' readonly name='DeliveryForm[goods_list][$con_num][name]' value='".$val['name']."'>";
+                            $tableTr.="<td class='colNum' rowspan='{$colNum}'><input type='text' class='form-control testInput spanInput' readonly name='DeliveryForm[goods_list][$con_num][name]' value='".$val['name']."'>";
                             $tableTr.="<input type='hidden' name='DeliveryForm[goods_list][$con_num][goods_id]' value='".$val['goods_id']."'>";
                             $tableTr.="<input type='hidden' name='DeliveryForm[goods_list][$con_num][id]' value='".$val['id']."'></td>";
-                            $tableTr.="<td class='hidden-xs'><input type='text' class='form-control unit spanInput' readonly name='DeliveryForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
-                            $tableTr.="<td class='hidden-xs'><input type='text' class='form-control unit spanInput' readonly name='DeliveryForm[goods_list][$con_num][inventory]' value='".$val['inventory']."'></td>";
-                            $tableTr.="<td><input type='text' class='form-control spanInput' readonly name='DeliveryForm[goods_list][$con_num][note]' value='".$val['note']."'></td>";
+                            $tableTr.="<td class='colNum hidden-xs' rowspan='{$colNum}'><input type='text' class='form-control unit spanInput' readonly name='DeliveryForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
+                            $tableTr.="<td class='colNum hidden-xs' rowspan='{$colNum}'><input type='text' class='form-control unit spanInput' readonly name='DeliveryForm[goods_list][$con_num][inventory]' value='".$val['inventory']."'></td>";
+                            $tableTr.="<td class='colNum' rowspan='{$colNum}'><input type='text' class='form-control spanInput' readonly name='DeliveryForm[goods_list][$con_num][note]' value='".$val['note']."'></td>";
                             if($model->status == "sent" || $model->status == "read"){
-                                $tableTr.="<td><input type='text' class='form-control' name='DeliveryForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
+                                $tableTr.="<td class='colNum' rowspan='{$colNum}'><input type='text' class='form-control' name='DeliveryForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
                             }else{
-                                $tableTr.="<td><input type='text' class='form-control spanInput' readonly name='DeliveryForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
+                                $tableTr.="<td class='colNum' rowspan='{$colNum}'><input type='text' class='form-control spanInput' readonly name='DeliveryForm[goods_list][$con_num][remark]' value='".$val['remark']."'></td>";
                             }
 
 
-                            $tableTr.="<td><input type='number' class='form-control spanInput' readonly name='DeliveryForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'></td>";
-                            if($model->status == "sent" || $model->status == "read"){
-                                $tableTr.="<td><input type='number' class='form-control numChange goods_num' name='DeliveryForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
-                            }else{
-                                $tableTr.="<td><input type='number' class='form-control numChange goods_num spanInput' readonly name='DeliveryForm[goods_list][$con_num][confirm_num]' value='".$val['confirm_num']."'></td>";
-                            }
-
-                            if($model->status == "finished"){
-                                //退回
-                                $tableTr.="<td>";
-                                $tableTr.="<a class='btn btn-danger go-balck' data-id='".$val["id"]."'>".Yii::t('procurement','Back Status')."</a>";
+                            $tableTr.="<td class='colNum' rowspan='{$colNum}'>";
+                            $tableTr.=TbHtml::hiddenField("DeliveryForm[goods_list][$con_num][confirm_num]",$val['confirm_num'],array("class"=>"goods_num"));
+                            $tableTr.="<input type='number' class='form-control spanInput' readonly name='DeliveryForm[goods_list][$con_num][goods_num]' value='".$val['goods_num']."'>";
+                            $tableTr.="</td>";
+                            foreach ($orderStore["store_id"] as $storeKey=>$storeRow){
+                                $tableTr.=empty($storeKey)?"":"<tr datanum='$con_num'>";
+                                $tableTr.="<td class='copyTd'>";
+                                $tableTr.=TbHtml::hiddenField("DeliveryForm[goods_list][$con_num][store_list][id][]",$orderStore['id'][$storeKey]);
+                                $tableTr.=TbHtml::dropDownList("DeliveryForm[goods_list][$con_num][store_list][store_id][]",$orderStore['store_id'][$storeKey],$storeList,array("readonly"=>!$readyOnly));
                                 $tableTr.="</td>";
+                                $tableTr.="<td class='copyTd'><input type='number' class='form-control {$storeClass}' name='DeliveryForm[goods_list][$con_num][store_list][store_num][]' value='".$orderStore['store_num'][$storeKey]."'></td>";
+
+                                if($model->status == "finished"){
+                                    //退回
+                                    $tableTr.="<td>";
+                                    $tableTr.="<a class='btn btn-danger go-balck' data-id='".$val["id"]."' data-store='".$orderStore['store_id'][$storeKey]."'>".Yii::t('procurement','Back Status')."</a>";
+                                    $tableTr.="</td>";
+                                }elseif($readyOnly){
+                                    //多个仓库发货
+                                    $tableTr.="<td>";
+                                    if(empty($storeKey)){
+                                        $tableTr.="<a class='btn btn-danger go-store'>+</a>";
+                                    }else{
+                                        $tableTr.="<a class='btn btn-danger del-store'>-</a>";
+                                    }
+                                    $tableTr.="</td>";
+                                }else{
+                                    $tableTr.="<td>&nbsp;</td>";
+                                }
+                                $tableTr.="</tr>";
                             }
-                            $tableTr.="</tr>";
+
                             echo $tableTr;
                         }
                         ?>
@@ -206,13 +231,46 @@ $this->renderPartial('//site/ject',array('model'=>$model,'form'=>$form,'submit'=
 ?>
 <?php
 $js = "
-$('.go-balck').on('click',function(){
+$('.go-store').on('click',function(){
     var trObj = $(this).parents('tr:first');
+    var objKey = trObj.attr('datanum');
+    var objMax = trObj.data('max');
+    var html='';
+    var nowLength =$('#table-change>tbody>tr[datanum=\"'+objKey+'\"]').length;
+    if(nowLength < objMax){
+        nowLength++;
+        $('#table-change>tbody>tr[datanum=\"'+objKey+'\"]').find('.colNum').attr('rowspan',nowLength);
+        html+='<tr datanum=\"'+objKey+'\">';
+        trObj.find('.copyTd').each(function(){
+            html+='<td>'+$(this).html()+'</td>';
+        });
+        html+='<td><a class=\"btn btn-danger del-store\">-</a></td>';
+        html+='</tr>';
+        var htmlObj = $(html);
+        htmlObj.find('input,select').val('').attr('id','');
+        trObj.after(htmlObj);
+    }
+});
+
+$('#table-change').on('click','.del-store',function(){
+    var trObj = $(this).parents('tr:first');
+    var objKey = trObj.attr('datanum');
+    var nowLength =$('#table-change>tbody>tr[datanum=\"'+objKey+'\"]').length;
+    nowLength--;
+    $('#table-change>tbody>tr[datanum=\"'+objKey+'\"]').find('.colNum').attr('rowspan',nowLength);
+    $(this).parents('tr:first').remove();
+});
+
+$('.go-balck').on('click',function(){
     var id = $(this).data('id');
-    var name = trObj.find('.testInput').val();
-    var num = trObj.find('.goods_num').val();
+    var name = $('#table-change>tbody>tr[datanum=\"'+id+'\"]').eq(0).find('.testInput').val();
+    var store_id = $(this).parents('tr:first').find('select').val();
+    var num = $(this).parents('tr:first').find('.numChange').val();
+    var store_name = $(this).parents('tr:first').find('select>option:selected').text();
     $('#black_form input[name=\"black_id\"]').val(id);
     $('#black_form input[name=\"name\"]').val(name);
+    $('#black_form input[name=\"store_id\"]').val(store_id);
+    $('#black_form input[name=\"store_name\"]').val(store_name);
     $('#black_form input[name=\"num\"]').attr('max',num);
     $('#black_form').modal('show');
 });
@@ -242,6 +300,13 @@ Yii::app()->clientScript->registerScript('readonlyClass',$js,CClientScript::POS_
                         <label class="col-sm-3 control-label" for="DeliveryForm_lcd">物品名称</label>
                         <div class="col-sm-4">
                             <input class="form-control" type="text" readonly name="name">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="DeliveryForm_lcd">退回仓库</label>
+                        <div class="col-sm-4">
+                            <input type="hidden" name="store_id">
+                            <input class="form-control" type="text" readonly name="store_name">
                         </div>
                     </div>
                     <div class="form-group">

@@ -7,6 +7,7 @@ class DeliveryForm extends CFormModel
 	//public $technician;
     public $status;
     public $remark;
+    public $city;
 	public $luu;
 	public $lcu;
 	public $lcd;
@@ -19,6 +20,8 @@ class DeliveryForm extends CFormModel
 	public $confirm_num;
 	public $num;
 	public $black_id;
+	public $store_id;
+	public $store_num;
 	public $goods_id;
 
 	//批量處理的訂單
@@ -50,16 +53,37 @@ class DeliveryForm extends CFormModel
 		return array(
 			array('id,lcd,num,black_id, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, luu, lcu, lud, lcd, checkBoxDown','safe'),
             array('goods_list','required','on'=>array('audit','edit','reject')),
+            array('id','validateID'),
             array('goods_list','validateGoods','on'=>array('audit','edit')),
             array('id','validatePriceOverTime','on'=>array('audit','edit')),
             array('ject_remark','required','on'=>'reject'),
-            array('black_id','required','on'=>'black'),
+            array('black_id,store_id','required','on'=>'black'),
             array('num','required','on'=>'black'),
             array('num','validateNum','on'=>'black'),
             //array('order_num','numerical','allowEmpty'=>true,'integerOnly'=>true),
             //array('order_num','in','range'=>range(0,600)),
 		);
 	}
+
+    public function validateID($attribute, $params) {
+        $id = $this->$attribute;
+        $city_allow = Yii::app()->user->city_allow();
+        $row = Yii::app()->db->createCommand()->select("city")->from("opr_order")
+            ->where("id=:id AND judge=0 AND city in ($city_allow)",array(":id"=>$id))->queryRow();
+        if($row){
+            $this->city = $row["city"];
+            $storeCount = Yii::app()->db->createCommand()->select("count(id)")->from("opr_store")
+                ->where("city=:city and z_display=1 and store_type=1",array(":city"=>$row["city"]))->queryScalar();
+            if(empty($storeCount)){
+                $this->addError($attribute, "该城市没有默认仓库:".$row["city"]);
+                return false;
+            }
+        }else{
+            $this->addError($attribute, "订单不存在，请刷新重试");
+            return false;
+        }
+    }
+
 	public function validatePriceOverTime($attribute='', $params='')
     {
         $city_allow = Yii::app()->user->city_allow();
@@ -104,6 +128,14 @@ class DeliveryForm extends CFormModel
         if($this->num!==""){
             $idList = Yii::app()->db->createCommand()->select("*")->from("opr_order_goods")->where('id = :id',array(':id'=>$this->black_id))->queryRow();
             if($idList){
+                $this->confirm_num = $idList["confirm_num"];
+                $this->id = $idList["order_id"];
+                $this->goods_id = $idList["goods_id"];
+                $storeOrder = Yii::app()->db->createCommand()->select("store_num")->from("opr_order_goods_store")
+                    ->where('order_goods_id=:id and store_id=:store_id',array(':id'=>$this->black_id,':store_id'=>$this->store_id))->queryRow();
+                if($storeOrder){//由于老版没有仓库，所以额外查询
+                    $idList["confirm_num"] = $storeOrder["store_num"];
+                }
                 if(is_numeric($this->num)){
                     if(floatval($idList["confirm_num"])<floatval($this->num)){
                         $message = "退回數量不能大於實際數量";
@@ -116,8 +148,7 @@ class DeliveryForm extends CFormModel
                     $message = "退回數量只能為數字";
                     $this->addError($attribute,$message);
                 }
-                $this->goods_id = $idList["goods_id"];
-                $this->confirm_num = $idList["confirm_num"];
+                $this->store_num = $idList["confirm_num"];
             }else{
                 $message = "訂單內的物品不存在";
                 $this->addError($attribute,$message);
@@ -141,7 +172,23 @@ class DeliveryForm extends CFormModel
             $this->addError($attribute,$message);
             return false;
         }
+        $storeList = StoreForm::getStoreListForCity($this->city);
         foreach ($goods_list as $key =>$goods){
+            if(empty($goods["store_list"])){
+                $this->addError($attribute,"仓库不存在，请刷新重试");
+                return false;
+            }else{
+                $goods["confirm_num"]=0;
+                foreach ($goods["store_list"]["store_id"] as $storeKey=>$storeID){
+                    $storeID="".$storeID;
+                    if(!key_exists($storeID,$storeList)){
+                        $this->addError($attribute,"仓库不存在，请刷新重试");
+                        return false;
+                    }
+                    $goods["confirm_num"]+=$goods["store_list"]["store_num"][$storeKey];
+                }
+            }
+            $this->goods_list[$key]["confirm_num"]=$goods["confirm_num"];
             if(empty($goods["goods_id"]) && empty($goods["confirm_num"])){
                 unset($this->goods_list[$key]);
                 continue;
@@ -195,6 +242,7 @@ class DeliveryForm extends CFormModel
                 $this->order_user = $row['order_user'];
                 //$this->technician = $row['technician'];
                 $this->status = $row['status'];
+                $this->city = $row['city'];
                 $this->remark = $row['remark'];
                 $this->lcu = OrderGoods::getNameToUsername($row['lcu']);
                 $this->ject_remark = $row['ject_remark'];
@@ -211,8 +259,30 @@ class DeliveryForm extends CFormModel
 		$connection = Yii::app()->db;
 		$transaction=$connection->beginTransaction();
 		try {
+            $oldOrderStatus = Yii::app()->db->createCommand()->select("*")->from("opr_order")
+                ->where("id=:id",array(":id"=>$this->id))->queryRow();
 			$this->saveGoods($connection);
-			$transaction->commit();
+            $curlData = $this->saveGoodsInfo($connection,$oldOrderStatus);
+            $bool=true;
+            if(!empty($curlData["goods_item"])){
+                $jdCurlModel = new CurlForDelivery();
+                $jdCurl = $jdCurlModel->sendJDCurlForOne($curlData);
+                if($jdCurl["code"]!=200){//金蝶提示失败
+                    $bool = false;
+                    $transaction->rollback();
+                    $jdCurlModel->saveTableForArr();
+                    Dialog::message("金蝶系统异常", $jdCurl["message"]);
+                }else{
+                    $transaction->commit();
+                    $jdCurlModel->saveTableForArr();
+                    $this->resetZIndex();
+                    //發送郵件
+                    OrderGoods::sendEmailTwo(array($oldOrderStatus),$this->status,$this->order_code);
+                }
+            }else{
+                $transaction->commit();
+            }
+            return $bool;
 		}
 		catch(Exception $e) {
 			$transaction->rollback();
@@ -220,9 +290,111 @@ class DeliveryForm extends CFormModel
 		}
 	}
 
+    protected function saveGoodsInfo(&$connection,$oldOrderStatus){
+        $time = date_format(date_create(),"Y-m-d H:i:s");
+        $curlData = self::getCurlDateForOrder($oldOrderStatus,$time);
+        $uid = Yii::app()->user->id;
+        $connection->createCommand()->insert('opr_order_status', array(
+            'order_id'=>$this->id,
+            'status'=>$this->status,
+            'r_remark'=>$this->remark,
+            'lcu'=>Yii::app()->user->user_display_name(),
+            'time'=>$time,
+        ));
+
+        $totalPrice = 0;
+        //物品的添加、修改
+        foreach ($this->goods_list as $goods){
+            if(!empty($goods["id"])){
+                $price = Yii::app()->db->createCommand("SELECT costPrice({$goods['goods_id']},'{$oldOrderStatus['lcd']}')")->queryScalar();
+                $totalPrice+=$goods["confirm_num"]*$price;
+                //修改
+                $connection->createCommand()->update('opr_order_goods', array(
+                    'confirm_num'=>$goods["confirm_num"],
+                    'total_price'=>$goods["confirm_num"]*$price,
+                    'remark'=>$goods["remark"],
+                    'luu'=>$uid,
+                    'lud'=>$time,
+                ), 'id=:id', array(':id'=>$goods["id"]));
+                //选择发货仓库(开始)
+                $this->saveOrderGoodStore($connection,$goods,$uid,$time);
+                //选择发货仓库(结束)
+                if ($this->scenario == "audit"){
+                    $warehouseRow = $connection->createCommand()->select("*")->from("opr_warehouse")
+                        ->where("id =:id",array(":id"=>$goods["goods_id"]))->queryRow();
+                    $storeList =$connection->createCommand()->select("a.store_num,b.jd_store_no")->from("opr_order_goods_store a")
+                        ->leftJoin("opr_store b","a.store_id=b.id")
+                        ->where("order_goods_id =:order_goods_id",array(":order_goods_id"=>$goods["id"]))->queryAll();
+                    if($storeList){
+                        $warehouseRow["store_list"]=$storeList;
+                    }
+                    $curlData["goods_item"][]=self::getCurlDateForWarehouse($warehouseRow,$goods["confirm_num"]);
+                    //记录库存数量
+                    $connection->createCommand()->insert('opr_warehouse_history',array(
+                        'apply_date'=>$time,
+                        'warehouse_id'=>$goods["goods_id"],
+                        'old_sum'=>$warehouseRow["inventory"],
+                        'now_sum'=>$warehouseRow["inventory"]-$goods["confirm_num"],
+                        'apply_name'=>Yii::app()->user->user_display_name(),
+                        'status_type'=>2,
+                        'order_code'=>$oldOrderStatus["order_code"],
+                        'lcu'=>$uid,
+                    ));
+                    //減少庫存 inventory
+                    $connection->createCommand()->update('opr_warehouse',array(
+                        'inventory'=>$warehouseRow["inventory"]-$goods["confirm_num"]
+                    ),"id=:id",array(":id"=>$goods["goods_id"]));
+                }
+            }
+        }
+
+        //修改訂單總價
+        $connection->createCommand()->update('opr_order', array(
+            'total_price'=>$totalPrice,
+        ), 'id=:id', array(':id'=>$this->id));
+
+        return $curlData;
+    }
+
+    protected function saveOrderGoodStore(&$connection,$goods,$uid,$time){
+        $storeRows = $connection->createCommand()->select("*")->from("opr_order_goods_store")
+            ->where("order_goods_id=".$goods["id"])->queryAll();
+        $storeIDList=array();
+        if($storeRows){
+            foreach ($storeRows as $storeRow){
+                $storeIDList[$storeRow["id"]] = $storeRow["id"];
+            }
+        }
+        foreach ($goods["store_list"]["store_id"] as $storeKey=>$storeID){
+            $orderGoodStoreId = $goods["store_list"]["id"][$storeKey];
+            if(!empty($orderGoodStoreId)){//修改发货仓库
+                if(isset($storeIDList[$orderGoodStoreId])){
+                    unset($storeIDList[$orderGoodStoreId]);
+                    $connection->createCommand()->update('opr_order_goods_store', array(
+                        'store_id'=>$goods["store_list"]["store_id"][$storeKey],
+                        'store_num'=>$goods["store_list"]["store_num"][$storeKey],
+                        'luu'=>$uid,
+                        'lud'=>$time,
+                    ), 'id=:id', array(':id'=>$orderGoodStoreId));
+                }
+            }else{//新增发货仓库
+                $connection->createCommand()->insert('opr_order_goods_store', array(
+                    'order_goods_id'=>$goods["id"],
+                    'store_id'=>$goods["store_list"]["store_id"][$storeKey],
+                    'store_num'=>$goods["store_list"]["store_num"][$storeKey],
+                    'lcu'=>$uid,
+                    'lcd'=>$time,
+                ));
+            }
+        }
+        if(!empty($storeIDList)){
+            foreach ($storeIDList as $id){
+                $connection->createCommand()->delete('opr_order_goods_store',"id=".$id);
+            }
+        }
+    }
+
 	protected function saveGoods(&$connection) {
-        $oldOrderStatus = Yii::app()->db->createCommand()->select("*")->from("opr_order")
-            ->where("id=:id",array(":id"=>$this->id))->queryAll();
 		$sql = '';
         switch ($this->scenario) {
             case 'edit':
@@ -284,45 +456,6 @@ class DeliveryForm extends CFormModel
         if (strpos($sql,':luu')!==false)
             $command->bindParam(':luu',$uid,PDO::PARAM_STR);
         $command->execute();
-
-        Yii::app()->db->createCommand()->insert('opr_order_status', array(
-            'order_id'=>$this->id,
-            'status'=>$this->status,
-            'r_remark'=>$this->remark,
-            'lcu'=>Yii::app()->user->user_display_name(),
-            'time'=>date('Y-m-d H:i:s'),
-        ));
-
-        $totalPrice = 0;
-        //物品的添加、修改
-        foreach ($this->goods_list as $goods){
-            if(!empty($goods["id"])){
-                $price = Yii::app()->db->createCommand("SELECT costPrice({$goods['goods_id']},'{$oldOrderStatus[0]['lcd']}')")->queryScalar();
-                $totalPrice+=$goods["confirm_num"]*$price;
-                //修改
-                Yii::app()->db->createCommand()->update('opr_order_goods', array(
-                    'confirm_num'=>$goods["confirm_num"],
-                    'total_price'=>$goods["confirm_num"]*$price,
-                    'remark'=>$goods["remark"],
-                    'luu'=>$uid,
-                    'lud'=>date('Y-m-d H:i:s'),
-                ), 'id=:id', array(':id'=>$goods["id"]));
-                if ($this->scenario == "audit"){
-                    //记录库存数量
-                    WarehouseForm::insertWarehouseHistory($goods["goods_id"],$goods["confirm_num"],2,true,$this->order_code);
-                    //減少庫存 inventory
-                    $this->reduceInventory($goods["goods_id"],$goods["confirm_num"]);
-                }
-            }
-        }
-        //修改訂單總價
-        Yii::app()->db->createCommand()->update('opr_order', array(
-            'total_price'=>$totalPrice,
-        ), 'id=:id', array(':id'=>$this->id));
-        $this->resetZIndex();
-
-        //發送郵件
-        OrderGoods::sendEmailTwo($oldOrderStatus,$this->status,$this->order_code);
 		return true;
 	}
 
@@ -339,42 +472,89 @@ class DeliveryForm extends CFormModel
 
     //退回
     function backward(){
-        $rows = Yii::app()->db->createCommand()->select("id")->from("opr_order")->where('status = "approve" and id = :id',array(':id'=>$this->id))->queryAll();
-        if(count($rows) > 0){
+        $row = Yii::app()->db->createCommand()->select("*")->from("opr_order")->where('status = "approve" and id = :id',array(':id'=>$this->id))->queryRow();
+        if($row){
             $uid = Yii::app()->user->id;
-            $this->status = "sent";
-            //修改訂單狀態
-            Yii::app()->db->createCommand()->update('opr_order', array(
-                'status'=>$this->status,
-                'remark'=>$this->remark,
-                'luu'=>$uid,
-                'lud'=>date('Y-m-d H:i:s'),
-            ), 'id=:id', array(':id'=>$this->id));
-
-            //補回庫存
-            $goods_list = Yii::app()->db->createCommand()->select("goods_id,confirm_num")->from("opr_order_goods")
-                ->where('order_id = :order_id',array(':order_id'=>$this->id))->queryAll();
-            if($goods_list){
-                foreach ($goods_list as $goods){
-                    $num = $goods["confirm_num"];
-                    $goodsId = $goods["goods_id"];
-                    //记录库存数量
-                    WarehouseForm::insertWarehouseHistory($goodsId,-1*$num,4,true,$this->order_code);
-                    //修改库存
-                    Yii::app()->db->createCommand("update opr_warehouse set inventory=inventory+$num where id=$goodsId")->execute();
-                }
-                $this->resetZIndex();
+            $time = date_format(date_create(),"Y-m-d H:i:s");
+            $curlData = DeliveryForm::getCurlDateForOrder($row,$time);
+            $storeDefaultList = StoreForm::getStoreDefaultForCity($row["city"]);
+            if($storeDefaultList===false){
+                return false;
             }
+            $this->status = "sent";
+            $connection = Yii::app()->db;
+            $transaction=$connection->beginTransaction();
+            try {
+                //修改訂單狀態
+                $connection->createCommand()->update('opr_order', array(
+                    'status'=>$this->status,
+                    'remark'=>$this->remark,
+                    'luu'=>$uid,
+                    'lud'=>$time,
+                ), 'id=:id', array(':id'=>$this->id));
+                //補回庫存
+                $goods_list = Yii::app()->db->createCommand()->select("id,goods_id,confirm_num")->from("opr_order_goods")
+                    ->where('order_id = :order_id',array(':order_id'=>$this->id))->queryAll();
+                if($goods_list){
+                    foreach ($goods_list as $goods){
+                        $num = $goods["confirm_num"];
+                        $goodsId = $goods["goods_id"];
+                        $warehouseRow = $connection->createCommand()->select("*")->from("opr_warehouse")
+                            ->where("id =:id",array(":id"=>$goodsId))->queryRow();
+                        $storeList =$connection->createCommand()->select("a.store_num as back_num,a.store_num,b.jd_store_no")->from("opr_order_goods_store a")
+                            ->leftJoin("opr_store b","a.store_id=b.id")
+                            ->where("order_goods_id =:order_goods_id",array(":order_goods_id"=>$goods["id"]))->queryAll();
+                        if($storeList){
+                            $warehouseRow["store_list"]=$storeList;
+                        }else{
+                            $warehouseRow["store_list"]=array();
+                            $warehouseRow["store_list"][]=array("back_num"=>$num,"store_num"=>$num,"jd_store_no"=>$storeDefaultList["jd_store_no"]);
+                        }
+                        $curlData["goods_item"][]=self::getCurlDateForWarehouse($warehouseRow,$num,array("back_num"=>$num));
+                        //记录库存
+                        $connection->createCommand()->insert('opr_warehouse_history',array(
+                            'apply_date'=>$time,
+                            'warehouse_id'=>$goodsId,
+                            'old_sum'=>$warehouseRow["inventory"],
+                            'now_sum'=>$warehouseRow["inventory"]+$num,
+                            'apply_name'=>Yii::app()->user->user_display_name(),
+                            'status_type'=>4,
+                            'order_code'=>$row["order_code"],
+                            'lcu'=>$uid,
+                        ));
+                        //补回庫存
+                        $connection->createCommand()->update('opr_warehouse',array(
+                            'inventory'=>$warehouseRow["inventory"]+$num
+                        ),"id=:id",array(":id"=>$goodsId));
+                    }
+                }
 
-            //添加狀態記錄
-            Yii::app()->db->createCommand()->insert('opr_order_status', array(
-                'order_id'=>$this->id,
-                'status'=>"backward",
-                'r_remark'=>$this->remark,
-                'lcu'=>Yii::app()->user->user_display_name(),
-                'time'=>date('Y-m-d H:i:s'),
-            ));
-            return true;
+                //添加狀態記錄
+                $connection->createCommand()->insert('opr_order_status', array(
+                    'order_id'=>$this->id,
+                    'status'=>"backward",
+                    'r_remark'=>$this->remark,
+                    'lcu'=>Yii::app()->user->user_display_name(),
+                    'time'=>$time,
+                ));
+
+                $jdCurlModel = new CurlForDelivery();
+                $jdCurl = $jdCurlModel->backJDCurlForOrder($curlData);
+                if($jdCurl["code"]!=200){//金蝶提示失败
+                    $transaction->rollback();
+                    $jdCurlModel->saveTableForArr();
+                    Dialog::message("金蝶系统异常", $jdCurl["message"]);
+                }else{
+                    $transaction->commit();
+                    $jdCurlModel->saveTableForArr();
+                    $this->resetZIndex();
+                    Dialog::message(Yii::t('dialog','Information'), Yii::t('procurement','Backward Done'));
+                }
+                return true;
+            }catch(Exception $e) {
+                $transaction->rollback();
+                throw new CHttpException(404,'Cannot update. ('.$e->getMessage().')');
+            }
         }
         return false;
     }
@@ -401,32 +581,85 @@ class DeliveryForm extends CFormModel
 
     //退回單個物品
     public function blackGoods($str=""){
+        $bool = true;
         $num = $this->num;
         $goodsId = $this->goods_id;
         $blackId = $this->black_id;
-        //记录库存数量
-        WarehouseForm::insertWarehouseHistory($goodsId,-1*$num,3,true,$this->order_code);
-        Yii::app()->db->createCommand("update opr_order_goods set confirm_num=confirm_num-$num where id=$blackId")->execute();
-        Yii::app()->db->createCommand("update opr_warehouse set inventory=inventory+$num where id=$goodsId")->execute();
+        $jd_store_no = StoreForm::getStoreListForStoreID($this->store_id);
+        $time = date_format(date_create(),"Y-m-d H:i:s");
+        $uid = Yii::app()->user->id;
+        $connection = Yii::app()->db;
+        $transaction=$connection->beginTransaction();
+        try {
+            $order = $connection->createCommand()->select("*")->from("opr_order")
+                ->where("id =:id",array(":id"=>$this->id))->queryRow();
+            $warehouseRow = $connection->createCommand()->select("*")->from("opr_warehouse")
+                ->where("id =:id",array(":id"=>$goodsId))->queryRow();
+            $warehouseRow["store_list"]=array();
+            $warehouseRow["store_list"][]=array("back_num"=>$num,"store_num"=>$this->store_num,"jd_store_no"=>$jd_store_no);
+            $curlData=self::getCurlDateForOrder($order,$time);
+            $curlData["goods_item"][]=self::getCurlDateForWarehouse($warehouseRow,$this->confirm_num,array("back_num"=>$num));
+            //记录库存
+            $connection->createCommand()->insert('opr_warehouse_history',array(
+                'apply_date'=>$time,
+                'warehouse_id'=>$goodsId,
+                'old_sum'=>$warehouseRow["inventory"],
+                'now_sum'=>$warehouseRow["inventory"]+$num,
+                'apply_name'=>Yii::app()->user->user_display_name(),
+                'status_type'=>3,
+                'order_code'=>$order["order_code"],
+                'lcu'=>$uid,
+            ));
+            //补回庫存
+            $connection->createCommand()->update('opr_warehouse',array(
+                'inventory'=>$warehouseRow["inventory"]+$num
+            ),"id=:id",array(":id"=>$goodsId));
+            //修改发货数量
+            $connection->createCommand()->update('opr_order_goods',array(
+                'confirm_num'=>$this->confirm_num-$num
+            ),"id=:id",array(":id"=>$blackId));
+            $connection->createCommand()->update('opr_order_goods_store',array(
+                'store_num'=>$this->store_num-$num
+            ),"order_goods_id=:id and store_id=:store_id",array(":id"=>$blackId,":store_id"=>$this->store_id));
 
-        $this->resetZIndex();
-        //記錄
-        Yii::app()->db->createCommand()->insert('opr_order_status', array(
-            'order_id'=>$this->id,
-            'status'=>"backward",
-            'r_remark'=>$str."退回數量:$num",
-            'lcu'=>Yii::app()->user->user_display_name(),
-            'time'=>date('Y-m-d H:i:s'),
-        ));
-        //記錄
-        Yii::app()->db->createCommand()->insert('opr_warehouse_back', array(
-            'order_id'=>$this->id,
-            'warehouse_id'=>$goodsId,
-            'back_num'=>$num,
-            'old_num'=>$this->confirm_num,
-            'lcu'=>Yii::app()->user->user_display_name(),
-        ));
+            //記錄
+            $connection->createCommand()->insert('opr_order_status', array(
+                'order_id'=>$this->id,
+                'status'=>"backward",
+                'r_remark'=>$str."退回數量:$num",
+                'lcu'=>Yii::app()->user->user_display_name(),
+                'time'=>$time,
+            ));
+            //記錄
+            $connection->createCommand()->insert('opr_warehouse_back', array(
+                'order_id'=>$this->id,
+                'warehouse_id'=>$goodsId,
+                'store_id'=>$this->store_id,
+                'back_num'=>$num,
+                'old_num'=>$this->confirm_num,
+                'lcu'=>Yii::app()->user->user_display_name(),
+            ));
+
+            $jdCurlModel = new CurlForDelivery();
+            $jdCurl = $jdCurlModel->backJDCurlForGoods($curlData);
+            if($jdCurl["code"]!=200){//金蝶提示失败
+                $bool=false;
+                $transaction->rollback();
+                $jdCurlModel->saveTableForArr();
+                Dialog::message("金蝶系统异常", $jdCurl["message"]);
+            }else{
+                $transaction->commit();
+                $jdCurlModel->saveTableForArr();
+                $this->resetZIndex();
+            }
+            $this->resetZIndex();
+        }catch(Exception $e) {
+            $transaction->rollback();
+            throw new CHttpException(404,'Cannot update. ('.$e->getMessage().')');
+        }
+        return $bool;
     }
+
     public function downTypeList(){
         $list = array(
             0=>Yii::t('procurement','All'),
@@ -476,54 +709,173 @@ class DeliveryForm extends CFormModel
         }
     }
 
+    protected static function getCurlDateForOrder($order,$time,$expArr=array()){
+        $list = array(
+            "order_id"=>$order["id"],
+            "order_code"=>$order["order_code"],
+            "order_user"=>$order["order_user"],
+            "city"=>$order["city"],
+            "apply_date"=>$order["lcd"],
+            "audit_date"=>$time,
+            "goods_item"=>array(),
+        );
+        if(!empty($expArr)){
+            foreach ($expArr as $key=>$item){
+                $list[$key] = $item;
+            }
+        }
+        return $list;
+    }
+
+    protected static function getCurlDateForWarehouse($warehouseRow,$num,$expArr=array()){
+        $list = array(
+            //"jd_warehouse_no"=>$warehouseRow["jd_warehouse_no"],
+            "jd_good_no"=>$warehouseRow["jd_good_no"],
+            "city"=>$warehouseRow["city"],
+            "good_id"=>$warehouseRow["id"],
+            "goods_code"=>$warehouseRow["goods_code"],
+            "goods_name"=>$warehouseRow["name"],
+            "inventory"=>$warehouseRow["inventory"],
+            "confirm_num"=>"".$num,
+            "store_list"=>$warehouseRow["store_list"]
+        );
+        if(!empty($expArr)){
+            foreach ($expArr as $key=>$item){
+                $list[$key] = $item;
+            }
+        }
+        return $list;
+    }
+
     //批量批准訂單
     public function allApproved(){
         $orderList = $this->orderList;
         $uid = Yii::app()->user->id;
         $city = Yii::app()->user->city();
-        if(!empty($orderList)){
-            foreach ($orderList as $order){
-                $this->lcd = $order["lcd"];
-                //記錄
-                Yii::app()->db->createCommand()->insert('opr_order_status', array(
-                    'order_id'=>$order["id"],
-                    'status'=>"approve",
-                    'r_remark'=>"",
-                    'lcu'=>Yii::app()->user->user_display_name(),
-                    'time'=>date('Y-m-d H:i:s'),
-                ));
+        $time = date_format(date_create(),"Y-m-d H:i:s");
+        $connection = Yii::app()->db;
+        $transaction=$connection->beginTransaction();
+        try {
+            $jdCurlDate=array();
+            $updateBool = true;
+            if(!empty($orderList)){
+                foreach ($orderList as $order){
+                    $storeDefaultList = StoreForm::getStoreDefaultForCity($order["city"]);
+                    if($storeDefaultList===false){
+                        $updateBool = false;
+                        $message = "城市:".$order["city"]."没有默认仓库";
+                        Dialog::message(Yii::t('dialog','Validation Message'), $message);
+                        break;
+                    }
+                    $tempCurl=self::getCurlDateForOrder($order,$time);
+                    $this->lcd = $order["lcd"];
+                    //記錄
+                    $connection->createCommand()->insert('opr_order_status', array(
+                        'order_id'=>$order["id"],
+                        'status'=>"approve",
+                        'r_remark'=>"",
+                        'lcu'=>Yii::app()->user->user_display_name(),
+                        'time'=>$time,
+                    ));
 
-                $totalPrice=0;//訂單總價
-                //批量減少庫存
-                $rows = Yii::app()->db->createCommand()->select("id,goods_id,goods_num,confirm_num")->from("opr_order_goods")
-                    ->where("order_id =:order_id",array(":order_id"=>$order["id"]))->queryAll();
-                if($rows){
-                    foreach ($rows as $row){
-                        $num = ($row["confirm_num"]===""||$row["confirm_num"]===null)?floatval($row["goods_num"]):floatval($row["confirm_num"]);
-                        $goodsId = intval($row["goods_id"]);
-                        $price = Yii::app()->db->createCommand("SELECT costPrice($goodsId,'{$order['lcd']}')")->queryScalar();
-                        $totalPrice+=$num*$price;
-                        //记录库存
-                        WarehouseForm::insertWarehouseHistory($goodsId,$num,2,true,$order["order_code"]);
-                        //減少庫存
-                        Yii::app()->db->createCommand("update opr_warehouse set inventory=inventory-$num where id=$goodsId")->execute();
-                        //修改物品的實際數量
-                        Yii::app()->db->createCommand()->update('opr_order_goods', array(
-                            'confirm_num'=>$num,
-                            'total_price'=>$num*$price,
-                        ), "id=:id",array(":id"=>$row["id"]));
+                    $totalPrice=0;//訂單總價
+                    //批量減少庫存
+                    $rows = $connection->createCommand()->select("id,goods_id,goods_num,confirm_num")->from("opr_order_goods")
+                        ->where("order_id =:order_id",array(":order_id"=>$order["id"]))->queryAll();
+                    if($rows){
+                        foreach ($rows as $row){
+                            $num = ($row["confirm_num"]===""||$row["confirm_num"]===null)?floatval($row["goods_num"]):floatval($row["confirm_num"]);
+                            $goodsId = intval($row["goods_id"]);
+                            $price = Yii::app()->db->createCommand("SELECT costPrice($goodsId,'{$order['lcd']}')")->queryScalar();
+                            $totalPrice+=$num*$price;
+
+                            $warehouseRow = $connection->createCommand()->select("*")->from("opr_warehouse")
+                                ->where("id =:id",array(":id"=>$goodsId))->queryRow();
+                            if($warehouseRow&&$warehouseRow["inventory"]>$num){
+                                $storeList =$connection->createCommand()->select("a.store_num,b.jd_store_no")->from("opr_order_goods_store a")
+                                    ->leftJoin("opr_store b","a.store_id=b.id")
+                                    ->where("order_goods_id =:order_goods_id",array(":order_goods_id"=>$row["id"]))->queryAll();
+                                if($storeList){
+                                    $warehouseRow["store_list"]=$storeList;
+                                }else{
+                                    $connection->createCommand()->insert('opr_order_goods_store', array(
+                                        'order_goods_id'=>$row["id"],
+                                        'store_id'=>$storeDefaultList["jd_store_no"],
+                                        'store_num'=>$num,
+                                        'lcu'=>$uid,
+                                        'lcd'=>$time,
+                                    ));
+                                    $warehouseRow["store_list"]=array();
+                                    $warehouseRow["store_list"][]=array("store_num"=>$num,"jd_store_no"=>$storeDefaultList["jd_store_no"]);
+                                }
+                                $tempCurl["goods_item"][]=self::getCurlDateForWarehouse($warehouseRow,$num);
+                                //记录库存
+                                $connection->createCommand()->insert('opr_warehouse_history',array(
+                                    'apply_date'=>$time,
+                                    'warehouse_id'=>$goodsId,
+                                    'old_sum'=>$warehouseRow["inventory"],
+                                    'now_sum'=>$warehouseRow["inventory"]-$num,
+                                    'apply_name'=>Yii::app()->user->user_display_name(),
+                                    'status_type'=>2,
+                                    'order_code'=>$order["order_code"],
+                                    'lcu'=>$uid,
+                                ));
+                                //減少庫存
+                                $connection->createCommand()->update('opr_warehouse',array(
+                                    'inventory'=>$warehouseRow["inventory"]-$num
+                                ),"id=:id",array(":id"=>$goodsId));
+                                //修改物品的實際數量
+                                $connection->createCommand()->update('opr_order_goods', array(
+                                    'confirm_num'=>$num,
+                                    'total_price'=>$num*$price,
+                                ), "id=:id",array(":id"=>$row["id"]));
+                            }else{
+                                $updateBool = false;
+                                $message = "订单:".$order["order_code"]."的库存不足。({$warehouseRow["name"]}库存:{$warehouseRow["inventory"]})";
+                                Dialog::message(Yii::t('dialog','Validation Message'), $message);
+                                break;
+                            }
+                        }
+                    }
+
+                    //修改物品的价格及狀態
+                    $connection->createCommand()->update('opr_order', array(
+                        'status'=>"approve",
+                        'total_price'=>$totalPrice,
+                        'audit_time'=>$time,
+                        'luu'=>$uid,
+                    ), "city='$city' AND judge=0 AND status in ('read','sent') and id=:id",array(":id"=>$order["id"]));
+
+                    if($updateBool===false){
+                        break;
+                    }else{
+                        $jdCurlDate[] = $tempCurl;
                     }
                 }
-
-                //修改物品的价格及狀態
-                Yii::app()->db->createCommand()->update('opr_order', array(
-                    'status'=>"approve",
-                    'total_price'=>$totalPrice,
-                    'audit_time'=>date('Y-m-d H:i:s'),
-                    'luu'=>$uid,
-                ), "city='$city' AND judge=0 AND status in ('read','sent') and id=:id",array(":id"=>$order["id"]));
             }
-        }
 
+
+            if($updateBool===true&&!empty($jdCurlDate)){
+                $jdCurlModel = new CurlForDelivery();
+                $jdCurl = $jdCurlModel->sendJDCurlForFull($jdCurlDate);
+                if($jdCurl["code"]!=200){//金蝶提示失败
+                    $updateBool=false;
+                    $transaction->rollback();
+                    $jdCurlModel->saveTableForArr();
+                    Dialog::message("金蝶系统异常", $jdCurl["message"]);
+                }else{
+                    $transaction->commit();
+                    $jdCurlModel->saveTableForArr();
+                    $this->resetZIndex();
+                }
+            }else{
+                $transaction->rollback();
+            }
+            return $updateBool;
+        }
+        catch(Exception $e) {
+            $transaction->rollback();
+            throw new CHttpException(404,'Cannot update. ('.$e->getMessage().')');
+        }
     }
 }

@@ -324,5 +324,24 @@ return array(
     'now num'=>'修改后数量',
     //2022-2-7
     'good image'=>'物品图片',
+    //2024-5-14
+    'JD System Curl'=>'金蝶同步相关数据',
+    'JD warehouse no'=>'金蝶仓库编号',
+    'JD classify no'=>'金蝶分类编号',
+    'JD good no'=>'金蝶物料编号',
+    'Add For JD'=>'金蝶系统新增',
+    'Update For JD'=>'金蝶系统修改',
+    'Store Name'=>'仓库名称',
+    'Store List'=>'仓库列表',
+    'Store Form'=>'仓库表单',
+    'store type'=>'仓库类型',
+    'store default'=>'默认仓库',
+    'store normal'=>'正常仓库',
+    'display'=>'是否显示',
+    'show'=>'显示',
+    'none'=>'隐藏',
+    'city name'=>'城市',
+    'send store'=>'发货仓库',
+    'send number'=>'发货数量',
 );
 ?>

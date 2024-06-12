@@ -159,7 +159,7 @@ class OrderGoods extends CActiveRecord{
         }
     }
     //訂單發郵件(倉庫)
-    public function sendEmailTwo($oldOrderStatus,$stauts,$order_code=0){
+    public static function sendEmailTwo($oldOrderStatus,$stauts,$order_code=0){
         $city = Yii::app()->user->city();
         $uid = Yii::app()->user->user_display_name();
         $email = ActivityForm::getEmailToCity($city);

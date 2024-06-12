@@ -60,12 +60,16 @@ class StoreComparisonForm extends CFormModel
 
     private function getLBSWarehouse(){
         $list = array();
-        $rows = Yii::app()->db->createCommand()->select("goods_code,name,inventory,jd_good_no")->from("opr_warehouse")
+        $rows = Yii::app()->db->createCommand()->select("goods_code,name,inventory,jd_good_no,city")->from("opr_warehouse")
             ->where("city=:city and display=1",array(":city"=>$this->search_city))->queryAll();
         if($rows){
             foreach ($rows as $row){
-                $row["jd_good_no"]="".$row["jd_good_no"];
-                $list[$row["jd_good_no"]]=array(
+                if(empty($row["jd_good_no"])){
+                    $key=$row["city"].$row["goods_code"];
+                }else{
+                    $key="".$row["jd_good_no"];
+                }
+                $list[$key]=array(
                     "lbs_good_no"=>$row["goods_code"],
                     "lbs_good_name"=>$row["name"],
                     "lbs_store_sum"=>$row["inventory"],
@@ -106,6 +110,7 @@ class StoreComparisonForm extends CFormModel
 
     public function retrieveData() {
         $data = array(
+            "errorNone"=>array("count"=>0,"name"=>"LBS未填写金蝶物料编号","list"=>array()),
             "error"=>array("count"=>0,"name"=>"库存不一致","list"=>array()),
             "errorLBS"=>array("count"=>0,"name"=>"LBS不存在该物品","list"=>array()),
             "errorJD"=>array("count"=>0,"name"=>"金蝶系统不存在该物品","list"=>array()),
@@ -116,8 +121,11 @@ class StoreComparisonForm extends CFormModel
         $jdData = $this->getJDWarehouse();
 
         if(!empty($lbsData)){
-            foreach ($lbsData as $good_no=>$lbsRow){
-                if(key_exists($good_no,$jdData)){
+            foreach ($lbsData as $lbsRow){
+                $good_no = $lbsRow["jd_good_no"];
+                if(empty($good_no)){
+                    $data["errorNone"]["list"][]=$this->getComparisonRow($lbsRow,array(),"errorNone");
+                }elseif(key_exists($good_no,$jdData)){
                     if($jdData["jd_store_sum"]!=$lbsRow["lbs_store_sum"]){
                         $data["error"]["list"][]=$this->getComparisonRow($lbsRow,array(),"error");
                     }else{
@@ -145,6 +153,19 @@ class StoreComparisonForm extends CFormModel
     private function getComparisonRow($lbsRow,$jdRow,$errorType){
         $arr = array();
         switch ($errorType){
+            case "errorNone"://金蝶系统不存在该物品
+                $arr = array(
+                    "city_name"=>$this->city_name,
+                    "lbs_good_no"=>$lbsRow["lbs_good_no"],
+                    "lbs_good_name"=>$lbsRow["lbs_good_name"],
+                    "lbs_store_sum"=>$lbsRow["lbs_store_sum"],
+                    "jd_good_no"=>"-",
+                    "jd_good_name"=>"-",
+                    "jd_store_sum"=>"-",
+                    "jd_good_text"=>"-",
+                    "comparison_text"=>"LBS未填写金蝶物料编号",
+                );
+                break;
             case "errorJD"://金蝶系统不存在该物品
                 $arr = array(
                     "city_name"=>$this->city_name,

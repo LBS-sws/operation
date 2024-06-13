@@ -235,6 +235,11 @@ class CurlReceiveList extends CListPageModel
 	    $this->sendCurl("/JDSync/ip",$data);
     }
 
+    public function getGoods($city,$goods){
+	    $data =array("city_arr"=>$city,"jd_good_arr"=>$goods);
+	    $this->sendCurl("/JDSync/GetGoods",$data);
+    }
+
     public function systemU($type){
         //$city = Yii::app()->user->city();
         $city = "CD";

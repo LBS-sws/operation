@@ -211,4 +211,43 @@ class CurlForJD{
 
         return $rtn;
     }
+
+    public static function getDataToLocal($data,$url) {
+        $root = Yii::app()->params['uCurlIP'];
+        $endUrl = $root.$url;
+        $rtn = array('message'=>'', 'code'=>400,'outData'=>array());//成功时code=200；
+        $tokenModel = new JDToken();
+        $tokenList = $tokenModel->getToken();
+        if($tokenList["status"]===true){
+            $data_string = json_encode($data);
+
+            $ch = curl_init($endUrl);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                'Content-Type:application/json',
+                'Content-Length:'.strlen($data_string),
+                'accessToken:'.$tokenList["token"],
+            ));
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            $out = curl_exec($ch);
+            if ($out===false) {
+                $rtn['message'] = curl_error($ch);
+            } else {
+                $json = json_decode($out, true);
+                if(is_array($json)&&key_exists("errorCode",$json)&&$json["errorCode"]==0){
+                    $rtn['code'] = 200;
+                    $rtn['outData'] = $json["data"]["rows"];
+                }else{
+                    $rtn['message'] = isset($json["message"])?$json["message"]:"";
+                }
+            }
+        }else{
+            $rtn["message"] = "token获取失败:".$tokenList["message"];//token获取失败
+        }
+
+        return $rtn;
+    }
 }

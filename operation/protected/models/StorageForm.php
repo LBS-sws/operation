@@ -146,10 +146,12 @@ class StorageForm extends CFormModel
         $rows = Yii::app()->db->createCommand()->select("*")->from("opr_storage_info")
             ->where("storage_id=:id",array(":id"=>$this->id))->queryAll();
         if($rows){
+            $oldGoodsList=array();
             foreach ($rows as $row){
                 $goods = Yii::app()->db->createCommand()->select("*")->from("opr_warehouse")
                     ->where('id=:id', array(':id'=>$row["warehouse_id"]))->queryRow();
                 if($goods){
+                    $oldGoodsList[$row["warehouse_id"]]=$goods;
                     $inventory = floatval($goods["inventory"])-floatval($row["add_num"]);
                     //记录库存数量
                     WarehouseForm::insertWarehouseHistory($row["warehouse_id"],$inventory,6,false,$this->code);
@@ -161,6 +163,7 @@ class StorageForm extends CFormModel
                     ), 'id=:id', array(':id'=>$row["warehouse_id"]));
                 }
             }
+            CurlForWareHouse::editGoodFull($oldGoodsList);
         }
     }
 
@@ -308,6 +311,8 @@ class StorageForm extends CFormModel
         }
 
         Yii::app()->db->createCommand()->delete("opr_storage_info","storage_id=:storage_id",array(":storage_id"=>$this->id));
+
+        $oldGoodsList = array();
         foreach ($this->storage_list as $row){ //添加入庫物品
             $addArr=array(
                 "add_num"=>$row["add_num"],
@@ -319,6 +324,10 @@ class StorageForm extends CFormModel
             }
             Yii::app()->db->createCommand()->insert("opr_storage_info",$addArr);
             if($this->status_type == 1){ //物品入庫（庫存添加）
+                $goods = Yii::app()->db->createCommand()->select("*")->from("opr_warehouse")
+                    ->where('id=:id', array(':id'=>$row["warehouse_id"]))->queryRow();
+                $oldGoodsList[$row["warehouse_id"]]=$goods;
+
                 $inventory = floatval($row["inventory"])+floatval($row["add_num"]);
                 //记录库存数量
                 WarehouseForm::insertWarehouseHistory($row["warehouse_id"],$inventory,6,false,$this->code);
@@ -330,6 +339,7 @@ class StorageForm extends CFormModel
                 ), 'id=:id', array(':id'=>$row["warehouse_id"]));
             }
         }
+        CurlForWareHouse::editGoodFull($oldGoodsList);
 		return true;
 	}
 

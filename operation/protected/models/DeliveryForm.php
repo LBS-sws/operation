@@ -101,7 +101,7 @@ class DeliveryForm extends CFormModel
         if(date("Y-m-d")<="2020-03-20"){ //一月份以前不需要驗證
             return true;
         }
-        $city = Yii::app()->user->city();
+        $city = $this->city;
         $year = date("Y");
         $month = date("m");
         $day = date("d");

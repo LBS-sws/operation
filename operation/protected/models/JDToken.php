@@ -29,8 +29,7 @@ class JDToken{
         }else{
             $tokenList = $this->getTokenForSend();
             if($tokenList["status"]===true){
-                $timer = $date->getTimestamp()+floatval($tokenList["expires_in"]);
-                $date->setTimestamp($timer);
+                $date->modify(sprintf("+%d seconds", $tokenList["expires_in"] / 1000));
                 Yii::app()->db->createCommand()->update("operation{$suffix}.opr_token",array(
                     "access_token"=>$tokenList["token"],
                     "expires_in"=>$tokenList["expires_in"],

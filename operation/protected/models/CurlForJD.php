@@ -181,6 +181,7 @@ class CurlForJD{
         $tokenList = $tokenModel->getToken();
         if($tokenList["status"]===true){
             $data_string = json_encode($data);
+            //echo "请求内容:<br/>{$data_string}<br/><br/>";
 
             $ch = curl_init($endUrl);
             curl_setopt($ch, CURLOPT_POST, true);
@@ -194,6 +195,7 @@ class CurlForJD{
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
             $out = curl_exec($ch);
+            //echo "返回内容:<br/>{$out}<br/><br/>";
             if ($out===false) {
                 $rtn['message'] = curl_error($ch);
             } else {

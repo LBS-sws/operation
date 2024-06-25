@@ -185,7 +185,7 @@ class CurlReceiveList extends CListPageModel
     public function testWarehouseUpdate($no,$sum=100){
 	    $data = array(
             "status"=>"update",//状态
-            "city"=>"CD",//城市
+            "city"=>"CD",// 城市
             "timestamp"=>date_format(date_create(),"Y/m/d H:i:s"),//记录时间
             "jd_warehouse_no"=>"CD001",//仓库编号(金蝶系统)
             "jd_good_no"=>$no,//物料编号(金蝶系统)
@@ -237,7 +237,7 @@ class CurlReceiveList extends CListPageModel
 
     public function getGoods($city,$goods){
 	    $data =array("city_arr"=>$city,"jd_good_arr"=>$goods);
-	    $this->sendCurl("/JDSync/GetGoods",$data);
+	    $this->sendCurl("/JDSync/getGoods",$data);
     }
 
     public function systemU($type){
@@ -311,6 +311,7 @@ class CurlReceiveList extends CListPageModel
         $ip =Yii::app()->params['uCurlIP'];
         $interval = 600; // 10分钟的秒数
         $secret_key = 'c09c321acaf59c57e2a2a999e31b5ea8'; // 加密密钥
+        $secret_key = 'c0999e31b5ea8'; // 加密密钥
 
         //生成key
         $salt = floor(time() / $interval) * $interval; // 使用10分钟为间隔的时间戳作为盐
@@ -324,8 +325,15 @@ class CurlReceiveList extends CListPageModel
 
         //加密发送时间戳
         $encryptedData = openssl_encrypt($salt, 'AES-128-ECB', $secret_key, OPENSSL_RAW_DATA);
-        $encrypted = base64_encode($encryptedData);
 
+        $encrypted = base64_encode($encryptedData);
         return $key.'.'.$encrypted;
+    }
+
+    public static function encryptSalt($password) {
+        // 使用'$6$'指定SHA-256和自动盐值生成的前缀
+        // 这里的12个字符是盐值的长度，可以根据需要调整
+        $salt = '$6$' . substr(sha1(uniqid(mt_rand(), true)), 0, 12);
+        return crypt($password, $salt);
     }
 }

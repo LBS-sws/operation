@@ -1,5 +1,5 @@
 <?php
-//仓库物品的curl
+//仓库物品的 curl
 class CurlForJD{
     protected $info_type="warehouse";
     protected $saveArr=array();

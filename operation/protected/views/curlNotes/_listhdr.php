@@ -1,3 +1,4 @@
+<!-- -->
 <tr>
 	<th>
 		<?php echo TbHtml::link($this->getLabelName('id').$this->drawOrderArrow('id'),'#',$this->createOrderLink('curlNotes-list','id'))

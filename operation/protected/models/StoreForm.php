@@ -104,6 +104,18 @@ class StoreForm extends CFormModel
         return $list;
     }
 
+    public static function getStoreRowForCity($city){
+        $list = array();
+        $rows = Yii::app()->db->createCommand()->select("*")->from("opr_store")
+            ->where("z_display=1 and city=:city",array(":city"=>$city))->order("store_type asc")->queryAll();
+        if($rows){
+            foreach ($rows as $row){
+                $list[$row["id"]] = $row;
+            }
+        }
+        return $list;
+    }
+
     public static function getStoreDefaultForCity($city){
         $row = Yii::app()->db->createCommand()->select("id,jd_store_no")->from("opr_store")
             ->where("store_type=1 and z_display=1 and city=:city",array(":city"=>$city))->order("id asc")->queryRow();

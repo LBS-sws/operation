@@ -141,7 +141,7 @@ return array(
     'LBS To JD'=>'LBS发送给金蝶',
     'JD To LBS'=>'金蝶发送给LBS',
     'Store Info'=>'金蝶仓库信息',
-    'Store Comparison'=>'金蝶库存对比',
+    'Store Comparison'=>'金蝶物料对比',
     //沈超添加結束
 	
 );

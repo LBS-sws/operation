@@ -92,14 +92,15 @@ CREATE TABLE `opr_order_goods_store` (
 -- ----------------------------
 -- Table structure for opr_warehouse
 -- ----------------------------
-alter table opr_warehouse add jd_good_no varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '金蝶物品编号' after display;
+alter table opr_warehouse add old_good_no varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '旧物品编号' after display;
+alter table opr_warehouse add `jd_classify_no`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '金蝶类别编号' after display;
+alter table opr_warehouse add `jd_classify_name`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '金蝶类别名称' after display;
+update opr_warehouse set old_good_no=CONCAT(city,'_',goods_code) where old_good_no is null;
+update opr_warehouse set jd_classify_no=classify_id where jd_classify_no is null;
+update opr_warehouse set jd_classify_name=(select name from opr_classify a where a.id=classify_id) where jd_classify_name is null;
 
 -- ----------------------------
 -- Table structure for opr_warehouse_back
 -- ----------------------------
 alter table opr_warehouse_back add store_id int(11) NULL DEFAULT NULL COMMENT '仓库id' after warehouse_id;
 
--- ----------------------------
--- Table structure for opr_classify
--- ----------------------------
-alter table opr_classify add `jd_classify_no`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '金蝶类别编号' after class_type;

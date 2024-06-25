@@ -8,7 +8,7 @@ $this->pageTitle=Yii::app()->name . ' - Store';
 'clientOptions'=>array('validateOnSubmit'=>true,),
 'layout'=>TbHtml::FORM_LAYOUT_INLINE,
 )); ?>
-
+<!-- -->
 <section class="content-header">
 	<h1>
 		<strong><?php echo Yii::t('app','Store Info'); ?></strong>

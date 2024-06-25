@@ -16,10 +16,10 @@ $this->pageTitle=Yii::app()->name . ' - StoreComparison Form';
     .radio-inline,select{ opacity: 0.6;pointer-events: none;}
     .form-group{ margin-bottom: 0px;}
     .table-fixed>thead>tr>th,.table-fixed>tfoot>tr>td,.table-fixed>tbody>tr>td{ text-align: center;vertical-align: middle;font-size: 12px;border-color: #333;}
-    .table-fixed>tfoot>tr>td,.table-fixed>tbody>tr>td{ text-align: right;}
+    .table-fixed>tfoot>tr>td,.table-fixed>tbody>tr>td{ text-align: left;}
     .table-fixed>thead>tr>th.header-width{ height: 0px;padding: 0px;overflow: hidden;border-width: 0px;line-height: 0px;}
 </style>
-
+<!-- -->
 <section class="content-header">
 	<h1>
         <strong><?php echo Yii::t('app','Store Comparison'); ?></strong>

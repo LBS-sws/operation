@@ -1,5 +1,5 @@
 <?php
-//仓库物品的curl
+//仓库物品的 curl
 class CurlForWareHouse extends CurlForJD{
 
     //物品新增(所有物品)

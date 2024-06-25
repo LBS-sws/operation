@@ -60,20 +60,16 @@ class StoreComparisonForm extends CFormModel
 
     private function getLBSWarehouse(){
         $list = array();
-        $rows = Yii::app()->db->createCommand()->select("goods_code,name,inventory,jd_good_no,city")->from("opr_warehouse")
+        $rows = Yii::app()->db->createCommand()->select("id,goods_code,name,city")->from("opr_warehouse")
             ->where("city=:city and display=1",array(":city"=>$this->search_city))->queryAll();
         if($rows){
             foreach ($rows as $row){
-                if(empty($row["jd_good_no"])){
-                    $key=$row["city"].$row["goods_code"];
-                }else{
-                    $key="".$row["jd_good_no"];
-                }
+                $row["jd_good_id"] = WarehouseForm::getJDGoodsInfoToGoodsId($row["id"]);
+                $key="".$row["goods_code"];
                 $list[$key]=array(
                     "lbs_good_no"=>$row["goods_code"],
                     "lbs_good_name"=>$row["name"],
-                    "lbs_store_sum"=>$row["inventory"],
-                    "jd_good_no"=>$row["jd_good_no"],
+                    "jd_good_id"=>$row["jd_good_id"],
                 );
             }
         }
@@ -82,39 +78,18 @@ class StoreComparisonForm extends CFormModel
 
     private function getJDWarehouse(){
         $searchData=array(
-            "org_number"=>$this->search_city,
+            "org_number"=>CurlForDelivery::getJDCityCodeForCity($this->search_city),
         );
-        $list = array();
-        $jdData = CurlForDelivery::getWarehouseGoodsForJD(array("data"=>$searchData));
-        if($jdData["code"]==200){
-            foreach ($jdData["outData"] as $row){
-                $row["material_number"]="".$row["material_number"];
-                if(!key_exists($row["material_number"],$list)){
-                    $list[$row["material_number"]]=array(
-                        "jd_good_no"=>$row["material_number"],
-                        "jd_good_name"=>$row["material_name"],
-                        "jd_store_sum"=>0,
-                        "jd_good_text"=>"",
-                        "jd_warehouse_list"=>array(),
-                    );
-                    $list[$row["material_number"]]["jd_store_sum"]+=$row["qty"];
-                    $list[$row["material_number"]]["jd_warehouse_list"][]=$row;
-                    $list[$row["material_number"]]["jd_good_text"].=empty($list[$row["material_number"]]["jd_good_text"])?"":";";
-                    $list[$row["material_number"]]["jd_good_text"].="仓库编码：".$row["warehouse_number"].",";//
-                    $list[$row["material_number"]]["jd_good_text"].="仓库库存：".$row["qty"];//
-                }
-            }
-        }
+        $list = CurlForDelivery::getWarehouseGoodsStoreForJD(array("data"=>$searchData));
         return $list;
     }
 
     public function retrieveData() {
         $data = array(
-            "errorNone"=>array("count"=>0,"name"=>"LBS未填写金蝶物料编号","list"=>array()),
-            "error"=>array("count"=>0,"name"=>"库存不一致","list"=>array()),
+            "errorNone"=>array("count"=>0,"name"=>"LBS未填写金蝶物料id","list"=>array()),
             "errorLBS"=>array("count"=>0,"name"=>"LBS不存在该物品","list"=>array()),
             "errorJD"=>array("count"=>0,"name"=>"金蝶系统不存在该物品","list"=>array()),
-            "success"=>array("count"=>0,"name"=>"库存一致","list"=>array()),
+            "success"=>array("count"=>0,"name"=>"成功","list"=>array()),
         );
 
         $lbsData = $this->getLBSWarehouse();
@@ -122,15 +97,14 @@ class StoreComparisonForm extends CFormModel
 
         if(!empty($lbsData)){
             foreach ($lbsData as $lbsRow){
-                $good_no = $lbsRow["jd_good_no"];
-                if(empty($good_no)){
+                $good_no = $lbsRow["lbs_good_no"];
+                if(empty($lbsRow["jd_good_id"])){
                     $data["errorNone"]["list"][]=$this->getComparisonRow($lbsRow,array(),"errorNone");
-                }elseif(key_exists($good_no,$jdData)){
-                    if($jdData["jd_store_sum"]!=$lbsRow["lbs_store_sum"]){
-                        $data["error"]["list"][]=$this->getComparisonRow($lbsRow,array(),"error");
-                    }else{
-                        $data["success"]["list"][]=$this->getComparisonRow($lbsRow,array(),"success");
+                    if(key_exists($good_no,$jdData)){
+                        unset($jdData[$good_no]);
                     }
+                }elseif(key_exists($good_no,$jdData)){
+                    $data["success"]["list"][]=$this->getComparisonRow($lbsRow,$jdData[$good_no],"success");
                     unset($jdData[$good_no]);
                 }else{
                     $data["errorJD"]["list"][]=$this->getComparisonRow($lbsRow,array(),"errorJD");
@@ -153,17 +127,16 @@ class StoreComparisonForm extends CFormModel
     private function getComparisonRow($lbsRow,$jdRow,$errorType){
         $arr = array();
         switch ($errorType){
-            case "errorNone"://金蝶系统不存在该物品
+            case "errorNone"://LBS未填写金蝶物料id
                 $arr = array(
                     "city_name"=>$this->city_name,
                     "lbs_good_no"=>$lbsRow["lbs_good_no"],
                     "lbs_good_name"=>$lbsRow["lbs_good_name"],
-                    "lbs_store_sum"=>$lbsRow["lbs_store_sum"],
-                    "jd_good_no"=>"-",
+                    "jd_good_id"=>$lbsRow["jd_good_id"],
                     "jd_good_name"=>"-",
                     "jd_store_sum"=>"-",
                     "jd_good_text"=>"-",
-                    "comparison_text"=>"LBS未填写金蝶物料编号",
+                    "comparison_text"=>"LBS未填写金蝶物料id",
                 );
                 break;
             case "errorJD"://金蝶系统不存在该物品
@@ -171,8 +144,7 @@ class StoreComparisonForm extends CFormModel
                     "city_name"=>$this->city_name,
                     "lbs_good_no"=>$lbsRow["lbs_good_no"],
                     "lbs_good_name"=>$lbsRow["lbs_good_name"],
-                    "lbs_store_sum"=>$lbsRow["lbs_store_sum"],
-                    "jd_good_no"=>$lbsRow["jd_good_no"],
+                    "jd_good_id"=>$lbsRow["jd_good_id"],
                     "jd_good_name"=>"-",
                     "jd_store_sum"=>"-",
                     "jd_good_text"=>"-",
@@ -182,27 +154,13 @@ class StoreComparisonForm extends CFormModel
             case "errorLBS"://LBS不存在该物品
                 $arr = array(
                     "city_name"=>$this->city_name,
-                    "lbs_good_no"=>"-",
+                    "lbs_good_no"=>$jdRow["jd_good_no"],
                     "lbs_good_name"=>"-",
-                    "lbs_store_sum"=>"-",
-                    "jd_good_no"=>$jdRow["jd_good_no"],
+                    "jd_good_id"=>"-",
                     "jd_good_name"=>$jdRow["jd_good_name"],
                     "jd_store_sum"=>$jdRow["jd_store_sum"],
                     "jd_good_text"=>$jdRow["jd_good_text"],
                     "comparison_text"=>"LBS不存在该物品",
-                );
-                break;
-            case "error"://库存不一致
-                $arr = array(
-                    "city_name"=>$this->city_name,
-                    "lbs_good_no"=>$lbsRow["lbs_good_no"],
-                    "lbs_good_name"=>$lbsRow["lbs_good_name"],
-                    "lbs_store_sum"=>$lbsRow["lbs_store_sum"],
-                    "jd_good_no"=>$jdRow["jd_good_no"],
-                    "jd_good_name"=>$jdRow["jd_good_name"],
-                    "jd_store_sum"=>$jdRow["jd_store_sum"],
-                    "jd_good_text"=>$jdRow["jd_good_text"],
-                    "comparison_text"=>"库存不一致",
                 );
                 break;
             case "success"://库存一致
@@ -210,12 +168,11 @@ class StoreComparisonForm extends CFormModel
                     "city_name"=>$this->city_name,
                     "lbs_good_no"=>$lbsRow["lbs_good_no"],
                     "lbs_good_name"=>$lbsRow["lbs_good_name"],
-                    "lbs_store_sum"=>$lbsRow["lbs_store_sum"],
-                    "jd_good_no"=>$jdRow["jd_good_no"],
+                    "jd_good_id"=>$lbsRow["jd_good_id"],
                     "jd_good_name"=>$jdRow["jd_good_name"],
                     "jd_store_sum"=>$jdRow["jd_store_sum"],
                     "jd_good_text"=>$jdRow["jd_good_text"],
-                    "comparison_text"=>"库存正常",
+                    "comparison_text"=>"成功",
                 );
                 break;
         }
@@ -247,14 +204,12 @@ class StoreComparisonForm extends CFormModel
         $topList=array(
             //城市
             array("name"=>Yii::t("summary","City"),"background"=>""),
-            //LBS物料编号
-            array("name"=>Yii::t("summary","lbs good no"),"background"=>"#f7fd9d"),
+            //物料编号
+            array("name"=>Yii::t("summary","good no"),"background"=>"#f7fd9d"),
             //LBS物料名称
             array("name"=>Yii::t("summary","lbs good name"),"background"=>"#f7fd9d"),
-            //LBS物料库存
-            array("name"=>Yii::t("summary","lbs store sum"),"background"=>"#f7fd9d"),
-            //金蝶物料编号
-            array("name"=>Yii::t("summary","jd good no"),"background"=>"#fcd5b4"),
+            //金蝶物料id
+            array("name"=>Yii::t("summary","jd good id"),"background"=>"#f7fd9d"),
             //金蝶物料名称
             array("name"=>Yii::t("summary","jd good name"),"background"=>"#fcd5b4"),
             //金蝶物料库存
@@ -319,9 +274,9 @@ class StoreComparisonForm extends CFormModel
         $html="<tr>";
         for($i=0;$i<$this->th_sum;$i++){
             if($i===0){
-                $width=70;
-            }elseif(in_array($i,array(3,6))){
                 $width=60;
+            }elseif(in_array($i,array(3,5))){
+                $width=50;
             }else{
                 $width=90;
             }
@@ -346,8 +301,8 @@ class StoreComparisonForm extends CFormModel
     //获取td对应的键名
     private function getDataAllKeyStr(){
         $bodyKey = array(
-            "city_name","lbs_good_no","lbs_good_name","lbs_store_sum",
-            "jd_good_no","jd_good_name","jd_store_sum",
+            "city_name","lbs_good_no","lbs_good_name",
+            "jd_good_id","jd_good_name","jd_store_sum",
             "jd_good_text","comparison_text",
         );
 

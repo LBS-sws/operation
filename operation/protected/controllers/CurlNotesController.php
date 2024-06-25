@@ -10,7 +10,7 @@ class CurlNotesController extends Controller
 			'enforceRegisteredStation',
 			'enforceSessionExpiration', 
 			'enforceNoConcurrentLogin',
-			'accessControl', // perform access control for CRUD operations
+			'accessControl', // perform access control for CRUD operations 1
 			'postOnly + delete', // we only allow deletion via POST request
 		);
 	}

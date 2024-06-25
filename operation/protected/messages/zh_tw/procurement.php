@@ -343,5 +343,8 @@ return array(
     'city name'=>'城市',
     'send store'=>'發貨倉庫',
     'send number'=>'發貨數量',
+
+    'jd unit code'=>'金蝶單位編號',
+    'jd good id'=>'金蝶物料id',
 );
 ?>

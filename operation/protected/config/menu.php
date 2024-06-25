@@ -63,7 +63,7 @@ return array(
                 'access'=>'YD10',
                 'url'=>'/store/index',
             ),
-            //对比金蝶仓库库存
+            //对比金蝶仓库物料
             'Store Comparison'=>array(
                 'access'=>'YD11',
                 'url'=>'/storeComparison/index',

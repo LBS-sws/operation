@@ -1,3 +1,4 @@
+<!-- -->
 <tr>
     <td><?php echo $this->record['id']; ?></td>
     <td><?php echo $this->record['info_type']; ?></td>

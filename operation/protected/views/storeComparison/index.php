@@ -20,7 +20,7 @@ $this->pageTitle=Yii::app()->name . ' - StoreComparison Form';
 	</ol>
 -->
 </section>
-
+<!-- -->
 <section class="content">
 	<div class="box"><div class="box-body">
 	<div class="btn-group" role="group">

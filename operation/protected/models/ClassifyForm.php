@@ -6,7 +6,6 @@ class ClassifyForm extends CFormModel
 	public $name;
 	public $class_type;
 	public $level;
-	public $jd_classify_no;
 
 	public function attributeLabels()
 	{
@@ -14,7 +13,6 @@ class ClassifyForm extends CFormModel
             'name'=>Yii::t('procurement','Name'),
             'class_type'=>Yii::t('procurement','Class Type'),
             'level'=>Yii::t('procurement','Level'),
-            'jd_classify_no'=>Yii::t('procurement','JD classify no'),
 		);
 	}
 
@@ -24,7 +22,7 @@ class ClassifyForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id, name,class_type,level,jd_classify_no','safe'),
+			array('id, name,class_type,level','safe'),
             array('name','required'),
             array('class_type','required'),
 			array('name','validateName'),
@@ -56,7 +54,6 @@ class ClassifyForm extends CFormModel
                 $this->name = $row['name'];
                 $this->class_type = $row['class_type'];
                 $this->level = $row['level'];
-                $this->jd_classify_no = $row['jd_classify_no'];
                 break;
 			}
 		}
@@ -202,9 +199,9 @@ class ClassifyForm extends CFormModel
                 break;
             case 'new':
                 $sql = "insert into opr_classify(
-							name,level,class_type,jd_classify_no, lcu, lcd
+							name,level,class_type, lcu, lcd
 						) values (
-							:name,:level,:class_type,:jd_classify_no, :lcu, :lcd
+							:name,:level,:class_type, :lcu, :lcd
 						)";
                 break;
             case 'edit':
@@ -212,7 +209,6 @@ class ClassifyForm extends CFormModel
 							name = :name, 
 							level = :level, 
 							class_type = :class_type, 
-							jd_classify_no = :jd_classify_no, 
 							luu = :luu,
 							lud = :lud
 						where id = :id
@@ -234,8 +230,6 @@ class ClassifyForm extends CFormModel
             $command->bindParam(':level',$this->level,PDO::PARAM_INT);
         if (strpos($sql,':class_type')!==false)
             $command->bindParam(':class_type',$this->class_type,PDO::PARAM_STR);
-        if (strpos($sql,':jd_classify_no')!==false)
-            $command->bindParam(':jd_classify_no',$this->jd_classify_no,PDO::PARAM_STR);
 
         if (strpos($sql,':luu')!==false)
             $command->bindParam(':luu',$uid,PDO::PARAM_STR);

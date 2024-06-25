@@ -146,11 +146,17 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                         <tbody>
 
                         <?php
+                        $searchData=array(
+                            "org_number"=>CurlForDelivery::getJDCityCodeForCity($model->city),
+                        );
+                        $jd_goods_list = CurlForDelivery::getWarehouseGoodsStoreForJD(array("data"=>$searchData));
+
                         $storeList = StoreForm::getStoreListForCity($model->city);
                         $readyOnly = $model->status == "sent" || $model->status == "read";
                         $storeClass = $readyOnly?"numChange":"numChange spanInput";
                         foreach ($model->goods_list as $key => $val){
-                            $orderStore = StoreForm::getStoreListForOrder($val);
+                            $val['inventory'] = key_exists($val["goods_code"],$jd_goods_list)?$jd_goods_list[$val["goods_code"]]["jd_store_sum"]:"";
+                            $orderStore = key_exists("store_list",$val)?$val["store_list"]:StoreForm::getStoreListForOrder($val);
                             $colNum = count($orderStore["store_id"]);
                             $colNum = empty($colNum)?1:$colNum;
                             $con_num = empty($val['id'])?$key:$val['id'];
@@ -158,6 +164,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                             $val['confirm_num'] = (empty($val['confirm_num']) && $val['confirm_num'] !== "0")?$val['goods_num']:$val['confirm_num'];
                             $tableTr.="<td class='colNum' rowspan='{$colNum}'><input type='text' class='form-control testInput spanInput' readonly name='DeliveryForm[goods_list][$con_num][name]' value='".$val['name']."'>";
                             $tableTr.="<input type='hidden' name='DeliveryForm[goods_list][$con_num][goods_id]' value='".$val['goods_id']."'>";
+                            $tableTr.="<input type='hidden' name='DeliveryForm[goods_list][$con_num][goods_code]' value='".$val['goods_code']."'>";
                             $tableTr.="<input type='hidden' name='DeliveryForm[goods_list][$con_num][id]' value='".$val['id']."'></td>";
                             $tableTr.="<td class='colNum hidden-xs' rowspan='{$colNum}'><input type='text' class='form-control unit spanInput' readonly name='DeliveryForm[goods_list][$con_num][unit]' value='".$val['unit']."'></td>";
                             $tableTr.="<td class='colNum hidden-xs' rowspan='{$colNum}'><input type='text' class='form-control unit spanInput' readonly name='DeliveryForm[goods_list][$con_num][inventory]' value='".$val['inventory']."'></td>";

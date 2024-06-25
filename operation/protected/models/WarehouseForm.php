@@ -19,9 +19,17 @@ class WarehouseForm extends CFormModel
 	public $matching;
 	public $z_index=1;
     public $display = 1;
+    public $jd_classify_no;
+    public $jd_classify_name;
+    public $old_good_no;
+
     private $foreach_num = 0;
 
-    public $jd_good_no;
+    public $jd_set = array();
+    public static $jd_set_list=array(
+        array("field_id"=>"jd_unit_code","field_type"=>"text","field_name"=>"jd unit code"),
+        array("field_id"=>"jd_good_id","field_type"=>"text","field_name"=>"jd good id"),
+    );
 
 	public function attributeLabels()
 	{
@@ -38,7 +46,8 @@ class WarehouseForm extends CFormModel
             'matching'=>Yii::t('procurement','matching'),
             'matters'=>Yii::t('procurement','matters'),
             'display'=>Yii::t('procurement','judge for visible'),
-            'jd_good_no'=>Yii::t('procurement','JD good no'),
+            'jd_classify_name'=>Yii::t('procurement','Classify'),
+            'jd_classify_no'=>Yii::t('procurement','JD classify no'),
 		);
 	}
 
@@ -49,9 +58,9 @@ class WarehouseForm extends CFormModel
 	{
 		return array(
 			array('id, goods_code,display, min_num, name, unit, inventory, classify_id, price, costing, decimal_num, lcu, luu, matching, matters,
-			jd_good_no','safe'),
+			jd_set,old_good_no,jd_classify_no,jd_classify_name','safe'),
             array('name','required'),
-            array('classify_id','required'),
+            array('jd_classify_no,jd_classify_name','required'),
             array('unit','required'),
             array('inventory','required'),
             array('inventory','numerical','allowEmpty'=>false,'integerOnly'=>false),
@@ -151,7 +160,20 @@ class WarehouseForm extends CFormModel
                 $this->matters = $row['matters'];
                 $this->matching = $row['matching'];
                 $this->display = $row['display'];
-                $this->jd_good_no = $row['jd_good_no'];
+                $this->old_good_no = $row['old_good_no'];
+                $this->jd_classify_no = $row['jd_classify_no'];
+                $this->jd_classify_name = $row['jd_classify_name'];
+                $setRows = Yii::app()->db->createCommand()->select("field_id,field_value")
+                    ->from("opr_send_set_jd")->where("table_id=:table_id and set_type='warehouse'",array(":table_id"=>$index))->queryAll();
+                $setList = array();
+                foreach ($setRows as $setRow){
+                    $setList[$setRow["field_id"]] = $setRow["field_value"];
+                }
+                $this->jd_set=array();
+                foreach (self::$jd_set_list as $item){
+                    $fieldValue = key_exists($item["field_id"],$setList)?$setList[$item["field_id"]]:null;
+                    $this->jd_set[$item["field_id"]] = $fieldValue;
+                }
                 break;
 			}
 		}
@@ -245,6 +267,20 @@ class WarehouseForm extends CFormModel
         }
     }
 
+    //根據物品id獲取金蝶关联数据
+    public static function getJDGoodsInfoToGoodsId($goods_id,$field_id="jd_good_id"){
+        $row = Yii::app()->db->createCommand()->select("field_value")
+            ->from("opr_send_set_jd")
+            ->where("set_type='warehouse' and table_id=:table_id and field_id=:field_id",array(
+                ':table_id'=>$goods_id,':field_id'=>$field_id
+            ))->queryRow();
+        if($row){
+            return $row["field_value"];
+        }else{
+            return "";
+        }
+    }
+
     //根據訂單id查訂單所有物品
     public function getGoodsListToId($order_id){
         $rs = Yii::app()->db->createCommand()->select("b.id as warehouse_id,a.lcd,b.matching,b.matters,b.name,b.inventory,b.goods_code,b.classify_id,b.unit,a.goods_num,a.confirm_num,a.id,a.goods_id,a.remark,a.note")
@@ -294,12 +330,14 @@ class WarehouseForm extends CFormModel
 		$connection = Yii::app()->db;
 		$transaction=$connection->beginTransaction();
 		try {
-		    $oldGoodList = $this->getGoodsToGoodsId($this->id);
+		    //$oldGoodList = $this->getGoodsToGoodsId($this->id);
 			$this->saveHistory($connection);
 			$this->saveGoods($connection);
+            //保存金蝶要求的字段
+			$this->saveJDSetInfo($connection);
 			$transaction->commit();
 
-			$this->sendCurlJD($oldGoodList);//发送数据到金蝶
+			//$this->sendCurlJD($oldGoodList);//发送数据到金蝶
 			$this->setScenario("edit");
 		}
 		catch(Exception $e) {
@@ -327,6 +365,29 @@ class WarehouseForm extends CFormModel
         }
     }
 
+    //保存金蝶要求的字段
+    protected function saveJDSetInfo(&$connection) {
+        foreach (self::$jd_set_list as $list){
+            $field_value = key_exists($list["field_id"],$this->jd_set)?$this->jd_set[$list["field_id"]]:null;
+            $rs = Yii::app()->db->createCommand()->select("id,field_id")->from("opr_send_set_jd")
+                ->where("set_type ='warehouse' and table_id=:table_id and field_id=:field_id",array(
+                    ':field_id'=>$list["field_id"],':table_id'=>$this->id,
+                ))->queryRow();
+            if($rs){
+                $connection->createCommand()->update('opr_send_set_jd',array(
+                    "field_value"=>$field_value,
+                ),"id=:id",array(':id'=>$rs["id"]));
+            }else{
+                $connection->createCommand()->insert('opr_send_set_jd',array(
+                    "table_id"=>$this->id,
+                    "set_type"=>'warehouse',
+                    "field_id"=>$list["field_id"],
+                    "field_value"=>$field_value,
+                ));
+            }
+        }
+    }
+    
     protected function saveHistory(&$connection) {
         switch ($this->scenario) {
             case 'delete':
@@ -348,9 +409,9 @@ class WarehouseForm extends CFormModel
                 break;
             case 'new':
                 $sql = "insert into opr_warehouse(
-							name, unit, display, inventory, classify_id, lcu, goods_code,city,costing,decimal_num,min_num,z_index,matching,matters,jd_good_no
+							name, unit, display, inventory, classify_id, lcu, goods_code,city,costing,decimal_num,min_num,matching,matters,old_good_no,jd_classify_no,jd_classify_name
 						) values (
-							:name, :unit, :display, :inventory, :classify_id, :lcu, :goods_code,:city,:costing,:decimal_num,:min_num,:z_index,:matching,:matters,:jd_good_no
+							:name, :unit, :display, :inventory, :classify_id, :lcu, :goods_code,:city,:costing,:decimal_num,:min_num,:matching,:matters,:old_good_no,:jd_classify_no,:jd_classify_name
 						)";
                 break;
             case 'edit':
@@ -362,12 +423,13 @@ class WarehouseForm extends CFormModel
 							unit = :unit,
 							costing = :costing,
 							decimal_num = :decimal_num,
-							z_index = :z_index,
 							min_num = :min_num,
 							matching = :matching,
 							matters = :matters,
-							jd_good_no = :jd_good_no,
 							luu = :luu,
+							old_good_no = :old_good_no,
+							jd_classify_no = :jd_classify_no,
+							jd_classify_name = :jd_classify_name,
 							inventory = :inventory
 						where id = :id AND city=:city
 						";
@@ -408,12 +470,14 @@ class WarehouseForm extends CFormModel
             $command->bindParam(':matching',$this->matching,PDO::PARAM_STR);
         if (strpos($sql,':matters')!==false)
             $command->bindParam(':matters',$this->matters,PDO::PARAM_STR);
-        if (strpos($sql,':jd_good_no')!==false){
-            $this->jd_good_no = $this->jd_good_no===""?null:$this->jd_good_no;
-            $command->bindParam(':jd_good_no',$this->jd_good_no,PDO::PARAM_STR);
-        }
         if (strpos($sql,':classify_id')!==false)
             $command->bindParam(':classify_id',$this->classify_id,PDO::PARAM_INT);
+        if (strpos($sql,':old_good_no')!==false)
+            $command->bindParam(':old_good_no',$this->old_good_no,PDO::PARAM_INT);
+        if (strpos($sql,':jd_classify_no')!==false)
+            $command->bindParam(':jd_classify_no',$this->jd_classify_no,PDO::PARAM_INT);
+        if (strpos($sql,':jd_classify_name')!==false)
+            $command->bindParam(':jd_classify_name',$this->jd_classify_name,PDO::PARAM_INT);
 
         if (strpos($sql,':city')!==false)
             $command->bindParam(':city',$city,PDO::PARAM_STR);

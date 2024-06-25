@@ -312,7 +312,7 @@ Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_R
 <?php
 $js = Script::genReadonlyField();
 Yii::app()->clientScript->registerScript('readonlyClass',$js,CClientScript::POS_READY);
-Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/goodsChange.js?2", CClientScript::POS_END);
+Yii::app()->clientScript->registerScriptFile(Yii::app()->baseUrl . "/js/goodsChange.js?4", CClientScript::POS_END);
 Yii::app()->clientScript->registerCssFile(Yii::app()->baseUrl . "/css/goodsChange.css");
 ?>
 

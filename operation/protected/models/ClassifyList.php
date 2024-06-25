@@ -8,7 +8,6 @@ class ClassifyList extends CListPageModel
 			'name'=>Yii::t('procurement','Name'),
             'class_type'=>Yii::t('procurement','Class Type'),
             'level'=>Yii::t('procurement','Level'),
-            'jd_classify_no'=>Yii::t('procurement','JD classify no'),
 		);
 	}
 	
@@ -55,7 +54,6 @@ class ClassifyList extends CListPageModel
 						'name'=>$record['name'],
 						'class_type'=>$record['class_type'],
 						'level'=>$record['level'],
-						'jd_classify_no'=>$record['jd_classify_no'],
 					);
 			}
 		}

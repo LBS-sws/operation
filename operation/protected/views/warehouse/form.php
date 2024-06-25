@@ -71,6 +71,8 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
 		<div class="box-body">
 			<?php echo $form->hiddenField($model, 'scenario'); ?>
 			<?php echo $form->hiddenField($model, 'id'); ?>
+			<?php echo $form->hiddenField($model, 'classify_id'); ?>
+			<?php echo $form->hiddenField($model, 'old_good_no'); ?>
 
 
             <div class="form-group">
@@ -93,10 +95,18 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                 </div>
             </div>
             <div class="form-group">
-                <?php echo $form->labelEx($model,'classify_id',array('class'=>"col-sm-2 control-label")); ?>
+                <?php echo $form->labelEx($model,'jd_classify_no',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
-                    <?php echo $form->dropDownList($model, 'classify_id',ClassifyForm::getAllClassifyList("Warehouse"),
-                        array('disabled'=>($model->scenario =='view'))
+                    <?php echo $form->textField($model, 'jd_classify_no',
+                        array('readonly'=>($model->scenario=='view'))
+                    ); ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'jd_classify_name',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-4">
+                    <?php echo $form->textField($model, 'jd_classify_name',
+                        array('readonly'=>($model->scenario=='view'))
                     ); ?>
                 </div>
             </div>
@@ -186,14 +196,27 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                 </div>
             </div>
             <legend><?php echo Yii::t("procurement","JD System Curl");?></legend>
-            <div class="form-group">
-                <?php echo $form->labelEx($model,'jd_good_no',array('class'=>"col-sm-2 control-label")); ?>
-                <div class="col-sm-3">
-                    <?php echo $form->textField($model, 'jd_good_no',
-                        array('readonly'=>($model->scenario=='view'),'autocomplete'=>'off')
-                    ); ?>
-                </div>
-            </div>
+            <?php
+            $html = "";
+            $className = get_class($model);
+            foreach (WarehouseForm::$jd_set_list as $num=>$item){
+                $field_value = key_exists($item["field_id"],$model->jd_set)?$model->jd_set[$item["field_id"]]:null;
+                if($num%2==0){
+                    $html.='<div class="form-group">';
+                }
+                $html.=TbHtml::label(Yii::t("procurement",$item["field_name"]),'',array('class'=>"col-sm-2 control-label"));
+                $html.='<div class="col-lg-3">';
+                $html.=TbHtml::textField("{$className}[jd_set][{$item["field_id"]}]",$field_value,array('readonly'=>($model->scenario=='view')));
+                $html.="</div>";
+                if($num%2==1){
+                    $html.='</div>';
+                }
+            }
+            if(count(WarehouseForm::$jd_set_list)%2==0){
+                $html.='</div>';
+            }
+            echo $html;
+            ?>
 		</div>
 	</div>
 </section>

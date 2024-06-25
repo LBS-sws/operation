@@ -11,11 +11,6 @@
         ?>
     </th>
     <th>
-        <?php echo TbHtml::link($this->getLabelName('jd_classify_no').$this->drawOrderArrow('jd_classify_no'),'#',$this->createOrderLink('classify-list','jd_classify_no'))
-        ;
-        ?>
-    </th>
-    <th>
         <?php echo TbHtml::link($this->getLabelName('level').$this->drawOrderArrow('level'),'#',$this->createOrderLink('classify-list','level'))
         ;
         ?>

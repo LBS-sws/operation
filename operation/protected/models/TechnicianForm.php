@@ -76,6 +76,15 @@ class TechnicianForm extends CFormModel
             $this->addError($attribute,$message);
             return false;
         }
+        $searchData=array(
+            "org_number"=>CurlForDelivery::getJDCityCodeForCity($this->city),
+        );
+        $jd_goods_list = CurlForDelivery::getWarehouseGoodsStoreForJD(array("data"=>$searchData));
+        if(empty($jd_goods_list)){
+            $message = "金蝶物料为空，请与管理员联系。({$this->city})";
+            $this->addError($attribute,$message);
+            return false;
+        }
         foreach ($goods_list as $key =>$goods){
             $goods_num = trim($goods["goods_num"]);
             if(empty($goods["goods_id"]) && empty($goods["goods_num"])){
@@ -109,10 +118,18 @@ class TechnicianForm extends CFormModel
                     $message = $list["name"]."：".Yii::t('procurement','Goods can only be positive integers');
                     $this->addError($attribute,$message);
                     return false;
-                }elseif (floatval($list["inventory"])<floatval($goods["goods_num"])){
-                    $message = $list["name"]."：".Yii::t('procurement','Cannot exceed the quantity of Inventory')."（".$list["inventory"]."）";
-                    $this->addError($attribute,$message);
-                    return false;
+                }else{
+                    if(key_exists($list["goods_code"],$jd_goods_list)){
+                        if($jd_goods_list[$list["goods_code"]]["jd_store_sum"]<$goods_num){
+                            $message = $list["name"]."：金蝶系统库存不足(".$jd_goods_list[$list["goods_code"]]["jd_store_sum"].")";
+                            $this->addError($attribute,$message);
+                            return false;
+                        }
+                    }else{
+                        $message = $list["name"]."：金蝶系统没有找到该物品(".$list["goods_code"].")";
+                        $this->addError($attribute,$message);
+                        return false;
+                    }
                 }
             }
 
@@ -355,15 +372,20 @@ class TechnicianForm extends CFormModel
     }
     //獲取物品列表(按分類生成二維數組）
     public static function getWarehouseGoodsListToCity($city){
-        $arr = array(array("id"=>0,"name"=>Yii::t("procurement","All Goods Class"),"list"=>array()));
-        $rs = Yii::app()->db->createCommand()->select()->from("opr_classify")->where("class_type=:class_type",array(":class_type"=>"Warehouse"))->order('level desc')->queryAll();
-        if($rs){
-            foreach ($rs as $row){
-				$goodList = Yii::app()->db->createCommand()->select("*")
-					->from("opr_warehouse")->where("classify_id=:classify_id and city=:city and display=1",array(":classify_id"=>$row["id"],":city"=>$city))->queryAll();
-                if($goodList){
-                    array_push($arr,array("id"=>$row["id"],"name"=>$row["name"],"list"=>$goodList));
+        $arr = array();
+        $arr["all"] = array("id"=>0,"name"=>Yii::t("procurement","All Goods Class"),"list"=>array());
+
+
+        $goodRows = Yii::app()->db->createCommand()->select("*")->from("opr_warehouse")
+            ->where("city=:city and display=1",array(
+                ":city"=>$city
+            ))->queryAll();
+        if($goodRows){
+            foreach ($goodRows as $goodRow){
+                if(!key_exists($goodRow["jd_classify_no"],$arr)){
+                    $arr[$goodRow["jd_classify_no"]]=array("id"=>$goodRow["jd_classify_no"],"name"=>$goodRow["jd_classify_name"],"list"=>array());
                 }
+                $arr[$goodRow["jd_classify_no"]]["list"][]=$goodRow;
             }
         }
         return $arr;

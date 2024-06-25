@@ -12,7 +12,7 @@ class WarehouseList extends CListPageModel
 			'min_num'=>Yii::t('procurement','min inventory'),
 			'price'=>Yii::t('procurement','Price（RMB）'),
 			'cost_price'=>Yii::t('procurement','price history'),
-            'classify_id'=>Yii::t('procurement','Classify'),
+            'jd_classify_name'=>Yii::t('procurement','Classify'),
             'display'=>Yii::t('procurement','judge for visible'),
 		);
 	}
@@ -20,13 +20,11 @@ class WarehouseList extends CListPageModel
 	public function retrieveDataByPage($pageNum=1)
 	{
 		$city = Yii::app()->user->city();
-		$sql1 = "select a.*,b.name as classify_name,ifnull(costPrice(a.id,now()),0) as cost_price 
+		$sql1 = "select a.*,ifnull(costPrice(a.id,now()),0) as cost_price 
 				from opr_warehouse a
-				LEFT JOIN opr_classify b ON a.classify_id=b.id
 				where city = '$city' 
 			";
 		$sql2 = "select count(a.id) from opr_warehouse a
-				LEFT JOIN opr_classify b ON a.classify_id=b.id
 				where city = '$city' 
 			";
 		$clause = "";
@@ -63,8 +61,8 @@ class WarehouseList extends CListPageModel
 					//$clause .= General::getSqlConditionClause('inventory', $svalue);
 					$clause .= "and a.inventory = '$svalue' ";
 					break;
-				case 'classify_id':
-                    $clause .= General::getSqlConditionClause('b.name', $svalue);
+				case 'jd_classify_name':
+                    $clause .= General::getSqlConditionClause('a.jd_classify_name', $svalue);
 					break;
 			}
 		}
@@ -97,7 +95,7 @@ class WarehouseList extends CListPageModel
 						'min_num'=>$record['min_num'],
 						'display'=>empty($record['display'])?Yii::t("misc","No"):Yii::t("misc","Yes"),
 						'price'=>$record['cost_price'],
-						'classify_id'=>$record['classify_name'],
+						'jd_classify_name'=>$record['jd_classify_name'],
 						//'classify_id'=>ClassifyForm::getClassifyToId($record['classify_id']),
 						'inventory'=>$record['inventory'],
 						'goods_code'=>$record['goods_code'],

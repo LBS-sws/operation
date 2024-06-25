@@ -172,8 +172,19 @@ class DeliveryForm extends CFormModel
             $this->addError($attribute,$message);
             return false;
         }
-        $storeList = StoreForm::getStoreListForCity($this->city);
+        $storeList = StoreForm::getStoreRowForCity($this->city);
+
+        $searchData=array(
+            "org_number"=>CurlForDelivery::getJDCityCodeForCity($this->city),
+        );
+        $jd_goods_list = CurlForDelivery::getWarehouseGoodsStoreForJD(array("data"=>$searchData));
+        if(empty($jd_goods_list)){
+            $message = "金蝶物料为空，请与管理员联系。({$this->city})";
+            $this->addError($attribute,$message);
+            return false;
+        }
         foreach ($goods_list as $key =>$goods){
+            $list = WarehouseForm::getGoodsToGoodsId($goods["goods_id"]);
             if(empty($goods["store_list"]["store_id"])){
                 $this->addError($attribute,"仓库不存在，请刷新重试");
                 return false;
@@ -183,6 +194,25 @@ class DeliveryForm extends CFormModel
                     $storeID="".$storeID;
                     if(!key_exists($storeID,$storeList)){
                         $this->addError($attribute,"仓库不存在，请刷新重试");
+                        return false;
+                    }
+                    $jd_goods_code = $list["goods_code"];
+                    $jd_store_code = $storeList[$storeID]["jd_store_no"];
+                    if(key_exists($jd_goods_code,$jd_goods_list)){
+                        if(key_exists("{$jd_store_code}",$jd_goods_list[$jd_goods_code]["jd_warehouse_list"])){
+                            if($jd_goods_list[$jd_goods_code]["jd_warehouse_list"][$jd_store_code]["qty"]<$goods["store_list"]["store_num"][$storeKey]){
+                                $message = $list["name"]."：金蝶系统库存不足(".$jd_goods_list[$jd_goods_code]["jd_warehouse_list"][$jd_store_code]["qty"].")";
+                                $this->addError($attribute,$message);
+                                return false;
+                            }
+                        }else{
+                            $message = $list["name"]."：金蝶仓库没有找到该物品(".$jd_store_code.")";
+                            $this->addError($attribute,$message);
+                            return false;
+                        }
+                    }else{
+                        $message = $list["name"]."：金蝶系统没有找到该物品(".$jd_goods_code.")";
+                        $this->addError($attribute,$message);
                         return false;
                     }
                     $goods["confirm_num"]+=$goods["store_list"]["store_num"][$storeKey];
@@ -201,7 +231,6 @@ class DeliveryForm extends CFormModel
                 $this->addError($attribute,$message);
                 return false;
             }else if ($goods["confirm_num"] != 0){
-                $list = WarehouseForm::getGoodsToGoodsId($goods["goods_id"]);
                 if (empty($list)){
                     $message = Yii::t('procurement','Not Font Goods').$goods["goods_id"]."a";
                     $this->addError($attribute,$message);
@@ -322,13 +351,15 @@ class DeliveryForm extends CFormModel
                 if ($this->scenario == "audit"){
                     $warehouseRow = $connection->createCommand()->select("*")->from("opr_warehouse")
                         ->where("id =:id",array(":id"=>$goods["goods_id"]))->queryRow();
-                    $storeList =$connection->createCommand()->select("a.store_num,b.jd_store_no")->from("opr_order_goods_store a")
+                    $storeList =$connection->createCommand()->select("a.id,a.store_num,b.jd_store_no")->from("opr_order_goods_store a")
                         ->leftJoin("opr_store b","a.store_id=b.id")
                         ->where("order_goods_id =:order_goods_id",array(":order_goods_id"=>$goods["id"]))->queryAll();
                     if($storeList){
                         $warehouseRow["store_list"]=$storeList;
                     }
-                    $curlData["goods_item"][]=self::getCurlDateForWarehouse($warehouseRow,$goods["confirm_num"]);
+                    $tempArr=self::getCurlDateForWarehouse($warehouseRow,$goods["confirm_num"]);
+                    $curlData["goods_item"] = array_merge($curlData["goods_item"],$tempArr);
+                    /*由于金蝶要求LBS系统不需要储存库存，所以无法记录库存的变更
                     //记录库存数量
                     $connection->createCommand()->insert('opr_warehouse_history',array(
                         'apply_date'=>$time,
@@ -344,6 +375,7 @@ class DeliveryForm extends CFormModel
                     $connection->createCommand()->update('opr_warehouse',array(
                         'inventory'=>$warehouseRow["inventory"]-$goods["confirm_num"]
                     ),"id=:id",array(":id"=>$goods["goods_id"]));
+                    */
                 }
             }
         }
@@ -501,16 +533,18 @@ class DeliveryForm extends CFormModel
                         $goodsId = $goods["goods_id"];
                         $warehouseRow = $connection->createCommand()->select("*")->from("opr_warehouse")
                             ->where("id =:id",array(":id"=>$goodsId))->queryRow();
-                        $storeList =$connection->createCommand()->select("a.store_num as back_num,a.store_num,b.jd_store_no")->from("opr_order_goods_store a")
+                        $storeList =$connection->createCommand()->select("a.id,a.store_num as back_num,a.store_num,b.jd_store_no")->from("opr_order_goods_store a")
                             ->leftJoin("opr_store b","a.store_id=b.id")
                             ->where("order_goods_id =:order_goods_id",array(":order_goods_id"=>$goods["id"]))->queryAll();
                         if($storeList){
                             $warehouseRow["store_list"]=$storeList;
                         }else{
                             $warehouseRow["store_list"]=array();
-                            $warehouseRow["store_list"][]=array("back_num"=>$num,"store_num"=>$num,"jd_store_no"=>$storeDefaultList["jd_store_no"]);
+                            $warehouseRow["store_list"][]=array("id"=>0,"back_num"=>$num,"store_num"=>$num,"jd_store_no"=>$storeDefaultList["jd_store_no"]);
                         }
-                        $curlData["goods_item"][]=self::getCurlDateForWarehouse($warehouseRow,$num,array("back_num"=>$num));
+                        $tempArr=self::getCurlDateForWarehouse($warehouseRow,$goods["confirm_num"],array("back_num"=>$num));
+                        $curlData["goods_item"] = array_merge($curlData["goods_item"],$tempArr);
+                        /*由于金蝶要求LBS系统不需要储存库存，所以无法记录库存的变更
                         //记录库存
                         $connection->createCommand()->insert('opr_warehouse_history',array(
                             'apply_date'=>$time,
@@ -526,6 +560,7 @@ class DeliveryForm extends CFormModel
                         $connection->createCommand()->update('opr_warehouse',array(
                             'inventory'=>$warehouseRow["inventory"]+$num
                         ),"id=:id",array(":id"=>$goodsId));
+                        */
                     }
                 }
 
@@ -575,8 +610,9 @@ class DeliveryForm extends CFormModel
     }
     //
     private function resetZIndex(){
-        Yii::app()->db->createCommand("update opr_warehouse set z_index=1 where (inventory+0)>(min_num+0)")->execute();
-        Yii::app()->db->createCommand("update opr_warehouse set z_index=2 where (inventory+0)<=(min_num+0)")->execute();
+        //由于金蝶要求LBS系统不需要储存库存，所以无法记录库存的变更
+        //Yii::app()->db->createCommand("update opr_warehouse set z_index=1 where (inventory+0)>(min_num+0)")->execute();
+        //Yii::app()->db->createCommand("update opr_warehouse set z_index=2 where (inventory+0)<=(min_num+0)")->execute();
     }
 
     //退回單個物品
@@ -596,9 +632,12 @@ class DeliveryForm extends CFormModel
             $warehouseRow = $connection->createCommand()->select("*")->from("opr_warehouse")
                 ->where("id =:id",array(":id"=>$goodsId))->queryRow();
             $warehouseRow["store_list"]=array();
-            $warehouseRow["store_list"][]=array("back_num"=>$num,"store_num"=>$this->store_num,"jd_store_no"=>$jd_store_no);
+            $warehouseRow["store_list"][]=array("id"=>$blackId,"back_num"=>$num,"store_num"=>$this->store_num,"jd_store_no"=>$jd_store_no);
             $curlData=self::getCurlDateForOrder($order,$time);
-            $curlData["goods_item"][]=self::getCurlDateForWarehouse($warehouseRow,$this->confirm_num,array("back_num"=>$num));
+
+            $tempArr=self::getCurlDateForWarehouse($warehouseRow,$this->confirm_num,array("back_num"=>$num));
+            $curlData["goods_item"] = array_merge($curlData["goods_item"],$tempArr);
+            /*由于金蝶要求LBS系统不需要储存库存，所以无法记录库存的变更
             //记录库存
             $connection->createCommand()->insert('opr_warehouse_history',array(
                 'apply_date'=>$time,
@@ -614,6 +653,7 @@ class DeliveryForm extends CFormModel
             $connection->createCommand()->update('opr_warehouse',array(
                 'inventory'=>$warehouseRow["inventory"]+$num
             ),"id=:id",array(":id"=>$goodsId));
+            */
             //修改发货数量
             $connection->createCommand()->update('opr_order_goods',array(
                 'confirm_num'=>$this->confirm_num-$num
@@ -728,23 +768,34 @@ class DeliveryForm extends CFormModel
     }
 
     protected static function getCurlDateForWarehouse($warehouseRow,$num,$expArr=array()){
+        $warehouseRow["jd_good_id"] = WarehouseForm::getJDGoodsInfoToGoodsId($warehouseRow["id"]);
+        $arr = array();
         $list = array(
             //"jd_warehouse_no"=>$warehouseRow["jd_warehouse_no"],
-            "jd_good_no"=>$warehouseRow["jd_good_no"],
+            "lbs_order_store_id"=>0,
+            "jd_good_id"=>$warehouseRow["jd_good_id"],
             "city"=>$warehouseRow["city"],
             "good_id"=>$warehouseRow["id"],
             "goods_code"=>$warehouseRow["goods_code"],
             "goods_name"=>$warehouseRow["name"],
             "inventory"=>$warehouseRow["inventory"],
-            "confirm_num"=>"".$num,
-            "store_list"=>$warehouseRow["store_list"]
+            "confirm_num"=>"".$num
         );
-        if(!empty($expArr)){
-            foreach ($expArr as $key=>$item){
-                $list[$key] = $item;
+        if(!empty($warehouseRow["store_list"])){
+            foreach ($warehouseRow["store_list"] as $storeRow){
+                $temp = $list;
+                $temp["lbs_order_store_id"]=$storeRow["id"];
+                $temp["confirm_num"]="".$storeRow["store_num"];
+                $temp["jd_store_no"]="".$storeRow["jd_store_no"];
+                if(!empty($expArr)){
+                    foreach ($expArr as $key=>$item){
+                        $temp[$key] = $item;
+                    }
+                }
+                $arr[]=$temp;
             }
         }
-        return $list;
+        return $arr;
     }
 
     //批量批准訂單
@@ -791,8 +842,8 @@ class DeliveryForm extends CFormModel
 
                             $warehouseRow = $connection->createCommand()->select("*")->from("opr_warehouse")
                                 ->where("id =:id",array(":id"=>$goodsId))->queryRow();
-                            if($warehouseRow&&$warehouseRow["inventory"]>$num){
-                                $storeList =$connection->createCommand()->select("a.store_num,b.jd_store_no")->from("opr_order_goods_store a")
+                            if($warehouseRow){
+                                $storeList =$connection->createCommand()->select("a.id,a.store_num,b.jd_store_no")->from("opr_order_goods_store a")
                                     ->leftJoin("opr_store b","a.store_id=b.id")
                                     ->where("order_goods_id =:order_goods_id",array(":order_goods_id"=>$row["id"]))->queryAll();
                                 if($storeList){
@@ -805,10 +856,14 @@ class DeliveryForm extends CFormModel
                                         'lcu'=>$uid,
                                         'lcd'=>$time,
                                     ));
+                                    $id = Yii::app()->db->getLastInsertID();
                                     $warehouseRow["store_list"]=array();
-                                    $warehouseRow["store_list"][]=array("store_num"=>$num,"jd_store_no"=>$storeDefaultList["jd_store_no"]);
+                                    $warehouseRow["store_list"][]=array("id"=>$id,"store_num"=>$num,"jd_store_no"=>$storeDefaultList["jd_store_no"]);
                                 }
-                                $tempCurl["goods_item"][]=self::getCurlDateForWarehouse($warehouseRow,$num);
+
+                                $tempArr=self::getCurlDateForWarehouse($warehouseRow,$num);
+                                $tempCurl["goods_item"] = array_merge($tempCurl["goods_item"],$tempArr);
+                                /*由于金蝶要求LBS系统不需要储存库存，所以无法记录库存的变更
                                 //记录库存
                                 $connection->createCommand()->insert('opr_warehouse_history',array(
                                     'apply_date'=>$time,
@@ -824,6 +879,7 @@ class DeliveryForm extends CFormModel
                                 $connection->createCommand()->update('opr_warehouse',array(
                                     'inventory'=>$warehouseRow["inventory"]-$num
                                 ),"id=:id",array(":id"=>$goodsId));
+                                */
                                 //修改物品的實際數量
                                 $connection->createCommand()->update('opr_order_goods', array(
                                     'confirm_num'=>$num,

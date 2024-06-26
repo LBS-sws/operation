@@ -133,6 +133,7 @@ class CurlReceiveList extends CListPageModel
             "WarehouseFull"=>"批量修改仓库",
             "UpdateJDNO"=>"修改金蝶物料编号",
             "SupplierFull"=>"批量修改供应商",
+            "PaymentFull"=>"回传报销单",
         );
         if($bool){
             if(key_exists($key,$list)){
@@ -256,6 +257,16 @@ class CurlReceiveList extends CListPageModel
     public function getSupplier($city){
 	    $data =array("city_arr"=>$city);
 	    $this->sendCurl("/JDSync/getSupplier",$data);
+    }
+
+    public function testPayment($index){
+	    $data =array(
+	        "lbs_id"=>$index,
+            "state_type"=>1,//状态 1：成功 0：失败
+            "timestamp"=>date_format(date_create(),"Y/m/d H:i:s"),//记录时间
+            "jd_username"=>"800002",//操作人员
+        );
+	    $this->sendCurl("/JDSync/paymentFull",array($data));
     }
 
     public function TestSupplier(){

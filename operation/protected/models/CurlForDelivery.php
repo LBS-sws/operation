@@ -3,34 +3,35 @@
 class CurlForDelivery extends CurlForJD{
     protected $info_type="delivery";
 
+    ///kapi/v2/lbs/im/im_materialreqoutbill/save
     //审核单个外勤领料
     public function sendJDCurlForOne($curlData){
-        $data = $curlData;
-        $rtn = $this->sendData($data,"/delivery/sendJDCurlForOne");
+        $data = array("data"=>array($curlData));
+        $rtn = $this->sendData($data,"/kapi/v2/lbs/im/im_materialreqoutbill/save");
         //$rtn = array('message'=>'', 'code'=>200,'outData'=>'');//成功时code=200；
         return $rtn;
     }
 
     //批量审核外勤领料
     public function sendJDCurlForFull($curlData){
-        $data = $curlData;
-        $rtn = $this->sendData($data,"/delivery/sendJDCurlForFull");
+        $data = array("data"=>$curlData);
+        $rtn = $this->sendData($data,"/kapi/v2/lbs/im/im_materialreqoutbill/save");
         //$rtn = array('message'=>'', 'code'=>200,'outData'=>'');//成功时code=200；
         return $rtn;
     }
 
     //退回单个外勤领料
     public function backJDCurlForGoods($curlData){
-        $data = $curlData;
-        $rtn = $this->sendData($data,"/delivery/backJDCurlForGoods");
+        $data = array("data"=>array($curlData));
+        $rtn = $this->sendData($data,"/kapi/v2/lbs/im/im_materialreqoutbill/save");
         //$rtn = array('message'=>'', 'code'=>200,'outData'=>'');//成功时code=200；
         return $rtn;
     }
 
     //批量退回外勤领料
     public function backJDCurlForOrder($curlData){
-        $data = $curlData;
-        $rtn = $this->sendData($data,"/delivery/backJDCurlForOrder");
+        $data = array("data"=>array($curlData));
+        $rtn = $this->sendData($data,"/kapi/v2/lbs/im/im_materialreqoutbill/save");
         //$rtn = array('message'=>'', 'code'=>200,'outData'=>'');//成功时code=200；
         return $rtn;
     }

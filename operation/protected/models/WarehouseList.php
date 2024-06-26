@@ -2,6 +2,8 @@
 
 class WarehouseList extends CListPageModel
 {
+    public $inventoryJD=array();
+
 	public function attributeLabels()
 	{
 		return array(	
@@ -87,22 +89,28 @@ class WarehouseList extends CListPageModel
 		
 		$this->attr = array();
 		if (count($records) > 0) {
+		    $searchCode=array();
 			foreach ($records as $k=>$record) {
-					$this->attr[] = array(
-						'id'=>$record['id'],
-						'name'=>$record['name'],
-						'unit'=>$record['unit'],
-						'min_num'=>$record['min_num'],
-						'display'=>empty($record['display'])?Yii::t("misc","No"):Yii::t("misc","Yes"),
-						'price'=>$record['cost_price'],
-						'jd_classify_name'=>$record['jd_classify_name'],
-						//'classify_id'=>ClassifyForm::getClassifyToId($record['classify_id']),
-						'inventory'=>$record['inventory'],
-						'goods_code'=>$record['goods_code'],
-						'color'=>$record['z_index'] == 1?"":" text-danger",
-						//'goodsHistory'=>self::getGoodsHistory($record['id']),
-					);
+                $searchCode[]=$record['goods_code'];
+                $this->attr[] = array(
+                    'id'=>$record['id'],
+                    'name'=>$record['name'],
+                    'unit'=>$record['unit'],
+                    'min_num'=>$record['min_num'],
+                    'display'=>empty($record['display'])?Yii::t("misc","No"):Yii::t("misc","Yes"),
+                    'price'=>$record['cost_price'],
+                    'jd_classify_name'=>$record['jd_classify_name'],
+                    //'classify_id'=>ClassifyForm::getClassifyToId($record['classify_id']),
+                    'inventory'=>0,
+                    'goods_code'=>$record['goods_code'],
+                    'color'=>"",
+                    //'goodsHistory'=>self::getGoodsHistory($record['id']),
+                );
 			}
+            $searchData=array(
+                "material_number"=>$searchCode,
+            );
+            $this->inventoryJD = CurlForDelivery::getWarehouseGoodsStoreForJD(array("data"=>$searchData));
 		}
 		$session = Yii::app()->session;
 		$session['warehouse_ya01'] = $this->getCriteria();

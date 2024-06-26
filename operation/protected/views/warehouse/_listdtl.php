@@ -16,7 +16,11 @@
     </td>
     <?php endif ?>
 	<td>
-        <?php echo $this->record['inventory']; ?>
+        <?php
+        $good_code=$this->record['goods_code'];
+        $inventory = key_exists($good_code,$this->model->inventoryJD)?$this->model->inventoryJD[$good_code]["jd_store_sum"]:"0";
+        echo $inventory;
+        ?>
         <span class="fa fa-question-circle goodsHistoryMouse" data-id="<?php echo $this->record['id'];?>"></span>
     </td>
 </tr>

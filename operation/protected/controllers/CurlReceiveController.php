@@ -24,7 +24,7 @@ class CurlReceiveController extends Controller
 	{
 		return array(
 			array('allow', 
-				'actions'=>array('send','testUpdateJDNO','testWarehouseFull','testWarehouseOne','testWarehouseUpdate','testIp','getGoods','System'),
+				'actions'=>array('send','testUpdateJDNO','testWarehouseFull','testWarehouseOne','testWarehouseUpdate','testIp','getGoods','getSupplier','testSupplier','System'),
 				'expression'=>array('CurlReceiveController','allowReadWrite'),
 			),
 			array('allow', 
@@ -108,6 +108,21 @@ class CurlReceiveController extends Controller
         $model->getGoods($city_arr,$goods_arr);
         die();
 	}
+
+	public function actionGetSupplier($city="")
+	{
+        $model = new CurlReceiveList();
+        $city_arr = !empty($city)?explode(",",$city):array();
+        $model->getSupplier($city_arr);
+        die();
+	}
+
+    public function actionTestSupplier()
+    {
+        $model = new CurlReceiveList();
+        $model->testSupplier();
+        die();
+    }
 
 	public function actionSystem($type)
 	{

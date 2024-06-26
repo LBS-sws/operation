@@ -2,13 +2,24 @@
 class JobQueueCommand extends CConsoleCommand {
 	protected $webroot;
 	
+	public function runCURL() {
+        $row = Yii::app()->db->createCommand()->select("*")->from("opr_api_curl")
+            ->where("status_type='P'")->queryRow();
+        if($row){
+            CurlForJD::sendUpdateRowForJD($row,false);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
 	public function run($args) {
 		$this->webroot = Yii::app()->params['webroot'];
 		$sql = "select a.id, a.ts, a.rpt_type, a.username, a.rpt_desc, a.req_dt  
 					from opr_queue a
 				where a.status='P' order by a.req_dt limit 1";
 		$row = Yii::app()->db->createCommand($sql)->queryRow();
-		if ($row===false) return;
+		if ($row===false) return $this->runCURL();
 		
 		$id = $row['id'];
 		$ts = $row['ts'];

@@ -359,18 +359,18 @@ class DeliveryForm extends CFormModel
                     }
                     $tempArr=self::getCurlDateForWarehouse($warehouseRow,$goods["confirm_num"]);
                     $curlData["goods_item"] = array_merge($curlData["goods_item"],$tempArr);
-                    /*由于金蝶要求LBS系统不需要储存库存，所以无法记录库存的变更
                     //记录库存数量
                     $connection->createCommand()->insert('opr_warehouse_history',array(
                         'apply_date'=>$time,
                         'warehouse_id'=>$goods["goods_id"],
-                        'old_sum'=>$warehouseRow["inventory"],
-                        'now_sum'=>$warehouseRow["inventory"]-$goods["confirm_num"],
+                        'old_sum'=>0,
+                        'now_sum'=>0-$goods["confirm_num"],
                         'apply_name'=>Yii::app()->user->user_display_name(),
                         'status_type'=>2,
                         'order_code'=>$oldOrderStatus["order_code"],
                         'lcu'=>$uid,
                     ));
+                    /*由于金蝶要求LBS系统不需要储存库存，所以无法记录库存的变更
                     //減少庫存 inventory
                     $connection->createCommand()->update('opr_warehouse',array(
                         'inventory'=>$warehouseRow["inventory"]-$goods["confirm_num"]
@@ -544,18 +544,18 @@ class DeliveryForm extends CFormModel
                         }
                         $tempArr=self::getCurlDateForWarehouse($warehouseRow,$goods["confirm_num"],array("back_num"=>$num));
                         $curlData["goods_item"] = array_merge($curlData["goods_item"],$tempArr);
-                        /*由于金蝶要求LBS系统不需要储存库存，所以无法记录库存的变更
                         //记录库存
                         $connection->createCommand()->insert('opr_warehouse_history',array(
                             'apply_date'=>$time,
                             'warehouse_id'=>$goodsId,
-                            'old_sum'=>$warehouseRow["inventory"],
-                            'now_sum'=>$warehouseRow["inventory"]+$num,
+                            'old_sum'=>0,
+                            'now_sum'=>0+$num,
                             'apply_name'=>Yii::app()->user->user_display_name(),
                             'status_type'=>4,
                             'order_code'=>$row["order_code"],
                             'lcu'=>$uid,
                         ));
+                        /*由于金蝶要求LBS系统不需要储存库存，所以无法记录库存的变更
                         //补回庫存
                         $connection->createCommand()->update('opr_warehouse',array(
                             'inventory'=>$warehouseRow["inventory"]+$num
@@ -637,18 +637,18 @@ class DeliveryForm extends CFormModel
 
             $tempArr=self::getCurlDateForWarehouse($warehouseRow,$this->confirm_num,array("back_num"=>$num));
             $curlData["goods_item"] = array_merge($curlData["goods_item"],$tempArr);
-            /*由于金蝶要求LBS系统不需要储存库存，所以无法记录库存的变更
             //记录库存
             $connection->createCommand()->insert('opr_warehouse_history',array(
                 'apply_date'=>$time,
                 'warehouse_id'=>$goodsId,
-                'old_sum'=>$warehouseRow["inventory"],
-                'now_sum'=>$warehouseRow["inventory"]+$num,
+                'old_sum'=>0,
+                'now_sum'=>0+$num,
                 'apply_name'=>Yii::app()->user->user_display_name(),
                 'status_type'=>3,
                 'order_code'=>$order["order_code"],
                 'lcu'=>$uid,
             ));
+            /*由于金蝶要求LBS系统不需要储存库存，所以无法记录库存的变更
             //补回庫存
             $connection->createCommand()->update('opr_warehouse',array(
                 'inventory'=>$warehouseRow["inventory"]+$num
@@ -863,18 +863,18 @@ class DeliveryForm extends CFormModel
 
                                 $tempArr=self::getCurlDateForWarehouse($warehouseRow,$num);
                                 $tempCurl["goods_item"] = array_merge($tempCurl["goods_item"],$tempArr);
-                                /*由于金蝶要求LBS系统不需要储存库存，所以无法记录库存的变更
                                 //记录库存
                                 $connection->createCommand()->insert('opr_warehouse_history',array(
                                     'apply_date'=>$time,
                                     'warehouse_id'=>$goodsId,
-                                    'old_sum'=>$warehouseRow["inventory"],
-                                    'now_sum'=>$warehouseRow["inventory"]-$num,
+                                    'old_sum'=>0,
+                                    'now_sum'=>0-$num,
                                     'apply_name'=>Yii::app()->user->user_display_name(),
                                     'status_type'=>2,
                                     'order_code'=>$order["order_code"],
                                     'lcu'=>$uid,
                                 ));
+                                /*由于金蝶要求LBS系统不需要储存库存，所以无法记录库存的变更
                                 //減少庫存
                                 $connection->createCommand()->update('opr_warehouse',array(
                                     'inventory'=>$warehouseRow["inventory"]-$num

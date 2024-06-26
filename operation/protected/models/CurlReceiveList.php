@@ -129,9 +129,10 @@ class CurlReceiveList extends CListPageModel
 	//翻译curl的类型
 	public static function getInfoTypeList($key="",$bool=false){
         $list = array(
-            "Warehouse"=>"仓库信息",
+            "Warehouse"=>"修改仓库信息",
+            "WarehouseFull"=>"批量修改仓库",
             "UpdateJDNO"=>"修改金蝶物料编号",
-            //"T"=>"外勤领料",
+            "SupplierFull"=>"批量修改供应商",
         );
         if($bool){
             if(key_exists($key,$list)){
@@ -163,10 +164,10 @@ class CurlReceiveList extends CListPageModel
     private function warehouseData($num){
         return array(
             "status"=>$num%3==0?"update":"add",//状态
-            "city"=>"CD",//城市
+            "city"=>"LBSMC",//城市(金蝶城市)
             "timestamp"=>"2024-05-24 10:33:28",//记录时间
             "jd_warehouse_no"=>"CD001",//仓库编号(金蝶系统)
-            "jd_good_no"=>"JDGD0000{$num}",//物料编号(金蝶系统)
+            "good_code"=>"JDGD0000{$num}",//LBS的物料编号 = 金蝶物料编号。
             "good_name"=>"帽子-{$num}",//物料名称
             "classify_no"=>"JDCY0001",//分类编号
             "unit"=>"个",//物料单位
@@ -179,18 +180,28 @@ class CurlReceiveList extends CListPageModel
             "matters"=>null,//注意事項
             "jd_username"=>"800002",//操作人员
             "display"=>$num%2==0?1:0,//是否顯示 1：顯示  0：不顯示
+
+            "jd_good_id"=>$num,//金蝶物料id
+            "jd_classify_no"=>"JDCY0001",//分类编号
+            "jd_classify_name"=>"帽子",//分类编号
+            "jd_unit_code"=>"UN01",//物料单位编号
+            "data_type"=>$num%2==0?1:2,//数据类型：1：存量(LBS的旧数据) 2：新数据
+            "old_good_no"=>"W00017",//老版LBS物料编号
         );
     }
 
     public function testWarehouseUpdate($no,$sum=100){
 	    $data = array(
             "status"=>"update",//状态
-            "city"=>"CD",// 城市
+            "city"=>"LBSMC",// 城市
             "timestamp"=>date_format(date_create(),"Y/m/d H:i:s"),//记录时间
             "jd_warehouse_no"=>"CD001",//仓库编号(金蝶系统)
-            "jd_good_no"=>$no,//物料编号(金蝶系统)
+            "good_code"=>$no,//LBS的物料编号 = 金蝶物料编号。
             "good_name"=>"帽子-修改",//物料名称
-            "classify_no"=>"JDCY0001",//分类编号
+            "jd_good_id"=>"17",//金蝶物料id
+            "jd_classify_no"=>"JDCY0001",//分类编号
+            "jd_classify_name"=>"帽子",//分类编号
+            "jd_unit_code"=>"UN01",//物料单位编号
             "unit"=>"个",//物料单位
             "price"=>null,//单价
             "decimal_num"=>null,//是否允許小數
@@ -201,6 +212,8 @@ class CurlReceiveList extends CListPageModel
             "matters"=>null,//注意事項
             "jd_username"=>"800002",//操作人员
             "display"=>1,//是否顯示 1：顯示  0：不顯示
+            "data_type"=>1,//数据类型：1：存量(LBS的旧数据) 2：新数据
+            "old_good_no"=>"W00017",//老版LBS物料编号
         );
 	    $this->sendCurl("/JDSync/WarehouseOne",$data);
     }
@@ -238,6 +251,51 @@ class CurlReceiveList extends CListPageModel
     public function getGoods($city,$goods){
 	    $data =array("city_arr"=>$city,"jd_good_arr"=>$goods);
 	    $this->sendCurl("/JDSync/getGoods",$data);
+    }
+
+    public function getSupplier($city){
+	    $data =array("city_arr"=>$city);
+	    $this->sendCurl("/JDSync/getSupplier",$data);
+    }
+
+    public function TestSupplier(){
+        $data = array(
+            array(
+                "status"=>"update",
+                "timestamp"=>"2024-06-26 09:51:46",
+                "city"=>"LBSMC",
+                "jd_supplier_id"=>"12",
+                "lbs_id"=>"2",
+                "supplier_code"=>"UP0001",
+                "supplier_name"=>"api修改供应商",
+                "full_name"=>"api修改供应商全称",
+                "tax_reg_no"=>"TAX00001",
+                "cont_name"=>"api修改供应商联系人",
+                "cont_phone"=>"api修改供供应商电话",
+                "address"=>"api修改供应商地址",
+                "bank_name"=>"api修改付款账户",
+                "bank_code"=>"BANK00001",
+                "data_type"=>"1",//数据类型：1：存量(LBS的旧数据) 2：新数据
+            ),
+            array(
+                "status"=>"update",
+                "timestamp"=>"2024-06-26 11:51:46",
+                "city"=>"LBSMC",
+                "jd_supplier_id"=>"13",
+                "lbs_id"=>"2",
+                "supplier_code"=>"UP0003",
+                "supplier_name"=>"api修改供应商3",
+                "full_name"=>"api修改供应商全称3",
+                "tax_reg_no"=>"TAX00003",
+                "cont_name"=>"api修改供应商联系人3",
+                "cont_phone"=>"api修改供供应商电话3",
+                "address"=>"api修改供应商地址3",
+                "bank_name"=>"api修改付款账户3",
+                "bank_code"=>"BANK00003",
+                "data_type"=>"2",//数据类型：1：存量(LBS的旧数据) 2：新数据
+            ),
+        );
+        $this->sendCurl("/JDSync/UpdateSupplierFull",$data);
     }
 
     public function systemU($type){
@@ -311,7 +369,6 @@ class CurlReceiveList extends CListPageModel
         $ip =Yii::app()->params['uCurlIP'];
         $interval = 600; // 10分钟的秒数
         $secret_key = 'c09c321acaf59c57e2a2a999e31b5ea8'; // 加密密钥
-        $secret_key = 'c0999e31b5ea8'; // 加密密钥
 
         //生成key
         $salt = floor(time() / $interval) * $interval; // 使用10分钟为间隔的时间戳作为盐

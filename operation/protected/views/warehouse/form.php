@@ -74,7 +74,16 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
 			<?php echo $form->hiddenField($model, 'classify_id'); ?>
 			<?php echo $form->hiddenField($model, 'old_good_no'); ?>
 
-
+            <?php if (!empty($model->old_good_no)): ?>
+                <div class="form-group">
+                    <?php echo $form->labelEx($model,'old_good_no',array('class'=>"col-sm-2 control-label")); ?>
+                    <div class="col-sm-3">
+                        <?php echo $form->textField($model, 'old_good_no',
+                            array('min'=>0,'readonly'=>(true))
+                        ); ?>
+                    </div>
+                </div>
+            <?php endif ?>
             <div class="form-group">
                 <?php echo $form->labelEx($model,'goods_code',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-3">
@@ -158,7 +167,7 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                 <?php echo $form->labelEx($model,'inventory',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
                     <?php echo $form->numberField($model, 'inventory',
-                        array('min'=>0,'readonly'=>($model->scenario=='view'))
+                        array('min'=>0,'readonly'=>(true))
                     ); ?>
                 </div>
             </div>
@@ -166,7 +175,7 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                 <?php echo $form->labelEx($model,'min_num',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-4">
                     <?php echo $form->numberField($model, 'min_num',
-                        array('min'=>0,'readonly'=>($model->scenario=='view'))
+                        array('min'=>0,'readonly'=>(true))
                     ); ?>
                 </div>
             </div>

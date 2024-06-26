@@ -38,7 +38,7 @@
     </th>
     <?php endif ?>
     <th>
-        <?php echo TbHtml::link($this->getLabelName('inventory').$this->drawOrderArrow('inventory'),'#',$this->createOrderLink('warehouse-list','inventory'))
+        <?php echo TbHtml::link($this->getLabelName('inventory').$this->drawOrderArrow('inventory'),'#')
         ;
         ?>
     </th>

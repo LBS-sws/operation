@@ -143,6 +143,7 @@ class CurlNotesList extends CListPageModel
             "delivery"=>"外勤领料",
             "expensePayment"=>"日常费用报销",
             "remitPayment"=>"日常付款",
+            "customer"=>"客户资料",
         );
         if($bool){
             if(key_exists($key,$list)){

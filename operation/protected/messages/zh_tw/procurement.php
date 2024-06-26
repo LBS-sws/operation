@@ -346,5 +346,7 @@ return array(
 
     'jd unit code'=>'金蝶單位編號',
     'jd good id'=>'金蝶物料id',
+    'Old Goods Code'=>'物品编号（旧）',
+    'change num'=>'变动数量',
 );
 ?>

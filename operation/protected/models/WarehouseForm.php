@@ -34,6 +34,7 @@ class WarehouseForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
+            'old_good_no'=>Yii::t('procurement','Old Goods Code'),
             'goods_code'=>Yii::t('procurement','Goods Code'),
             'classify_id'=>Yii::t('procurement','Classify'),
             'name'=>Yii::t('procurement','Name'),
@@ -147,16 +148,20 @@ class WarehouseForm extends CFormModel
             ->from("opr_warehouse")->where("id=:id and city=:city",array(":id"=>$index,':city'=>$city))->queryAll();
 		if (count($rows) > 0) {
 			foreach ($rows as $row) {
+                $searchData=array(
+                    "material_number"=>array($row['goods_code']),
+                );
+                $inventoryJD = CurlForDelivery::getWarehouseGoodsStoreForJD(array("data"=>$searchData));
                 $this->id = $row['id'];
                 $this->name = $row['name'];
                 $this->unit = $row['unit'];
                 $this->classify_id = $row['classify_id'];
                 $this->goods_code = $row['goods_code'];
-                $this->inventory = $row['inventory'];
+                $this->inventory = key_exists($row['goods_code'],$inventoryJD)?$inventoryJD[$row['goods_code']]["jd_store_sum"]:"0";
                 $this->costing = sprintf("%.2f",$row['costing']);
                 $this->decimal_num = empty($row['decimal_num'])?"否":$row['decimal_num'];
                 $this->price = $row['cost_price'];
-                $this->min_num = $row['min_num'];
+                $this->min_num = 0;
                 $this->matters = $row['matters'];
                 $this->matching = $row['matching'];
                 $this->display = $row['display'];
@@ -220,8 +225,7 @@ class WarehouseForm extends CFormModel
         $html.="<th>".Yii::t("procurement","Goods Name")."</th>";
         $html.="<th>".Yii::t("procurement","Operator Status")."</th>";
         $html.="<th>".Yii::t("procurement","Operator User")."</th>";
-        $html.="<th>".Yii::t("procurement","old num")."</th>";
-        $html.="<th>".Yii::t("procurement","now num")."</th>";
+        $html.="<th>".Yii::t("procurement","change num")."</th>";
         $html.="</tr></thead><tbody>";
         $historyList = Yii::app()->db->createCommand()
             ->select("a.apply_date,a.old_sum,a.now_sum,a.apply_name,a.status_type,a.order_code,b.name")
@@ -232,13 +236,13 @@ class WarehouseForm extends CFormModel
             foreach ($historyList as $list){
                 $status_type=key_exists($list["status_type"],$statusList)?$statusList[$list["status_type"]]["name"]:"";
                 $style=key_exists($list["status_type"],$statusList)?$statusList[$list["status_type"]]["style"]:"";
+                $changeNum = $list["now_sum"] - $list["old_sum"];
                 $html.="<tr class='{$style}' data-type='{$list['status_type']}'>";
                 $html.="<td>".$list["apply_date"]."</td>";
                 $html.="<td>".$list["name"]."</td>";
                 $html.="<td>".$status_type.TbHtml::hiddenField('test',$list["order_code"])."</td>";
                 $html.="<td>".$list["apply_name"]."</td>";
-                $html.="<td>".$list["old_sum"]."</td>";
-                $html.="<td>".$list["now_sum"]."</td>";
+                $html.="<td>".$changeNum."</td>";
                 $html.="</tr>";
 
             }
@@ -396,7 +400,7 @@ class WarehouseForm extends CFormModel
             case 'new':
                 break;
             case 'edit':
-                self::insertWarehouseHistory($this->id,$this->inventory);
+                //self::insertWarehouseHistory($this->id,$this->inventory);
                 break;
         }
     }
@@ -411,7 +415,7 @@ class WarehouseForm extends CFormModel
                 $sql = "insert into opr_warehouse(
 							name, unit, display, inventory, classify_id, lcu, goods_code,city,costing,decimal_num,min_num,matching,matters,old_good_no,jd_classify_no,jd_classify_name
 						) values (
-							:name, :unit, :display, :inventory, :classify_id, :lcu, :goods_code,:city,:costing,:decimal_num,:min_num,:matching,:matters,:old_good_no,:jd_classify_no,:jd_classify_name
+							:name, :unit, :display, '0', :classify_id, :lcu, :goods_code,:city,:costing,:decimal_num,'0',:matching,:matters,:old_good_no,:jd_classify_no,:jd_classify_name
 						)";
                 break;
             case 'edit':
@@ -423,14 +427,12 @@ class WarehouseForm extends CFormModel
 							unit = :unit,
 							costing = :costing,
 							decimal_num = :decimal_num,
-							min_num = :min_num,
 							matching = :matching,
 							matters = :matters,
 							luu = :luu,
 							old_good_no = :old_good_no,
 							jd_classify_no = :jd_classify_no,
-							jd_classify_name = :jd_classify_name,
-							inventory = :inventory
+							jd_classify_name = :jd_classify_name
 						where id = :id AND city=:city
 						";
                 break;

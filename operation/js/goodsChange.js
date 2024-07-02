@@ -90,7 +90,7 @@ $(function () {
 
     //獲取物品列表
     function getGoodsList() {
-        var list = [];
+        var list = {};
         $("#goodsListToClassify>li").each(function ($index, $obj) {
             var id = $(this).find("ul>li").eq(0).text();
             var name = $(this).find("ul>li").eq(1).text();

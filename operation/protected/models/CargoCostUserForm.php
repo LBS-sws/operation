@@ -70,7 +70,7 @@ class CargoCostUserForm extends CFormModel
 	public function printTable(){
         $html = '<tbody>';
         $total_price = 0;
-        $rows = $rs = Yii::app()->db->createCommand()->select("costPrice(b.id,f.lcd) as cost_price,b.id as warehouse_id,a.lcd,b.name,b.inventory,b.goods_code,b.classify_id,b.unit,a.goods_num,a.confirm_num,a.id,a.goods_id,a.remark,a.note")
+        $rows = $rs = Yii::app()->db->createCommand()->select("b.id as warehouse_id,b.name,b.inventory,b.goods_code,b.classify_id,b.unit,a.goods_num,a.confirm_num,a.id,a.goods_id,a.remark,a.note,f.city,f.lcd")
             ->from("opr_order_goods a")
             ->leftJoin("opr_order f","a.order_id = f.id")
             ->leftJoin("opr_warehouse b","a.goods_id = b.id")
@@ -79,7 +79,7 @@ class CargoCostUserForm extends CFormModel
         if($rows){
             foreach ($rows as $row){//warehouse_id
                 $num = ($row["confirm_num"]===""||$row["confirm_num"]===null)?floatval($row["goods_num"]):floatval($row["confirm_num"]);
-                $price = empty($row["cost_price"])?0:$row["cost_price"];
+                $price = WarehouseList::getNowWarehousePrice($row["warehouse_id"],$row["city"],$row["lcd"]);
                 $total_price+=$price*$num;
                 $html.="<tr>";
                 $html.="<td>".$row["goods_code"]."</td>";

@@ -58,11 +58,7 @@ class CurlReceiveList extends CListPageModel
 		$clause = "";
 		if(!empty($this->info_type)){
             $svalue = str_replace("'","\'",$this->info_type);
-            if($svalue=="Warehouse"){
-                $clause.=" and info_type in ('Warehouse','WarehouseFull') ";
-            }else{
-                $clause.=" and info_type='$svalue' ";
-            }
+            $clause.=" and info_type='$svalue' ";
         }
 		if (!empty($this->searchField) && !empty($this->searchValue)) {
 			$svalue = str_replace("'","\'",$this->searchValue);
@@ -129,9 +125,7 @@ class CurlReceiveList extends CListPageModel
 	//翻译curl的类型
 	public static function getInfoTypeList($key="",$bool=false){
         $list = array(
-            "Warehouse"=>"修改仓库信息",
             "WarehouseFull"=>"批量修改仓库",
-            "UpdateJDNO"=>"修改金蝶物料编号",
             "SupplierFull"=>"批量修改供应商",
             "PaymentFull"=>"回传报销单",
         );
@@ -164,19 +158,12 @@ class CurlReceiveList extends CListPageModel
 
     private function warehouseData($num){
         return array(
-            "status"=>$num%3==0?"update":"add",//状态
-            "city"=>"LBSMC",//城市(金蝶城市)
             "timestamp"=>"2024-05-24 10:33:28",//记录时间
-            "jd_warehouse_no"=>"CD001",//仓库编号(金蝶系统)
             "good_code"=>"JDGD0000{$num}",//LBS的物料编号 = 金蝶物料编号。
             "good_name"=>"帽子-{$num}",//物料名称
             "classify_no"=>"JDCY0001",//分类编号
             "unit"=>"个",//物料单位
-            "price"=>null,//单价
             "decimal_num"=>null,//是否允許小數
-            "costing"=>null,//物料成本
-            "inventory"=>78,//库存
-            "min_num"=>60,//安全库存
             "matching"=>null,//產品配比
             "matters"=>null,//注意事項
             "jd_username"=>"800002",//操作人员
@@ -187,51 +174,8 @@ class CurlReceiveList extends CListPageModel
             "jd_classify_name"=>"帽子",//分类编号
             "jd_unit_code"=>"UN01",//物料单位编号
             "data_type"=>$num%2==0?1:2,//数据类型：1：存量(LBS的旧数据) 2：新数据
-            "old_good_no"=>"W00017",//老版LBS物料编号
+            "old_good_no"=>"W0001{$num}",//老版LBS物料编号
         );
-    }
-
-    public function testWarehouseUpdate($no,$sum=100){
-	    $data = array(
-            "status"=>"update",//状态
-            "city"=>"LBSMC",// 城市
-            "timestamp"=>date_format(date_create(),"Y/m/d H:i:s"),//记录时间
-            "jd_warehouse_no"=>"CD001",//仓库编号(金蝶系统)
-            "good_code"=>$no,//LBS的物料编号 = 金蝶物料编号。
-            "good_name"=>"帽子-修改",//物料名称
-            "jd_good_id"=>"17",//金蝶物料id
-            "jd_classify_no"=>"JDCY0001",//分类编号
-            "jd_classify_name"=>"帽子",//分类编号
-            "jd_unit_code"=>"UN01",//物料单位编号
-            "unit"=>"个",//物料单位
-            "price"=>null,//单价
-            "decimal_num"=>null,//是否允許小數
-            "costing"=>null,//物料成本
-            "inventory"=>$sum,//库存
-            "min_num"=>70,//安全库存
-            "matching"=>null,//產品配比
-            "matters"=>null,//注意事項
-            "jd_username"=>"800002",//操作人员
-            "display"=>1,//是否顯示 1：顯示  0：不顯示
-            "data_type"=>1,//数据类型：1：存量(LBS的旧数据) 2：新数据
-            "old_good_no"=>"W00017",//老版LBS物料编号
-        );
-	    $this->sendCurl("/JDSync/WarehouseOne",$data);
-    }
-
-    public function testWarehouseOne(){
-        $data = self::warehouseData(1);
-        $this->sendCurl("/JDSync/WarehouseOne",$data);
-    }
-
-    public function testUpdateJDNO(){
-        $data = array(
-            array("city"=>"HK","lbs_good_no"=>"W00001","jd_good_no"=>"jd00001"),
-            array("city"=>"HK","lbs_good_no"=>"W00002","jd_good_no"=>"jd00002"),
-            array("city"=>"HK","lbs_good_no"=>"W00003","jd_good_no"=>"jd00003"),
-            array("city"=>"HK","lbs_good_no"=>"W00004","jd_good_no"=>"jd00004"),
-        );
-        $this->sendCurl("/JDSync/UpdateJDNO",$data);
     }
 
     public function testWarehouseFull($index){
@@ -272,10 +216,10 @@ class CurlReceiveList extends CListPageModel
     public function TestSupplier(){
         $data = array(
             array(
-                "status"=>"update",
                 "timestamp"=>"2024-06-26 09:51:46",
-                "city"=>"LBSMC",
                 "jd_supplier_id"=>"12",
+                "jd_condition_code"=>"code001",
+                "jd_condition_name"=>"条件1",
                 "lbs_id"=>"2",
                 "supplier_code"=>"UP0001",
                 "supplier_name"=>"api修改供应商",
@@ -289,10 +233,10 @@ class CurlReceiveList extends CListPageModel
                 "data_type"=>"1",//数据类型：1：存量(LBS的旧数据) 2：新数据
             ),
             array(
-                "status"=>"update",
                 "timestamp"=>"2024-06-26 11:51:46",
-                "city"=>"LBSMC",
                 "jd_supplier_id"=>"13",
+                "jd_condition_code"=>"code002",
+                "jd_condition_name"=>"条件2",
                 "lbs_id"=>"2",
                 "supplier_code"=>"UP0003",
                 "supplier_name"=>"api修改供应商3",

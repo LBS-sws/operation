@@ -107,7 +107,7 @@ class TechnicianForm extends CFormModel
                 $this->goods_list[$key]["goods_num"] = $goods_num;
 				$list = Yii::app()->db->createCommand()->select("*")
 				->from("opr_warehouse")
-				->where('id = :id and city=:city',array(':id'=>$goods["goods_id"],':city'=>$this->city))
+				->where('id = :id and (city=:city or local_bool=0)',array(':id'=>$goods["goods_id"],':city'=>$this->city))
 				->queryRow();
                 //$list = WarehouseForm::getGoodsToGoodsId($goods["goods_id"]);
                 if (empty($list)){
@@ -377,7 +377,7 @@ class TechnicianForm extends CFormModel
 
 
         $goodRows = Yii::app()->db->createCommand()->select("*")->from("opr_warehouse")
-            ->where("city=:city and display=1",array(
+            ->where("(city=:city or local_bool=0) and display=1",array(
                 ":city"=>$city
             ))->queryAll();
         if($goodRows){

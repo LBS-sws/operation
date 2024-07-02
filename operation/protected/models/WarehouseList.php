@@ -12,22 +12,22 @@ class WarehouseList extends CListPageModel
 			'unit'=>Yii::t('procurement','Unit'),
 			'inventory'=>Yii::t('procurement','Inventory'),
 			'min_num'=>Yii::t('procurement','min inventory'),
-			'price'=>Yii::t('procurement','Price（RMB）'),
-			'cost_price'=>Yii::t('procurement','price history'),
             'jd_classify_name'=>Yii::t('procurement','Classify'),
             'display'=>Yii::t('procurement','judge for visible'),
+            'cost_price'=>Yii::t('procurement','price history'),
+            'price'=>Yii::t('procurement','Price（RMB）'),
 		);
 	}
 	
 	public function retrieveDataByPage($pageNum=1)
 	{
 		$city = Yii::app()->user->city();
-		$sql1 = "select a.*,ifnull(costPrice(a.id,now()),0) as cost_price 
+		$sql1 = "select a.* 
 				from opr_warehouse a
-				where city = '$city' 
+				where (city = '$city' or  local_bool=0)
 			";
 		$sql2 = "select count(a.id) from opr_warehouse a
-				where city = '$city' 
+				where (city = '$city' or  local_bool=0)
 			";
 		$clause = "";
 		if($this->searchField == 'inventory'){
@@ -55,9 +55,6 @@ class WarehouseList extends CListPageModel
 					break;
 				case 'unit':
 					$clause .= General::getSqlConditionClause('a.unit', $svalue);
-					break;
-				case 'price':
-					$clause .= General::getSqlConditionClause('a.price', $svalue);
 					break;
 				case 'inventory':
 					//$clause .= General::getSqlConditionClause('inventory', $svalue);
@@ -98,10 +95,10 @@ class WarehouseList extends CListPageModel
                     'unit'=>$record['unit'],
                     'min_num'=>$record['min_num'],
                     'display'=>empty($record['display'])?Yii::t("misc","No"):Yii::t("misc","Yes"),
-                    'price'=>$record['cost_price'],
                     'jd_classify_name'=>$record['jd_classify_name'],
                     //'classify_id'=>ClassifyForm::getClassifyToId($record['classify_id']),
                     'inventory'=>0,
+                    'price'=>self::getNowWarehousePrice($record["id"]),
                     'goods_code'=>$record['goods_code'],
                     'color'=>"",
                     //'goodsHistory'=>self::getGoodsHistory($record['id']),
@@ -118,12 +115,16 @@ class WarehouseList extends CListPageModel
 	}
 
 	//獲取物品由訂單扣減的歷史 (最多顯示5條)
-	public static function getGoodsHistory($goods_id){
+	public static function getGoodsHistory($goods_id,$city=""){
+        $city = empty($city)?Yii::app()->user->city():$city;
 	    $html="";
-        $rows = Yii::app()->db->createCommand()->select("*")
-            ->from("opr_order_goods")
-            ->where('goods_id=:goods_id and order_status="finished"',array(':goods_id'=>$goods_id))
-            ->order('lud desc')->limit(5)->queryAll();
+        $rows = Yii::app()->db->createCommand()->select("a.*")
+            ->from("opr_order_goods a")
+            ->leftJoin("opr_order b","a.order_id=b.id")
+            ->where('b.city=:city and a.goods_id=:goods_id and a.order_status="finished"',array(
+                ':city'=>$city,
+                ':goods_id'=>$goods_id,
+            ))->order('a.lud desc')->limit(5)->queryAll();
 	    if($rows){
             foreach ($rows as $historyList){
                 $html.= "<tr>";
@@ -153,5 +154,18 @@ class WarehouseList extends CListPageModel
         }else{
             return " and classify_id in ('')";
         }
+    }
+
+    //获取物料的最新价格
+    public static function getNowWarehousePrice($warehouse_id,$city='',$applyDate=''){
+        $city = empty($city)?Yii::app()->user->city():$city;
+        $year = date_format(date_create($applyDate),"Y");
+        $month = date_format(date_create($applyDate),"n");
+        $row = Yii::app()->db->createCommand()->select("price")
+            ->from("opr_warehouse_price")
+            ->where("warehouse_id=:id and city=:city and (year<'{$year}' or (year='{$year}' and month<='{$month}'))",
+                array(":id"=>$warehouse_id,":city"=>$city))
+            ->order("year desc,month desc")->queryRow();
+        return $row?floatval($row["price"]):0;
     }
 }

@@ -110,12 +110,15 @@ CREATE TABLE `opr_send_set_jd` (
 -- ----------------------------
 -- Table structure for opr_warehouse
 -- ----------------------------
+alter table opr_warehouse_price add city varchar(100) NULL DEFAULT NULL COMMENT '价格所在城市' after price;
+alter table opr_warehouse add local_bool int(11) NOT NULL DEFAULT 1 COMMENT '是否本地物料 0:否 1：是' after display;
 alter table opr_warehouse add old_good_no varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '旧物品编号' after display;
 alter table opr_warehouse add `jd_classify_no`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '金蝶类别编号' after display;
 alter table opr_warehouse add `jd_classify_name`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '金蝶类别名称' after display;
-update opr_warehouse set old_good_no=CONCAT(city,'_',goods_code) where old_good_no is null;
+update opr_warehouse set old_good_no=goods_code where old_good_no is null;
 update opr_warehouse set jd_classify_no=classify_id where jd_classify_no is null;
 update opr_warehouse set jd_classify_name=(select name from opr_classify a where a.id=classify_id) where jd_classify_name is null;
+update opr_warehouse_price set city=(select city from opr_warehouse a where a.id=warehouse_id) where city is null;
 
 -- ----------------------------
 -- Table structure for opr_warehouse_back

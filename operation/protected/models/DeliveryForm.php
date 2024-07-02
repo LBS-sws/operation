@@ -111,8 +111,7 @@ class DeliveryForm extends CFormModel
             $year--;
         }
         $bool = Yii::app()->db->createCommand()->select("a.id")->from("opr_warehouse_price a")
-            ->leftJoin("opr_warehouse b","a.warehouse_id=b.id")
-            ->where('b.city = :city and a.year=:year and a.month=:month', array(':city' =>$city,':year' =>$year,':month' =>$month))->queryRow();
+            ->where('a.city = :city and a.year=:year and a.month=:month', array(':city' =>$city,':year' =>$year,':month' =>$month))->queryRow();
         if ($bool) {
             return true;
         }else{
@@ -242,7 +241,7 @@ class DeliveryForm extends CFormModel
                 }
 
                 //物品价格过高，限制审核
-                $price = Yii::app()->db->createCommand("SELECT costPrice({$goods["goods_id"]},'{$orderRow['lcd']}')")->queryScalar();
+                $price = WarehouseList::getNowWarehousePrice($goods["goods_id"],$orderRow['city'],$orderRow['lcd']);
                 $price*=floatval($goods["confirm_num"]);
                 if($price>999999){
                     $message = $list["name"]."价格过高，无法保存。计算后价格:{$price}";
@@ -335,7 +334,7 @@ class DeliveryForm extends CFormModel
         //物品的添加、修改
         foreach ($this->goods_list as $goods){
             if(!empty($goods["id"])){
-                $price = Yii::app()->db->createCommand("SELECT costPrice({$goods['goods_id']},'{$oldOrderStatus['lcd']}')")->queryScalar();
+                $price = WarehouseList::getNowWarehousePrice($goods['goods_id'],$oldOrderStatus['city'],$oldOrderStatus['lcd']);
                 $totalPrice+=$goods["confirm_num"]*$price;
                 //修改
                 $connection->createCommand()->update('opr_order_goods', array(
@@ -655,8 +654,11 @@ class DeliveryForm extends CFormModel
             ),"id=:id",array(":id"=>$goodsId));
             */
             //修改发货数量
+            $priceNum = $this->confirm_num-$num;
+            $price = WarehouseList::getNowWarehousePrice($goodsId,$order["city"],$order["lcd"]);
             $connection->createCommand()->update('opr_order_goods',array(
-                'confirm_num'=>$this->confirm_num-$num
+                'confirm_num'=>$priceNum,
+                'total_price'=>$priceNum*$price,
             ),"id=:id",array(":id"=>$blackId));
             $connection->createCommand()->update('opr_order_goods_store',array(
                 'store_num'=>$this->store_num-$num
@@ -837,7 +839,7 @@ class DeliveryForm extends CFormModel
                         foreach ($rows as $row){
                             $num = ($row["confirm_num"]===""||$row["confirm_num"]===null)?floatval($row["goods_num"]):floatval($row["confirm_num"]);
                             $goodsId = intval($row["goods_id"]);
-                            $price = Yii::app()->db->createCommand("SELECT costPrice($goodsId,'{$order['lcd']}')")->queryScalar();
+                            $price = WarehouseList::getNowWarehousePrice($goodsId,$order['city'],$order['lcd']);
                             $totalPrice+=$num*$price;
 
                             $warehouseRow = $connection->createCommand()->select("*")->from("opr_warehouse")

@@ -24,7 +24,7 @@ class CurlReceiveController extends Controller
 	{
 		return array(
 			array('allow', 
-				'actions'=>array('send','testPayment','testUpdateJDNO','testWarehouseFull','testWarehouseOne','testWarehouseUpdate','testIp','getGoods','getSupplier','testSupplier','System'),
+				'actions'=>array('send','testPayment','testWarehouseFull','testIp','getGoods','getSupplier','testSupplier','System'),
 				'expression'=>array('CurlReceiveController','allowReadWrite'),
 			),
 			array('allow', 
@@ -65,31 +65,10 @@ class CurlReceiveController extends Controller
         $this->redirect(Yii::app()->createUrl('curlReceive/index'));
 	}
 
-	public function actionTestWarehouseOne()
-	{
-        $model = new CurlReceiveList();
-        $model->testWarehouseOne();
-        die();
-	}
-
-	public function actionTestWarehouseUpdate($no,$sum=100)
-	{
-        $model = new CurlReceiveList();
-        $model->testWarehouseUpdate($no,$sum);
-        die();
-	}
-
     public function actionTestWarehouseFull($index=10)
     {
         $model = new CurlReceiveList();
         $model->testWarehouseFull($index);
-        die();
-    }
-
-    public function actionTestUpdateJDNO()
-    {
-        $model = new CurlReceiveList();
-        $model->testUpdateJDNO();
         die();
     }
 

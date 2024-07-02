@@ -81,7 +81,7 @@ class WarehouseForm extends CFormModel
         $matters = "";
         if($this->getScenario() == "edit"){
             $row = Yii::app()->db->createCommand()->select("matching,matters")->from("opr_warehouse")
-                ->where('id=:id and city=:city', array(':id'=>$this->id,':city'=>$city))->queryRow();
+                ->where('id=:id and (city=:city or local_bool=0)', array(':id'=>$this->id,':city'=>$city))->queryRow();
             if($row){
                 if(Yii::app()->user->validFunction('YN04')){
                     $matching = $this->matching;
@@ -105,7 +105,7 @@ class WarehouseForm extends CFormModel
             $id = $this->id;
         }
         $rows = Yii::app()->db->createCommand()->select("id")->from("opr_warehouse")
-            ->where('name=:name and id!=:id and city = :city', array(':name'=>$this->name,':id'=>$id,':city'=>$city))->queryAll();
+            ->where('name=:name and id!=:id and (city = :city or local_bool=0)', array(':name'=>$this->name,':id'=>$id,':city'=>$city))->queryAll();
         if(count($rows)>0){
             $message = Yii::t('procurement','the name of already exists');
             $this->addError($attribute,$message);
@@ -118,7 +118,7 @@ class WarehouseForm extends CFormModel
             $id = $this->id;
         }
         $rows = Yii::app()->db->createCommand()->select("id")->from("opr_warehouse")
-            ->where('goods_code=:goods_code and id!=:id and city = :city', array(':goods_code'=>$this->goods_code,':id'=>$id,':city'=>$city))->queryAll();
+            ->where('goods_code=:goods_code and id!=:id and (city = :city or local_bool=0)', array(':goods_code'=>$this->goods_code,':id'=>$id,':city'=>$city))->queryAll();
         if(count($rows)>0){
             $message = Yii::t('procurement','the Goods Code of already exists');
             $this->addError($attribute,$message);
@@ -145,7 +145,7 @@ class WarehouseForm extends CFormModel
 	public function retrieveData($index) {
 		$city = Yii::app()->user->city();
 		$rows = Yii::app()->db->createCommand()->select("*,costPrice(id,now()) as cost_price")
-            ->from("opr_warehouse")->where("id=:id and city=:city",array(":id"=>$index,':city'=>$city))->queryAll();
+            ->from("opr_warehouse")->where("id=:id and (city = :city or local_bool=0)",array(":id"=>$index,':city'=>$city))->queryAll();
 		if (count($rows) > 0) {
 			foreach ($rows as $row) {
                 $searchData=array(
@@ -160,7 +160,7 @@ class WarehouseForm extends CFormModel
                 $this->inventory = key_exists($row['goods_code'],$inventoryJD)?$inventoryJD[$row['goods_code']]["jd_store_sum"]:"0";
                 $this->costing = sprintf("%.2f",$row['costing']);
                 $this->decimal_num = empty($row['decimal_num'])?"否":$row['decimal_num'];
-                $this->price = $row['cost_price'];
+                $this->price = WarehouseList::getNowWarehousePrice($row["id"]);
                 $this->min_num = 0;
                 $this->matters = $row['matters'];
                 $this->matching = $row['matching'];
@@ -286,7 +286,7 @@ class WarehouseForm extends CFormModel
     }
 
     //根據訂單id查訂單所有物品
-    public function getGoodsListToId($order_id){
+    public static function getGoodsListToId($order_id){
         $rs = Yii::app()->db->createCommand()->select("b.id as warehouse_id,a.lcd,b.matching,b.matters,b.name,b.inventory,b.goods_code,b.classify_id,b.unit,a.goods_num,a.confirm_num,a.id,a.goods_id,a.remark,a.note")
             ->from("opr_order_goods a,opr_warehouse b")->where('a.order_id=:order_id and a.goods_id = b.id',array(':order_id'=>$order_id))->queryAll();
         return $rs;
@@ -294,10 +294,12 @@ class WarehouseForm extends CFormModel
 
     //
     public function getPriceHistory($id){
+        $city = Yii::app()->user->city();
         $html = '';
         $rs = Yii::app()->db->createCommand()->select("a.year,a.month,a.price,b.name,b.goods_code")
-            ->from("opr_warehouse_price a")->leftJoin('opr_warehouse b',"a.warehouse_id=b.id")
-            ->where('b.id =:id',array(':id'=>$id))->order("a.year desc,a.month desc")->queryAll();
+            ->from("opr_warehouse_price a")
+            ->leftJoin('opr_warehouse b',"a.warehouse_id=b.id")
+            ->where('b.id =:id and a.city=:city',array(':id'=>$id,':city'=>$city))->order("a.year desc,a.month desc")->queryAll();
         if($rs){
             foreach ($rs as $row){
                 $html.="<tr>";

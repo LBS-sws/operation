@@ -61,7 +61,7 @@ class StoreComparisonForm extends CFormModel
     private function getLBSWarehouse(){
         $list = array();
         $rows = Yii::app()->db->createCommand()->select("id,goods_code,name,city")->from("opr_warehouse")
-            ->where("city=:city and display=1",array(":city"=>$this->search_city))->queryAll();
+            ->where("(city=:city or local_bool=0) and display=1",array(":city"=>$this->search_city))->queryAll();
         if($rows){
             foreach ($rows as $row){
                 $row["jd_good_id"] = WarehouseForm::getJDGoodsInfoToGoodsId($row["id"]);

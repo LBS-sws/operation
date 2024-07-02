@@ -222,7 +222,7 @@ class OrderForm extends CFormModel
     }
 
     //根據訂單id查訂單所有狀態
-    public function getStatusListToId($order_id){
+    public static function getStatusListToId($order_id){
         $rs = Yii::app()->db->createCommand()->select()->from("opr_order_status")->where('order_id=:order_id',array(':order_id'=>$order_id))->queryAll();
         return $rs;
     }

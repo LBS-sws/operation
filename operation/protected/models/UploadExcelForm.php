@@ -109,9 +109,10 @@ class UploadExcelForm extends CFormModel
             if($continue){
                 $uid = Yii::app()->user->id;
                 $row = Yii::app()->db->createCommand()->select("id")->from("opr_warehouse_price")
-                    ->where("warehouse_id=:warehouse_id and year=:year and month=:month",
+                    ->where("warehouse_id=:warehouse_id and year=:year and month=:month and city=:city",
                         array(
                             ':warehouse_id'=>$arrList["warehouse_id"],
+                            ':city'=>Yii::app()->user->city(),
                             ':year'=>$arrList["year"],
                             ':month'=>$arrList["month"]
                         )
@@ -128,6 +129,7 @@ class UploadExcelForm extends CFormModel
                 }else{
                     Yii::app()->db->createCommand()->insert("opr_warehouse_price",array(
                         "warehouse_id"=>$arrList["warehouse_id"],
+                        'city'=>Yii::app()->user->city(),
                         "year"=>$arrList["year"],
                         "month"=>$arrList["month"],
                         "price"=>$arrList["price"],
@@ -263,7 +265,7 @@ class UploadExcelForm extends CFormModel
                 }else{
                     $arr[$item["sqlName"]] =$list[$item['column']];
                     $row = Yii::app()->db->createCommand()->select("id,goods_code,id,name")->from("opr_warehouse")
-                        ->where("goods_code=:goods_code and city=:city", array(':goods_code'=>$arr["goods_code"],":city"=>Yii::app()->user->city()))->queryAll();
+                        ->where("goods_code=:goods_code and (city=:city or local_bool=0)", array(':goods_code'=>$arr["goods_code"],":city"=>Yii::app()->user->city()))->queryAll();
                     if($row){
 /*                        if($row['name']!=$arr["name"]){
                             $this->error_list[] = array('key'=>$key,'value'=>"物品编号和物品名稱不一致(".$arr['name']." != ".$row['name'].")，物品id:".$row['id']);

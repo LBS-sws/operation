@@ -83,7 +83,7 @@ class OrderGoods extends CActiveRecord{
     }
 
     //獲取用戶暱稱
-    public function getNameToUsername($username){
+    public static function getNameToUsername($username){
         $suffix = Yii::app()->params['envSuffix'];
         $rs = Yii::app()->db->createCommand()->select("disp_name")->from("security$suffix.sec_user")
             ->where("username=:username",array(":username"=>$username))->queryRow();

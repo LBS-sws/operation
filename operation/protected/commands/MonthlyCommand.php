@@ -15,12 +15,10 @@ class MonthlyCommand extends CConsoleCommand {
 		echo "YEAR: ".$this->year."\tMONTH: ".$this->month."\n";
 
 		$suffix = Yii::app()->params['envSuffix'];
-		$sql = "select a.code
-				from security$suffix.sec_city a left outer join security$suffix.sec_city b on a.code=b.region 
-				where b.code is null 
-				order by a.code
-			";
-		$rows = Yii::app()->db->createCommand($sql)->queryAll();
+        $rows = Yii::app()->db->createCommand()->select("code")
+            ->from("security{$suffix}.sec_city_info")
+            ->where("field_id='OPERA' and field_value='1'")//城市开启了“营运报告（营运系统）”权限
+            ->queryAll();
 		if (count($rows) > 0) {
 			foreach ($rows as $row) {
 				$city = $row['code'];

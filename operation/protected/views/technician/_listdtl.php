@@ -22,6 +22,7 @@ switch ($this->record['status']){
 ?>
 	<td><?php echo $this->drawEditButton('YC02', 'technician/edit', 'technician/view', array('index'=>$this->record['id'])); ?></td>
 	<td><?php echo $this->record['lcd']; ?></td>
+	<td><?php echo $this->record['jd_order_type']; ?></td>
 	<td><?php echo $this->record['order_code']; ?></td>
 	<td>
         <?php

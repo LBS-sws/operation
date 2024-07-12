@@ -348,5 +348,9 @@ return array(
     'jd good id'=>'金蝶物料id',
     'Old Goods Code'=>'物品编号（旧）',
     'change num'=>'变动数量',
+    'jd order type'=>'申請類型',
+    'apply type'=>'申請類型',
+    'technician apply'=>'領料單',
+    'sales apply'=>'銷售出庫',
 );
 ?>

@@ -1,12 +1,17 @@
 <tr>
     <th></th>
     <th>
-        <?php echo TbHtml::link($this->getLabelName('lcd').$this->drawOrderArrow('lcd'),'#',$this->createOrderLink('technician-list','lcd'))
+        <?php echo TbHtml::link($this->getLabelName('lcd').$this->drawOrderArrow('a.lcd'),'#',$this->createOrderLink('technician-list','a.lcd'))
         ;
         ?>
     </th>
     <th>
-        <?php echo TbHtml::link($this->getLabelName('order_code').$this->drawOrderArrow('order_code'),'#',$this->createOrderLink('technician-list','order_code'))
+        <?php echo TbHtml::link($this->getLabelName('jd_order_type').$this->drawOrderArrow('b.field_value'),'#',$this->createOrderLink('technician-list','b.field_value'))
+        ;
+        ?>
+    </th>
+    <th>
+        <?php echo TbHtml::link($this->getLabelName('order_code').$this->drawOrderArrow('a.order_code'),'#',$this->createOrderLink('technician-list','a.order_code'))
         ;
         ?>
     </th>
@@ -16,7 +21,7 @@
         ?>
     </th>
     <th>
-        <?php echo TbHtml::link($this->getLabelName('status').$this->drawOrderArrow('status'),'#',$this->createOrderLink('technician-list','status'))
+        <?php echo TbHtml::link($this->getLabelName('status').$this->drawOrderArrow('a.status'),'#',$this->createOrderLink('technician-list','a.status'))
         ;
         ?>
     </th>

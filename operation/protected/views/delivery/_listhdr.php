@@ -12,6 +12,11 @@
         ?>
     </th>
     <th>
+        <?php echo TbHtml::link($this->getLabelName('jd_order_type').$this->drawOrderArrow('f.field_value'),'#',$this->createOrderLink('delivery-list','f.field_value'))
+        ;
+        ?>
+    </th>
+    <th>
         <?php echo TbHtml::link($this->getLabelName('order_code').$this->drawOrderArrow('a.order_code'),'#',$this->createOrderLink('delivery-list','a.order_code'))
         ;
         ?>

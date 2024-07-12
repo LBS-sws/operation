@@ -127,6 +127,17 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
             </div>
 
             <div class="form-group">
+                <?php echo Tbhtml::label(Yii::t("procurement","apply type"),'jd_order_type',array('class'=>"col-sm-2 control-label",'required'=>true)); ?>
+                <div class="col-sm-3">
+                    <?php
+                    echo $form->dropDownList($model,"jd_set[jd_order_type]",TechnicianList::getApplyTypeList(),
+                        array('readonly'=>true,"id"=>"jd_order_type")
+                    );
+                    ?>
+                </div>
+            </div>
+
+            <div class="form-group">
                 <?php echo $form->labelEx($model,'goods_list',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-12">
                     <table class="table table-bordered disabled" id="table-change">

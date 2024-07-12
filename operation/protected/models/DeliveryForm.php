@@ -28,6 +28,14 @@ class DeliveryForm extends CFormModel
     public $orderList;
     public $checkBoxDown;
 
+
+    public $jd_set = array(
+        "jd_order_type"=>0
+    );
+    public static $jd_set_list=array(
+        array("field_id"=>"jd_order_type","field_type"=>"list","field_name"=>"jd order type","display"=>"none"),
+    );
+
     public function attributeLabels()
 	{
 		return array(
@@ -51,7 +59,7 @@ class DeliveryForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id,lcd,num,black_id, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, luu, lcu, lud, lcd, checkBoxDown','safe'),
+			array('id,jd_set,lcd,num,black_id, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, luu, lcu, lud, lcd, checkBoxDown','safe'),
             array('goods_list','required','on'=>array('audit','edit','reject')),
             array('id','validateID'),
             array('goods_list','validateGoods','on'=>array('audit','edit')),
@@ -101,6 +109,7 @@ class DeliveryForm extends CFormModel
         if(date("Y-m-d")<="2020-03-20"){ //一月份以前不需要驗證
             return true;
         }
+        return true;//不需要价格验证
         $city = $this->city;
         $year = date("Y");
         $month = date("m");
@@ -276,6 +285,18 @@ class DeliveryForm extends CFormModel
                 $this->ject_remark = $row['ject_remark'];
                 $this->lcd = date("Y-m-d",strtotime($row['lcd']));
                 $this->statusList = OrderForm::getStatusListToId($row['id']);
+
+                $setRows = Yii::app()->db->createCommand()->select("field_id,field_value")
+                    ->from("opr_send_set_jd")->where("table_id=:table_id and set_type='technician'",array(":table_id"=>$index))->queryAll();
+                $setList = array();
+                foreach ($setRows as $setRow){
+                    $setList[$setRow["field_id"]] = $setRow["field_value"];
+                }
+                $this->jd_set=array();
+                foreach (self::$jd_set_list as $item){
+                    $fieldValue = key_exists($item["field_id"],$setList)?$setList[$item["field_id"]]:null;
+                    $this->jd_set[$item["field_id"]] = $fieldValue;
+                }
                 break;
 			}
 		}
@@ -356,6 +377,8 @@ class DeliveryForm extends CFormModel
                     if($storeList){
                         $warehouseRow["store_list"]=$storeList;
                     }
+                    $warehouseRow["note"] = $goods["note"];
+                    $warehouseRow["remark"] = $goods["remark"];
                     $tempArr=self::getCurlDateForWarehouse($warehouseRow,$goods["confirm_num"]);
                     $curlData["goods_item"] = array_merge($curlData["goods_item"],$tempArr);
                     //记录库存数量
@@ -524,7 +547,7 @@ class DeliveryForm extends CFormModel
                     'lud'=>$time,
                 ), 'id=:id', array(':id'=>$this->id));
                 //補回庫存
-                $goods_list = Yii::app()->db->createCommand()->select("id,goods_id,confirm_num")->from("opr_order_goods")
+                $goods_list = Yii::app()->db->createCommand()->select("id,goods_id,confirm_num,note,remark")->from("opr_order_goods")
                     ->where('order_id = :order_id',array(':order_id'=>$this->id))->queryAll();
                 if($goods_list){
                     foreach ($goods_list as $goods){
@@ -541,6 +564,8 @@ class DeliveryForm extends CFormModel
                             $warehouseRow["store_list"]=array();
                             $warehouseRow["store_list"][]=array("id"=>0,"back_num"=>$num,"store_num"=>$num,"jd_store_no"=>$storeDefaultList["jd_store_no"]);
                         }
+                        $warehouseRow["note"] = $goods["note"];
+                        $warehouseRow["remark"] = $goods["remark"];
                         $tempArr=self::getCurlDateForWarehouse($warehouseRow,$goods["confirm_num"],array("back_num"=>$num));
                         $curlData["goods_item"] = array_merge($curlData["goods_item"],$tempArr);
                         //记录库存
@@ -634,6 +659,8 @@ class DeliveryForm extends CFormModel
             $warehouseRow["store_list"][]=array("id"=>$blackId,"back_num"=>$num,"store_num"=>$this->store_num,"jd_store_no"=>$jd_store_no);
             $curlData=self::getCurlDateForOrder($order,$time);
 
+            $warehouseRow["note"] = "";
+            $warehouseRow["remark"] = "";
             $tempArr=self::getCurlDateForWarehouse($warehouseRow,$this->confirm_num,array("back_num"=>$num));
             $curlData["goods_item"] = array_merge($curlData["goods_item"],$tempArr);
             //记录库存
@@ -752,12 +779,15 @@ class DeliveryForm extends CFormModel
     }
 
     protected static function getCurlDateForOrder($order,$time,$expArr=array()){
+        $order["jd_order_type"] = TechnicianList::getJDOrderTypeForId($order["id"]);
         $list = array(
             "order_id"=>$order["id"],
             "order_code"=>$order["order_code"],
             "order_user"=>$order["order_user"],
             "city"=>$order["city"],
+            "remark"=>$order["remark"],
             "apply_date"=>$order["lcd"],
+            "jd_order_type"=>$order["jd_order_type"],
             "audit_date"=>$time,
             "goods_item"=>array(),
         );
@@ -771,16 +801,20 @@ class DeliveryForm extends CFormModel
 
     protected static function getCurlDateForWarehouse($warehouseRow,$num,$expArr=array()){
         $warehouseRow["jd_good_id"] = WarehouseForm::getJDGoodsInfoToGoodsId($warehouseRow["id"]);
+        $warehouseRow["jd_unit_code"] = WarehouseForm::getJDGoodsInfoToGoodsId($warehouseRow["id"],"jd_unit_code");
         $arr = array();
         $list = array(
             //"jd_warehouse_no"=>$warehouseRow["jd_warehouse_no"],
             "lbs_order_store_id"=>0,
             "jd_good_id"=>$warehouseRow["jd_good_id"],
+            "jd_unit_code"=>$warehouseRow["jd_unit_code"],
             "city"=>$warehouseRow["city"],
             "good_id"=>$warehouseRow["id"],
             "goods_code"=>$warehouseRow["goods_code"],
             "goods_name"=>$warehouseRow["name"],
             "inventory"=>$warehouseRow["inventory"],
+            "note"=>$warehouseRow["note"],
+            "remark"=>$warehouseRow["remark"],
             "confirm_num"=>"".$num
         );
         if(!empty($warehouseRow["store_list"])){
@@ -833,7 +867,7 @@ class DeliveryForm extends CFormModel
 
                     $totalPrice=0;//訂單總價
                     //批量減少庫存
-                    $rows = $connection->createCommand()->select("id,goods_id,goods_num,confirm_num")->from("opr_order_goods")
+                    $rows = $connection->createCommand()->select("id,goods_id,goods_num,confirm_num,note,remark")->from("opr_order_goods")
                         ->where("order_id =:order_id",array(":order_id"=>$order["id"]))->queryAll();
                     if($rows){
                         foreach ($rows as $row){
@@ -845,6 +879,8 @@ class DeliveryForm extends CFormModel
                             $warehouseRow = $connection->createCommand()->select("*")->from("opr_warehouse")
                                 ->where("id =:id",array(":id"=>$goodsId))->queryRow();
                             if($warehouseRow){
+                                $warehouseRow["note"] = $row["note"];
+                                $warehouseRow["remark"] = $row["remark"];
                                 $storeList =$connection->createCommand()->select("a.id,a.store_num,b.jd_store_no")->from("opr_order_goods_store a")
                                     ->leftJoin("opr_store b","a.store_id=b.id")
                                     ->where("order_goods_id =:order_goods_id",array(":order_goods_id"=>$row["id"]))->queryAll();

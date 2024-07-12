@@ -18,6 +18,7 @@ class TechnicianList extends CListPageModel
             'status'=>Yii::t('procurement','Order Status'),
             'city'=>Yii::t('procurement','Order For City'),
             'lcd'=>Yii::t('procurement','Apply for time'),
+            'jd_order_type'=>Yii::t('procurement','apply type'),
             'goods_name'=>Yii::t('procurement','Goods Name'),
         );
     }
@@ -32,35 +33,37 @@ class TechnicianList extends CListPageModel
     {
         //order_user = '$userName' OR technician = '$userName'
         $userName = Yii::app()->user->name;
-        $sql1 = "select *
-				from opr_order
-				where ( judge=0 AND lcu='$userName') 
+        $sql1 = "select a.*,b.field_value as jd_order_type
+				from opr_order a
+				LEFT JOIN opr_send_set_jd b ON b.table_id=a.id and b.field_id='jd_order_type'
+				where ( a.judge=0 AND a.lcu='$userName') 
 			";
-        $sql2 = "select count(id)
-				from opr_order
-				where ( judge=0 AND lcu='$userName') 
+        $sql2 = "select count(a.id)
+				from opr_order a
+				LEFT JOIN opr_send_set_jd b ON b.table_id=a.id and b.field_id='jd_order_type'
+				where ( a.judge=0 AND a.lcu='$userName') 
 			";
         $clause = "";
         if (!empty($this->searchField) && !empty($this->searchValue)) {
             $svalue = str_replace("'","\'",$this->searchValue);
             switch ($this->searchField) {
                 case 'lcd':
-                    $clause .= General::getSqlConditionClause('lcd', $svalue);
+                    $clause .= General::getSqlConditionClause('a.lcd', $svalue);
                 case 'order_code':
-                    $clause .= General::getSqlConditionClause('order_code', $svalue);
+                    $clause .= General::getSqlConditionClause('a.order_code', $svalue);
                     break;
                 case 'goods_name':
-                    $clause .= ' and id in '.DeliveryList::getOrderIdSqlLikeGoodsName($svalue);
+                    $clause .= ' and a.id in '.DeliveryList::getOrderIdSqlLikeGoodsName($svalue);
                     break;
             }
         }
         if (!empty($this->searchTimeStart) && !empty($this->searchTimeStart)) {
             $svalue = str_replace("'","\'",$this->searchTimeStart);
-            $clause .= " and lcd >='$svalue 00:00:00' ";
+            $clause .= " and a.lcd >='$svalue 00:00:00' ";
         }
         if (!empty($this->searchTimeEnd) && !empty($this->searchTimeEnd)) {
             $svalue = str_replace("'","\'",$this->searchTimeEnd);
-            $clause .= " and lcd <='$svalue 23:59:59' ";
+            $clause .= " and a.lcd <='$svalue 23:59:59' ";
         }
 
         $order = "";
@@ -68,7 +71,7 @@ class TechnicianList extends CListPageModel
             $order .= " order by ".$this->orderField." ";
             if ($this->orderType=='D') $order .= "desc ";
         } else
-            $order = " order by id desc";
+            $order = " order by a.id desc";
 
         $sql = $sql2.$clause;
         $this->totalRow = Yii::app()->db->createCommand($sql)->queryScalar();
@@ -90,6 +93,7 @@ class TechnicianList extends CListPageModel
                     'technician'=>$record['technician'],
                     'status'=>$record['status'],
                     'city'=>$record['city'],
+                    'jd_order_type'=>self::getApplyTypeStrForType($record['jd_order_type']),
                     'lcd'=>date("Y-m-d",strtotime($record['lcd'])),
                 );
             }
@@ -111,5 +115,34 @@ class TechnicianList extends CListPageModel
             'searchTimeStart'=>$this->searchTimeStart,
             'searchTimeEnd'=>$this->searchTimeEnd,
         );
+    }
+
+    public static function getApplyTypeList(){
+        return array(
+            0=>Yii::t("procurement","technician apply"),
+            1=>Yii::t("procurement","sales apply")
+        );
+    }
+
+    public static function getApplyTypeStrForType($type){
+        $type="".$type;
+        $list = self::getApplyTypeList();
+        if(key_exists($type,$list)){
+            return $list[$type];
+        }else{
+            return $list[0];
+        }
+    }
+
+    public static function getJDOrderTypeForId($order_id){
+        $row = Yii::app()->db->createCommand()->select("field_value")
+            ->from("opr_send_set_jd")->where("table_id=:id and field_id='jd_order_type'",array(
+                ":id"=>$order_id
+            ))->queryRow();
+        if($row){
+            return $row["field_value"];
+        }else{
+            return 0;
+        }
     }
 }

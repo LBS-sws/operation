@@ -20,6 +20,7 @@ class DeliveryList extends CListPageModel
             'city'=>Yii::t('procurement','Order For City'),
             'lcd'=>Yii::t('procurement','Apply for time'),
             'lcu'=>Yii::t('procurement','Apply for user'),
+            'jd_order_type'=>Yii::t('procurement','apply type'),
             'goods_name'=>Yii::t('procurement','Goods Name'),
         );
     }
@@ -36,14 +37,16 @@ class DeliveryList extends CListPageModel
         $suffix =  Yii::app()->params['envSuffix'];
         $city_allow = Yii::app()->user->city_allow();
         $userName = Yii::app()->user->name;
-        $sql1 = "select a.*,b.disp_name,b.city AS s_city 
+        $sql1 = "select a.*,b.disp_name,b.city AS s_city,f.field_value as jd_order_type 
 				from opr_order a
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
+				LEFT JOIN opr_send_set_jd f ON f.table_id=a.id and f.field_id='jd_order_type'
 				where (a.city in ($city_allow) AND a.judge=0 AND a.status != 'pending' AND a.status != 'cancelled') 
 			";
-        $sql2 = "select count(id)
+        $sql2 = "select count(a.id)
 				from opr_order a
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
+				LEFT JOIN opr_send_set_jd f ON f.table_id=a.id and f.field_id='jd_order_type'
 				where (a.city in ($city_allow) AND a.judge=0 AND a.status != 'pending' AND a.status != 'cancelled') 
 			";
         $clause = "";
@@ -110,6 +113,7 @@ class DeliveryList extends CListPageModel
                     'status'=>$record['status'],
                     'city'=>CGeneral::getCityName($record['city']),
                     'lcu'=>$record['disp_name'],
+                    'jd_order_type'=>TechnicianList::getApplyTypeStrForType($record['jd_order_type']),
                     'lcd'=>date("Y-m-d",strtotime($record['lcd'])),
                 );
             }

@@ -9,6 +9,7 @@ class CurlForDelivery extends CurlForJD{
             foreach ($data["data"] as $row){
                 $jdCity = self::getJDCityCodeForCity($row["city"]);
                 $backBool = isset($row["back_type"])&&$row["back_type"]==1;
+                $employeeList = self::getEmployeeCodeForUsername($row["order_user"]);
                 $temp=array(
                     "id"=>0,//
                     "org_number"=>$jdCity,//库存组织.编码
@@ -20,12 +21,19 @@ class CurlForDelivery extends CurlForJD{
                     "supplyownertype"=>"bos_org",//货主类型
                     "supplyowner_number"=>$jdCity,//供应货主.编码
                     "bookdate"=>$row["apply_date"],//记账日期
-                    "requser_number"=>self::getEmployeeCodeForUsername($row["order_user"]),//领用人.工号
+                    "lbs_lbswarehouser"=>$row["luu_name"],//LBS库管员
                     "settlecurrency_number"=>"CNY",//币别.货币代码
                     "comment"=>$row["remark"],//备注
                     "lbs_apikey"=>$row["order_code"],//第三方单据标识
                     "billentry"=>array(),//物料明细
                 );
+                if(!empty($employeeList)){
+                    $temp["requser_number"]=$employeeList["code"];//领用人.工号
+                    $temp["lbs_lbsapplierdept"]=$employeeList["department_name"];//申请人部门
+                }
+                if($row["jd_order_type"]==1){//销售出库
+                    $temp["lbs_customer_number"]=$row["jd_company_code"];//客户编码
+                }
                 if(!empty($row["goods_item"])){
                     foreach ($row["goods_item"] as $goodRow){
                         $qty = $backBool?(-1*$goodRow["back_num"]):$goodRow["confirm_num"];
@@ -41,7 +49,8 @@ class CurlForDelivery extends CurlForJD{
                             "outowner_number"=>$jdCity,//出库货主.编码
                             "outkeepertype"=>"bos_org",//物料明细.出库保管者类型
                             "outkeeper_number"=>$jdCity,//出库保管者.编码
-                            "entrycomment"=>$goodRow["remark"],//物料明细.备注
+                            "entrycomment"=>$goodRow["note"],//物料明细.备注
+                            "lbs_sendgooddesc"=>$goodRow["remark"],//物料发货说明.备注
                             "lbs_eapikey"=>$goodRow["lbs_order_store_id"],//物料明细.第三方明细标识
                         );
                     }
@@ -181,15 +190,16 @@ class CurlForDelivery extends CurlForJD{
 
     public static function getEmployeeCodeForUsername($username){
         $suffix = Yii::app()->params['envSuffix'];
-        $row = Yii::app()->db->createCommand()->select("b.code")
+        $row = Yii::app()->db->createCommand()->select("b.code,b.name,f.name as department_name")
             ->from("hr{$suffix}.hr_binding a")
             ->leftJoin("hr{$suffix}.hr_employee b","a.employee_id=b.id")
+            ->leftJoin("hr{$suffix}.hr_dept f","b.department=f.id")
             ->where("a.user_id=:user_id",array(':user_id'=>$username))
             ->queryRow();
         if($row){
-            return $row["code"];
+            return $row;
         }else{
-            return "";
+            return array();
         }
     }
 }

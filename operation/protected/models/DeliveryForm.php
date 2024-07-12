@@ -30,10 +30,12 @@ class DeliveryForm extends CFormModel
 
 
     public $jd_set = array(
-        "jd_order_type"=>0
+        "jd_order_type"=>0,
+        "jd_company_code"=>''
     );
     public static $jd_set_list=array(
         array("field_id"=>"jd_order_type","field_type"=>"list","field_name"=>"jd order type","display"=>"none"),
+        array("field_id"=>"jd_company_code","field_type"=>"list","field_name"=>"jd company code","display"=>"none"),
     );
 
     public function attributeLabels()
@@ -780,6 +782,7 @@ class DeliveryForm extends CFormModel
 
     protected static function getCurlDateForOrder($order,$time,$expArr=array()){
         $order["jd_order_type"] = TechnicianList::getJDOrderTypeForId($order["id"]);
+        $order["jd_company_code"] = TechnicianList::getJDOrderTypeForId($order["id"],"jd_company_code");
         $list = array(
             "order_id"=>$order["id"],
             "order_code"=>$order["order_code"],
@@ -788,7 +791,9 @@ class DeliveryForm extends CFormModel
             "remark"=>$order["remark"],
             "apply_date"=>$order["lcd"],
             "jd_order_type"=>$order["jd_order_type"],
+            "jd_company_code"=>$order["jd_company_code"],
             "audit_date"=>$time,
+            "luu_name"=>Yii::app()->user->user_display_name(),
             "goods_item"=>array(),
         );
         if(!empty($expArr)){

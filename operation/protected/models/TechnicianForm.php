@@ -16,10 +16,12 @@ class TechnicianForm extends CFormModel
     public $city;
 
     public $jd_set = array(
-        "jd_order_type"=>0
+        "jd_order_type"=>0,
+        "jd_company_code"=>null
     );
     public static $jd_set_list=array(
         array("field_id"=>"jd_order_type","field_type"=>"list","field_name"=>"jd order type","display"=>"none"),
+        array("field_id"=>"jd_company_code","field_type"=>"list","field_name"=>"jd company code","display"=>"none"),
     );
 
     public function init()
@@ -69,10 +71,27 @@ class TechnicianForm extends CFormModel
             array('goods_list','required'),
             array('city','validateCity'),
             array('goods_list','validateGoods'),
+            array('jd_set','validateJDSet'),
             array('remark','validateActivity','on'=>'audit'),
             //array('order_num','numerical','allowEmpty'=>true,'integerOnly'=>true),
             //array('order_num','in','range'=>range(0,600)),
         );
+    }
+
+    //驗證訂單內的物品
+    public function validateJDSet($attribute, $params){
+        if(!isset($this->jd_set["jd_order_type"])||$this->jd_set["jd_order_type"]===""){
+            $message = "申请类型不能为空";
+            $this->addError($attribute,$message);
+        }else{
+            if($this->jd_set["jd_order_type"]==0){
+                $this->jd_set["jd_company_code"]=null;
+            }
+            if($this->jd_set["jd_order_type"]==1&&$this->jd_set["jd_company_code"]===""){
+                $message = "客户名称不能为空";
+                $this->addError($attribute,$message);
+            }
+        }
     }
 
     //驗證訂單內的物品

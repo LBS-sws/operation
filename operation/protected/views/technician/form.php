@@ -13,6 +13,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
 )); ?>
 
 <style>
+    *.readonly{ pointer-events: none;}
     .input-text-span{display: block;width: 100%;padding: 6px 12px;
         font-size: 14px;
         line-height: 1.42857143;
@@ -94,6 +95,17 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                     <?php
                     echo $form->dropDownList($model,"jd_set[jd_order_type]",TechnicianList::getApplyTypeList(),
                         array('readonly'=>$model->getInputBool(),"id"=>"jd_order_type")
+                    );
+                    ?>
+                </div>
+            </div>
+
+            <div class="form-group" id="jd_company_div" <?php if($model->jd_set["jd_order_type"]!=1){ echo "style='display:none;'";} ?>>
+                <?php echo Tbhtml::label(Yii::t("procurement","jd company code"),'jd_company_code',array('class'=>"col-sm-2 control-label",'required'=>true)); ?>
+                <div class="col-sm-6">
+                    <?php
+                    echo $form->dropDownList($model,"jd_set[jd_company_code]",TechnicianList::getCompanyList($model->city,$model->jd_set["jd_company_code"]),
+                        array('readonly'=>$model->getInputBool(),"id"=>"jd_company_code","empty"=>"")
                     );
                     ?>
                 </div>
@@ -314,6 +326,15 @@ $('.spanInput').each(function(){
     var text = $(this).val();
     $(this).hide();
     $(this).parent('td').append('<span class=\'input-text-span\'>'+text+'</span>');
+});
+
+$('#jd_order_type').change(function(){
+    if($(this).val()==1){
+        $('#jd_company_div').slideDown(100);
+    }else{
+        $('#jd_company_code').val('');
+        $('#jd_company_div').slideUp(100);
+    }
 });
 ";
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);

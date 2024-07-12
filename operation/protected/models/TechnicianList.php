@@ -134,15 +134,45 @@ class TechnicianList extends CListPageModel
         }
     }
 
-    public static function getJDOrderTypeForId($order_id){
+    public static function getJDOrderTypeForId($order_id,$field_id='jd_order_type'){
         $row = Yii::app()->db->createCommand()->select("field_value")
-            ->from("opr_send_set_jd")->where("table_id=:id and field_id='jd_order_type'",array(
-                ":id"=>$order_id
+            ->from("opr_send_set_jd")
+            ->where("set_type='technician' and table_id=:id and field_id=:field_id",array(
+                ":id"=>$order_id,
+                ":field_id"=>$field_id
             ))->queryRow();
         if($row){
             return $row["field_value"];
         }else{
             return 0;
+        }
+    }
+
+    public static function getCompanyList($city,$code=""){
+        $suffix = Yii::app()->params['envSuffix'];
+        $rows = Yii::app()->db->createCommand()->select("code,name")
+            ->from("swoper{$suffix}.swo_company")
+            ->where("city=:city or code=:code",array(':city'=>$city,':code'=>$code))
+            ->queryAll();
+        $list = array();
+        if($rows){
+            foreach ($rows as $row){
+                $list[$row["code"]] = $row["name"]."({$row["code"]})";
+            }
+        }
+        return $list;
+    }
+
+    public static function getCompanyNameForCode($code){
+        $suffix = Yii::app()->params['envSuffix'];
+        $row = Yii::app()->db->createCommand()->select("name")
+            ->from("swoper{$suffix}.swo_company")
+            ->where("code=:code",array(':code'=>$code))
+            ->queryRow();
+        if($row){
+            return $row["name"]."({$row["code"]})";
+        }else{
+            return "";
         }
     }
 }

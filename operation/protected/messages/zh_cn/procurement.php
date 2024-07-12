@@ -352,5 +352,6 @@ return array(
     'apply type'=>'申请类型',
     'technician apply'=>'领料单',
     'sales apply'=>'销售出库',
+    'jd company code'=>'客户名称',
 );
 ?>

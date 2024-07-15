@@ -165,7 +165,7 @@ class TechnicianList extends CListPageModel
 
     public static function getCompanyNameForCode($code){
         $suffix = Yii::app()->params['envSuffix'];
-        $row = Yii::app()->db->createCommand()->select("name")
+        $row = Yii::app()->db->createCommand()->select("name,code")
             ->from("swoper{$suffix}.swo_company")
             ->where("code=:code",array(':code'=>$code))
             ->queryRow();

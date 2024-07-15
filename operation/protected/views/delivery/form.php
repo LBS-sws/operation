@@ -140,10 +140,9 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
             <div class="form-group" id="jd_company_div" <?php if($model->jd_set["jd_order_type"]!=1){ echo "style='display:none;'";} ?>>
                 <?php echo Tbhtml::label(Yii::t("procurement","jd company code"),'jd_company_code',array('class'=>"col-sm-2 control-label",'required'=>true)); ?>
                 <div class="col-sm-6">
+                    <?php echo $form->hiddenField($model, 'jd_set[jd_company_code]'); ?>
                     <?php
-                    echo $form->dropDownList($model,"jd_set[jd_company_code]",TechnicianList::getCompanyList($model->city,$model->jd_set["jd_company_code"]),
-                        array('readonly'=>true,"id"=>"jd_company_code","empty"=>"")
-                    );
+                    echo TbHtml::textField("jd_company_code",TechnicianList::getCompanyNameForCode($model->jd_set["jd_company_code"]),array('readonly'=>true,"id"=>"jd_company_code"));
                     ?>
                 </div>
             </div>

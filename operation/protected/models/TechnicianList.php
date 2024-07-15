@@ -152,7 +152,7 @@ class TechnicianList extends CListPageModel
         $suffix = Yii::app()->params['envSuffix'];
         $rows = Yii::app()->db->createCommand()->select("code,name")
             ->from("swoper{$suffix}.swo_company")
-            ->where("city=:city or code=:code",array(':city'=>$city,':code'=>$code))
+            ->where("(city=:city and status!=2) or code=:code",array(':city'=>$city,':code'=>$code))
             ->queryAll();
         $list = array();
         if($rows){

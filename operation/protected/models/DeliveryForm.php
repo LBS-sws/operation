@@ -36,6 +36,7 @@ class DeliveryForm extends CFormModel
     public static $jd_set_list=array(
         array("field_id"=>"jd_order_type","field_type"=>"list","field_name"=>"jd order type","display"=>"none"),
         array("field_id"=>"jd_company_code","field_type"=>"list","field_name"=>"jd company code","display"=>"none"),
+        array("field_id"=>"jd_order_id","field_type"=>"text","field_name"=>"jd order id","display"=>"none"),
     );
 
     public function attributeLabels()

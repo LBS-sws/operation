@@ -90,6 +90,9 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
 			<?php echo $form->hiddenField($model, 'id'); ?>
 			<?php echo $form->hiddenField($model, 'status'); ?>
 			<?php echo $form->hiddenField($model, 'city'); ?>
+            <?php if (key_exists("jd_order_id",$model->jd_set)): ?>
+                <?php echo TbHtml::hiddenField("jd_order_id", $model->jd_set["jd_order_id"]); ?>
+            <?php endif ?>
 
             <div class="form-group">
                 <?php echo Tbhtml::label(Yii::t("procurement","apply type"),'jd_order_type',array('class'=>"col-sm-2 control-label",'required'=>true)); ?>

@@ -141,8 +141,9 @@ class CurlNotesList extends CListPageModel
         $list = array(
             "warehouse"=>"仓库",
             "delivery"=>"外勤领料",
-            "expensePayment"=>"日常费用报销",
-            "remitPayment"=>"日常付款",
+            "expenseAudit"=>"日常费用报销",
+            "remitAudit"=>"日常付款",
+            "temporaryAudit"=>"暂支单",
             "customer"=>"客户资料",
         );
         if($bool){

@@ -3,6 +3,29 @@
 class CurlForDelivery extends CurlForJD{
     protected $info_type="delivery";
 
+    protected function saveJDData($rtn){//保存成功的金蝶id
+        if($rtn['code']==200){
+            $out = $rtn['outData'];
+            $json = json_decode($out, true);
+            foreach ($json["data"]["result"] as $row){
+                $orderCode = $row["keys"]["lbs_apikey"];
+                $jd_order_id = $row["id"];
+                $lbs_order_id = Yii::app()->db->createCommand()->select("id")
+                    ->from("opr_order")
+                    ->where("code=:code AND a.judge=0",array(':code'=>$orderCode))
+                    ->queryRow();
+                if($lbs_order_id){
+                    Yii::app()->db->createCommand()->insert('opr_send_set_jd',array(
+                        "table_id"=>$jd_order_id,
+                        "set_type"=>'technician',
+                        "field_id"=>"jd_order_id",
+                        "field_value"=>$jd_order_id,
+                    ));
+                }
+            }
+        }
+    }
+
     protected function resetJDData($data){
         $list=array("data"=>array());
         if(!empty($data["data"])){
@@ -108,6 +131,7 @@ class CurlForDelivery extends CurlForJD{
         $data = self::resetJDData($data);
         $rtn = $this->sendData($data,"/kapi/v2/lbs/im/im_materialreqoutbill/save");
         //$rtn = array('message'=>'', 'code'=>200,'outData'=>'');//成功时code=200；
+        $this->saveJDData($rtn);
         return $rtn;
     }
 
@@ -117,6 +141,7 @@ class CurlForDelivery extends CurlForJD{
         $data = self::resetJDData($data);
         $rtn = $this->sendData($data,"/kapi/v2/lbs/im/im_materialreqoutbill/save");
         //$rtn = array('message'=>'', 'code'=>200,'outData'=>'');//成功时code=200；
+        $this->saveJDData($rtn);
         return $rtn;
     }
 

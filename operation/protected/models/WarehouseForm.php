@@ -29,6 +29,7 @@ class WarehouseForm extends CFormModel
     public static $jd_set_list=array(
         array("field_id"=>"jd_unit_code","field_type"=>"text","field_name"=>"jd unit code"),
         array("field_id"=>"jd_good_id","field_type"=>"text","field_name"=>"jd good id"),
+        array("field_id"=>"jd_good_spec","field_type"=>"text","field_name"=>"jd good spec"),
     );
 
 	public function attributeLabels()

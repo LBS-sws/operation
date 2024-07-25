@@ -263,7 +263,7 @@ class WarehouseForm extends CFormModel
         $city = Yii::app()->user->city();
         $rows = Yii::app()->db->createCommand()->select("*")
             ->from("opr_warehouse")
-            ->where('id = :id and city=:city',array(':id'=>$goods_id,':city'=>$city))
+            ->where('id = :id',array(':id'=>$goods_id,':city'=>$city))
             ->queryAll();
         if($rows){
             return $rows[0];

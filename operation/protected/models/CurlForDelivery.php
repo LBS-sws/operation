@@ -189,11 +189,11 @@ class CurlForDelivery extends CurlForJD{
                             "jd_good_text"=>"",
                             "jd_warehouse_list"=>array(),
                         );
-                        $list[$row["material_number"]]["jd_store_sum"]+=$row["qty"];
-                        $list[$row["material_number"]]["jd_warehouse_list"][$row["warehouse_number"]]=$row;
-                        $list[$row["material_number"]]["jd_good_text"].=empty($list[$row["material_number"]]["jd_good_text"])?"":"\n";
-                        $list[$row["material_number"]]["jd_good_text"].="仓库({$row["warehouse_number"]}):库存(".$row["qty"].");";//
                     }
+                    $list[$row["material_number"]]["jd_store_sum"]+=$row["qty"];
+                    $list[$row["material_number"]]["jd_warehouse_list"][$row["warehouse_number"]]=$row;
+                    $list[$row["material_number"]]["jd_good_text"].=empty($list[$row["material_number"]]["jd_good_text"])?"":"\n";
+                    $list[$row["material_number"]]["jd_good_text"].="仓库({$row["warehouse_number"]}):库存(".$row["qty"].");";//
                 }
             }
         }

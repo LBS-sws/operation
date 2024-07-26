@@ -16,7 +16,7 @@ class CurlForDelivery extends CurlForJD{
                     ->queryRow();
                 if($lbs_order_id){
                     Yii::app()->db->createCommand()->insert('opr_send_set_jd',array(
-                        "table_id"=>$lbs_order_id,
+                        "table_id"=>$lbs_order_id["id"],
                         "set_type"=>'technician',
                         "field_id"=>"jd_order_code",
                         "field_value"=>$jd_order_code,
@@ -58,7 +58,7 @@ class CurlForDelivery extends CurlForJD{
                     $temp["lbs_customer_number"]=$row["jd_company_code"];//客户编码
                 }
                 if($backBool){//退库时的对应ERP出库单据编号
-                    $jd_order_code = TechnicianList::getJDOrderTypeForId($data["order_id"],"jd_order_code");
+                    $jd_order_code = TechnicianList::getJDOrderTypeForId($row["order_id"],"jd_order_code");
                     $temp["lbs_erpsrcbillno"]=empty($jd_order_code)?null:$jd_order_code;//
                 }
                 if(!empty($row["goods_item"])){

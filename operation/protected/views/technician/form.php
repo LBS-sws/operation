@@ -90,8 +90,8 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
 			<?php echo $form->hiddenField($model, 'id'); ?>
 			<?php echo $form->hiddenField($model, 'status'); ?>
 			<?php echo $form->hiddenField($model, 'city'); ?>
-            <?php if (key_exists("jd_order_id",$model->jd_set)): ?>
-                <?php echo TbHtml::hiddenField("jd_order_id", $model->jd_set["jd_order_id"]); ?>
+            <?php if (key_exists("jd_order_code",$model->jd_set)): ?>
+                <?php echo TbHtml::hiddenField("jd_order_code", $model->jd_set["jd_order_code"]); ?>
             <?php endif ?>
 
             <div class="form-group">

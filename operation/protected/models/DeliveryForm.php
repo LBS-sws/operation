@@ -36,7 +36,7 @@ class DeliveryForm extends CFormModel
     public static $jd_set_list=array(
         array("field_id"=>"jd_order_type","field_type"=>"list","field_name"=>"jd order type","display"=>"none"),
         array("field_id"=>"jd_company_code","field_type"=>"list","field_name"=>"jd company code","display"=>"none"),
-        array("field_id"=>"jd_order_id","field_type"=>"text","field_name"=>"jd order id","display"=>"none"),
+        array("field_id"=>"jd_order_code","field_type"=>"text","field_name"=>"jd order code","display"=>"none"),
     );
 
     public function attributeLabels()
@@ -244,10 +244,6 @@ class DeliveryForm extends CFormModel
             }else if ($goods["confirm_num"] != 0){
                 if (empty($list)){
                     $message = Yii::t('procurement','Not Font Goods').$goods["goods_id"]."a";
-                    $this->addError($attribute,$message);
-                    return false;
-                }elseif (intval($list["inventory"])<intval($goods["confirm_num"])){
-                    $message = $list["name"]."：".Yii::t('procurement','Cannot exceed the quantity of Inventory')."（".$list["inventory"]."）";
                     $this->addError($attribute,$message);
                     return false;
                 }

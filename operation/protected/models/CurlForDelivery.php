@@ -9,17 +9,17 @@ class CurlForDelivery extends CurlForJD{
             $json = json_decode($out, true);
             foreach ($json["data"]["result"] as $row){
                 $orderCode = $row["keys"]["lbs_apikey"];
-                $jd_order_id = $row["id"];
+                $jd_order_code = $row["number"];//2024年7月26日14:09:16改为保存编号
                 $lbs_order_id = Yii::app()->db->createCommand()->select("id")
                     ->from("opr_order")
-                    ->where("code=:code AND a.judge=0",array(':code'=>$orderCode))
+                    ->where("order_code=:code AND judge=0",array(':code'=>$orderCode))
                     ->queryRow();
                 if($lbs_order_id){
                     Yii::app()->db->createCommand()->insert('opr_send_set_jd',array(
-                        "table_id"=>$jd_order_id,
+                        "table_id"=>$lbs_order_id,
                         "set_type"=>'technician',
-                        "field_id"=>"jd_order_id",
-                        "field_value"=>$jd_order_id,
+                        "field_id"=>"jd_order_code",
+                        "field_value"=>$jd_order_code,
                     ));
                 }
             }
@@ -56,6 +56,10 @@ class CurlForDelivery extends CurlForJD{
                 }
                 if($row["jd_order_type"]==1){//销售出库
                     $temp["lbs_customer_number"]=$row["jd_company_code"];//客户编码
+                }
+                if($backBool){//退库时的对应ERP出库单据编号
+                    $jd_order_code = TechnicianList::getJDOrderTypeForId($data["order_id"],"jd_order_code");
+                    $temp["lbs_erpsrcbillno"]=empty($jd_order_code)?null:$jd_order_code;//
                 }
                 if(!empty($row["goods_item"])){
                     foreach ($row["goods_item"] as $goodRow){

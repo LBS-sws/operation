@@ -565,7 +565,7 @@ class DeliveryForm extends CFormModel
                         }
                         $warehouseRow["note"] = $goods["note"];
                         $warehouseRow["remark"] = $goods["remark"];
-                        $tempArr=self::getCurlDateForWarehouse($warehouseRow,$goods["confirm_num"],array("back_num"=>$num));
+                        $tempArr=self::getCurlDateForWarehouse($warehouseRow,$goods["confirm_num"]);
                         $curlData["goods_item"] = array_merge($curlData["goods_item"],$tempArr);
                         //记录库存
                         $connection->createCommand()->insert('opr_warehouse_history',array(
@@ -825,6 +825,9 @@ class DeliveryForm extends CFormModel
                 $temp["lbs_order_store_id"]=$storeRow["id"];
                 $temp["confirm_num"]="".$storeRow["store_num"];
                 $temp["jd_store_no"]="".$storeRow["jd_store_no"];
+                if(key_exists("back_num",$storeRow)){
+                    $temp["back_num"] = $storeRow["back_num"];
+                }
                 if(!empty($expArr)){
                     foreach ($expArr as $key=>$item){
                         $temp[$key] = $item;

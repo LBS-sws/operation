@@ -15,12 +15,22 @@ class CurlForDelivery extends CurlForJD{
                     ->where("order_code=:code AND judge=0",array(':code'=>$orderCode))
                     ->queryRow();
                 if($lbs_order_id){
-                    Yii::app()->db->createCommand()->insert('opr_send_set_jd',array(
-                        "table_id"=>$lbs_order_id["id"],
-                        "set_type"=>'technician',
-                        "field_id"=>"jd_order_code",
-                        "field_value"=>$jd_order_code,
-                    ));
+                    $rs = Yii::app()->db->createCommand()->select("id,field_id")->from("opr_send_set_jd")
+                        ->where("set_type ='technician' and table_id=:table_id and field_id=:field_id",array(
+                            ':field_id'=>"jd_order_code",':table_id'=>$lbs_order_id["id"],
+                        ))->queryRow();
+                    if($rs){
+                        Yii::app()->db->createCommand()->update('opr_send_set_jd',array(
+                            "field_value"=>$jd_order_code
+                        ),"id=:id",array(':id'=>$rs["id"]));
+                    }else{
+                        Yii::app()->db->createCommand()->insert('opr_send_set_jd',array(
+                            "table_id"=>$lbs_order_id["id"],
+                            "set_type"=>'technician',
+                            "field_id"=>"jd_order_code",
+                            "field_value"=>$jd_order_code,
+                        ));
+                    }
                 }
             }
         }

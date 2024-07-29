@@ -29,6 +29,7 @@ class CurlForDelivery extends CurlForJD{
                             "set_type"=>'technician',
                             "field_id"=>"jd_order_code",
                             "field_value"=>$jd_order_code,
+                            "lcd"=>date_format(date_create(),"Y/m/d H:i:s"),
                         ));
                     }
                 }

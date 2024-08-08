@@ -148,6 +148,7 @@ class CurlReceiveList extends CListPageModel
         if($row){
             Yii::app()->db->createCommand()->update("datasync{$suffix}.sync_jd_api_curl",array(
                 "status_type"=>"P",
+                "message"=>null,
                 "lcu"=>$uid,
             ),"id={$index}");
             return true;
@@ -205,10 +206,14 @@ class CurlReceiveList extends CListPageModel
 
     public function testPayment($index){
 	    $data =array(
-	        "lbs_id"=>$index,
-            "state_type"=>1,//状态 1：成功 0：失败
-            "timestamp"=>date_format(date_create(),"Y/m/d H:i:s"),//记录时间
-            "jd_username"=>"800002",//操作人员
+            "cut_account_no"=>"98990078801400002771",
+            "cut_money"=>"333.000000",
+            "jd_username"=>"KD3",
+            "lbs_id"=>"19",
+            "payment_date"=>"2024/07/29",
+            "payment_type"=>"BANKOUT",
+            "state_type"=>"1",
+            "timestamp"=>"2024-07-31 00=>57=>21"
         );
 	    $this->sendCurl("/JDSync/paymentFull",array($data));
     }

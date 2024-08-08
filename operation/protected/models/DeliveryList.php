@@ -132,6 +132,7 @@ class DeliveryList extends CListPageModel
             'noOfItem'=>$this->noOfItem,
             'pageNum'=>$this->pageNum,
             'filter'=>$this->filter,
+            'dateRangeValue'=>$this->dateRangeValue,
             'city'=>$this->city,
             'searchTimeStart'=>$this->searchTimeStart,
             'searchTimeEnd'=>$this->searchTimeEnd,

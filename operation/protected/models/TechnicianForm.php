@@ -250,6 +250,9 @@ class TechnicianForm extends CFormModel
     }
     //保存金蝶要求的字段
     protected function saveJDSetInfo(&$connection) {
+        if(in_array($this->getScenario(),array("finish","delete"))){
+            return true;//完成、删除不需要修改
+        }
         foreach (self::$jd_set_list as $list){
             $field_value = key_exists($list["field_id"],$this->jd_set)?$this->jd_set[$list["field_id"]]:null;
             $rs = Yii::app()->db->createCommand()->select("id,field_id")->from("opr_send_set_jd")

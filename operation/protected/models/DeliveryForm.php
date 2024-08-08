@@ -20,6 +20,7 @@ class DeliveryForm extends CFormModel
 	public $confirm_num;
 	public $num;
 	public $black_id;
+	public $black_store_id;//明细id（包含仓库）
 	public $store_id;
 	public $store_num;
 	public $goods_id;
@@ -142,9 +143,10 @@ class DeliveryForm extends CFormModel
                 $this->confirm_num = $idList["confirm_num"];
                 $this->id = $idList["order_id"];
                 $this->goods_id = $idList["goods_id"];
-                $storeOrder = Yii::app()->db->createCommand()->select("store_num")->from("opr_order_goods_store")
+                $storeOrder = Yii::app()->db->createCommand()->select("id,store_num")->from("opr_order_goods_store")
                     ->where('order_goods_id=:id and store_id=:store_id',array(':id'=>$this->black_id,':store_id'=>$this->store_id))->queryRow();
                 if($storeOrder){//由于老版没有仓库，所以额外查询
+                    $this->black_store_id = $storeOrder["id"];
                     $idList["confirm_num"] = $storeOrder["store_num"];
                 }
                 if(is_numeric($this->num)){
@@ -644,6 +646,7 @@ class DeliveryForm extends CFormModel
         $num = $this->num;
         $goodsId = $this->goods_id;
         $blackId = $this->black_id;
+        $blackStoreId = empty($this->black_store_id)?$this->black_id:$this->black_store_id;
         $jd_store_no = StoreForm::getStoreListForStoreID($this->store_id);
         $time = date_format(date_create(),"Y-m-d H:i:s");
         $uid = Yii::app()->user->id;
@@ -655,7 +658,7 @@ class DeliveryForm extends CFormModel
             $warehouseRow = $connection->createCommand()->select("*")->from("opr_warehouse")
                 ->where("id =:id",array(":id"=>$goodsId))->queryRow();
             $warehouseRow["store_list"]=array();
-            $warehouseRow["store_list"][]=array("id"=>$blackId,"back_num"=>$num,"store_num"=>$this->store_num,"jd_store_no"=>$jd_store_no);
+            $warehouseRow["store_list"][]=array("id"=>$blackStoreId,"back_num"=>$num,"store_num"=>$this->store_num,"jd_store_no"=>$jd_store_no);
             $curlData=self::getCurlDateForOrder($order,$time);
 
             $warehouseRow["note"] = "";
@@ -743,8 +746,8 @@ class DeliveryForm extends CFormModel
         if(!key_exists($type,$list)){
             $type = 0;
         }
-        $city = Yii::app()->user->city();
-        $sql ="city='$city' AND judge=0 AND status in (".$list[$type].")";
+        $city_allow = Yii::app()->user->city_allow();
+        $sql ="city in ($city_allow) AND judge=0 AND status in (".$list[$type].")";
         if($this->getScenario()=="approved"){
             if(empty($this->checkBoxDown)||!is_array($this->checkBoxDown)){
                 return false;

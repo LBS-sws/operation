@@ -68,7 +68,7 @@ $this->pageTitle=Yii::app()->name . ' - Report';
                 <div class="col-sm-6">
                     <?php
                     echo $form->textArea($model, 'city_desc',
-                        array('rows'=>4,'cols'=>80,'maxlength'=>1000,'readonly'=>true,)
+                        array('rows'=>4,'cols'=>80,'maxlength'=>1000,'readonly'=>true)
                     );
                     ?>
                 </div>

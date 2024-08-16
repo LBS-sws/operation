@@ -120,6 +120,7 @@ update opr_warehouse set jd_classify_no=classify_id where jd_classify_no is null
 update opr_warehouse set jd_classify_name=(select name from opr_classify a where a.id=classify_id) where jd_classify_name is null;
 update opr_warehouse_price set city=(select city from opr_warehouse a where a.id=warehouse_id) where city is null;
 
+UPDATE opr_warehouse SET display=0 WHERE id>0;
 -- ----------------------------
 -- Table structure for opr_warehouse_back
 -- ----------------------------

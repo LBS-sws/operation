@@ -13,8 +13,13 @@ class MonthlyCommand extends CConsoleCommand {
 		$this->year = (empty($year)) ? date('Y') : $year;
 		$this->month = (empty($month)) ? date('m') : $month;
 		echo "YEAR: ".$this->year."\tMONTH: ".$this->month."\n";
+        $suffix = Yii::app()->params['envSuffix'];
 
-		$suffix = Yii::app()->params['envSuffix'];
+		//每月删除一次token记录表(开始)
+        Yii::app()->db->createCommand()->delete("operation{$suffix}.opr_token_history", 'lcd<:lcd',
+            array(':lcd'=>"{$this->year}-{$this->month}-01"));
+        //每月删除一次token记录表(结束)
+
         $rows = Yii::app()->db->createCommand()->select("code")
             ->from("security{$suffix}.sec_city_info")
             ->where("field_id='OPERA' and field_value='1'")//城市开启了“营运报告（营运系统）”权限

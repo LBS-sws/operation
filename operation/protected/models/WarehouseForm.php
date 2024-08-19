@@ -151,6 +151,7 @@ class WarehouseForm extends CFormModel
 			foreach ($rows as $row) {
                 $searchData=array(
                     "material_number"=>array($row['goods_code']),
+                    "org_number"=>CurlForDelivery::getJDCityCodeForCity($city),
                 );
                 $inventoryJD = CurlForDelivery::getWarehouseGoodsStoreForJD(array("data"=>$searchData));
                 $this->id = $row['id'];

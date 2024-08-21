@@ -23,7 +23,7 @@ switch ($this->record['status']){
 	<td><?php echo $this->drawEditButton('YS01', 'purchase/edit', 'purchase/view', array('index'=>$this->record['id'])); ?></td>
 	<td><?php echo $this->record['lcd']; ?></td>
 	<td><?php echo $this->record['order_code']; ?></td>
-	<td><?php echo OrderList::getCityNameToCode($this->record['city']); ?></td>
+	<td><?php echo $this->record['city']; ?></td>
 	<td><?php echo $this->record['order_class']; ?></td>
 	<td>
         <?php

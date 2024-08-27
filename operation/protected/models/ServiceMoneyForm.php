@@ -277,9 +277,26 @@ class ServiceMoneyForm extends CFormModel
         return $jobFeeList;
     }
 
-    public static function getUServiceMoney($year,$month){
+    public static function getMMRANKCity(){
+        $cityList = array();
+        $suffix = Yii::app()->params['envSuffix'];
+        $rows = Yii::app()->db->createCommand()->select("code")
+            ->from("security{$suffix}.sec_city_info")
+            ->where("field_id='MMRANK' and field_value=1")
+            ->queryAll();
+        if($rows){
+            foreach ($rows as $row){
+                $cityList[] = $row["code"];
+            }
+        }
+        $cityStr = "'".implode("','",$cityList)."'";
+        return $cityStr;
+    }
+
+    public static function getUServiceMoney($year,$month,$city=''){
+        $cityList = empty($city)?self::getMMRANKCity():$city;
         //由于2024年1月29日使用了新的U系统，所以使用新代码
-        $list = SystemU::getTechnicianSNC($year,$month);
+        $list = SystemU::getTechnicianSNC($year,$month,$cityList);
         return isset($list["data"])?$list["data"]:array();
         //由于2024年1月29日使用了新的U系统，所以不使用以下代码
         $whereDate = date("Y/m/01",strtotime("{$year}/{$month}/01"));
@@ -448,10 +465,11 @@ class ServiceMoneyForm extends CFormModel
 
     public static function getEmployeeCodeList(){
         $suffix = Yii::app()->params['envSuffix'];
+        $city_allow = self::getMMRANKCity();
         $list = array();
         $rows = Yii::app()->db->createCommand()->select("a.id,a.code,a.name")->from("hr$suffix.hr_employee a")
             ->leftJoin("hr$suffix.hr_dept b","a.position=b.id")
-            ->where("b.review_status=1 and b.review_type=2")->queryAll();
+            ->where("b.review_status=1 and b.review_type=2 and a.city in ({$city_allow})")->queryAll();
         if($rows){
             foreach ($rows as $row){
                 $list[$row["code"]] = array("code"=>$row["code"],"name"=>$row["name"],"id"=>$row["id"]);

@@ -818,6 +818,7 @@ class RankingMonthForm extends CFormModel
     }
 
 	public function insertTechnician($year,$month,$resetBool=true){
+        $city_allow = ServiceMoneyForm::getMMRANKCity();
         $year = is_numeric($year)?intval($year):2022;
 	    $month = is_numeric($month)?intval($month):1;
         $month = $month>=1&&$month<=12?$month:date("n");
@@ -825,7 +826,7 @@ class RankingMonthForm extends CFormModel
         $suffix = Yii::app()->params['envSuffix'];
         $rows = Yii::app()->db->createCommand()->select("a.id,a.name,a.code")->from("hr$suffix.hr_employee a")
             ->leftJoin("hr$suffix.hr_dept b","a.position=b.id")
-            ->where("b.review_status=1 and b.review_type=2 and b.dept_class='Technician' and a.staff_status=0")->queryAll();
+            ->where("a.city in ({$city_allow}) and b.review_status=1 and b.review_type=2 and b.dept_class='Technician' and a.staff_status=0")->queryAll();
         if($rows){
             foreach ($rows as $row){
                 $this->employee_id = $row["id"];

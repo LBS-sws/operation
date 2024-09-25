@@ -26,7 +26,7 @@ CREATE TABLE `opr_api_curl` (
   `info_type` varchar(255) NOT NULL,
   `info_url` varchar(255) NOT NULL COMMENT '接口地址',
   `data_content` longtext NOT NULL COMMENT '发送的curl（json字符串）',
-  `out_content` text COMMENT '响应的内容',
+  `out_content` longtext COMMENT '响应的内容',
   `message` varchar(255) DEFAULT NULL,
   `lcu` varchar(255) DEFAULT NULL,
   `luu` varchar(255) DEFAULT NULL,

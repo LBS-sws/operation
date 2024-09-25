@@ -43,6 +43,7 @@ class CurlForJD{
             $rtn["message"] = "token获取失败:".$tokenList["message"];//token获取失败
         }
 
+        $rtn["message"] = mb_strlen($rtn["message"],'UTF-8')>250?mb_substr($rtn["message"],0,250,'UTF-8'):$rtn["message"];
         $this->saveArr = array(
             "status_type"=>$rtn['code']==200?"C":"E",
             "info_type"=>$this->info_type,
@@ -51,7 +52,7 @@ class CurlForJD{
             "data_content"=>json_encode($data),
             "out_content"=>$rtn['outData'],
             "message"=>$rtn['message'],
-            "lcu"=>Yii::app()->user->id,
+            "lcu"=>Yii::app()->getComponent('user')===null?"admin":Yii::app()->user->id,
             "lcd"=>$sendDate,
         );
         return $rtn;
@@ -103,6 +104,7 @@ class CurlForJD{
             $rtn["message"] = "token获取失败:".$tokenList["message"];//token获取失败
         }
 
+        $rtn["message"] = mb_strlen($rtn["message"],'UTF-8')>250?mb_substr($rtn["message"],0,250,'UTF-8'):$rtn["message"];
         $sqlData=array(
             "status_type"=>$rtn['code']==200?"C":"E",
             "info_type"=>$info_type,
@@ -111,7 +113,7 @@ class CurlForJD{
             "data_content"=>json_encode($data),
             "out_content"=>$rtn['outData'],
             "message"=>$rtn['message'],
-            "lcu"=>Yii::app()->user->id,
+            "lcu"=>Yii::app()->getComponent('user')===null?"admin":Yii::app()->user->id,
             "lcd"=>$sendDate,
         );
         $suffix = Yii::app()->params['envSuffix'];
@@ -151,8 +153,9 @@ class CurlForJD{
                 $json = json_decode($out, true);
                 if(is_array($json)&&key_exists("errorCode",$json)&&$json["errorCode"]==0){
                     $rtn['code'] = 200;
+                    $rtn['message'] = "成功";
                 }else{
-                    $rtn['message'] = isset($json["message"])?$json["message"]:"";
+                    $rtn['message'] = isset($json["message"])?$json["message"]:"失败";
                 }
             }
         }else{
@@ -160,6 +163,7 @@ class CurlForJD{
             $rtn["message"] = "token获取失败:".$tokenList["message"];//token获取失败
         }
 
+        $rtn["message"] = mb_strlen($rtn["message"],'UTF-8')>250?mb_substr($rtn["message"],0,250,'UTF-8'):$rtn["message"];
         $sqlData=array(
             "status_type"=>$rtn['code']==200?"C":"E",
             "data_content"=>json_encode($data),
@@ -211,6 +215,7 @@ class CurlForJD{
             $rtn["message"] = "token获取失败:".$tokenList["message"];//token获取失败
         }
 
+        $rtn["message"] = mb_strlen($rtn["message"],'UTF-8')>250?mb_substr($rtn["message"],0,250,'UTF-8'):$rtn["message"];
         return $rtn;
     }
 
@@ -250,6 +255,7 @@ class CurlForJD{
             $rtn["message"] = "token获取失败:".$tokenList["message"];//token获取失败
         }
 
+        $rtn["message"] = mb_strlen($rtn["message"],'UTF-8')>250?mb_substr($rtn["message"],0,250,'UTF-8'):$rtn["message"];
         return $rtn;
     }
 }

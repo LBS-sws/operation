@@ -24,11 +24,11 @@ class DeliveryController extends Controller
     {
         return array(
             array('allow',
-                'actions'=>array('save','audit','reject','edit','backward','black'),
+                'actions'=>array('save','audit','reject','backward','black','allApproved'),
                 'expression'=>array('DeliveryController','allowReadWrite'),
             ),
             array('allow',
-                'actions'=>array('index','view','allApproved','allDownload'),
+                'actions'=>array('index','view','edit','allDownload'),
                 'expression'=>array('DeliveryController','allowReadOnly'),
             ),
             array('allow',
@@ -42,7 +42,12 @@ class DeliveryController extends Controller
     }
 
     public static function allowReadWrite() {
-        return Yii::app()->user->validRWFunction('YD02');
+        $date = date_format(date_create(),"Y/m/d H:i:s");
+        if($date>'2024/09/25 18:00:00'&&$date<'2024/10/01 00:00:00'){
+            return false;
+        }else{
+            return Yii::app()->user->validRWFunction('YD02');
+        }
     }
 
     public static function allowReadOnly() {

@@ -25,6 +25,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery List';
 <section class="content">
     <div class="box">
         <div class="box-body">
+            <!--
             <div class="btn-group" role="group">
                 <?php
                 echo TbHtml::button('<span class="fa fa-paper-plane"></span> '.Yii::t('procurement','All shipments'), array(
@@ -32,6 +33,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery List';
                 ));
                 ?>
             </div>
+            -->
             <div class="btn-group pull-right" role="group">
                 <?php
                 echo TbHtml::button('<span class="fa fa-cloud-download"></span> '.Yii::t('misc','Download'), array(

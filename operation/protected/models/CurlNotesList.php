@@ -145,6 +145,7 @@ class CurlNotesList extends CListPageModel
             "remitAudit"=>"日常付款",
             "temporaryAudit"=>"暂支单",
             "customer"=>"客户资料",
+            "customerAll"=>"批量客户资料",
         );
         if($bool){
             if(key_exists($key,$list)){
@@ -161,10 +162,46 @@ class CurlNotesList extends CListPageModel
         $row = Yii::app()->db->createCommand()->select("*")->from("opr_api_curl")
             ->where("id=:id", array(':id'=>$index))->queryRow();
         if($row){
-            CurlForJD::sendUpdateRowForJD($row);
+            $rtn = CurlForJD::sendUpdateRowForJD($row);
+            if(in_array($row["info_type"],array("customer","customerAll"))){
+                CurlNotesList::saveJDCustomerID($rtn);
+            }
             return true;
         }else{
             return false;
+        }
+    }
+
+    public static function saveJDCustomerID($rtn){
+        if($rtn['code']==200){//成功
+            $suffix = Yii::app()->params['envSuffix'];
+            $jsonList = json_decode($rtn['outData'],true);
+            if(is_array($jsonList)&&isset($jsonList["data"]["result"])){
+                foreach ($jsonList["data"]["result"] as $row){
+                    if(key_exists("billStatus",$row)&&$row["billStatus"]===true){
+                        $jdID = $row["id"];
+                        $lbsID = isset($row["keys"]["lbs_apikey"])?$row["keys"]["lbs_apikey"]:0;
+                        $rs = Yii::app()->db->createCommand()->select("id,field_value")->from("swoper{$suffix}.swo_send_set_jd")
+                            ->where("set_type ='customer' and table_id=:table_id and field_id=:field_id",array(
+                                ':field_id'=>'jd_customer_id',':table_id'=>$lbsID,
+                            ))->queryRow();
+                        if($rs){
+                            if(empty($rs["field_value"])){//空值才允许修改
+                                Yii::app()->db->createCommand()->update("swoper{$suffix}.swo_send_set_jd",array(
+                                    "field_value"=>$jdID,
+                                ),"id=:id",array(':id'=>$rs["id"]));
+                            }
+                        }else{
+                            Yii::app()->db->createCommand()->insert("swoper{$suffix}.swo_send_set_jd",array(
+                                "table_id"=>$lbsID,
+                                "set_type"=>'customer',
+                                "field_id"=>'jd_customer_id',
+                                "field_value"=>$jdID,
+                            ));
+                        }
+                    }
+                }
+            }
         }
     }
 

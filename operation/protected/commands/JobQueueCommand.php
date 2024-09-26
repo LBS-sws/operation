@@ -7,7 +7,10 @@ class JobQueueCommand extends CConsoleCommand {
             ->where("status_type='P'")->queryRow();
         if($row){
             Yii::app()->db->createCommand()->update("opr_api_curl",array("status_type"=>"I"),"id=".$row["id"]);
-            CurlForJD::sendUpdateRowForJD($row,false);
+            $rtn = CurlForJD::sendUpdateRowForJD($row);
+            if(in_array($row["info_type"],array("customer","customerAll"))){
+                CurlNotesList::saveJDCustomerID($rtn);
+            }
             return true;
         }else{
             return false;

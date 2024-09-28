@@ -397,7 +397,7 @@ class WarehouseForm extends CFormModel
                 }
             }
         }else{
-            $connection->createCommand()->delete('opr_warehouse_history',"table_id={$this->id} and set_type='warehouse'");
+            $connection->createCommand()->delete('opr_send_set_jd',"table_id={$this->id} and set_type='warehouse'");
         }
     }
     

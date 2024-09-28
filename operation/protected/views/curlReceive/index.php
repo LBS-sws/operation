@@ -114,15 +114,24 @@ $this->pageTitle=Yii::app()->name . ' - CurlReceive';
 </script>
 <?php
 echo TbHtml::button("",array("submit"=>"#","class"=>"hide"));
+$ajaxUrl =Yii::app()->createUrl('curlReceive/getAjaxStr');
 	$js = "
 	    $('.text-break').click(function(){
-	        var text = $(this).children('pre').text();
-	        if(typeof text=='object'){
-	            text = JSON.stringify(text);
-	        }
-            text=unicode2Ch(text);
-	        $('#textInput').val(text);
-	        $('#textModal').modal('show');
+            $.ajax({
+                type: 'post',
+                url: '{$ajaxUrl}',
+                data: {
+                    id: $(this).data('id'),
+                    type: $(this).data('type')
+                },
+                dataType: 'json',
+                success: function (data) {
+                    var text = data['content'];
+                    text = unicode2Ch(text);
+                    $('#textInput').val(text);
+                    $('#textModal').modal('show');
+                }
+            });
 	    });
 	    
 $('.submitBtn').change(function(){

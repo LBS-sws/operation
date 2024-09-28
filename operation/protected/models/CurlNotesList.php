@@ -227,4 +227,24 @@ class CurlNotesList extends CListPageModel
                 break;
         }
     }
+
+    public static function getCurlTextForID($id,$type=0){
+        $type = "".$type;
+        $list = array(
+            0=>"data_content",//请求内容
+            1=>"out_content",//响应的内容
+            //2=>"cmd_content",//执行结果
+        );
+        $selectStr = key_exists($type,$list)?$list[$type]:$list[0];
+        $suffix = Yii::app()->params['envSuffix'];
+        $row = Yii::app()->db->createCommand()->select($selectStr)->from("opr_api_curl")
+            ->where("id=:id", array(':id'=>$id))->queryRow();
+        if($row){
+            $searchList = array("\\r","\\n","\\t");
+            $replaceList = array("\r","\n","\t");
+            return str_replace($searchList,$replaceList,$row[$selectStr]);
+        }else{
+            return "";
+        }
+    }
 }

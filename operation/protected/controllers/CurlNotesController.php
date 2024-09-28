@@ -29,7 +29,7 @@ class CurlNotesController extends Controller
 				'expression'=>array('CurlNotesController','allowReadWrite'),
 			),
 			array('allow', 
-				'actions'=>array('index'),
+				'actions'=>array('index','getAjaxStr'),
 				'expression'=>array('CurlNotesController','allowReadOnly'),
 			),
 			array('deny',  // deny all users
@@ -37,6 +37,19 @@ class CurlNotesController extends Controller
 			),
 		);
 	}
+
+    public function actionGetAjaxStr()
+    {
+        if(Yii::app()->request->isAjaxRequest) {//是否ajax请求
+            $model = new CurlNotesList();
+            $id = key_exists("id",$_POST)?$_POST["id"]:0;
+            $type = key_exists("type",$_POST)?$_POST["type"]:0;
+            $content = $model->getCurlTextForID($id,$type);
+            echo CJSON::encode(array("content"=>$content));
+        }else{
+            $this->redirect(Yii::app()->createUrl('curlBsNotes/index'));
+        }
+    }
 
 	public function actionIndex($pageNum=0) 
 	{

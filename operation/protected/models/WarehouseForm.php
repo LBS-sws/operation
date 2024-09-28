@@ -376,24 +376,28 @@ class WarehouseForm extends CFormModel
 
     //保存金蝶要求的字段
     protected function saveJDSetInfo(&$connection) {
-        foreach (self::$jd_set_list as $list){
-            $field_value = key_exists($list["field_id"],$this->jd_set)?$this->jd_set[$list["field_id"]]:null;
-            $rs = Yii::app()->db->createCommand()->select("id,field_id")->from("opr_send_set_jd")
-                ->where("set_type ='warehouse' and table_id=:table_id and field_id=:field_id",array(
-                    ':field_id'=>$list["field_id"],':table_id'=>$this->id,
-                ))->queryRow();
-            if($rs){
-                $connection->createCommand()->update('opr_send_set_jd',array(
-                    "field_value"=>$field_value,
-                ),"id=:id",array(':id'=>$rs["id"]));
-            }else{
-                $connection->createCommand()->insert('opr_send_set_jd',array(
-                    "table_id"=>$this->id,
-                    "set_type"=>'warehouse',
-                    "field_id"=>$list["field_id"],
-                    "field_value"=>$field_value,
-                ));
+	    if($this->getScenario()!="delete"){
+            foreach (self::$jd_set_list as $list){
+                $field_value = key_exists($list["field_id"],$this->jd_set)?$this->jd_set[$list["field_id"]]:null;
+                $rs = Yii::app()->db->createCommand()->select("id,field_id")->from("opr_send_set_jd")
+                    ->where("set_type ='warehouse' and table_id=:table_id and field_id=:field_id",array(
+                        ':field_id'=>$list["field_id"],':table_id'=>$this->id,
+                    ))->queryRow();
+                if($rs){
+                    $connection->createCommand()->update('opr_send_set_jd',array(
+                        "field_value"=>$field_value,
+                    ),"id=:id",array(':id'=>$rs["id"]));
+                }else{
+                    $connection->createCommand()->insert('opr_send_set_jd',array(
+                        "table_id"=>$this->id,
+                        "set_type"=>'warehouse',
+                        "field_id"=>$list["field_id"],
+                        "field_value"=>$field_value,
+                    ));
+                }
             }
+        }else{
+            $connection->createCommand()->delete('opr_warehouse_history',"table_id={$this->id} and set_type='warehouse'");
         }
     }
     
@@ -414,7 +418,7 @@ class WarehouseForm extends CFormModel
 		$sql = '';
         switch ($this->scenario) {
             case 'delete':
-                $sql = "delete from opr_warehouse where id = :id AND city=:city";
+                $sql = "delete from opr_warehouse where id = :id";
                 break;
             case 'new':
                 $sql = "insert into opr_warehouse(
@@ -438,7 +442,7 @@ class WarehouseForm extends CFormModel
 							old_good_no = :old_good_no,
 							jd_classify_no = :jd_classify_no,
 							jd_classify_name = :jd_classify_name
-						where id = :id AND city=:city
+						where id = :id
 						";
                 break;
         }

@@ -784,6 +784,7 @@ class DeliveryForm extends CFormModel
     protected static function getCurlDateForOrder($order,$time,$expArr=array()){
         $order["jd_order_type"] = TechnicianList::getJDOrderTypeForId($order["id"]);
         $order["jd_company_code"] = TechnicianList::getJDOrderTypeForId($order["id"],"jd_company_code");
+        $order["jd_company_code"].="-".$order["city"];
         $list = array(
             "order_id"=>$order["id"],
             "order_code"=>$order["order_code"],

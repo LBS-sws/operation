@@ -1,4 +1,5 @@
 <?php
+//2024年9月28日09:28:46
 //外勤领料的curl
 class CurlForDelivery extends CurlForJD{
     protected $info_type="delivery";

@@ -1,3 +1,7 @@
+
+<?php
+//2024年9月28日09:28:46
+?>
 <!-- -->
 <tr class='clickable-row' data-href='<?php echo $this->getLink('YD10', 'store/edit', 'store/view', array('index'=>$this->record['id']));?>'>
 	<td><?php echo $this->drawEditButton('YD10', 'store/edit', 'store/view', array('index'=>$this->record['id'])); ?></td>

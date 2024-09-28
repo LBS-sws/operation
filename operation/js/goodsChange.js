@@ -1,3 +1,5 @@
+
+//2024年9月28日09:28:46
 $(function () {
     var goodsList = "";//所有物品列表（按物品分類劃分的二維數組）
     var selectGoodsList = [];//

@@ -1,3 +1,7 @@
+
+<?php
+//2024年9月28日09:28:46
+?>
 <?php
 $htmlTrHref = $this->getLink('YC02', 'technician/edit', 'technician/view', array('index'=>$this->record['id']));
 switch ($this->record['status']){

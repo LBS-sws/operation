@@ -1,3 +1,7 @@
+
+<?php
+//2024年9月28日09:28:46
+?>
 <?php
 if (empty($model->id)&&$model->scenario == "edit"){
     $this->redirect(Yii::app()->createUrl('delivery/index'));

@@ -1,4 +1,5 @@
 <?php
+//2024年9月28日09:28:46
 //仓库物品的 curl
 class CurlForWareHouse extends CurlForJD{
 

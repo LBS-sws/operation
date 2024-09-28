@@ -1,3 +1,7 @@
+
+<?php
+//2024年9月28日09:28:46
+?>
 <?php
 $htmlTrHref = $this->getLink('YS01', 'purchase/edit', 'purchase/view', array('index'=>$this->record['id']));
 switch ($this->record['status']){

@@ -1,4 +1,5 @@
 <?php
+//2024年9月28日09:28:46
 return array(
 	'Enquiry'=>'查询',
 	'search city'=>'查询城市',

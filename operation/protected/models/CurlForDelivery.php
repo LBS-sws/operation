@@ -76,6 +76,9 @@ class CurlForDelivery extends CurlForJD{
                 if(!empty($row["goods_item"])){
                     foreach ($row["goods_item"] as $goodRow){
                         $qty = $backBool?(-1*$goodRow["back_num"]):$goodRow["confirm_num"];
+						if(empty($qty)){
+							continue;
+						}
                         $temp["billentry"][]=array(
                             "linetype_number"=>"010",//行类型.编码
                             "material_number"=>$goodRow["goods_code"],//物料编码.编码

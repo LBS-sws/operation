@@ -443,18 +443,27 @@ class TechnicianForm extends CFormModel
         $arr["all"] = array("id"=>0,"name"=>Yii::t("procurement","All Goods Class"),"list"=>array());
 
 
+        $searchData=array(
+            "org_number"=>CurlForDelivery::getJDCityCodeForCity($city),
+        );
+        $JDList = CurlForDelivery::getWarehouseGoodsStoreForJD(array("data"=>$searchData));
+
         $goodRows = Yii::app()->db->createCommand()->select("*")->from("opr_warehouse")
             ->where("(city=:city or local_bool=0) and display=1",array(
                 ":city"=>$city
             ))->queryAll();
         if($goodRows){
             foreach ($goodRows as $goodRow){
-                if(!key_exists($goodRow["jd_classify_no"],$arr)){
-                    $arr[$goodRow["jd_classify_no"]]=array("id"=>$goodRow["jd_classify_no"],"name"=>$goodRow["jd_classify_name"],"list"=>array());
+                $goods_code = $goodRow['goods_code'];
+                if(key_exists($goods_code,$JDList)&&!empty($JDList[$goods_code]['jd_store_sum'])){
+                    if(!key_exists($goodRow["jd_classify_no"],$arr)){
+                        $arr[$goodRow["jd_classify_no"]]=array("id"=>$goodRow["jd_classify_no"],"name"=>$goodRow["jd_classify_name"],"list"=>array());
+                    }
+                    $arr[$goodRow["jd_classify_no"]]["list"][]=$goodRow;
+
                 }
-                $arr[$goodRow["jd_classify_no"]]["list"][]=$goodRow;
             }
         }
         return $arr;
-	}
+    }
 }

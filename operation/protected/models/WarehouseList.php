@@ -108,6 +108,7 @@ class WarehouseList extends CListPageModel
             $searchData=array(
                 "material_number"=>$searchCode,
                 "org_number"=>CurlForDelivery::getJDCityCodeForCity($city),
+                "warehouse_number"=>CurlForDelivery::getJDStoreListForCity($city),
             );
             $this->inventoryJD = CurlForDelivery::getWarehouseGoodsStoreForJD(array("data"=>$searchData));
 		}

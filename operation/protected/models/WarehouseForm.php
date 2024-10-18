@@ -63,16 +63,16 @@ class WarehouseForm extends CFormModel
 			array('id, goods_code,display, min_num, name, unit, inventory, classify_id, price, costing, decimal_num, lcu, luu, matching, matters,
 			jd_set,old_good_no,jd_classify_no,jd_classify_name','safe'),
             array('name','required'),
-            array('jd_classify_no,jd_classify_name','required'),
+            //array('jd_classify_no,jd_classify_name','required'),
             array('unit','required'),
-            array('inventory','required'),
-            array('inventory','numerical','allowEmpty'=>false,'integerOnly'=>false),
-            array('min_num','required'),
-            array('min_num','numerical','allowEmpty'=>false,'integerOnly'=>false),
+            //array('inventory','required'),
+            //array('inventory','numerical','allowEmpty'=>false,'integerOnly'=>false),
+            //array('min_num','required'),
+            //array('min_num','numerical','allowEmpty'=>false,'integerOnly'=>false),
 			array('name','validateId'),
 			array('name','validateName'),
 			array('goods_code','validateCode'),
-			array('price','validatePrice'),
+			//array('price','validatePrice'),
 		);
 	}
 //
@@ -153,6 +153,7 @@ class WarehouseForm extends CFormModel
                 $searchData=array(
                     "material_number"=>array($row['goods_code']),
                     "org_number"=>CurlForDelivery::getJDCityCodeForCity($city),
+                    "warehouse_number"=>CurlForDelivery::getJDStoreListForCity($city),
                 );
                 $inventoryJD = CurlForDelivery::getWarehouseGoodsStoreForJD(array("data"=>$searchData));
                 $this->id = $row['id'];
@@ -290,7 +291,7 @@ class WarehouseForm extends CFormModel
 
     //根據訂單id查訂單所有物品
     public static function getGoodsListToId($order_id){
-        $rs = Yii::app()->db->createCommand()->select("b.id as warehouse_id,a.lcd,b.matching,b.matters,b.name,b.inventory,b.goods_code,b.classify_id,b.unit,a.goods_num,a.confirm_num,a.id,a.goods_id,a.remark,a.note")
+        $rs = Yii::app()->db->createCommand()->select("b.id as warehouse_id,a.lcd,b.matching,b.matters,b.name,b.inventory,b.goods_code,b.jd_classify_no as classify_id,b.unit,a.goods_num,a.confirm_num,a.id,a.goods_id,a.remark,a.note")
             ->from("opr_order_goods a,opr_warehouse b")->where('a.order_id=:order_id and a.goods_id = b.id',array(':order_id'=>$order_id))->queryAll();
         return $rs;
     }
@@ -471,20 +472,26 @@ class WarehouseForm extends CFormModel
             $command->bindParam(':costing',$this->costing,PDO::PARAM_STR);
         if (strpos($sql,':decimal_num')!==false)
             $command->bindParam(':decimal_num',$this->decimal_num,PDO::PARAM_STR);
-        if (strpos($sql,':min_num')!==false)
+        if (strpos($sql,':min_num')!==false){
+			$this->min_num = empty($this->min_num)?0:$this->min_num;
             $command->bindParam(':min_num',$this->min_num,PDO::PARAM_STR);
+		}
+        if (strpos($sql,':inventory')!==false){
+			$this->inventory = empty($this->inventory)?0:$this->inventory;
+            $command->bindParam(':inventory',$this->inventory,PDO::PARAM_STR);
+		}
         if (strpos($sql,':z_index')!==false)
             $command->bindParam(':z_index',$this->z_index,PDO::PARAM_INT);
-        if (strpos($sql,':inventory')!==false)
-            $command->bindParam(':inventory',$this->inventory,PDO::PARAM_STR);
         if (strpos($sql,':matching')!==false)
             $command->bindParam(':matching',$this->matching,PDO::PARAM_STR);
         if (strpos($sql,':matters')!==false)
             $command->bindParam(':matters',$this->matters,PDO::PARAM_STR);
         if (strpos($sql,':classify_id')!==false)
             $command->bindParam(':classify_id',$this->classify_id,PDO::PARAM_INT);
-        if (strpos($sql,':old_good_no')!==false)
+        if (strpos($sql,':old_good_no')!==false){
+			$this->old_good_no = empty($this->old_good_no)?$this->goods_code:$this->old_good_no;
             $command->bindParam(':old_good_no',$this->old_good_no,PDO::PARAM_INT);
+		}
         if (strpos($sql,':jd_classify_no')!==false)
             $command->bindParam(':jd_classify_no',$this->jd_classify_no,PDO::PARAM_INT);
         if (strpos($sql,':jd_classify_name')!==false)
@@ -524,7 +531,8 @@ class WarehouseForm extends CFormModel
                 $this->setGoodsCode($row['id']);
             }else{
                 Yii::app()->db->createCommand()->update('opr_warehouse', array(
-                    'goods_code'=>$goodsCode
+                    'goods_code'=>$goodsCode,
+                    'old_good_no'=>$goodsCode,
                 ), 'id=:id', array(':id'=>$this->id));
             }
         }
@@ -538,20 +546,26 @@ class WarehouseForm extends CFormModel
             $list["head"][]="单价";
         }
         $list["head"][]="是否显示";
-        $rs = Yii::app()->db->createCommand()->select("a.*,b.name as classify_name")->from("opr_warehouse a")
-            ->leftJoin("opr_classify b","a.classify_id=b.id")
-            ->where('a.city=:city',array(':city'=>$city))->queryAll();
+        $rs = Yii::app()->db->createCommand()->select("a.*")->from("opr_warehouse a")
+            //->leftJoin("opr_classify b","a.classify_id=b.id")
+            ->where('a.city=:city or  a.local_bool=0',array(':city'=>$city))->queryAll();
         $list["body"] = array();
+        $searchData=array(
+            "org_number"=>CurlForDelivery::getJDCityCodeForCity($city),
+            "warehouse_number"=>CurlForDelivery::getJDStoreListForCity($city),
+        );
+        $JDList = CurlForDelivery::getWarehouseGoodsStoreForJD(array("data"=>$searchData));
         if($rs){
             foreach ($rs as $row){
+				$good_no = $row["goods_code"];
                 $arr = array(
                     "goods_code"=>$row["goods_code"],
                     "name"=>$row["name"],
                     "unit"=>$row["unit"],
-                    "classify_name"=>$row["classify_name"],
+                    "classify_name"=>$row["jd_classify_name"],
                     "costing"=>$row["costing"],
                     "decimal_num"=>$row["decimal_num"],
-                    "inventory"=>$row["inventory"],
+                    "inventory"=>key_exists($good_no,$JDList)?$JDList[$good_no]["jd_store_sum"]:"",
                     "matching"=>$row["matching"],
                     "matters"=>$row["matters"]
                 );

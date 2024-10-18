@@ -56,6 +56,7 @@ class DeliveryList extends CListPageModel
             switch ($this->searchField) {
                 case 'lcd':
                     $clause .= General::getSqlConditionClause('a.lcd', $svalue);
+                    break;
                 case 'order_code':
                     $clause .= General::getSqlConditionClause('a.order_code', $svalue);
                     break;

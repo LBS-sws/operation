@@ -232,6 +232,18 @@ class CurlForDelivery extends CurlForJD{
         }
     }
 
+    public static function getJDStoreListForCity($city){
+        $list = array();
+        $rows = Yii::app()->db->createCommand()->select("jd_store_no")->from("opr_store")
+            ->where("z_display=1 and city=:city",array(":city"=>$city))->queryAll();
+        if($rows){
+            foreach ($rows as $row){
+                $list[]=$row["jd_store_no"];
+            }
+        }
+        return $list;
+    }
+
     public static function getEmployeeCodeForUsername($username){
         $suffix = Yii::app()->params['envSuffix'];
         $row = Yii::app()->db->createCommand()->select("b.code,b.name,f.name as department_name")

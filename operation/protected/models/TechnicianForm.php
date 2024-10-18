@@ -106,6 +106,7 @@ class TechnicianForm extends CFormModel
         }
         $searchData=array(
             "org_number"=>CurlForDelivery::getJDCityCodeForCity($this->city),
+            "warehouse_number"=>CurlForDelivery::getJDStoreListForCity($this->city),
         );
         $jd_goods_list = CurlForDelivery::getWarehouseGoodsStoreForJD(array("data"=>$searchData));
         if(empty($jd_goods_list)){
@@ -135,7 +136,7 @@ class TechnicianForm extends CFormModel
                 $this->goods_list[$key]["goods_num"] = $goods_num;
 				$list = Yii::app()->db->createCommand()->select("*")
 				->from("opr_warehouse")
-				->where('id = :id and (city=:city or local_bool=0)',array(':id'=>$goods["goods_id"],':city'=>$this->city))
+				->where('id = :id and (city=:city or local_bool=0) and display=1',array(':id'=>$goods["goods_id"],':city'=>$this->city))
 				->queryRow();
                 //$list = WarehouseForm::getGoodsToGoodsId($goods["goods_id"]);
                 if (empty($list)){
@@ -445,6 +446,7 @@ class TechnicianForm extends CFormModel
 
         $searchData=array(
             "org_number"=>CurlForDelivery::getJDCityCodeForCity($city),
+            "warehouse_number"=>CurlForDelivery::getJDStoreListForCity($city),
         );
         $JDList = CurlForDelivery::getWarehouseGoodsStoreForJD(array("data"=>$searchData));
 

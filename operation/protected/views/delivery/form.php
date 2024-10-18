@@ -176,6 +176,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                         <?php
                         $searchData=array(
                             "org_number"=>CurlForDelivery::getJDCityCodeForCity($model->city),
+                            "warehouse_number"=>CurlForDelivery::getJDStoreListForCity($model->city),
                         );
                         $jd_goods_list = CurlForDelivery::getWarehouseGoodsStoreForJD(array("data"=>$searchData));
 
@@ -353,7 +354,7 @@ Yii::app()->clientScript->registerScript('readonlyClass',$js,CClientScript::POS_
                 </div>
                 <div class="modal-footer">
                     <button data-dismiss="modal" class="btn btn-define pull-left" type="button">关闭</button>
-                    <button class="btn btn-primary" type="submit">提交</button>
+                    <button class="btn btn-primary" type="submit" formnovalidate>提交</button>
                 </div>
             </div>
         </div>

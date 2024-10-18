@@ -190,6 +190,7 @@ class DeliveryForm extends CFormModel
 
         $searchData=array(
             "org_number"=>CurlForDelivery::getJDCityCodeForCity($this->city),
+            "warehouse_number"=>CurlForDelivery::getJDStoreListForCity($this->city),
         );
         $jd_goods_list = CurlForDelivery::getWarehouseGoodsStoreForJD(array("data"=>$searchData));
         if(empty($jd_goods_list)){
@@ -224,10 +225,10 @@ class DeliveryForm extends CFormModel
                             $this->addError($attribute,$message);
                             return false;
                         }
-                    }else{
-                        $message = $list["name"]."：金蝶系统没有找到该物品(".$jd_goods_code.")";
-                        $this->addError($attribute,$message);
-                        return false;
+                    }else{//2024年10月9日11:23:38，金蝶系统说不需要该验证
+                        //$message = $list["name"]."：金蝶系统没有找到该物品(".$jd_goods_code.")";
+                        //$this->addError($attribute,$message);
+                        //return false;
                     }
                     $goods["confirm_num"]+=$goods["store_list"]["store_num"][$storeKey];
                 }

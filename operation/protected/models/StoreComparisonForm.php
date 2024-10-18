@@ -80,6 +80,7 @@ class StoreComparisonForm extends CFormModel
     private function getJDWarehouse(){
         $searchData=array(
             "org_number"=>CurlForDelivery::getJDCityCodeForCity($this->search_city),
+            "warehouse_number"=>CurlForDelivery::getJDStoreListForCity($this->search_city),
         );
         $list = CurlForDelivery::getWarehouseGoodsStoreForJD(array("data"=>$searchData));
         return $list;

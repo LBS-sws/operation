@@ -108,8 +108,8 @@ class StoreComparisonForm extends CFormModel
                 }elseif(key_exists($good_no,$jdData)){
                     $data["success"]["list"][]=$this->getComparisonRow($lbsRow,$jdData[$good_no],"success");
                     unset($jdData[$good_no]);
-                }else{
-                    $data["errorJD"]["list"][]=$this->getComparisonRow($lbsRow,array(),"errorJD");
+                }else{//不显示，因为金蝶数据太多
+                    //$data["errorJD"]["list"][]=$this->getComparisonRow($lbsRow,array(),"errorJD");
                 }
             }
         }

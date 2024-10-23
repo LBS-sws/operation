@@ -1,3 +1,6 @@
+<style>
+    .select2-container{ width:100%!important;}
+</style>
 <?php
 $ftrbtn = array();
 $ftrbtn[] = TbHtml::button(Yii::t('dialog','Close'), array('data-dismiss'=>'modal','color'=>TbHtml::BUTTON_COLOR_DEFAULT));
@@ -41,6 +44,22 @@ $('#citySelectBtn').click(function(){
     }
     window.location.href=url;
 });
+$('#citySelectDialog').removeAttr('tabindex');
 ";
 Yii::app()->clientScript->registerScript('citySelect',$js,CClientScript::POS_READY);
+
+switch(Yii::app()->language) {
+    case 'zh_cn': $lang = 'zh-CN'; break;
+    case 'zh_tw': $lang = 'zh-TW'; break;
+    default: $lang = Yii::app()->language;
+}
+$js="
+$('#dialog_city,#aaa').select2({
+    multiple: false,
+    maximumInputLength: 10,
+    language: '$lang',
+    disabled: false
+});
+";
+Yii::app()->clientScript->registerScript('searchCitySelectDialog',$js,CClientScript::POS_READY);
 ?>

@@ -18,8 +18,8 @@
         ?>
     </th>
     <th>
-        <?php echo TbHtml::link($this->getLabelName('jd_order_type').$this->drawOrderArrow('f.field_value'),'#',$this->createOrderLink('delivery-list','f.field_value'))
-        ;
+        <?php
+        echo "<a href='#'>".$this->getLabelName('jd_order_type')."</a>";
         ?>
     </th>
     <th>

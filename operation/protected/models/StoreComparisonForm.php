@@ -77,6 +77,28 @@ class StoreComparisonForm extends CFormModel
         return $list;
     }
 
+    private function getLBSWarehouseForArr($good_arr){
+        $good_arr = is_array($good_arr)?$good_arr:array();
+        $good_str = "'".implode("','",$good_arr)."'";
+        $list = array();
+        $rows = Yii::app()->db->createCommand()->select("id,goods_code,name,city")->from("opr_warehouse")
+            ->where("(city=:city or local_bool=0) and display=1 and goods_code in ({$good_str})",array(
+                ":city"=>$this->search_city
+            ))->queryAll();
+        if($rows){
+            foreach ($rows as $row){
+                $row["jd_good_id"] = WarehouseForm::getJDGoodsInfoToGoodsId($row["id"]);
+                $key="".$row["goods_code"];
+                $list[$key]=array(
+                    "lbs_good_no"=>$row["goods_code"],
+                    "lbs_good_name"=>$row["name"],
+                    "jd_good_id"=>$row["jd_good_id"],
+                );
+            }
+        }
+        return $list;
+    }
+
     private function getJDWarehouse(){
         $searchData=array(
             "org_number"=>CurlForDelivery::getJDCityCodeForCity($this->search_city),
@@ -94,8 +116,9 @@ class StoreComparisonForm extends CFormModel
             "success"=>array("count"=>0,"name"=>"成功","list"=>array()),
         );
 
-        $lbsData = $this->getLBSWarehouse();
         $jdData = $this->getJDWarehouse();
+        $good_no_arr = array_keys($jdData);
+        $lbsData = $this->getLBSWarehouseForArr($good_no_arr);
 
         if(!empty($lbsData)){
             foreach ($lbsData as $lbsRow){
@@ -276,8 +299,10 @@ class StoreComparisonForm extends CFormModel
         $html="<tr>";
         for($i=0;$i<$this->th_sum;$i++){
             if($i===0){
-                $width=60;
-            }elseif(in_array($i,array(3,5))){
+                $width=40;
+            }elseif($i===3){
+                $width=100;
+            }elseif(in_array($i,array(5))){
                 $width=50;
             }else{
                 $width=90;

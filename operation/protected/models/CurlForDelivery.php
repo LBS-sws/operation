@@ -51,11 +51,11 @@ class CurlForDelivery extends CurlForJD{
                     "billtype_number"=>"im_MaterialReqOutBill_STD_BT_S",//单据类型.编码
                     "biztype_number"=>self::getJDBizType($row),//业务类型.编码
                     "invscheme_number"=>self::getJDInvscheme($row),//库存事务.编码
-                    "biztime"=>$row["apply_date"],//业务日期
+                    "biztime"=>$row["audit_date"],//业务日期
                     "bizorg_number"=>$jdCity,//需求组织.编码
                     "supplyownertype"=>"bos_org",//货主类型
                     "supplyowner_number"=>$jdCity,//供应货主.编码
-                    "bookdate"=>$row["apply_date"],//记账日期
+                    "bookdate"=>$row["audit_date"],//记账日期
                     "lbs_lbswarehouser"=>$row["luu_name"],//LBS库管员
                     "settlecurrency_number"=>"CNY",//币别.货币代码
                     "comment"=>$row["remark"],//备注

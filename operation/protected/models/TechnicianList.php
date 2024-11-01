@@ -34,14 +34,12 @@ class TechnicianList extends CListPageModel
     {
         //order_user = '$userName' OR technician = '$userName'
         $userName = Yii::app()->user->name;
-        $sql1 = "select a.*,b.field_value as jd_order_type
+        $sql1 = "select a.*
 				from opr_order a
-				LEFT JOIN opr_send_set_jd b ON b.table_id=a.id and b.field_id='jd_order_type'
 				where ( a.judge=0 AND a.lcu='$userName') 
 			";
         $sql2 = "select count(a.id)
 				from opr_order a
-				LEFT JOIN opr_send_set_jd b ON b.table_id=a.id and b.field_id='jd_order_type'
 				where ( a.judge=0 AND a.lcu='$userName') 
 			";
         $clause = "";
@@ -84,6 +82,7 @@ class TechnicianList extends CListPageModel
         $this->attr = array();
         if (count($records) > 0) {
             foreach ($records as $k=>$record) {
+                $record['jd_order_type'] = TechnicianList::getJDOrderTypeForId($record['id'],"jd_order_type");
                 $this->attr[] = array(
                     'id'=>$record['id'],
                     'order_code'=>$record['order_code'],

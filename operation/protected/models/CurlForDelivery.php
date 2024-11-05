@@ -43,6 +43,7 @@ class CurlForDelivery extends CurlForJD{
         if(!empty($data["data"])){
             foreach ($data["data"] as $row){
                 $jdCity = self::getJDCityCodeForCity($row["city"]);
+                $jdCostCode = self::getJDCityCodeForCity($row["city"],"JD_cost_code");
                 $backBool = isset($row["back_type"])&&$row["back_type"]==1;
                 $employeeList = self::getEmployeeCodeForUsername($row["order_user"]);
                 $temp=array(
@@ -94,6 +95,7 @@ class CurlForDelivery extends CurlForJD{
                             "entrycomment"=>$goodRow["note"],//物料明细.备注
                             "lbs_sendgooddesc"=>$goodRow["remark"],//物料发货说明.备注
                             "lbs_eapikey"=>$goodRow["lbs_order_store_id"],//物料明细.第三方明细标识
+                            "ecostcenter_number"=>$jdCostCode,//成本中心.编码
                         );
                     }
                 }
@@ -219,11 +221,11 @@ class CurlForDelivery extends CurlForJD{
         return $list;
     }
 
-    public static function getJDCityCodeForCity($city){
+    public static function getJDCityCodeForCity($city,$field_id="JD_city"){
         $suffix = Yii::app()->params['envSuffix'];
         $list = Yii::app()->db->createCommand()->select("field_value")
             ->from("security{$suffix}.sec_city_info")
-            ->where("code=:code and field_id='JD_city'",array(':code'=>$city))
+            ->where("code=:code and field_id=:field_id",array(':code'=>$city,':field_id'=>$field_id))
             ->queryRow();
         if($list){
             return $list["field_value"];

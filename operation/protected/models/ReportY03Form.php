@@ -30,7 +30,7 @@ class ReportY03Form extends CReportForm
 		$this->name = Yii::t('report','Picking Records Report');
 		$this->format = 'EXCEL';
 		$this->city = Yii::app()->user->city();
-		$this->fields = 'start_dt,end_dt,user_ids,user_names';
+		$this->fields = 'city,start_dt,end_dt,user_ids,user_names';
 		$this->start_dt = date("Y/m").'/01';
 		$this->end_dt = date("Y/m/d");
 		$this->user_ids = '';

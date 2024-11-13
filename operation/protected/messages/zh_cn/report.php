@@ -34,14 +34,14 @@ return array(
 	'Grand Total'=>'总计',
 	'No Record'=>'没有相关记录',
 	
-	//'China & Franchise'=>'中国及加盟商',
-	'China & Franchise'=>'东南亚',
+	'China & Franchise'=>'中国及加盟商',
 	'South East Asia'=>'东南亚',
 	'All'=>'全部',
 	'Clean_PC_Misc_Paper'=>'清洁_灭虫_杂项_纸品',
 	'Puriscent'=>'飘盈香',
 	'Formaldehye'=>'甲醛',
 	'Grease trap'=>'隔油池',
+	'Air purifier rental'=>'空气净化机租赁',
 
 	'Goods'=>'物品',
 	'HQ Approved Date'=>'总部审批日期',
@@ -64,5 +64,9 @@ return array(
 	'Order Person'=>'申请人',
 // Percy 2018/2/8
 	'Item Price'=>'参考售价',
+    'send store'=>'发货仓库',
+    'send number'=>'发货数量',
+    'Apply Date'=>'申请日期',
+    'Black Store Name'=>'退回仓库',
 );
 ?>

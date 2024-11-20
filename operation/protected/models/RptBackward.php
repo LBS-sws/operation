@@ -45,7 +45,7 @@ class RptBackward extends CReport {
         $searchSQL=" AND f.city IN ({$citylist})";
         if(!empty($user_ids)){
             $user_ids = "'".str_replace("~","','",$user_ids)."'";
-            $searchSQL.=" AND f.username in ({$user_ids})";
+            $searchSQL.=" AND f.order_user in ({$user_ids})";
         }
         if(!empty($start_dt)){
             $start_dt = date("Y/m/d",strtotime($start_dt));

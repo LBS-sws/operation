@@ -187,9 +187,9 @@ class CurlForDelivery extends CurlForJD{
     }
 
     //获取金蝶系统的物料详情
-    public static function getWarehouseGoodsForJD($curlData){
+    public static function getWarehouseGoodsForJD($curlData,$printBool=false){
         $data = $curlData;
-        $rtn = self::getData($data,"/kapi/v2/lbs/im/getInventoryAvbQty");
+        $rtn = self::getData($data,"/kapi/v2/lbs/im/getInventoryAvbQty",$printBool);
         return $rtn;
     }
 

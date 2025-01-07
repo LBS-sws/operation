@@ -163,11 +163,11 @@ class TechnicianList extends CListPageModel
         return $list;
     }
 
-    public static function getCompanyNameForCode($code){
+    public static function getCompanyNameForCode($code,$city){
         $suffix = Yii::app()->params['envSuffix'];
         $row = Yii::app()->db->createCommand()->select("name,code")
             ->from("swoper{$suffix}.swo_company")
-            ->where("code=:code",array(':code'=>$code))
+            ->where("code=:code and city=:city",array(':code'=>$code,':city'=>$city))
             ->queryRow();
         if($row){
             return $row["name"]."({$row["code"]})";

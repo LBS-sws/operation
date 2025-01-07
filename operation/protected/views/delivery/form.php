@@ -149,7 +149,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                 <div class="col-sm-6">
                     <?php echo $form->hiddenField($model, 'jd_set[jd_company_code]'); ?>
                     <?php
-                    echo TbHtml::textField("jd_company_code",TechnicianList::getCompanyNameForCode($model->jd_set["jd_company_code"]),array('readonly'=>true,"id"=>"jd_company_code"));
+                    echo TbHtml::textField("jd_company_code",TechnicianList::getCompanyNameForCode($model->jd_set["jd_company_code"],$model->city),array('readonly'=>true,"id"=>"jd_company_code"));
                     ?>
                 </div>
             </div>

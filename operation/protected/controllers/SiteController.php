@@ -97,15 +97,16 @@ class SiteController extends Controller
 		}
 	}
 
+
     /**
      * Displays the login page
      */
     public function actionLogin()
     {
-        //$lbsUrl = str_replace(Yii::app()->getBaseUrl(false),'',Yii::app()->getBaseUrl(true));
-        //$lbsUrl.= Yii::app()->request->url;
         $lbsUrl = Yii::app()->getBaseUrl(true);
-        $lbsUrl = urlencode($lbsUrl);
+        if(!empty(Yii::app()->user->returnUrl)){
+            $lbsUrl = str_replace(Yii::app()->getBaseUrl(false),'',$lbsUrl).Yii::app()->user->returnUrl;
+        }
         $muUrl = Yii::app()->params['MHCurlRootURL']."/cas/login?service=".$lbsUrl;
         $this->redirect($muUrl);
     }
@@ -150,10 +151,10 @@ class SiteController extends Controller
 	 */
 	public function actionLogout()
 	{
-		Yii::app()->user->logout();
+        Yii::app()->user->logout();
         $url = Yii::app()->params['MHCurlRootURL']."/cas/logout";
         //$result = file_get_contents($url);//单点登出门户网站
-		$this->redirect($url);
+        $this->redirect($url);
         //$this->redirect(Yii::app()->homeUrl);
 	}
 

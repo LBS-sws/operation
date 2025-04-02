@@ -24,7 +24,8 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
         min-height: 34px;
         min-width: 75px;
     }
-    select{ min-width: 100px}
+    select{ min-width: 120px}
+    input{ min-width: 100px}
     #table-change td{vertical-align: middle;}
 </style>
 

@@ -29,7 +29,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
     #table-change td{position: relative;}
     .select2-container .select2-selection--single{ height: 34px;}
     .select2.select2-container{ width: 100% !important;}
-    .select_num,.select_remark{ min-width: 75px;}
+    .select_num,.select_remark{ min-width: 100px;}
 </style>
 <section class="content-header">
 	<h1>

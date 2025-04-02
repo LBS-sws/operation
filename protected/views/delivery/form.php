@@ -22,7 +22,9 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
         border: 1px solid #d2d6de;
         background-color: #eee;
         min-height: 34px;
+        min-width: 75px;
     }
+    select{ min-width: 100px}
     #table-change td{vertical-align: middle;}
 </style>
 
@@ -157,6 +159,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
             <div class="form-group">
                 <?php echo $form->labelEx($model,'goods_list',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-12">
+                    <div class="table-responsive">
                     <table class="table table-bordered disabled" id="table-change">
                         <thead>
                         <tr>
@@ -242,6 +245,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                         ?>
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
 

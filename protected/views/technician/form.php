@@ -24,10 +24,12 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
         border: 1px solid #d2d6de;
         background-color: #eee;
         min-height: 34px;
+        min-width: 75px;
     }
     #table-change td{position: relative;}
     .select2-container .select2-selection--single{ height: 34px;}
     .select2.select2-container{ width: 100% !important;}
+    .select_num,.select_remark{ min-width: 75px;}
 </style>
 <section class="content-header">
 	<h1>
@@ -153,6 +155,7 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
             <div class="form-group">
                 <?php echo $form->labelEx($model,'goods_list',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-10">
+                    <div class="table-responsive">
                     <table class="table table-bordered table-striped disabled" id="table-change" data-matching="<?php echo Yii::t("procurement","matching")?>" data-matters="<?php echo Yii::t("procurement","matters")?>" data-del="<?php echo Yii::t("misc","Delete")?>">
                         <thead>
                         <tr>
@@ -235,6 +238,8 @@ $this->pageTitle=Yii::app()->name . ' - Technician Summary Form';
                         <?php endif ?>
                         </tfoot>
                     </table>
+
+                    </div>
                 </div>
             </div>
 

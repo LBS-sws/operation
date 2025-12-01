@@ -102,6 +102,7 @@ class General extends CGeneral {
         }
     }
 
+
     public static function getCityListForArea(){
         $suffix = Yii::app()->params['envSuffix'];
         //$sql = "select field_id, field_value from security$suffix.sec_template_info where temp_id=$id";

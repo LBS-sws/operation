@@ -19,21 +19,14 @@ class WorkflowOprpt extends WorkflowDMS {
 	}
 
 	public function routeToManager() {
-		$mgr = $this->seekManager();
-		$this->assignRespUser($mgr);
-		$users = $this->getUserByControlRight(array('YN05'));
-		if (!empty($users)) {
-			foreach ($users as $user) {
-				if ($user!=$mgr) $this->assignRespUser($user);
-			}
-		}
+		$user = $this->seekManager();
+		$this->assignRespUser($user);
 	}
 
 	protected function getUserByControlRight($access=array()) {
 		$rtn = array();
 		if (!empty($access)) {
-//			$city = Yii::app()->user->city();
-			$city = $this->getRequestData('CITY');
+			$city = Yii::app()->user->city();
 			$citylist = City::model()->getAncestorList($city);
 			$citylist = empty($citylist) ? "'$city'" : $citylist.",'$city'";
 			$suffix = Yii::app()->params['envSuffix'];

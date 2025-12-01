@@ -538,7 +538,7 @@ class WarehouseForm extends CFormModel
         }
     }
 
-    public function downExcel(){
+    public static function downExcel(){
         $city = Yii::app()->user->city();
         $list["head"] = array("存货编码","存货名称","主计量单位","所属分类码","参考售价(成本)","是否允许小数","现有库存","产品配比","使用注意事项");
         if(Yii::app()->user->validFunction('YN02')){
@@ -580,6 +580,34 @@ class WarehouseForm extends CFormModel
                     $arr["cost_price"] = $priceList["cost_price"];
                 }
                 $arr["display"] = empty($row["display"])?"不显示":"显示";
+                $list["body"][]=$arr;
+            }
+        }
+        return $list;
+    }
+
+    public static function downPriceExcel(){
+        $list["head"] = array("物品编号","物品名称","年份","月份","单价");
+        $rs = Yii::app()->db->createCommand()->select("a.*")->from("opr_warehouse a")
+            ->where('a.local_bool=0')->queryAll();
+        $list["body"] = array();
+        if($rs){
+            $year = date("Y");
+            $month = date("n");
+            foreach ($rs as $row){
+                $priceList = Yii::app()->db->createCommand()->select("price as cost_price,year,month")->from("opr_warehouse_price")
+                    ->where("(year<date_format(:date_time,'%Y') or (year=date_format(:date_time,'%Y') and month<=date_format(:date_time,'%m'))) AND warehouse_id = :id",
+                        array(':id'=>$row['id'],':date_time'=>date("Y-m-d")))->order("year DESC,month DESC")->queryRow();
+                if(!$priceList){
+                    $priceList=array('cost_price'=>'0','year'=>'','month'=>'');
+                }
+                $arr = array(
+                    "goods_code"=>$row["goods_code"],
+                    "name"=>$row["name"],
+                    "price_year"=>$year,
+                    "price_month"=>$month,
+                    "price"=>$priceList["cost_price"],
+                );
                 $list["body"][]=$arr;
             }
         }

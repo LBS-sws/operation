@@ -6,6 +6,7 @@ class Monthly2Form extends CFormModel
 	public $year_no;
 	public $month_no;
 	public $lcd;
+	public $lcu;
 	public $record = array();
 	public $wfstatus;
 	public $wfstatusdesc;
@@ -170,6 +171,93 @@ class Monthly2Form extends CFormModel
 		}
 		return true;
 	}
+
+    //發送流程
+    protected function sendFlow($scenario,$wf){
+        //$wf = new WorkflowOprpt;
+        $lcu = $wf->getRequestData("REQ_USER");
+        $menuCode = "YA03";
+        $flowModel = new CNoticeFlowModel($menuCode,$this->id);
+        $flowModel->setOwerNumForUsername($lcu);
+        $html = "<p>地区：".CGeneral::getCityName($this->city)."</p>";
+        $html .= "<p>ID营业报告（年月）：".$this->year_no."年".$this->month_no."月</p>";
+        //$flowModel->setDescription($description);
+        switch ($scenario){
+            case "resubmit"://主管拒绝后第二次提交
+            case "submit"://提交
+                $html .= "<p>申请时间：".date('Y-m-d H:i:s')."</p>";
+                $flowModel->setMessage($html);
+                $flowModel->setMB_PC_Url("monthly2/view",array("index"=>$this->id,'rtn'=>'indexa'));
+                $subject="ID营业报告({$this->year_no}/{$this->month_no}) - 待主管审核";
+                $flowModel->setSubject($subject);
+                $userList = $wf->getCurrentStateRespUser();//获取通知人
+                $flowModel->addEmailToLcuList($userList);
+                $flowModel->saveFlowAll("",$menuCode);
+                break;
+            case "rejectm"://主管拒绝
+                $html .= "<p>拒绝原因：".$this->reason."</p>";
+                $flowModel->setMessage($html);
+                $flowModel->setMB_PC_Url("monthly2/view",array("index"=>$this->id));
+                $subject="ID营业报告({$this->year_no}/{$this->month_no}) - 主管已拒绝";
+                $flowModel->setSubject($subject);
+                $flowModel->sendRefuseFlow($menuCode);
+                $flowModel->addEmailToLcu($lcu);
+                $flowModel->note_type=2;
+                $flowModel->setMB_PC_Url("monthly2/edit",array("index"=>$this->id));
+                $flowModel->saveNoticeAll("",$menuCode);
+                break;
+            case "reject"://总部拒绝
+                $html .= "<p>拒绝原因：".$this->reason."</p>";
+                $flowModel->setMessage($html);
+                $flowModel->setMB_PC_Url("monthly2/view",array("index"=>$this->id));
+                $subject="ID营业报告({$this->year_no}/{$this->month_no}) - 总部已拒绝";
+                $flowModel->setSubject($subject);
+                $flowModel->sendRefuseFlow($menuCode);
+                $flowModel->addEmailToLcu($lcu);
+                $flowModel->note_type=2;
+                $flowModel->setMB_PC_Url("monthly2/edit",array("index"=>$this->id));
+                $flowModel->saveNoticeAll("",$menuCode);
+                break;
+            case "acceptm"://主管批准
+                $flowModel->setMessage($html);
+                $subject="ID营业报告({$this->year_no}/{$this->month_no}) - 待总部审核";
+                $flowModel->setSubject($subject);
+                $flowModel->setMB_PC_Url("monthly2/view",array("index"=>$this->id));
+                $flowModel->sendFinishFlow($menuCode);
+                $flowModel->setMB_PC_Url("monthly2/view",array("index"=>$this->id,'rtn'=>'indexa'));
+                $userList = $wf->getCurrentStateRespUser();//获取通知人
+                $flowModel->addEmailToLcuList($userList);
+                $flowModel->saveFlowAll('',$menuCode);
+                $flowModel->resetToAddr();
+                $flowModel->setMB_PC_Url("monthly2/edit",array("index"=>$this->id));
+                $flowModel->addEmailToLcu($lcu);
+                $flowModel->note_type=2;
+                $flowModel->saveNoticeAll("",$menuCode);
+                break;
+            case "accept"://总部批准
+                $flowModel->setMessage($html);
+                $subject="ID营业报告({$this->year_no}/{$this->month_no}) - 总部已批准";
+                $flowModel->setSubject($subject);
+                $flowModel->setMB_PC_Url("monthly2/view",array("index"=>$this->id,'rtn'=>'indexc'));
+                $flowModel->sendFinishFlow($menuCode);
+                $flowModel->setMB_PC_Url("monthly2/edit",array("index"=>$this->id));
+                $flowModel->addEmailToLcu($lcu);
+                $flowModel->note_type=2;
+                $flowModel->saveNoticeAll("",$menuCode);
+                break;
+            case "clearWorkflow"://退回草稿
+                $flowModel->setOwerNumForUsername($this->lcu);
+                $flowModel->setMessage($html);
+                $subject="ID营业报告({$this->year_no}/{$this->month_no}) - 已退回草稿";
+                $flowModel->setSubject($subject);
+                $flowModel->setMB_PC_Url("monthly2/edit",array("index"=>$this->id));
+                $flowModel->sendRefuseFlow($menuCode);
+                $flowModel->addEmailToLcu($this->lcu);
+                $flowModel->note_type=2;
+                $flowModel->saveNoticeAll("",$menuCode);
+                break;
+        }
+    }
 	
 	public function submit()
 	{
@@ -189,6 +277,8 @@ class Monthly2Form extends CFormModel
 				$wf->takeAction('SUBMIT');
 			}
 			$wf->transaction->commit();
+
+			$this->sendFlow("submit",$wf);
 		}
 		catch(Exception $e) {
 			$wf->transaction->rollback();
@@ -209,6 +299,8 @@ class Monthly2Form extends CFormModel
 				$wf->takeAction('RESUBMIT');
 			}
 			$wf->transaction->commit();
+
+            $this->sendFlow("resubmit",$wf);
 		}
 		catch(Exception $e) {
 			$wf->transaction->rollback();
@@ -225,6 +317,8 @@ class Monthly2Form extends CFormModel
 				$wf->takeAction('APPROVE');
 			}
 			$wf->transaction->commit();
+
+            $this->sendFlow("accept",$wf);
 		}
 		catch(Exception $e) {
 			$wf->transaction->rollback();
@@ -241,6 +335,8 @@ class Monthly2Form extends CFormModel
 				$wf->takeAction('HDAPPROVE');
 			}
 			$wf->transaction->commit();
+
+            $this->sendFlow("acceptm",$wf);
 		}
 		catch(Exception $e) {
 			$wf->transaction->rollback();
@@ -257,6 +353,8 @@ class Monthly2Form extends CFormModel
 				$wf->takeAction('DENY',$this->reason);
 			}
 			$wf->transaction->commit();
+
+            $this->sendFlow("reject",$wf);
 		}
 		catch(Exception $e) {
 			$wf->transaction->rollback();
@@ -273,6 +371,8 @@ class Monthly2Form extends CFormModel
 				$wf->takeAction('HDDENY',$this->reason);
 			}
 			$wf->transaction->commit();
+
+            $this->sendFlow("rejectm",$wf);
 		}
 		catch(Exception $e) {
 			$wf->transaction->rollback();
@@ -285,9 +385,12 @@ class Monthly2Form extends CFormModel
 		$connection = $wf->openConnection();
 		try {
 			if ($wf->startProcess('OPRPT2',$this->id,$this->lcd)) {
+			    $this->lcu = $wf->getRequestData("REQ_USER");
 				$wf->clearFlow();
 			}
 			$wf->transaction->commit();
+
+            $this->sendFlow("clearWorkflow",$wf);
 		}
 		catch(Exception $e) {
 			$wf->transaction->rollback();

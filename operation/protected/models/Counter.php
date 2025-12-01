@@ -42,8 +42,19 @@ class Counter {
     public function getDeliNum(){
         $city = Yii::app()->user->city();
         $uid = Yii::app()->user->id;
-        $deli_num = Yii::app()->db->createCommand()->select("count(id)")
-            ->from("opr_order")->where('status="sent" and judge=0 and city=:city',array(":city"=>$city))->queryScalar();
+        $deli_num = Yii::app()->db->createCommand()->select("count(a.id)")
+            ->from("opr_order a")
+            ->where('a.status="sent" and a.judge=0 and a.city=:city and a.judge_type=2',array(":city"=>$city))->queryScalar();
+        return $deli_num;
+    }
+
+	//销售出库审核的數量
+    public function getSalesAuditNum(){
+        $city = Yii::app()->user->city();
+        $uid = Yii::app()->user->id;
+        $deli_num = Yii::app()->db->createCommand()->select("count(a.id)")
+            ->from("opr_order a")
+            ->where('a.status="sent" and a.judge=0 and a.city=:city and a.judge_type="1"',array(":city"=>$city))->queryScalar();
 		return $deli_num;
     }
 
@@ -51,9 +62,20 @@ class Counter {
     public function getGoodsNum(){
         $city = Yii::app()->user->city();
         $uid = Yii::app()->user->id;
-        $goods_num = Yii::app()->db->createCommand()->select("count(id)")
-            ->from("opr_order")->where('status="approve" and judge=0 and city=:city and lcu=:lcu',array(":city"=>$city,":lcu"=>$uid))->queryScalar();
+        $goods_num = Yii::app()->db->createCommand()->select("count(a.id)")
+            ->from("opr_order a")
+            ->where('a.status="approve" and a.judge=0 and a.city=:city and a.lcu=:lcu and a.judge_type=2',array(":city"=>$city,":lcu"=>$uid))->queryScalar();
 		return $goods_num;
+    }
+
+	//销售出库的數量
+    public function getSalesNum(){
+        $city = Yii::app()->user->city();
+        $uid = Yii::app()->user->id;
+        $goods_num = Yii::app()->db->createCommand()->select("count(a.id)")
+            ->from("opr_order a")
+            ->where('a.status="approve" and a.judge=0 and a.city=:city and a.lcu=:lcu and a.judge_type=1',array(":city"=>$city,":lcu"=>$uid))->queryScalar();
+        return $goods_num;
     }
 
 	// 营业报告审核的數量

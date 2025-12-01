@@ -355,5 +355,6 @@ return array(
     'sales apply'=>'銷售出庫',
     'jd company code'=>'客户名称',
     'jd good spec'=>'金蝶规格型号',
+    'Add requisition sales'=>'添加銷售出庫',
 );
 ?>

@@ -50,8 +50,8 @@ class TechnicianController extends Controller
 			$model->attributes = $_POST['TechnicianList'];
 		} else {
 			$session = Yii::app()->session;
-			if (isset($session['technician_ya01']) && !empty($session['technician_ya01'])) {
-				$criteria = $session['technician_ya01'];
+			if (isset($session['technician_ya00']) && !empty($session['technician_ya00'])) {
+				$criteria = $session['technician_ya00'];
 				$model->setCriteria($criteria);
 			}
 		}

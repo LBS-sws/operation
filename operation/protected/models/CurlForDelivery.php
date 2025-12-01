@@ -187,9 +187,9 @@ class CurlForDelivery extends CurlForJD{
     }
 
     //获取金蝶系统的物料详情
-    public static function getWarehouseGoodsForJD($curlData,$printBool=false){
+    public static function getWarehouseGoodsForJD($curlData){
         $data = $curlData;
-        $rtn = self::getData($data,"/kapi/v2/lbs/im/getInventoryAvbQty",$printBool);
+        $rtn = self::getData($data,"/kapi/v2/lbs/im/getInventoryAvbQty");
         return $rtn;
     }
 
@@ -227,10 +227,10 @@ class CurlForDelivery extends CurlForJD{
             ->from("security{$suffix}.sec_city_info")
             ->where("code=:code and field_id=:field_id",array(':code'=>$city,':field_id'=>$field_id))
             ->queryRow();
-        if($list){
+        if($list&&!empty($list["field_value"])){
             return $list["field_value"];
         }else{
-            return "";
+            return "SBTTTT";//随便定义的，为了不让查询空值
         }
     }
 

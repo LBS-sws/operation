@@ -11,6 +11,8 @@ class OrderForm extends CFormModel
     public $remark;
 	public $luu;
 	public $lcu;
+	public $lcd;
+	public $lud;
 	public $statusList;
 	public $order_code;
 	public $order_class;
@@ -490,6 +492,8 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
 
         $city = Yii::app()->user->city();
         $uid = Yii::app()->user->id;
+        $this->lcu = $uid;
+        $this->lcd = date('Y-m-d H:i:s');
         $order_username = Yii::app()->user->name;
         $command=$connection->createCommand($sql);
         if (strpos($sql,':id')!==false)
@@ -521,10 +525,12 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
             $command->bindParam(':city',$city,PDO::PARAM_STR);
         if (strpos($sql,':luu')!==false)
             $command->bindParam(':luu',$uid,PDO::PARAM_STR);
-        if (strpos($sql,':lcu')!==false)
+        if (strpos($sql,':lcu')!==false){
             $command->bindParam(':lcu',$uid,PDO::PARAM_STR);
-        if (strpos($sql,':lcd')!==false)
-            $command->bindParam(':lcd',date('Y-m-d H:i:s'),PDO::PARAM_STR);
+        }
+        if (strpos($sql,':lcd')!==false){
+            $command->bindParam(':lcd',$this->lcd,PDO::PARAM_STR);
+        }
         $command->execute();
 
         if ($insetBool){
@@ -594,10 +600,61 @@ $html.='<p>丁：	不論來源地，單價為嘉富貨倉提取價（不包括�
         }
 
         $this->updateGoodsStatus();
-        //發送郵件
-        OrderGoods::sendEmail($oldOrderStatus,$this->status,$this->order_code,$this->activity_id);
+        //發送流程
+        $this->sendFlow();
+        //發送郵件(不使用)
+        //OrderGoods::sendEmail($oldOrderStatus,$this->status,$this->order_code,$this->activity_id);
 		return true;
 	}
+
+    //發送流程
+    protected function sendFlow(){
+        $menuCode = "YD03";
+        $flowModel = new CNoticeFlowModel($menuCode,$this->id);
+        $scenario = $this->getScenario();
+        if($scenario=='delete'){
+            $subject="删除订单";
+            $flowModel->setSubject($subject);
+            $flowModel->deleteFlowAll($menuCode);
+        }elseif(in_array($this->status,array("sent","finished"))){
+            //$email = new Email();
+            if(!empty($this->activity_id)){
+                $activityList = new ActivityForm();
+                $activityList->retrieveData($this->activity_id);
+                $html = "<p>采购编号：".$activityList->activity_code."</p>";
+                $html .= "<p>采购标题：".$activityList->activity_title."</p>";
+            }else{
+                $html = "<p>采购编号：快速订单</p>";
+                $html .= "<p>采购标题：快速订单</p>";
+            }
+            $html .= "<p>下单城市：".CGeneral::getCityName($this->city)."</p>";
+            $html .= "<p>下单用户：".OrderGoods::getNameToUsername($this->lcu)."</p>";
+            $html .= "<p>下单时间：".$this->lcd."</p>";
+            $html .= "<p>订单编号：".$this->order_code."</p>";
+            //$flowModel->setDescription($description);
+            $flowModel->setMessage($html);
+            if($this->status=="sent"){
+                $flowModel->setMB_PC_Url("areaAudit/edit",array("index"=>$this->id));
+                $subject="待审核采购订单（订单编号：".$this->order_code."）";
+                $flowModel->setSubject($subject);
+                $flowModel->addEmailToPrefixAndCity("YD06",$this->city);
+                $flowModel->saveFlowAll("",$menuCode);
+            }else{
+                $flowModel->setMB_PC_Url("order/edit",array("index"=>$this->id));
+                $subject="采购订单已完成，地区已收货（订单编号：".$this->order_code."）";
+                $flowModel->setSubject($subject);
+                $flowModel->sendFinishFlow($menuCode);
+                if(!empty($this->activity_id)){
+                    $flowModel->setMB_PC_Url("purchase/edit",array("index"=>$this->id));
+                }else{
+                    $flowModel->setMB_PC_Url("fast/edit",array("index"=>$this->id));
+                }
+                $flowModel->addEmailToOperation();
+                $flowModel->note_type=2;
+                $flowModel->saveNoticeAll("",$menuCode);
+            }
+        }
+    }
 
     //修改訂單內物品的狀態
     protected function updateGoodsStatus(){

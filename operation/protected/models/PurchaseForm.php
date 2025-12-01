@@ -9,6 +9,9 @@ class PurchaseForm extends CFormModel
     public $remark;
 	public $luu;
 	public $lcu;
+	public $lcd;
+	public $lud;
+	public $city;
 	public $statusList;
 	public $order_code;
 	public $order_class;
@@ -63,6 +66,8 @@ class PurchaseForm extends CFormModel
 	{
 		return array(
 			array('id, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, luu, lcu, lud, lcd, goods_list, notice','safe'),
+
+            array('id','validateID'),
             array('goods_list','required','on'=>array('audit','edit','reject')),
             array('goods_list','validateGoods','on'=>array('audit','edit')),
             array('ject_remark','required','on'=>'reject'),
@@ -71,6 +76,22 @@ class PurchaseForm extends CFormModel
             //array('order_num','in','range'=>range(0,600)),
 		);
 	}
+
+    public function validateID($attribute, $params){
+        $connection = Yii::app()->db;
+        $rows = $connection->createCommand()->select("activity_id,order_code,lcu,lcd,city")->from("opr_order")
+            ->where('id=:id AND status_type=1 AND judge=1', array(':id'=>$this->id))->queryRow();
+        if($rows){
+            $this->activity_id = $rows["activity_id"];
+            $this->order_code = $rows["order_code"];
+            $this->lcu = $rows["lcu"];
+            $this->lcd = $rows["lcd"];
+            $this->city = $rows["city"];
+        }else{
+            $message = Yii::t('dialog','No Record Found');
+            $this->addError($attribute,$message);
+        }
+    }
 
 	//驗證訂單內的物品
     public function validateGoods($attribute, $params){
@@ -427,14 +448,87 @@ class PurchaseForm extends CFormModel
         }
 
 
+        //發送流程
+        $this->sendFlow($this->getScenario());
         //發送郵件
-        OrderGoods::sendEmail($oldOrderStatus,$this->status,$this->order_code,$this->activity_id);
+        //OrderGoods::sendEmail($oldOrderStatus,$this->status,$this->order_code,$this->activity_id);
 		return true;
 	}
+
+    //發送流程
+    protected function sendFlow($scenario){
+        $menuCode = "YD03";
+        $flowModel = new CNoticeFlowModel($menuCode,$this->id);
+        $flowModel->setOwerNumForUsername($this->lcu);
+        if(!empty($this->activity_id)){
+            $activityList = new ActivityForm();
+            $activityList->retrieveData($this->activity_id);
+            $html = "<p>采购编号：".$activityList->activity_code."</p>";
+            $html .= "<p>采购标题：".$activityList->activity_title."</p>";
+        }else{
+            $html = "<p>采购编号：快速订单</p>";
+            $html .= "<p>采购标题：快速订单</p>";
+        }
+        $html .= "<p>下单城市：".CGeneral::getCityName($this->city)."</p>";
+        $html .= "<p>下单用户：".OrderGoods::getNameToUsername($this->lcu)."</p>";
+        $html .= "<p>下单时间：".$this->lcd."</p>";
+        $html .= "<p>订单编号：".$this->order_code."</p>";
+        //$flowModel->setDescription($description);
+        switch ($scenario){
+            case "notice"://通知
+                $html.="<p><b>通知原因：".$this->notice."</b></p>";
+                $flowModel->setMessage($html);
+                $flowModel->setMB_PC_Url("order/edit",array("index"=>$this->id));
+                $subject="采购订单通知（订单编号：".$this->order_code."）";
+                $flowModel->setSubject($subject);
+                $flowModel->addEmailToPrefixAndCity("YD03",$this->city);
+                $flowModel->note_type=2;
+                $flowModel->saveNoticeAll("",$menuCode);
+                break;
+            case "audit"://审核
+                $html .= "<p>审核时间：".date('Y-m-d H:i:s')."</p>";
+                $flowModel->setMessage($html);
+                $flowModel->setMB_PC_Url("order/edit",array("index"=>$this->id));
+                $subject="采购订单已发货，等待收货（订单编号：".$this->order_code."）";
+                $flowModel->setSubject($subject);
+                $flowModel->addEmailToPrefixAndCity("YD03",$this->city);
+                $flowModel->saveFlowAll("",$menuCode);
+                break;
+            case "backward"://退回
+                $html .= "<p>退回时间：".date('Y-m-d H:i:s')."</p>";
+                $flowModel->setMessage($html);
+                $flowModel->setMB_PC_Url("order/edit",array("index"=>$this->id));
+                $subject="采购订单已退回，等待重新发货（订单编号：".$this->order_code."）";
+                $flowModel->setSubject($subject);
+                $flowModel->sendFinishFlow($menuCode);
+                $flowModel->addEmailToPrefixAndCity("YD03",$this->city);
+                $flowModel->note_type=2;
+                $flowModel->saveNoticeAll("",$menuCode);
+                $flowModel->setMB_PC_Url("purchase/edit",array("index"=>$this->id));
+                $flowModel->resetToAddr();
+                $flowModel->note_type=1;
+                $flowModel->addEmailToOperation();
+                $flowModel->saveFlowAll("",$menuCode);
+                break;
+            case "reject"://拒绝
+                $html.="<p>拒绝原因：{$this->ject_remark}</p>";
+                $flowModel->setMessage($html);
+                $flowModel->setMB_PC_Url("order/edit",array("index"=>$this->id));
+                $subject="采购订单已拒绝，请查看详情（订单编号：".$this->order_code."）";
+                $flowModel->setSubject($subject);
+                $flowModel->addEmailToPrefixAndCity("YD03",$this->city);
+                $flowModel->sendRefuseFlow($menuCode);
+                $flowModel->note_type=2;
+                $flowModel->saveNoticeAll("",$menuCode);
+                break;
+        }
+    }
+
 	//退回
 	public function backward(){
-        $rows = Yii::app()->db->createCommand()->select("id")->from("opr_order")->where('status = "approve" and id = :id',array(':id'=>$this->id))->queryAll();
-        if(count($rows) > 0){
+        $row = Yii::app()->db->createCommand()->select("*")
+            ->from("opr_order")->where('status = "approve" and id = :id',array(':id'=>$this->id))->queryRow();
+        if($row){
             $uid = Yii::app()->user->id;
             $this->status = "sent";
             Yii::app()->db->createCommand()->update('opr_order', array(
@@ -451,6 +545,13 @@ class PurchaseForm extends CFormModel
                 'lcu'=>Yii::app()->user->user_display_name(),
                 'time'=>date('Y-m-d H:i:s'),
             ));
+
+            $this->activity_id = $row["activity_id"];
+            $this->order_code = $row["order_code"];
+            $this->lcu = $row["lcu"];
+            $this->lcd = $row["lcd"];
+            $this->city = $row["city"];
+            $this->sendFlow("backward");
             return true;
         }
         return false;
@@ -506,10 +607,20 @@ class PurchaseForm extends CFormModel
         return $arr;
     }
 
-
-
     //管理員操作通知
-    function notice(){
+    public function notice(){
+        Yii::app()->db->createCommand()->insert('opr_order_status', array(
+            'order_id'=>$this->id,
+            'status'=>"Notice",
+            'r_remark'=>$this->notice,
+            'lcu'=>Yii::app()->user->user_display_name(),
+            'time'=>date('Y-m-d H:i:s'),
+        ));//增加通知记录
+        $this->sendFlow("notice");
+    }
+
+    //管理員操作通知(失效)
+    function noticeOld(){
         $uid = Yii::app()->user->id;
         $suffix = Yii::app()->params['envSuffix'];
         $systemId = Yii::app()->params['systemId'];

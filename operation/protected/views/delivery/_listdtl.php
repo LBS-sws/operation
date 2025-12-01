@@ -52,6 +52,9 @@ switch ($this->record['status']){
             }
         ?>
     </td>
+<?php if (Yii::app()->user->validFunction('YN02')): ?>
+    <td><?php echo $this->record['total_price']; ?></td>
+<?php endif ?>
 <?php if (!Yii::app()->user->isSingleCity()): ?>
     <td><?php echo $this->record['city']; ?></td>
 <?php endif ?>

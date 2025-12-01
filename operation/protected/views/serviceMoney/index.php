@@ -28,7 +28,7 @@ $this->pageTitle=Yii::app()->name . ' - ServiceMoney';
 		<?php 
 			if (Yii::app()->user->validRWFunction('TL05'))
 				echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('misc','Add'), array(
-					'submit'=>Yii::app()->createUrl('serviceMoney/new'),
+					'submit'=>Yii::app()->createUrl('serviceMoney/new'),'class'=>'hide'
 				)); 
 		?>
 	</div>

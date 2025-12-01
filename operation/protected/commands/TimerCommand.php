@@ -26,6 +26,7 @@ class TimerCommand extends CConsoleCommand {
         $serviceMoneyModel->curlJobFee($year,$month);//同步U系統的服務金額
         $model = new RankingMonthForm();
         $model->insertTechnician($year,$month,true);//刷新技術員排行榜
+		/*
         echo "year:{$year}\n";
         echo "month:{$month}\n";
         echo "day:{$day}\n";
@@ -41,6 +42,7 @@ class TimerCommand extends CConsoleCommand {
             $model = new RankingMonthForm();
             $model->insertTechnician($year,$month,true);//刷新技術員排行榜
         }
+		*/
     }
 
     //技术员综合排行榜数据输入邮件提醒

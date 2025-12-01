@@ -31,7 +31,7 @@ $this->pageTitle=Yii::app()->name . ' - ServiceMoney Form';
 		<?php 
 			if ($model->scenario!='new' && $model->scenario!='view') {
 				echo TbHtml::button('<span class="fa fa-file-o"></span> '.Yii::t('misc','Add Another'), array(
-					'submit'=>Yii::app()->createUrl('serviceMoney/new')));
+					'submit'=>Yii::app()->createUrl('serviceMoney/new'),'class'=>'hide'));
 			}
 		?>
 		<?php echo TbHtml::button('<span class="fa fa-reply"></span> '.Yii::t('misc','Back'), array(
@@ -39,12 +39,12 @@ $this->pageTitle=Yii::app()->name . ' - ServiceMoney Form';
 		?>
 <?php if ($model->scenario!='view'): ?>
 			<?php echo TbHtml::button('<span class="fa fa-upload"></span> '.Yii::t('misc','Save'), array(
-				'submit'=>Yii::app()->createUrl('serviceMoney/save')));
+				'submit'=>Yii::app()->createUrl('serviceMoney/save'),'class'=>'hide'));
 			?>
 <?php endif ?>
 <?php if ($model->scenario!='new' && $model->scenario!='view'): ?>
 	<?php echo TbHtml::button('<span class="fa fa-remove"></span> '.Yii::t('misc','Delete'), array(
-			'name'=>'btnDelete','id'=>'btnDelete','data-toggle'=>'modal','data-target'=>'#removedialog',)
+			'name'=>'btnDelete','id'=>'btnDelete','class'=>'hide','data-toggle'=>'modal','data-target'=>'#removedialog',)
 		);
 	?>
 <?php endif ?>

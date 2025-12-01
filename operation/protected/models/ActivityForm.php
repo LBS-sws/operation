@@ -229,23 +229,37 @@ class ActivityForm extends CFormModel
         if ($this->scenario=='new'){
             $this->id = Yii::app()->db->getLastInsertID();
             $this->scenario = "edit";
-            $this->setEmail();
-        }elseif ($this->scenario=='edit'){
-            if(strtotime(date("Y-m-d"))<strtotime($this->start_time)){
-                $message = "<p>總部採購編號：".$this->activity_code."</p>";
-                $message .= "<p>總部採購標題：".$this->activity_title."</p>";
-                $message .= "<p>總部採購類型：".Yii::t("procurement",$this->order_class)."</p>";
-                $message .= "<p>總部採購開始時間：".$this->start_time."</p>";
-                $message .= "<p>總部採購結束時間：".$this->end_time."</p>";
-				$suffix = Yii::app()->params['envSuffix'];
-                Yii::app()->db->createCommand()->update("swoper$suffix.swo_email_queue", array(
-                    'request_dt'=>$this->start_time,
-                    'message'=>$message,
-                ),"lcu=:lcu",array(":lcu"=>$this->id));
-             }
         }
+
+        $this->sendFlow();
 		return true;
 	}
+
+    //發送流程
+    protected function sendFlow(){
+        $menuCode = "YD04";
+        $flowModel = new CNoticeFlowModel($menuCode,$this->id);
+        if($this->getScenario()=='delete'){
+            $subject="删除中央采购";
+            $flowModel->setSubject($subject);
+            $flowModel->deleteFlowAll($menuCode);
+        }elseif($this->getScenario()=='edit'){
+            $flowModel->setMB_PC_Url("order/activity");
+            //$email = new Email();
+            $subject="中央采购";
+            $message = "<p>	中央采购编号：".$this->activity_code."</p>";
+            $message .= "<p>中央采购标题：".$this->activity_title."</p>";
+            $message .= "<p>中央采购类型：".Yii::t("procurement",$this->order_class)."</p>";
+            $message .= "<p>中央采购开始时间：".$this->start_time."</p>";
+            $message .= "<p>中央采购结束时间：".$this->end_time."</p>";
+            //$flowModel->setDescription($description);
+            $flowModel->setMessage($message);
+            $flowModel->setSubject($subject);
+            $flowModel->addEmailToPrefixNullCity("YD04");
+            $flowModel->note_type=2;//通知流程
+            $flowModel->saveNoticeAll();
+        }
+    }
 
 	//發送郵件
 	private function setEmail(){

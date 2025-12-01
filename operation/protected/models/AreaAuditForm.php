@@ -8,6 +8,9 @@ class AreaAuditForm extends CFormModel
     public $remark;
     public $luu;
     public $lcu;
+    public $lcd;
+    public $lud;
+    public $city;
     public $statusList;
     public $order_code;
     public $order_class;
@@ -68,11 +71,14 @@ class AreaAuditForm extends CFormModel
 
     public function validateTime($attribute, $params){
         $connection = Yii::app()->db;
-        $rows = $connection->createCommand()->select("activity_id,order_code")->from("opr_order")
-            ->where('id=:id', array(':id'=>$this->id))->queryRow();
+        $rows = $connection->createCommand()->select("activity_id,order_code,lcu,lcd,city")->from("opr_order")
+            ->where('id=:id AND judge=1', array(':id'=>$this->id))->queryRow();
         if($rows){
             $this->activity_id = $rows["activity_id"];
             $this->order_code = $rows["order_code"];
+            $this->lcu = $rows["lcu"];
+            $this->lcd = $rows["lcd"];
+            $this->city = $rows["city"];
             if(!empty($this->activity_id)){
                 $nowDate = date("Y-m-d");
                 $list = $connection->createCommand()->select("activity_code,activity_title")->from("opr_order_activity")
@@ -206,9 +212,62 @@ class AreaAuditForm extends CFormModel
             'time'=>date('Y-m-d H:i:s'),
         ));
 
-        //發送郵件
-        $oldOrderStatus[0]["status"] = "aaa";
-        OrderGoods::sendEmail($oldOrderStatus,$this->status,$this->order_code,$this->activity_id);
+        //發送流程
+        $this->sendFlow();
+        //發送郵件(不使用)
+        //$oldOrderStatus[0]["status"] = "aaa";
+        //OrderGoods::sendEmail($oldOrderStatus,$this->status,$this->order_code,$this->activity_id);
 		return true;
 	}
+
+    //發送流程
+    protected function sendFlow(){
+        $menuCode = "YD03";
+        $flowModel = new CNoticeFlowModel($menuCode,$this->id);
+        $flowModel->setOwerNumForUsername($this->lcu);
+        $scenario = $this->getScenario();
+        if($scenario=='delete'){
+            $subject="删除订单";
+            $flowModel->setSubject($subject);
+            $flowModel->deleteFlowAll($menuCode);
+        }elseif(in_array($scenario,array("audit","reject"))){
+            //$email = new Email();
+            if(!empty($this->activity_id)){
+                $activityList = new ActivityForm();
+                $activityList->retrieveData($this->activity_id);
+                $html = "<p>采购编号：".$activityList->activity_code."</p>";
+                $html .= "<p>采购标题：".$activityList->activity_title."</p>";
+            }else{
+                $html = "<p>采购编号：快速订单</p>";
+                $html .= "<p>采购标题：快速订单</p>";
+            }
+            $html .= "<p>下单城市：".CGeneral::getCityName($this->city)."</p>";
+            $html .= "<p>下单用户：".OrderGoods::getNameToUsername($this->lcu)."</p>";
+            $html .= "<p>下单时间：".$this->lcd."</p>";
+            $html .= "<p>订单编号：".$this->order_code."</p>";
+            //$flowModel->setDescription($description);
+            if($scenario=="audit"){
+                $flowModel->setMessage($html);
+                if(!empty($this->activity_id)){
+                    $flowModel->setMB_PC_Url("purchase/edit",array("index"=>$this->id));
+                }else{
+                    $flowModel->setMB_PC_Url("fast/edit",array("index"=>$this->id));
+                }
+                $subject="待审核采购订单（订单编号：".$this->order_code."）";
+                $flowModel->setSubject($subject);
+                $flowModel->addEmailToOperation();
+                $flowModel->saveFlowAll("",$menuCode);
+            }else{
+                $html.="<p>拒绝原因:{$this->ject_remark}</p>";
+                $flowModel->setMessage($html);
+                $flowModel->setMB_PC_Url("order/edit",array("index"=>$this->id));
+                $subject="采购订单已拒绝，请查看详情（订单编号：".$this->order_code."）";
+                $flowModel->setSubject($subject);
+                $flowModel->addEmailToPrefixAndCity("YD03",$this->city);
+                $flowModel->sendRefuseFlow($menuCode);
+                $flowModel->note_type=2;
+                $flowModel->saveNoticeAll("",$menuCode);
+            }
+        }
+    }
 }

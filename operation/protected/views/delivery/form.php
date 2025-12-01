@@ -22,7 +22,10 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
         border: 1px solid #d2d6de;
         background-color: #eee;
         min-height: 34px;
+        min-width: 75px;
     }
+    select{ min-width: 120px}
+    input{ min-width: 100px}
     #table-change td{vertical-align: middle;}
 </style>
 
@@ -149,14 +152,25 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                 <div class="col-sm-6">
                     <?php echo $form->hiddenField($model, 'jd_set[jd_company_code]'); ?>
                     <?php
-                    echo TbHtml::textField("jd_company_code",TechnicianList::getCompanyNameForCode($model->jd_set["jd_company_code"],$model->city),array('readonly'=>true,"id"=>"jd_company_code"));
+                    echo TbHtml::textField("jd_company_code",TechnicianList::getCompanyNameForUCode($model->jd_set["jd_company_code"],$model->city),array('readonly'=>true,"id"=>"jd_company_code"));
                     ?>
                 </div>
             </div>
+            <?php if (Yii::app()->user->validFunction('YN02')): ?>
+                <div class="form-group">
+                    <?php echo $form->labelEx($model,'total_price',array('class'=>"col-sm-2 control-label")); ?>
+                    <div class="col-sm-3">
+                        <?php echo $form->textField($model, 'total_price',
+                            array('readonly'=>true)
+                        ); ?>
+                    </div>
+                </div>
+            <?php endif ?>
 
             <div class="form-group">
                 <?php echo $form->labelEx($model,'goods_list',array('class'=>"col-sm-2 control-label")); ?>
                 <div class="col-sm-12">
+                    <div class="table-responsive">
                     <table class="table table-bordered disabled" id="table-change">
                         <thead>
                         <tr>
@@ -242,6 +256,7 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                         ?>
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
 
@@ -315,6 +330,42 @@ $('.spanInput').each(function(){
     $(this).hide();
     $(this).parent('td').append('<span class=\'input-text-span\'>'+text+'</span>');
 });
+
+$('form').submit(function(){
+    var dataForm = {};
+    var inputObj = $('<input name=\"DeliveryForm[jsonFormData]\" type=\"hidden\">');
+    var inputName='',inputList=[],inputVal='';
+    var regex = /\[([^\]]+)\]/g;
+    $('form').find('*[name^=\"DeliveryForm[goods_list]\"]').each(function(){
+        inputVal = $(this).val();
+        inputName = $(this).attr('name');
+        inputName = inputName.replace('DeliveryForm[goods_list]','');
+        inputList = inputName.split(regex).filter(Boolean);
+        
+        buildNestedObject(dataForm,inputList,inputVal);
+        $(this).removeAttr('name');
+    });
+    dataForm = JSON.stringify(dataForm);
+    inputObj.val(dataForm);
+    $(this).append(inputObj);
+});
+
+// 辅助函数，用于递归构建嵌套对象
+    function buildNestedObject(obj,path,val) {
+        if (path.length === 0) return;
+        const [first, ...rest] = path;
+        if (rest.length === 0) {
+            if(first=='[]'){
+                var endKey = Object.keys(obj).length;
+                obj[endKey] = val; // 最后一个键设置为空对象，以便后续添加属性
+            }else{
+                obj[first] = val; // 最后一个键设置为空对象，以便后续添加属性
+            }
+        } else {
+            if (!obj[first]) obj[first] = {}; // 如果当前键不存在，则创建它
+            buildNestedObject(obj[first], rest,val); // 递归处理剩余路径
+        }
+    }
 ";
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 $js = Script::genReadonlyField();

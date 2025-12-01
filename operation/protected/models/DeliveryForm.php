@@ -14,6 +14,7 @@ class DeliveryForm extends CFormModel
 	public $lcd;
 	public $statusList;
 	public $order_code;
+	public $total_price;
 	public $goods_list;
 	public $ject_remark;
 
@@ -55,6 +56,7 @@ class DeliveryForm extends CFormModel
             'lcu'=>Yii::t('procurement','Apply for user'),
             'lcd'=>Yii::t('procurement','Apply for time'),
             'ject_remark'=>Yii::t('procurement','reject remark'),
+            'total_price'=>"订单总价",
 		);
 	}
 
@@ -64,7 +66,7 @@ class DeliveryForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id,jd_set,lcd,num,black_id, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, luu, lcu, lud, lcd, checkBoxDown','safe'),
+			array('id,jd_set,lcd,num,black_id, total_price, order_code, order_user, order_class, activity_id, technician, status, remark, ject_remark, luu, lcu, lud, lcd, checkBoxDown','safe'),
             array('goods_list','required','on'=>array('audit','edit','reject')),
             array('id','validateID'),
             array('goods_list','validateGoods','on'=>array('audit','edit')),
@@ -81,10 +83,13 @@ class DeliveryForm extends CFormModel
     public function validateID($attribute, $params) {
         $id = $this->$attribute;
         $city_allow = Yii::app()->user->city_allow();
-        $row = Yii::app()->db->createCommand()->select("city")->from("opr_order")
+        $row = Yii::app()->db->createCommand()->select("city,lcu,lcd,order_code")->from("opr_order")
             ->where("id=:id AND judge=0 AND city in ($city_allow)",array(":id"=>$id))->queryRow();
         if($row){
             $this->city = $row["city"];
+            $this->lcu = $row["lcu"];
+            $this->lcd = $row["lcd"];
+            $this->order_code = $row["order_code"];
             $storeCount = Yii::app()->db->createCommand()->select("count(id)")->from("opr_store")
                 ->where("city=:city and z_display=1 and store_type=1",array(":city"=>$row["city"]))->queryScalar();
             if(empty($storeCount)){
@@ -283,6 +288,7 @@ class DeliveryForm extends CFormModel
                 //$this->technician = $row['technician'];
                 $this->status = $row['status'];
                 $this->city = $row['city'];
+                $this->total_price = floatval($row['total_price']);
                 $this->remark = $row['remark'];
                 $this->lcu = OrderGoods::getNameToUsername($row['lcu']);
                 $this->ject_remark = $row['ject_remark'];
@@ -328,11 +334,15 @@ class DeliveryForm extends CFormModel
                     $transaction->commit();
                     $jdCurlModel->saveTableForArr();
                     $this->resetZIndex();
+                    //發送流程
+                    $this->sendFlow($this->getScenario());
                     //發送郵件
-                    OrderGoods::sendEmailTwo(array($oldOrderStatus),$this->status,$this->order_code);
+                    //OrderGoods::sendEmailTwo(array($oldOrderStatus),$this->status,$this->order_code);
                 }
             }else{
                 $transaction->commit();
+                //發送流程
+                $this->sendFlow($this->getScenario());
             }
             return $bool;
 		}
@@ -341,6 +351,75 @@ class DeliveryForm extends CFormModel
 			throw new CHttpException(404,'Cannot update. ('.$e->getMessage().')');
 		}
 	}
+
+    //發送流程
+    protected function sendFlow($scenario,$blackMessage=''){
+        if($this->jd_set["jd_order_type"]==1){
+            $titleStr = "销售出库";
+            $hrefName = "salesOut";
+        }else{
+            $titleStr = "外勤领料";
+            $hrefName = "technician";
+        }
+        $menuCode = "YD02";
+        $flowModel = new CNoticeFlowModel($menuCode,$this->id);
+        $flowModel->setOwerNumForUsername($this->lcu);
+        $html = "<p>下单城市：".CGeneral::getCityName($this->city)."</p>";
+        $html .= "<p>下单用户：".OrderGoods::getNameToUsername($this->lcu)."</p>";
+        $html .= "<p>申请时间：".$this->lcd."</p>";
+        $html .= "<p>订单编号：".$this->order_code."</p>";
+        //$flowModel->setDescription($description);
+        switch ($scenario){
+            case "audit"://审核
+                $html .= "<p>审核时间：".date('Y-m-d H:i:s')."</p>";
+                $flowModel->setMessage($html);
+                $flowModel->setMB_PC_Url("{$hrefName}/edit",array("index"=>$this->id));
+                $subject="{$titleStr}已发货，等待收货（订单编号：".$this->order_code."）";
+                $flowModel->setSubject($subject);
+                $flowModel->addEmailToLcu($this->lcu);
+                $flowModel->saveFlowAll("",$menuCode);
+                break;
+            case "black"://退回单个物料
+                $html .= "<p>退回物料：".$blackMessage."</p>";
+                $html .= "<p>退回时间：".date('Y-m-d H:i:s')."</p>";
+                $flowModel->setMessage($html);
+                $flowModel->setMB_PC_Url("{$hrefName}/edit",array("index"=>$this->id));
+                $subject="单个物料被退回，请查看详情（订单编号：".$this->order_code."）";
+                $flowModel->setSubject($subject);
+                $flowModel->sendFinishFlow($menuCode);
+                $flowModel->addEmailToLcu($this->lcu);
+                $flowModel->note_type=2;
+                $flowModel->saveNoticeAll("",$menuCode);
+                break;
+            case "backward"://退回
+                $html .= "<p>退回时间：".date('Y-m-d H:i:s')."</p>";
+                $flowModel->setMessage($html);
+                $flowModel->setMB_PC_Url("{$hrefName}/edit",array("index"=>$this->id));
+                $subject="{$titleStr}已退回，等待重新发货（订单编号：".$this->order_code."）";
+                $flowModel->setSubject($subject);
+                $flowModel->sendFinishFlow($menuCode);
+                $flowModel->addEmailToLcu($this->lcu);
+                $flowModel->note_type=2;
+                $flowModel->saveNoticeAll("",$menuCode);
+                $flowModel->setMB_PC_Url("delivery/edit",array("index"=>$this->id));
+                $flowModel->resetToAddr();
+                $flowModel->note_type=1;
+                $flowModel->addEmailToPrefixAndCity("YD02",$this->city);
+                $flowModel->saveFlowAll("",$menuCode);
+                break;
+            case "reject"://拒绝
+                $html.="<p>拒绝原因：{$this->ject_remark}</p>";
+                $flowModel->setMessage($html);
+                $flowModel->setMB_PC_Url("{$hrefName}/edit",array("index"=>$this->id));
+                $subject="{$titleStr}已拒绝，请查看详情（订单编号：".$this->order_code."）";
+                $flowModel->setSubject($subject);
+                $flowModel->addEmailToLcu($this->lcu);
+                $flowModel->sendRefuseFlow($menuCode);
+                $flowModel->note_type=2;
+                $flowModel->saveNoticeAll("",$menuCode);
+                break;
+        }
+    }
 
     protected function saveGoodsInfo(&$connection,$oldOrderStatus){
         $time = date_format(date_create(),"Y-m-d H:i:s");
@@ -531,6 +610,10 @@ class DeliveryForm extends CFormModel
     function backward(){
         $row = Yii::app()->db->createCommand()->select("*")->from("opr_order")->where('status = "approve" and id = :id',array(':id'=>$this->id))->queryRow();
         if($row){
+            $this->city = $row["city"];
+            $this->lcu = $row["lcu"];
+            $this->lcd = $row["lcd"];
+            $this->order_code = $row["order_code"];
             $uid = Yii::app()->user->id;
             $time = date_format(date_create(),"Y-m-d H:i:s");
             $curlData = DeliveryForm::getCurlDateForOrder($row,$time);
@@ -610,6 +693,8 @@ class DeliveryForm extends CFormModel
                     $transaction->commit();
                     $jdCurlModel->saveTableForArr();
                     $this->resetZIndex();
+
+                    $this->sendFlow("backward");//发送流程
                     Dialog::message(Yii::t('dialog','Information'), Yii::t('procurement','Backward Done'));
                 }
                 return true;
@@ -695,11 +780,12 @@ class DeliveryForm extends CFormModel
                 'store_num'=>$this->store_num-$num
             ),"order_goods_id=:id and store_id=:store_id",array(":id"=>$blackId,":store_id"=>$this->store_id));
 
+            $blackMessage = $str."退回數量:$num";
             //記錄
             $connection->createCommand()->insert('opr_order_status', array(
                 'order_id'=>$this->id,
                 'status'=>"backward",
-                'r_remark'=>$str."退回數量:$num",
+                'r_remark'=>$blackMessage,
                 'lcu'=>Yii::app()->user->user_display_name(),
                 'time'=>$time,
             ));
@@ -724,8 +810,9 @@ class DeliveryForm extends CFormModel
                 $transaction->commit();
                 $jdCurlModel->saveTableForArr();
                 $this->resetZIndex();
+
+                $this->sendFlow("black",$blackMessage);//发送流程
             }
-            $this->resetZIndex();
         }catch(Exception $e) {
             $transaction->rollback();
             throw new CHttpException(404,'Cannot update. ('.$e->getMessage().')');
@@ -749,15 +836,22 @@ class DeliveryForm extends CFormModel
             $type = 0;
         }
         $city_allow = Yii::app()->user->city_allow();
-        $sql ="city in ($city_allow) AND judge=0 AND status in (".$list[$type].")";
+        $sql ="a.city in ($city_allow) AND a.judge=0 AND a.status in (".$list[$type].")";
+        if($this->jd_set["jd_order_type"]==1){
+            $sql.=" and b.field_value='1'";
+        }else{
+            $sql.=" and b.field_value='0'";
+        }
         if($this->getScenario()=="approved"){
             if(empty($this->checkBoxDown)||!is_array($this->checkBoxDown)){
                 return false;
             }
             $idList = implode(",",$this->checkBoxDown);
-            $sql.=" and id in($idList)";
+            $sql.=" and a.id in($idList)";
         }
-        $rows = Yii::app()->db->createCommand()->select("*")->from("opr_order")->where($sql)->queryAll();
+        $rows = Yii::app()->db->createCommand()->select("a.*")->from("opr_order a")
+            ->leftJoin("opr_send_set_jd b","b.set_type='technician' and b.field_id='jd_order_type' and b.table_id=a.id")
+            ->where($sql)->queryAll();
         if($rows){
             $this->orderList = $rows;
             return true;
@@ -785,7 +879,7 @@ class DeliveryForm extends CFormModel
     protected static function getCurlDateForOrder($order,$time,$expArr=array()){
         $order["jd_order_type"] = TechnicianList::getJDOrderTypeForId($order["id"]);
         $order["jd_company_code"] = TechnicianList::getJDOrderTypeForId($order["id"],"jd_company_code");
-        $order["jd_company_code"].="-".$order["city"];
+        //$order["jd_company_code"].="-".$order["city"];
         $list = array(
             "order_id"=>$order["id"],
             "order_code"=>$order["order_code"],

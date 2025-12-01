@@ -23,6 +23,11 @@ class MyExcelTwo {
             ->setDescription("Test document for Office 2007 XLSX, generated using PHP classes.");
         $this->objActSheet = $this->objPHPExcel->setActiveSheetIndex(0); //填充表头
 
+        $this->objPHPExcel->getDefaultStyle()->applyFromArray(array(
+            'numberformat' => array(
+                'code' => '@' // '@' 符号用于文本格式
+            )
+        ));
         //$this->objPHPExcel->getActiveSheet()->getStyle('A1:H8')->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
         //$objPHPExcel->getActiveSheet()->freezePane('A2');
     }
@@ -92,7 +97,8 @@ class MyExcelTwo {
             $this->row++;
             $i = 0;
             foreach ($list as $item){
-                $this->objActSheet->setCellValue($this->listArr[$i].$this->row,$item);
+                //$this->objActSheet->setCellValue($this->listArr[$i].$this->row,$item);
+                $this->objActSheet->setCellValueExplicitByColumnAndRow($i, $this->row, $item,PHPExcel_Cell_DataType::TYPE_STRING);
                 $i++;
             }
         }

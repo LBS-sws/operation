@@ -54,7 +54,7 @@ class StoreComparisonController extends Controller
     {
         $city=empty($city)?Yii::app()->user->city():$city;
         $city = $city=="none"?"":$city;
-        $jdData = CurlForDelivery::getWarehouseGoodsForJD(array("data"=>array("org_number"=>$city)),true);
+        $jdData = CurlForDelivery::getWarehouseGoodsForJD(array("data"=>array("org_number"=>$city)));
         var_dump($jdData);
         die();
     }

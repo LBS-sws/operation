@@ -7,6 +7,7 @@ class DeliveryList extends CListPageModel
     public $searchTimeEnd;//結束日期
     public $goods_name;//結束日期
     public $city;//查詢的城市
+    public $jd_order_type=0;//申请类型
     public function attributeLabels()
     {
         return array(
@@ -23,6 +24,7 @@ class DeliveryList extends CListPageModel
             'lcu'=>Yii::t('procurement','Apply for user'),
             'jd_order_type'=>Yii::t('procurement','apply type'),
             'goods_name'=>Yii::t('procurement','Goods Name'),
+            'total_price'=>"订单总价",
         );
     }
 
@@ -38,15 +40,20 @@ class DeliveryList extends CListPageModel
         $suffix =  Yii::app()->params['envSuffix'];
         $city_allow = Yii::app()->user->city_allow();
         $userName = Yii::app()->user->name;
+        if($this->jd_order_type==1){//销售出库
+            $whereSql = " and a.judge_type=1 ";
+        }else{
+            $whereSql = " and a.judge_type=2 ";
+        }
         $sql1 = "select a.*,b.disp_name,b.city AS s_city
 				from opr_order a
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
-				where (a.city in ($city_allow) AND a.judge=0 AND a.status != 'pending' AND a.status != 'cancelled') 
+				where (a.city in ($city_allow) {$whereSql} AND a.judge=0 AND a.status != 'pending' AND a.status != 'cancelled') 
 			";
         $sql2 = "select count(a.id)
 				from opr_order a
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
-				where (a.city in ($city_allow) AND a.judge=0 AND a.status != 'pending' AND a.status != 'cancelled') 
+				where (a.city in ($city_allow) {$whereSql} AND a.judge=0 AND a.status != 'pending' AND a.status != 'cancelled') 
 			";
         $clause = "";
         if (!empty($this->searchField) && !empty($this->searchValue)) {
@@ -111,6 +118,7 @@ class DeliveryList extends CListPageModel
                     'goods_list'=>WarehouseForm::getGoodsListToId($record['id']),
                     'order_user'=>$record['order_user'],
                     'technician'=>$record['technician'],
+                    'total_price'=>floatval($record['total_price']),
                     'status'=>$record['status'],
                     'city'=>CGeneral::getCityName($record['city']),
                     'lcu'=>$record['disp_name'],
@@ -120,7 +128,7 @@ class DeliveryList extends CListPageModel
             }
         }
         $session = Yii::app()->session;
-        $session['delivery_ya01'] = $this->getCriteria();
+        $session['delivery_ya0'.$this->jd_order_type] = $this->getCriteria();
         return true;
     }
 

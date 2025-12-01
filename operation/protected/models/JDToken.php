@@ -3,8 +3,8 @@
 class JDToken{
 
     protected $client_id="lbsapp";//第三方应用系统编码，即appId
-    protected $client_secret="FriendSWSLBSAPP5264@kingdee//";//第三方应用AccessToken认证密钥，即appSecret
-    protected $accountId="1955176570721156096";//数据中心id
+    protected $client_secret="FriendSZSLBSAPP0905@kigdeen/!/";//第三方应用AccessToken认证密钥，即appSecret
+    protected $accountId="1955176570318500864";//数据中心id
     protected $username="LBSAPI";//第三方应用代理用户的用户名1
     //protected $nonce;//随机数
     //protected $timestamp;//时间戳，当前时间前后5分钟
@@ -66,7 +66,7 @@ class JDToken{
         $root = Yii::app()->params['JDCurlRootURL'];
         $url = $root."/kapi/oauth2/getToken";
 
-        $uid = Yii::app()->user->id;
+        $uid = Yii::app()->getComponent('user')===null?"admin":Yii::app()->user->id;
 
         $data=array(
             "client_id"=>$this->client_id,
@@ -102,7 +102,7 @@ class JDToken{
                     $rtn["expires_in"] = $json["data"]["expires_in"];
                     //access_token,expires_in
                 }else{
-                    $rtn["message"] = $json["message"];
+                    $rtn["message"] = isset($json["message"])?$json["message"]:"失败";
                 }
             }
         }

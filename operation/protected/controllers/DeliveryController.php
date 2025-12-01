@@ -25,7 +25,7 @@ class DeliveryController extends Controller
     {
         return array(
             array('allow',
-                'actions'=>array('save','audit','reject','backward','black','allApproved'),
+                'actions'=>array('save','audit','reject','backward','black'),
                 'expression'=>array('DeliveryController','allowReadWrite'),
             ),
             array('allow',
@@ -43,12 +43,7 @@ class DeliveryController extends Controller
     }
 
     public static function allowReadWrite() {
-        $date = date_format(date_create(),"Y/m/d H:i:s");
-        if($date>'2024/09/25 18:00:00'&&$date<'2024/10/01 00:00:00'){
-            return false;
-        }else{
-            return Yii::app()->user->validRWFunction('YD02');
-        }
+        return Yii::app()->user->validRWFunction('YD02');
     }
 
     public static function allowReadOnly() {
@@ -64,8 +59,8 @@ class DeliveryController extends Controller
 			$model->attributes = $_POST['DeliveryList'];
 		} else {
 			$session = Yii::app()->session;
-			if (isset($session['delivery_ya01']) && !empty($session['delivery_ya01'])) {
-				$criteria = $session['delivery_ya01'];
+			if (isset($session['delivery_ya00']) && !empty($session['delivery_ya00'])) {
+				$criteria = $session['delivery_ya00'];
 				$model->setCriteria($criteria);
 			}
 		}
@@ -80,6 +75,9 @@ class DeliveryController extends Controller
 		if (isset($_POST['DeliveryForm'])) {
 			$model = new DeliveryForm($_POST['DeliveryForm']['scenario']);
 			$model->attributes = $_POST['DeliveryForm'];
+			if(isset($_POST['DeliveryForm']["jsonFormData"])){//由于领料30个不同物料无法获取，所以转json回传
+			    $model->goods_list=json_decode($_POST['DeliveryForm']["jsonFormData"],true);
+            }
 			if ($model->validate()) {
 				$model->saveData();
 				Dialog::message(Yii::t('dialog','Information'), Yii::t('dialog','Save Done'));
@@ -97,6 +95,9 @@ class DeliveryController extends Controller
 		if (isset($_POST['DeliveryForm'])) {
 			$model = new DeliveryForm("audit");
 			$model->attributes = $_POST['DeliveryForm'];
+            if(isset($_POST['DeliveryForm']["jsonFormData"])){//由于领料30个不同物料无法获取，所以转json回传
+                $model->goods_list=json_decode($_POST['DeliveryForm']["jsonFormData"],true);
+            }
 			if ($model->validate()) {
 				$bool=$model->saveData();
 				$model->scenario = "edit";
@@ -118,6 +119,9 @@ class DeliveryController extends Controller
 		if (isset($_POST['DeliveryForm'])) {
 			$model = new DeliveryForm("reject");
 			$model->attributes = $_POST['DeliveryForm'];
+            if(isset($_POST['DeliveryForm']["jsonFormData"])){//由于领料30个不同物料无法获取，所以转json回传
+                $model->goods_list=json_decode($_POST['DeliveryForm']["jsonFormData"],true);
+            }
 			if ($model->validate()) {
 				$model->saveData();
 				$model->scenario = "edit";
@@ -157,6 +161,9 @@ class DeliveryController extends Controller
         if (isset($_POST['DeliveryForm'])) {
             $model = new DeliveryForm("backward");
             $model->attributes = $_POST['DeliveryForm'];
+            if(isset($_POST['DeliveryForm']["jsonFormData"])){//由于领料30个不同物料无法获取，所以转json回传
+                $model->goods_list=json_decode($_POST['DeliveryForm']["jsonFormData"],true);
+            }
             if($model->backward()){
                 $model->scenario = "edit";
                 $this->redirect(Yii::app()->createUrl('delivery/edit',array('index'=>$model->id)));

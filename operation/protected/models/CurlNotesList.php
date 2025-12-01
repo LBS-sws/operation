@@ -238,4 +238,24 @@ class CurlNotesList extends CListPageModel
             return "";
         }
     }
+
+    public function resetSendData($id){
+        $row = Yii::app()->db->createCommand()->select("id,data_content")->from("opr_api_curl")
+            ->where("id=:id", array(':id'=>$id))->queryRow();
+        if($row){
+            $jsonData = json_decode($row["data_content"],true);
+            if(!empty($jsonData)&&is_array($jsonData)){
+                foreach ($jsonData["data"] as $key=>$dataRow){
+                    if(isset($dataRow["name"])){
+                        $jsonData["data"][$key]["name"] = trim($dataRow["name"]);
+                    }
+                }
+            }
+            $data_string = json_encode($jsonData);
+            Yii::app()->db->createCommand()->update("opr_api_curl",array(
+                "data_content"=>$data_string,
+                "status_type"=>"P",
+            ),"id=:id",array(':id'=>$row["id"]));
+        }
+    }
 }

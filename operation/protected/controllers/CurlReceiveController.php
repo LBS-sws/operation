@@ -81,6 +81,7 @@ class CurlReceiveController extends Controller
 
     public function actionTestWarehouseFull($index=10)
     {
+		var_dump('start:');
         $model = new CurlReceiveList();
         $model->testWarehouseFull($index);
         die();

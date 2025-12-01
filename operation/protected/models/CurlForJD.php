@@ -178,11 +178,10 @@ class CurlForJD{
         return $rtn;
     }
 
-    public static function getData($data,$url,$printBool=false) {
+    public static function getData($data,$url) {
         $root = Yii::app()->params['JDCurlRootURL'];
         $endUrl = $root.$url;
         $rtn = array('message'=>'', 'code'=>400,'outData'=>array());//成功时code=200；
-        $curlStartDate = date_format(date_create(),"Y/m/d H:i:s");
         $tokenModel = new JDToken();
         $tokenList = $tokenModel->getToken();
         if($tokenList["status"]===true){
@@ -201,9 +200,6 @@ class CurlForJD{
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
             $out = curl_exec($ch);
-            if($printBool){//测试专用
-                self::printCurl($url,$data,$out,$curlStartDate);
-            }
             //echo "返回内容:<br/>{$out}<br/><br/>";
             if ($out===false) {
                 $rtn['message'] = curl_error($ch);
@@ -262,49 +258,5 @@ class CurlForJD{
 
         $rtn["message"] = mb_strlen($rtn["message"],'UTF-8')>250?mb_substr($rtn["message"],0,250,'UTF-8'):$rtn["message"];
         return $rtn;
-    }
-
-    private static function printCurl($url,$data,$out,$curlStartDate){
-        $curlEndDate = date_format(date_create(),"Y/m/d H:i:s");
-        $curlDateLength = strtotime($curlEndDate)-strtotime($curlStartDate);
-        echo "请求时间：".$curlStartDate;
-        echo "<br/>";
-        echo "响应时间：".$curlEndDate;
-        echo "<br/>";
-        echo "响应时长：".$curlDateLength."(秒)";
-        echo "<br/>";
-        echo "请求IP：".self::getCurlIP();
-        echo "<br/>";
-        echo "请求url：{$url}";
-        echo "<br/>";
-        echo "请求data：";
-        echo "<br/>";
-        var_dump($data);
-        echo "<br/>";
-        echo "<br/>";
-        $bool = true;
-        if(json_decode($out,true)!==false){
-            $json = json_decode($out,true);
-            if(isset($json["code"])&&isset($json["data"])&&$json["code"]==200){
-                echo "返回数组：";
-                echo "<br/>";
-                var_dump($json["data"]);
-            }
-        }
-        if($bool){
-            echo "<br/>";
-            echo "<br/>";
-            echo "响应数据：";
-            echo "<br/>";
-            echo $out;
-            echo "<br/>";
-            echo "<br/>";
-            echo "<br/>";
-        }
-        die();
-    }
-
-    public static function getCurlIP(){
-        return Yii::app()->params['uCurlIP'];
     }
 }

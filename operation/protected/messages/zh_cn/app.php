@@ -144,6 +144,8 @@ return array(
     'JD To LBS'=>'金蝶发送给LBS',
     'Store Info'=>'金蝶仓库信息',
     'Store Comparison'=>'金蝶物料对比',
+    'Sales outbound'=>'销售出库',
+    'Sales outbound audit'=>'销售出库审核',
     //沈超添加結束
 	
 );

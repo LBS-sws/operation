@@ -98,7 +98,7 @@ $this->pageTitle=Yii::app()->name . ' - ServiceNew Form';
 				<div class="col-lg-3">
 				<?php
                 echo $form->numberField($model, 'service_num',
-					array('readonly'=>($model->scenario=='view'),'min'=>0)
+					array('readonly'=>($model->getReadonly()),'min'=>0)
 				); ?>
 				</div>
 			</div>

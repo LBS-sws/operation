@@ -14,6 +14,7 @@ class ServiceNewForm extends CFormModel
 	public $score_num;
 	public $remark;
 	public $user_remark;
+    public $ltNowDate=false;//小于当前日期：true
 
 	/**
 	 * Declares customized attribute labels.
@@ -45,7 +46,7 @@ class ServiceNewForm extends CFormModel
             array('id,employee_id,service_code,user_remark,remark,service_month,service_year,service_num','safe'),
 			array('employee_id,service_num','required'),
             array('service_year,service_month','numerical','allowEmpty'=>true,'integerOnly'=>true),
-            array('id','validateID','on'=>array("delete")),
+            array('id','validateID'),
             array('service_num','validateMoney'),
             array('service_year','validateYear'),
             array('id','validateRemark','on'=>array("edit")),
@@ -60,18 +61,46 @@ class ServiceNewForm extends CFormModel
     }
 
     public function validateID($attribute, $params) {
-        $date = date("Ym",strtotime(" - 1 months"));
-        $row = Yii::app()->db->createCommand()->select("service_year,service_month")->from("opr_service_new")
-            ->where("id=:id",array(":id"=>$this->id))->queryRow();
-        if($row){
-            if($date>=date("Ym",strtotime($row["service_year"]."/".$row["service_month"]."/01"))){
-                $this->addError($attribute, "只允许删除本月服务，请与管理员联系");
-                return false;
+        $thisDate = self::isVivienne()?"0000/00":date("Y/m");
+        $status_dt = date("Y/m",strtotime($this->service_year."/".$this->service_month."/01"));
+        $scenario = $this->getScenario();
+        if(in_array($scenario,array("new"))){
+            $this->ltNowDate = $status_dt<$thisDate;
+            //验证新增
+            if($this->ltNowDate){
+                $this->addError($attribute, "无法新增({$status_dt})时间段的数据");
             }
         }else{
-            $this->addError($attribute, "数据异常，请刷新重试");
-            return false;
+            $id= empty($this->id)?0:$this->id;
+            $row = Yii::app()->db->createCommand()->select("*")->from("opr_service_new")
+                ->where("id=:id",array(":id"=>$id))->queryRow();
+            if($row){
+                $row["entry_dt"] = date("Y/m",strtotime($row["service_year"]."/".$row["service_month"]."/01"));
+                $this->ltNowDate = $row["entry_dt"]<$thisDate;
+                if($scenario=="delete"){
+                    if($this->ltNowDate){
+                        $this->addError($attribute, "无法删除({$row["entry_dt"]})时间段的数据");
+                    }
+                }else{
+                    $updateBool = $status_dt<$thisDate;//验证修改后的时间
+                    $updateBool = $updateBool||$row["entry_dt"]<$thisDate;//验证修改前的时间
+                    if($updateBool){
+                        $notUpdate=self::getNotUpdateList();
+                        foreach ($notUpdate as $item){
+                            $this->$item = $row[$item];
+                        }
+                    }
+                }
+            }else{
+                $this->addError($attribute, "数据异常，请刷新重试");
+            }
         }
+    }
+
+    public static function getNotUpdateList(){
+        return array("service_year","service_month","employee_id","service_code",
+            "service_num"
+        );
     }
 
     public function validateMoney($attribute, $params) {
@@ -126,6 +155,9 @@ class ServiceNewForm extends CFormModel
 			$this->remark = $row['remark'];
 			$this->user_remark = $row['user_remark'];
 			$this->score_num = $row['score_num'];
+            $thisDate = self::isVivienne()?"0000/00":date("Y/m");
+            $status_dt = date("Y/m",strtotime($this->service_year."/".$this->service_month."/01"));
+            $this->ltNowDate = $status_dt<$thisDate;
             return true;
 		}else{
 		    return false;
@@ -217,5 +249,15 @@ class ServiceNewForm extends CFormModel
 	protected function resetServiceCode(){
         $str="N";
         $this->service_code = $str.(100000+$this->id);
+    }
+
+    public static function isVivienne(){
+        $vivienneList = isset(Yii::app()->params['vivienneList'])?Yii::app()->params['vivienneList']:array("VivienneChen88888");
+        $uid = Yii::app()->getComponent('user')===null?"admin":Yii::app()->user->id;
+        return in_array($uid,$vivienneList);
+    }
+
+    public function getReadonly(){
+        return $this->scenario=='view'||$this->ltNowDate;
     }
 }

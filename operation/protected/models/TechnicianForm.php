@@ -10,6 +10,7 @@ class TechnicianForm extends CFormModel
     public $remark;
     public $luu;
     public $lcu;
+    public $lcd;
     public $statusList;
     public $order_code;
     public $goods_list;
@@ -290,9 +291,9 @@ class TechnicianForm extends CFormModel
             case 'new':
                 $insetBool = true;
                 $sql = "insert into opr_order(
-							order_user, remark, status, lcu, lcd
+							order_user, remark, judge_type, status, lcu, lcd
 						) values (
-							:order_user,:remark, :status, :lcu, :lcd
+							:order_user,:remark,:judge_type, :status, :lcu, :lcd
 						)";
                 break;
             case 'edit':
@@ -307,9 +308,9 @@ class TechnicianForm extends CFormModel
                 if(empty($this->id)){
                     $insetBool = true;
                     $sql = "insert into opr_order(
-							order_user, remark, status, lcu, lcd
+							order_user, remark, judge_type, status, lcu, lcd
 						) values (
-							:order_user,:remark, :status, :lcu, :lcd
+							:order_user,:remark,:judge_type, :status, :lcu, :lcd
 						)";
                 }else{
                     $sql = "update opr_order set
@@ -339,6 +340,7 @@ class TechnicianForm extends CFormModel
 
         $city = Yii::app()->user->city();
         $uid = Yii::app()->user->id;
+        $this->lcd = date('Y-m-d H:i:s');
         $order_username = Yii::app()->user->name;
         $command=$connection->createCommand($sql);
         if (strpos($sql,':id')!==false)
@@ -358,14 +360,20 @@ class TechnicianForm extends CFormModel
 
         if (strpos($sql,':remark')!==false)
             $command->bindParam(':remark',$this->remark,PDO::PARAM_STR);
+        if (strpos($sql,':judge_type')!==false){
+            $judge_type = isset($this->jd_set["jd_order_type"])?$this->jd_set["jd_order_type"]:0;
+            $judge_type = in_array($judge_type,array(1,2))?$judge_type:2;
+            $command->bindParam(':judge_type',$judge_type,PDO::PARAM_STR);
+        }
         if (strpos($sql,':lud')!==false)
             $command->bindParam(':lud',date('Y-m-d H:i:s'),PDO::PARAM_STR);
         if (strpos($sql,':luu')!==false)
             $command->bindParam(':luu',$uid,PDO::PARAM_STR);
         if (strpos($sql,':lcu')!==false)
             $command->bindParam(':lcu',$uid,PDO::PARAM_STR);
-        if (strpos($sql,':lcd')!==false)
-            $command->bindParam(':lcd',date('Y-m-d H:i:s'),PDO::PARAM_STR);
+        if (strpos($sql,':lcd')!==false){
+            $command->bindParam(':lcd',$this->lcd,PDO::PARAM_STR);
+        }
         $command->execute();
 
         if ($insetBool){
@@ -398,26 +406,79 @@ class TechnicianForm extends CFormModel
         }
 
 
+        $totalPrice = 0;
+        $applyDate = date("Y-m-d H:i:s");
         if ($goodsBool){
             //先刪除訂單里的所有物品
             Yii::app()->db->createCommand()->delete('opr_order_goods', 'order_id=:order_id', array(':order_id'=>$this->id));
             //物品的添加
             foreach ($this->goods_list as $goods){
+                $price = WarehouseList::getNowWarehousePrice($goods['goods_id'],'',$applyDate);
+                $goodPrice=$goods["goods_num"]*$price;
+                $totalPrice+=$goodPrice;
                 //添加
                 Yii::app()->db->createCommand()->insert('opr_order_goods', array(
                     'goods_id'=>$goods["goods_id"],
                     'order_id'=>$this->id,
                     'goods_num'=>$goods["goods_num"],
+                    'total_price'=>$goodPrice,
                     'note'=>$goods["note"],
                     'lcu'=>Yii::app()->user->user_display_name(),
                 ));
             }
         }
+        Yii::app()->db->createCommand()->update('opr_order', array(
+            'total_price'=>$totalPrice,
+        ), 'id=:id', array(':id'=>$this->id));
 
         $this->updateGoodsStatus();
+        //發送流程
+        $this->sendFlow();
         //發送郵件
-        OrderGoods::sendEmailTwo($oldOrderStatus,$this->status,$this->order_code);
+        //OrderGoods::sendEmailTwo($oldOrderStatus,$this->status,$this->order_code);
         return true;
+    }
+
+    //發送流程
+    protected function sendFlow(){
+        if($this->jd_set["jd_order_type"]==1){
+            $titleStr = "销售出库";
+            $hrefName = "salesOutAudit";
+        }else{
+            $titleStr = "外勤领料";
+            $hrefName = "delivery";
+        }
+        $menuCode = "YD02";
+        $flowModel = new CNoticeFlowModel($menuCode,$this->id);
+        if($this->getScenario()=='delete'){
+            $subject="删除{$titleStr}";
+            $flowModel->setSubject($subject);
+            $flowModel->deleteFlowAll($menuCode);
+        }elseif(in_array($this->status,array("sent","finished"))){
+            //$email = new Email();
+            $message = "<p>	下单城市：".CGeneral::getCityName($this->city)."</p>";
+            $message .= "<p>下单用户：".Yii::app()->user->user_display_name()."</p>";
+            $message .= "<p>申请时间：".$this->lcd."</p>";
+            $message .= "<p>订单编号：".$this->order_code."</p>";
+            //$flowModel->setDescription($description);
+            $flowModel->setMessage($message);
+            if($this->status=="sent"){
+                $flowModel->setMB_PC_Url("{$hrefName}/edit",array("index"=>$this->id));
+                $subject="{$titleStr}申请（订单编号：".$this->order_code."）";
+                $flowModel->setSubject($subject);
+                $flowModel->addEmailToPrefixAndCity("YD02",$this->city);
+                $flowModel->saveFlowAll("",$menuCode);
+            }else{
+                $flowModel->setMB_PC_Url("technician/edit",array("index"=>$this->id));
+                $subject="{$titleStr}已收货（订单编号：".$this->order_code."）";
+                $flowModel->setSubject($subject);
+                $flowModel->sendFinishFlow($menuCode);
+                $flowModel->setMB_PC_Url("{$hrefName}/edit",array("index"=>$this->id));
+                $flowModel->addEmailToPrefixAndCity("YD02",$this->city);
+                $flowModel->note_type=2;
+                $flowModel->saveNoticeAll("",$menuCode);
+            }
+        }
     }
 
     //修改訂單內物品的狀態

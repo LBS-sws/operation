@@ -13,13 +13,24 @@ class MonthlyCommand extends CConsoleCommand {
 		$this->year = (empty($year)) ? date('Y') : $year;
 		$this->month = (empty($month)) ? date('m') : $month;
 		echo "YEAR: ".$this->year."\tMONTH: ".$this->month."\n";
-        $suffix = Yii::app()->params['envSuffix'];
+
+		$suffix = Yii::app()->params['envSuffix'];
 
 		//每月删除一次token记录表(开始)
         Yii::app()->db->createCommand()->delete("operation{$suffix}.opr_token_history", 'lcd<:lcd',
             array(':lcd'=>"{$this->year}-{$this->month}-01"));
+        if(date_format(date_create(),"Y-m-d")=="2024-10-01"){
+            $accessSql = "
+                UPDATE security{$suffix}.sec_user_access a
+                LEFT JOIN security{$suffix}.sec_user b ON a.username=b.username
+                SET a.a_read_only=CONCAT(a.a_read_only,'YD01'),
+                a.a_read_write = REPLACE(a.a_read_write ,'YD01','')
+                WHERE a.a_read_write LIKE '%YD01%' AND a.system_id='ops';
+            ";
+            Yii::app()->db->createCommand($accessSql)->execute();
+        }
         //每月删除一次token记录表(结束)
-
+		
         $rows = Yii::app()->db->createCommand()->select("code")
             ->from("security{$suffix}.sec_city_info")
             ->where("field_id='OPERA' and field_value='1'")//城市开启了“营运报告（营运系统）”权限
@@ -89,5 +100,23 @@ class MonthlyCommand extends CConsoleCommand {
 		}
 	}
 	
+
+     public function actionSwitchCURL(){
+         $row = Yii::app()->db->createCommand()->select("*")->from("opr_api_curl")
+             ->where("status_type='P'")->queryRow();
+         if($row){
+             Yii::app()->db->createCommand()->update("opr_api_curl",array("status_type"=>"I"),"id=".$row["id"]);
+             $rtn = CurlForJD::sendUpdateRowForJD($row);
+             if(in_array($row["info_type"],array("customer","customerAll"))){
+                 CurlNotesList::saveJDCustomerID($rtn);
+             }
+             $bool=true;
+         }else{
+             $bool=false;
+         }
+         if($bool){
+             $this->actionSwitchCURL();
+         }
+     }
 }
 ?>

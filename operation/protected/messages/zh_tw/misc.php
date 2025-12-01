@@ -91,6 +91,7 @@ return array(
 '1 year'=>'1年內',
 'Your ranking is:'=>'你當前的段位為:',
 'Rollback'=>'退回草稿',
+'Again New Password'=>'再次輸入新密碼',
 );
 
 ?>

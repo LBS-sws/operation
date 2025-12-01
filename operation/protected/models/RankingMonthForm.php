@@ -52,28 +52,31 @@ class RankingMonthForm extends CFormModel
 
     //學分
     private function integral_num($year,$month,$employee_id){
+        //學分的由申请日期改成审核日期（2025年7月2日）
         $suffix = Yii::app()->params['envSuffix'];
         $score=Yii::app()->db->createCommand()->select("sum(credit_point)")->from("spoint{$suffix}.gr_credit_request")
-            ->where("state=3 and apply_date between '$this->startDate' and '$this->endDate' and employee_id=:id",
+            ->where("state=3 and audit_date between '$this->startDate' and '$this->endDate' and employee_id=:id",
                 array(":id"=>$employee_id))->queryScalar();
         return is_numeric($score)?floatval($score)*50:0;
     }
 
     //學分table
     private function integral_num_table(){
+        //學分的由申请日期改成审核日期（2025年7月2日）
         $suffix = Yii::app()->params['envSuffix'];
-        $rows=Yii::app()->db->createCommand()->select("b.credit_code,b.credit_name,a.id,a.credit_point,a.apply_date")
+        $rows=Yii::app()->db->createCommand()->select("b.credit_code,b.credit_name,a.id,a.credit_point,a.audit_date")
             ->from("spoint{$suffix}.gr_credit_request a")
             ->leftJoin("spoint{$suffix}.gr_credit_type b","a.credit_type=b.id")
-            ->where("a.state=3 and a.apply_date between '$this->startDate' and '$this->endDate' and a.employee_id=:id",
+            ->where("a.state=3 and a.audit_date between '$this->startDate' and '$this->endDate' and a.employee_id=:id",
                 array(":id"=>$this->employee_id))->queryAll();
         $html = "<thead>";
-        $html.="<tr><th>员工编号</th><th>员工姓名</th><th>学分名称</th><th>申请时间</th><th>学分数值</th><th>得分</th></tr>";
+        $html.="<tr><th>员工编号</th><th>员工姓名</th><th>学分名称</th><th>审核时间</th><th>学分数值</th><th>得分</th></tr>";
         $html.= "</thead><tbody>";
         if($rows){
             foreach ($rows as $row){
+                $row['audit_date'] = CGeneral::toDate($row['audit_date']);
                 $score = floatval($row["credit_point"])*50;
-                $html.="<tr data-id='{$row["id"]}'><td>{$this->employee_code}</td><td>{$this->employee_name}</td><td>{$row['credit_code']}-{$row['credit_name']}</td><td>{$row['apply_date']}</td><td>{$row['credit_point']}</td><td class='text-right'>{$score}</td></tr>";
+                $html.="<tr data-id='{$row["id"]}'><td>{$this->employee_code}</td><td>{$this->employee_name}</td><td>{$row['credit_code']}-{$row['credit_name']}</td><td>{$row['audit_date']}</td><td>{$row['credit_point']}</td><td class='text-right'>{$score}</td></tr>";
             }
         }else{
             $html.="<tr><td colspan='6'>无</td></tr>";
@@ -84,28 +87,31 @@ class RankingMonthForm extends CFormModel
 
     //慈善分
     private function charity_num($year,$month,$employee_id){
+        //慈善分的由申请日期改成审核日期（2025年7月2日）
         $suffix = Yii::app()->params['envSuffix'];
         $score=Yii::app()->db->createCommand()->select("sum(credit_point)")->from("charity{$suffix}.cy_credit_request")
-            ->where("state=3 and apply_date between '$this->startDate' and '$this->endDate' and employee_id=:id",
+            ->where("state=3 and two_date between '$this->startDate' and '$this->endDate' and employee_id=:id",
                 array(":id"=>$employee_id))->queryScalar();
         return is_numeric($score)?floatval($score)*500:0;
     }
 
     //慈善分table
     private function charity_num_table(){
+        //慈善分的由申请日期改成审核日期（2025年7月2日）
         $suffix = Yii::app()->params['envSuffix'];
-        $rows=Yii::app()->db->createCommand()->select("b.charity_code,b.charity_name,a.id,a.credit_point,a.apply_date")
+        $rows=Yii::app()->db->createCommand()->select("b.charity_code,b.charity_name,a.id,a.credit_point,a.two_date")
             ->from("charity{$suffix}.cy_credit_request a")
             ->leftJoin("charity{$suffix}.cy_credit_type b","a.credit_type=b.id")
-            ->where("a.state=3 and a.apply_date between '$this->startDate' and '$this->endDate' and a.employee_id=:id",
+            ->where("a.state=3 and a.two_date between '$this->startDate' and '$this->endDate' and a.employee_id=:id",
                 array(":id"=>$this->employee_id))->queryAll();
         $html = "<thead>";
-        $html.="<tr><th>员工编号</th><th>员工姓名</th><th>慈善分名称</th><th>申请时间</th><th>慈善分数值</th><th>得分</th></tr>";
+        $html.="<tr><th>员工编号</th><th>员工姓名</th><th>慈善分名称</th><th>审核时间</th><th>慈善分数值</th><th>得分</th></tr>";
         $html.= "</thead><tbody>";
         if($rows){
             foreach ($rows as $row){
+                $row['two_date'] = CGeneral::toDate($row['two_date']);
                 $score = floatval($row["credit_point"])*500;
-                $html.="<tr data-id='{$row["id"]}'><td>{$this->employee_code}</td><td>{$this->employee_name}</td><td>{$row['charity_code']}-{$row['charity_name']}</td><td>{$row['apply_date']}</td><td>{$row['credit_point']}</td><td class='text-right'>{$score}</td></tr>";
+                $html.="<tr data-id='{$row["id"]}'><td>{$this->employee_code}</td><td>{$this->employee_name}</td><td>{$row['charity_code']}-{$row['charity_name']}</td><td>{$row['two_date']}</td><td>{$row['credit_point']}</td><td class='text-right'>{$score}</td></tr>";
             }
         }else{
             $html.="<tr><td colspan='6'>无</td></tr>";
@@ -234,9 +240,10 @@ class RankingMonthForm extends CFormModel
     //表揚信得分
     private function prize_num($year,$month,$employee_id){
         //錦旗的日期由嘉許日期改成錄入日期（2022-09-16修改）prize_date改成lcd
+        //錦旗的日期由錄入日期改成审核日期（2025-07-02修改）lcd改成lud
         $suffix = Yii::app()->params['envSuffix'];
         $score=Yii::app()->db->createCommand()->select("count(id)")->from("hr{$suffix}.hr_prize")
-            ->where("status=3 and lcd between '$this->startDate' and '$this->endDate' and employee_id=:id",
+            ->where("status=3 and lud between '$this->startDate' and '$this->endDate' and employee_id=:id",
                 array(":id"=>$employee_id))->queryScalar();
         return is_numeric($score)?floatval($score)*100:0;
     }
@@ -244,12 +251,13 @@ class RankingMonthForm extends CFormModel
     //表揚信得分table
     private function prize_num_table(){
         //錦旗的日期由嘉許日期改成錄入日期（2022-09-16修改）prize_date改成lcd
+        //錦旗的日期由錄入日期改成审核日期（2025-07-02修改）lcd改成lud
         $suffix = Yii::app()->params['envSuffix'];
-        $rows=Yii::app()->db->createCommand()->select("id,lcd,prize_pro,prize_type")->from("hr{$suffix}.hr_prize")
-            ->where("status=3 and lcd between '$this->startDate' and '$this->endDate' and employee_id=:id",
+        $rows=Yii::app()->db->createCommand()->select("id,lud,prize_pro,prize_type")->from("hr{$suffix}.hr_prize")
+            ->where("status=3 and lud between '$this->startDate' and '$this->endDate' and employee_id=:id",
                 array(":id"=>$this->employee_id))->queryAll();
         $html = "<thead>";
-        $html.="<tr><th>员工编号</th><th>员工姓名</th><th>嘉许项目</th><th>客户奖励</th><th>录入日期</th><th>得分</th></tr>";
+        $html.="<tr><th>员工编号</th><th>员工姓名</th><th>嘉许项目</th><th>客户奖励</th><th>审核日期</th><th>得分</th></tr>";
         $html.= "</thead><tbody>";
         if($rows){
             $list = array(
@@ -260,9 +268,9 @@ class RankingMonthForm extends CFormModel
             foreach ($rows as $row){
                 $row["prize_pro"] = key_exists($row["prize_pro"],$list)?$list[$row["prize_pro"]]:"";
                 $row["prize_type"] = $row["prize_type"]==1?"锦旗":"表扬信";
-                $row["lcd"] = CGeneral::toMyDate($row["lcd"]);
+                $row["lud"] = CGeneral::toMyDate($row["lud"]);
                 $row["score_num"] = 100;
-                $html.="<tr data-id='{$row["id"]}'><td>{$this->employee_code}</td><td>{$this->employee_name}</td><td>{$row['prize_pro']}</td><td>{$row['prize_type']}</td><td>{$row['lcd']}</td><td>{$row['score_num']}</td></tr>";
+                $html.="<tr data-id='{$row["id"]}'><td>{$this->employee_code}</td><td>{$this->employee_name}</td><td>{$row['prize_pro']}</td><td>{$row['prize_type']}</td><td>{$row['lud']}</td><td>{$row['score_num']}</td></tr>";
             }
         }else{
             $html.="<tr><td colspan='6'>无</td></tr>";

@@ -25,7 +25,7 @@ class CurlNotesController extends Controller
 	{
 		return array(
 			array('allow', 
-				'actions'=>array('send','warehouse','fun'),
+				'actions'=>array('send','warehouse','fun','resetSendData'),
 				'expression'=>array('CurlNotesController','allowReadWrite'),
 			),
 			array('allow', 
@@ -37,6 +37,13 @@ class CurlNotesController extends Controller
 			),
 		);
 	}
+
+    public function actionResetSendData($index=0)
+    {
+        $model = new CurlNotesList();
+        $model->resetSendData($index);
+        echo "end!";die();
+    }
 
     public function actionGetAjaxStr()
     {

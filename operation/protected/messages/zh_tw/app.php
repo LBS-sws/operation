@@ -144,6 +144,8 @@ return array(
     'JD To LBS'=>'金蝶發送給LBS',
     'Store Info'=>'金蝶倉庫信息',
     'Store Comparison'=>'金蝶物料對比',
+    'Sales outbound'=>'銷售出庫',
+    'Sales outbound audit'=>'銷售出庫審核',
     //沈超添加結束
 
 );

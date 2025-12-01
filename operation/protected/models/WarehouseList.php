@@ -161,13 +161,13 @@ class WarehouseList extends CListPageModel
 
     //获取物料的最新价格
     public static function getNowWarehousePrice($warehouse_id,$city='',$applyDate=''){
-        $city = empty($city)?Yii::app()->user->city():$city;
+        //$city = empty($city)?Yii::app()->user->city():$city;
         $year = date_format(date_create($applyDate),"Y");
         $month = date_format(date_create($applyDate),"n");
         $row = Yii::app()->db->createCommand()->select("price")
             ->from("opr_warehouse_price")
-            ->where("warehouse_id=:id and city=:city and (year<'{$year}' or (year='{$year}' and month<='{$month}'))",
-                array(":id"=>$warehouse_id,":city"=>$city))
+            ->where("warehouse_id=:id and (year<'{$year}' or (year='{$year}' and month<='{$month}'))",
+                array(":id"=>$warehouse_id))
             ->order("year desc,month desc")->queryRow();
         return $row?floatval($row["price"]):0;
     }

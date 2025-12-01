@@ -6,6 +6,7 @@ class TechnicianList extends CListPageModel
     public $searchTimeStart;//開始日期
     public $searchTimeEnd;//結束日期
     public $goods_name;//結束日期
+    public $jd_order_type=0;//申请类型
     public function attributeLabels()
     {
         return array(
@@ -34,13 +35,18 @@ class TechnicianList extends CListPageModel
     {
         //order_user = '$userName' OR technician = '$userName'
         $userName = Yii::app()->user->name;
+        if($this->jd_order_type==1){//销售出库
+            $whereSql = " and a.judge_type=1 ";
+        }else{
+            $whereSql = " and a.judge_type=2 ";
+        }
         $sql1 = "select a.*
 				from opr_order a
-				where ( a.judge=0 AND a.lcu='$userName') 
+				where a.judge=0 AND a.lcu='$userName' {$whereSql}
 			";
         $sql2 = "select count(a.id)
 				from opr_order a
-				where ( a.judge=0 AND a.lcu='$userName') 
+				where a.judge=0 AND a.lcu='$userName' {$whereSql}
 			";
         $clause = "";
         if (!empty($this->searchField) && !empty($this->searchValue)) {
@@ -99,7 +105,7 @@ class TechnicianList extends CListPageModel
             }
         }
         $session = Yii::app()->session;
-        $session['technician_ya01'] = $this->getCriteria();
+        $session['technician_ya0'.$this->jd_order_type] = $this->getCriteria();
         return true;
     }
 
@@ -148,16 +154,35 @@ class TechnicianList extends CListPageModel
         }
     }
 
+    public static function getSalesOutCityAllow($city){
+        $arr = array($city);
+        $suffix = Yii::app()->params['envSuffix'];
+        $rows = Yii::app()->db->createCommand()->select("code")
+            ->from("security{$suffix}.sec_city_info")
+            ->where("field_id='SALES_OUT' and field_value=:city",array(':city'=>$city))
+            ->queryAll();
+        if($rows){
+            foreach ($rows as $row){
+                if(!in_array($row['code'],$arr)){
+                    $arr[]=$row["code"];
+                }
+            }
+        }
+        return $arr;
+    }
+
     public static function getCompanyList($city,$code=""){
         $suffix = Yii::app()->params['envSuffix'];
-        $rows = Yii::app()->db->createCommand()->select("code,name")
+        $cityList = self::getSalesOutCityAllow($city);
+        $cityAllow = empty($city)?"0":implode("','",$cityList);
+        $rows = Yii::app()->db->createCommand()->select("id,code,name,u_customer_code")
             ->from("swoper{$suffix}.swo_company")
-            ->where("(city=:city and status!=2) or code=:code",array(':city'=>$city,':code'=>$code))
+            ->where("(city in ('{$cityAllow}') and status!=2) or u_customer_code=:code",array(':code'=>$code))
             ->queryAll();
         $list = array();
         if($rows){
             foreach ($rows as $row){
-                $list[$row["code"]] = $row["name"]."({$row["code"]})";
+                $list[$row["u_customer_code"]] = $row["name"]."({$row["code"]})";
             }
         }
         return $list;
@@ -168,6 +193,19 @@ class TechnicianList extends CListPageModel
         $row = Yii::app()->db->createCommand()->select("name,code")
             ->from("swoper{$suffix}.swo_company")
             ->where("code=:code and city=:city",array(':code'=>$code,':city'=>$city))
+            ->queryRow();
+        if($row){
+            return $row["name"]."({$row["code"]})";
+        }else{
+            return "";
+        }
+    }
+
+    public static function getCompanyNameForUCode($code,$city=''){
+        $suffix = Yii::app()->params['envSuffix'];
+        $row = Yii::app()->db->createCommand()->select("name,code")
+            ->from("swoper{$suffix}.swo_company")
+            ->where("u_customer_code=:code",array(':code'=>$code))
             ->queryRow();
         if($row){
             return $row["name"]."({$row["code"]})";

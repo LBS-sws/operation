@@ -1,5 +1,5 @@
-<tr class='clickable-row' data-href='<?php echo $this->getLink('TL05', 'serviceMoney/edit', 'serviceMoney/view', array('index'=>$this->record['id']));?>'>
-	<td><?php echo $this->drawEditButton('TL05', 'serviceMoney/edit', 'serviceMoney/view', array('index'=>$this->record['id'])); ?></td>
+<tr class='clickable-row' data-href='<?php echo $this->getLink('TL85', 'serviceMoney/edit', 'serviceMoney/view', array('index'=>$this->record['id']));?>'>
+	<td><?php echo $this->drawEditButton('TL85', 'serviceMoney/edit', 'serviceMoney/view', array('index'=>$this->record['id'])); ?></td>
 	<td><?php echo $this->record['service_code']; ?></td>
 	<td><?php echo $this->record['name']; ?></td>
 	<td><?php echo $this->record['city_name']; ?></td>

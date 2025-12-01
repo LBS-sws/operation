@@ -70,5 +70,8 @@ return array(
 'Rollback Done'=>'退回草稿完成',
 	'City'=>'城市',
 	'Select City'=>'选择城市',
+	'Please reset password'=>'系統檢測到當前帳號的密碼過於簡單，請重新設置密碼！！',
+'The password entered twice is inconsistent'=>'两次输入密码不一致！！！',
+'The password requires 8-20 characters, consisting of numbers, letters, and symbols'=>'密碼强度至少需要達到一般！！！',
 );
 ?>

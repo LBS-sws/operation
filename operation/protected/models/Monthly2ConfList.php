@@ -59,11 +59,11 @@ class Monthly2ConfList extends CListPageModel
 					left outer join opr_monthly_dtl e on a.id=e.hdr_id and e.data_field='20003' 
 					left outer join opr_monthly_dtl f on a.id=f.hdr_id and f.data_field='20004' 
 					left outer join opr_monthly_dtl g on a.id=g.hdr_id and g.data_field='20005' 
-				where a.group_id='2' AND b.ka_bool=0 $citylist and a.city=b.code and (a.year_no<>year(now()) or a.month_no<>month(now())) $exclude
+				where a.group_id='2' $citylist and a.city=b.code and (a.year_no<>year(now()) or a.month_no<>month(now())) $exclude
 			";
 		$sql2 = "select count(a.id)
 				from opr_monthly_hdr a, security$suffix.sec_city b
-				where a.group_id='2' AND b.ka_bool=0 $citylist and a.city=b.code $exclude
+				where a.group_id='2' $citylist and a.city=b.code $exclude
 			";
 		$clause = "";
 		if (!empty($this->searchField) && !empty($this->searchValue)) {

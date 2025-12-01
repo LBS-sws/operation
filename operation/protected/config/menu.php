@@ -48,6 +48,11 @@ return array(
                 'access'=>'YD02',
                 'url'=>'/delivery/index',
             ),
+            //销售出库审核
+            'Sales outbound audit'=>array(
+                'access'=>'YD12',
+                'url'=>'/salesOutAudit/index',
+            ),
             //外勤領貨成本總覽
             'Technician cargo cost'=>array(
                 'access'=>'YD07',
@@ -100,6 +105,11 @@ return array(
 			'Technician List'=>array(
 				'access'=>'YC02',
 				'url'=>'/technician/index',
+			),
+            //销售出库(下訂單)
+			'Sales outbound'=>array(
+				'access'=>'YC03',
+				'url'=>'/salesOut/index',
 			),
 		),
 	),

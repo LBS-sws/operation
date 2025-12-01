@@ -318,6 +318,10 @@ class CurlReceiveList extends CListPageModel
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         $out = curl_exec($ch);
+        echo  "url:<br/>".$url."<br/><br/>";
+        echo  "data:<br/>".$data."<br/><br/>";
+        echo  "key:<br/>".$svrkey."<br/><br/>";
+        echo  "<br/>";
         if ($out===false) {
             echo 'Error: '.curl_error($ch);
         } else {
@@ -329,7 +333,7 @@ class CurlReceiveList extends CListPageModel
     public static function generate_key(){
         $ip =Yii::app()->params['uCurlIP'];
         $interval = 600; // 10分钟的秒数
-        $secret_key = 'c09c321acaf59c57e2a2a999e31b5ea8'; // 加密密钥
+        $secret_key = '0fdc8906eda40a5b3d02c8ef6ad0aab5'; // 加密密钥
 
         //生成key
         $salt = floor(time() / $interval) * $interval; // 使用10分钟为间隔的时间戳作为盐

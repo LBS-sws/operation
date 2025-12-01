@@ -23,7 +23,7 @@ class WarehouseController extends Controller
     {
         return array(
             array('allow',
-                'actions'=>array('new','edit','delete','save','copy','importGoods','downExcel','test'),
+                'actions'=>array('new','edit','delete','save','copy','importGoods','downExcel','downPriceExcel','test'),
                 'expression'=>array('WarehouseController','allowReadWrite'),
             ),
             array('allow',
@@ -150,6 +150,16 @@ class WarehouseController extends Controller
         $myExcel->setDataHeard($warehouseList["head"]);
         $myExcel->setDataBody($warehouseList["body"]);
         $myExcel->outDownExcel("仓库物品.xls");
+    }
+
+    public function actionDownPriceExcel()
+    {
+        //$model = new WarehouseForm();
+        $warehouseList = WarehouseForm::downPriceExcel();
+        $myExcel = new MyExcelTwo();
+        $myExcel->setDataHeard($warehouseList["head"]);
+        $myExcel->setDataBody($warehouseList["body"]);
+        $myExcel->outDownExcel(date("Y年m月d日")."物品价格.xls");
     }
 
     public function actionImportGoods(){

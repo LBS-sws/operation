@@ -29,12 +29,12 @@ class Monthly2ApprList extends CListPageModel
 		$sql1 = "select a.*, b.name as city_name 
 				from opr_monthly_hdr a, security$suffix.sec_city b 
 				where a.group_id='2' $citylist and a.city=b.code 
-				and a.id in ($list) AND b.ka_bool=0 $exclude
+				and a.id in ($list) $exclude
 			";
 		$sql2 = "select count(a.id)
 				from opr_monthly_hdr a, security$suffix.sec_city b 
 				where a.group_id='2' $citylist and a.city=b.code 
-				and a.id in ($list) AND b.ka_bool=0 $exclude
+				and a.id in ($list) $exclude
 			";
 		$clause = "";
 		if (!empty($this->searchField) && !empty($this->searchValue)) {

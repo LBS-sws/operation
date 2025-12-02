@@ -63,6 +63,11 @@ return array(
                 'access'=>'YD01',
                 'url'=>'/warehouse/index',
             ),
+            //仓库物品分类
+            'Warehouse Class'=>array(
+                'access'=>'YD13',
+                'url'=>'/wareClass/index',
+            ),
             //仓库信息(金蝶)
             'Store Info'=>array(
                 'access'=>'YD10',

@@ -27,7 +27,11 @@ class WarehouseController extends Controller
                 'expression'=>array('WarehouseController','allowReadWrite'),
             ),
             array('allow',
-                'actions'=>array('importPrice','ajaxPriceHistory'),
+                'actions'=>array('ajaxPriceHistory'),
+                'expression'=>array('WarehouseController','allowUnitPrice'),
+            ),
+            array('allow',
+                'actions'=>array('importPrice'),
                 'expression'=>array('WarehouseController','allowImportPrice'),
             ),
             array('allow',
@@ -40,8 +44,12 @@ class WarehouseController extends Controller
         );
     }
 
-    public static function allowImportPrice() {
+    public static function allowUnitPrice() {
         return Yii::app()->user->validFunction('YN02');
+    }
+
+    public static function allowImportPrice() {
+        return Yii::app()->user->validFunction('YN11');
     }
 
     public static function allowReadWrite() {

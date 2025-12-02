@@ -146,6 +146,8 @@ return array(
     'Store Comparison'=>'金蝶物料對比',
     'Sales outbound'=>'銷售出庫',
     'Sales outbound audit'=>'銷售出庫審核',
+    'report unit price'=>'导入物品单价',
+    'Warehouse Class'=>'仓库物品分类',
     //沈超添加結束
 
 );

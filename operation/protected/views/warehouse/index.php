@@ -51,7 +51,7 @@ $this->pageTitle=Yii::app()->name . ' - Warehouse Info';
                         'submit'=>Yii::app()->createUrl('warehouse/DownExcel'),
                     ));
 
-                if (Yii::app()->user->validFunction('YN02')){
+                if (Yii::app()->user->validFunction('YN11')){
                     //導入
                     echo TbHtml::button('<span class="fa fa-file-text-o"></span> '.Yii::t('procurement','Import Price'), array(
                         'data-toggle'=>'modal','data-target'=>'#importPrice'));

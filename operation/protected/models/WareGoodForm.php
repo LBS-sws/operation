@@ -5,6 +5,8 @@ class WareGoodForm extends CFormModel
     /* User Fields */
     public $start_date;
     public $end_date;
+    public $searchU=1;//是否查询派单系统
+    public $searchType=2;//查询类型 1:销售出库 2：技术员领料
     public $four_start_date;
 
     public $data=array();
@@ -24,6 +26,8 @@ class WareGoodForm extends CFormModel
         return array(
             'start_date'=>"开始时间",
             'end_date'=>"结束时间",
+            'searchU'=>"是否查询派单系统",
+            'searchType'=>"查询类型",
         );
     }
 
@@ -33,7 +37,7 @@ class WareGoodForm extends CFormModel
     public function rules()
     {
         return array(
-            array('start_date,end_date','safe'),
+            array('start_date,end_date,searchU,searchType','safe'),
             array('start_date,end_date','required'),
             array('start_date','validateDate'),
         );
@@ -61,6 +65,8 @@ class WareGoodForm extends CFormModel
         return array(
             'four_start_date'=>$this->four_start_date,
             'end_date'=>$this->end_date,
+            'searchU'=>$this->searchU,
+            'searchType'=>$this->searchType,
             'start_date'=>$this->start_date
         );
     }
@@ -94,13 +100,23 @@ class WareGoodForm extends CFormModel
         return $data["data"];
     }
 
-    protected function getMyTotalCostData($start,$end,$city_allow){
+    protected function getMyTotalCostData($start,$end,$city_allow,$judge_type=0){
+        switch ($judge_type){
+            case 1://销售出库
+                $whereSql = " and b.judge_type=1";
+                break;
+            case 2://技术员领料
+                $whereSql = " and b.judge_type=2";
+                break;
+            default:
+                $whereSql = "";
+        }
         $rows = Yii::app()->db->createCommand()
             ->select("b.city,ifnull(f.class_report,'其它') as report_str,sum(ifnull(a.total_price,0)) as sum_amt")
             ->from("opr_order_goods a")
             ->leftJoin("opr_order b","a.order_id=b.id")
             ->leftJoin("opr_warehouse_class f","a.goods_id=f.warehouse_id")
-            ->where("b.city in ({$city_allow})")
+            ->where("b.city in ({$city_allow}) {$whereSql} and date_format(b.audit_time,'%Y-%m-%d') BETWEEN '{$start}' and '{$end}'")
             ->group("b.city,ifnull(f.class_report,'其它')")
             ->queryAll();
         $data = array();
@@ -139,11 +155,13 @@ class WareGoodForm extends CFormModel
         //签到签离统计
         $uOneWareGood=array();
         $uFourWareGood=array();
-        $uOneWareGood = self::getUMaterialsCostData($this->start_date,$this->end_date,$city_allow);
-        $uFourWareGood = self::getUMaterialsCostData($this->four_start_date,$this->end_date,$city_allow);
+        if($this->searchU==1){
+            $uOneWareGood = self::getUMaterialsCostData($this->start_date,$this->end_date,$city_allow);
+            $uFourWareGood = self::getUMaterialsCostData($this->four_start_date,$this->end_date,$city_allow);
+        }
         $this->u_load_data['u_load_end'] = time();
-        $myOneCost = $this->getMyTotalCostData($this->start_date,$this->end_date,$my_city_allow);
-        $myFourCost = $this->getMyTotalCostData($this->four_start_date,$this->end_date,$my_city_allow);
+        $myOneCost = $this->getMyTotalCostData($this->start_date,$this->end_date,$my_city_allow,$this->searchType);
+        $myFourCost = $this->getMyTotalCostData($this->four_start_date,$this->end_date,$my_city_allow,$this->searchType);
         $allTemp = $this->defMoreCity();
         if($citySetList){
             $data = array();
@@ -157,6 +175,8 @@ class WareGoodForm extends CFormModel
                         "regionTemp"=>$allTemp,
                         "list"=>array(),
                     );
+                    $data[$regionCode]["regionTemp"]["city"]=$regionCode;
+                    $data[$regionCode]["regionTemp"]["city_name"]=$cityRow["region_name"];
                 }
                 $temp = $allTemp;
                 $temp["city"]=$cityCode;
@@ -664,12 +684,13 @@ class WareGoodForm extends CFormModel
                             if(!$keyRow["show"]){//不显示
                                 continue;
                             }
-                            $tdClass = self::getTextColorForKeyStr($text,$keyRow,$cityList);
+                            $tdClass = self::getTextColorForKeyStr($text,$keyRow,$keyStr);
 
-                            $excelText = self::showExcelNum($text,$keyRow,$cityList);
+                            $exprData = self::tdClick($tdClass,$keyStr,$cityList["city"]);//点击后弹窗详细内容
+                            $excelText = self::showExcelNum($text,$keyRow,$keyStr);
                             $this->downJsonText["excel"][$regionList['regionCode']]['list'][$cityList['city']][$keyStr]=$excelText;
 
-                            $html.="<td class='{$tdClass}'><span>{$text}</span></td>";
+                            $html.="<td class='{$tdClass}' {$exprData}><span>{$text}</span></td>";
                         }
                         $html.="</tr>";
                     }
@@ -682,8 +703,60 @@ class WareGoodForm extends CFormModel
         return $html;
     }
 
+    protected function clickList(){
+        $moreList = array(
+            "qingjie_amt"=>array("exprName"=>"清洁","exprFun"=>"funQing"),//清洁
+            "miechong_amt"=>array("exprName"=>"灭虫","exprFun"=>"funMie"),//灭虫
+            "other_amt"=>array("exprName"=>"其它","exprFun"=>"funOther"),//其它
+            "all_amt"=>array("exprName"=>"全部","exprFun"=>"funAll"),//汇总
+        );
+        $topList=array(
+            //array("prv"=>"one_g_","name"=>"过去一周工单金额","type"=>"number"),
+            //array("prv"=>"one_l_","name"=>"过去一周理论领料金额","type"=>"number"),
+            array("prv"=>"one_s_","name"=>"过去一周实际领料金额","type"=>"number","funStr"=>"one"),
+            //array("prv"=>"four_g_","name"=>"过去四周工单金额","type"=>"number"),
+            //array("prv"=>"four_l_","name"=>"过去四周理论领料金额","type"=>"number"),
+            array("prv"=>"four_s_","name"=>"过去四周实际领料金额","type"=>"number","funStr"=>"four"),
+        );
+        $bodyKey=array();
+        foreach ($topList as $row){
+            foreach ($moreList as $key=>$value){
+                $title = $row["name"]."({$value["exprName"]})";
+                $type = $value["exprFun"]."_".$row["funStr"];
+                $bodyKey[$row["prv"].$key]=array("title"=>$title,"type"=>$type);
+            }
+        }
+        return $bodyKey;
+    }
+
+    private function tdClick(&$tdClass,$keyStr,$city){
+        $expr = " data-city='{$city}'";
+        $list = $this->clickList();
+        if(key_exists($keyStr,$list)){
+            $tdClass.=" td_detail";
+            $expr.= " data-type='{$list[$keyStr]['type']}'";
+            $expr.= " data-title='{$list[$keyStr]['title']}'";
+        }
+
+        return $expr;
+    }
+
     //設置百分比顏色
-    public static function showExcelNum($text,$keyRow,$row){
+    public static function showExcelNum($text,$keyRow,$keyStr){
+        if (strpos($keyStr,'_r_s-l_')!==false){//实际-理论
+            $rateNum = floatval($text);
+            $text =array("bg"=>"FFFFFF","color"=>"","text"=>$text);
+            if($rateNum>5){
+                $text["bg"]="FFF3CA";
+            }
+            if($rateNum>0){
+                $text["color"]="C00000";
+            }elseif ($rateNum<=-5){
+                $text["color"]="00B050";
+            }else{
+                $text["color"]="BFBFBF";
+            }
+        }
         /*
     if($keyRow["type"]=="rate"){
         $rateNum = floatval($text);
@@ -700,20 +773,23 @@ class WareGoodForm extends CFormModel
     }
 
     //設置百分比顏色
-    public static function getTextColorForKeyStr(&$text,$keyRow,$row){
+    public static function getTextColorForKeyStr(&$text,$keyRow,$keyStr){
         $tdClass = "";
         if($keyRow["type"]=="rate"){
             $rateNum = floatval($text);
             $rateNum*=100;
-            /*
-            if($rateNum>=1&&$rateNum<=3){
-                $tdClass ="info";
-            }elseif ($rateNum>3&&$rateNum<=5){
-                $tdClass ="warning";
-            }elseif ($rateNum>5){
-                $tdClass ="danger";
+            if (strpos($keyStr,'_r_s-l_')!==false){//实际-理论
+                if($rateNum>5){
+                    $tdClass.=" bgFFF3CA";
+                }
+                if($rateNum>0){
+                    $tdClass.=" crC00000";
+                }elseif ($rateNum<=-5){
+                    $tdClass.=" cr00B050";
+                }else{
+                    $tdClass.=" crBFBFBF";
+                }
             }
-            */
             $text = "".$rateNum."%";
         }
 
@@ -728,9 +804,9 @@ class WareGoodForm extends CFormModel
                 continue;
             }
             $text = key_exists($keyStr,$data)?$data[$keyStr]:"0";
-            $tdClass = self::getTextColorForKeyStr($text,$keyRow,$data);
+            $tdClass = self::getTextColorForKeyStr($text,$keyRow,$keyStr);
 
-            $excelText = self::showExcelNum($text,$keyRow,$data);
+            $excelText = self::showExcelNum($text,$keyRow,$keyStr);
             $this->downJsonText["excel"][$data['city']]['count'][$keyStr]=$excelText;
             $html.="<td class='{$tdClass}' style='font-weight: bold'><span>{$text}</span></td>";
         }

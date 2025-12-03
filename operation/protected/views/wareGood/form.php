@@ -18,6 +18,10 @@ $this->pageTitle=Yii::app()->name . ' - WareGood Form';
     .table-fixed>thead>tr>th,.table-fixed>tfoot>tr>td,.table-fixed>tbody>tr>td{ text-align: center;vertical-align: middle;font-size: 12px;border-color: #333;}
     .table-fixed>tfoot>tr>td,.table-fixed>tbody>tr>td{ text-align: right;}
     .table-fixed>thead>tr>th.header-width{ height: 0px;padding: 0px;overflow: hidden;border-width: 0px;line-height: 0px;}
+    .bgFFF3CA{ background: #FFF3CA;}
+    .crC00000{ color: #C00000;}
+    .cr00B050{ color: #00B050;}
+    .crBFBFBF{ color: #BFBFBF;}
 </style>
 
 <section class="content-header">
@@ -68,6 +72,15 @@ $this->pageTitle=Yii::app()->name . ' - WareGood Form';
                                     <div class="col-lg-5">
                                         <?php echo $form->textField($model, 'end_date',
                                             array('readonly'=>true,'prepend'=>"<span class='fa fa-calendar'></span>")
+                                        ); ?>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <?php echo $form->labelEx($model,'searchU',array('class'=>"col-lg-5 control-label")); ?>
+                                    <div class="col-lg-5">
+                                        <?php
+                                        echo $form->inlineRadioButtonList($model, 'searchU',array("1"=>"是","0"=>"否"),
+                                            array('readonly'=>true,'disabled'=>true)
                                         ); ?>
                                     </div>
                                 </div>
@@ -179,18 +192,6 @@ $js="
         });
     });
     
-    $('td.changeOffice').on('click',function(){
-        var city = $(this).parent('tr').eq(0).data('city');
-        console.log(city);
-        console.log($('tr.office-city-tr[data-city=\"'+city+'\"]').length);
-        if($(this).find('i:first').hasClass('fa-plus')){ //展开
-            $(this).find('i:first').removeClass('fa-plus').addClass('fa-minus');
-            $('tr.office-city-tr[data-city=\"'+city+'\"]').slideDown(100);
-        }else if($(this).find('i:first').hasClass('fa-minus')){ //收缩
-            $(this).find('i:first').removeClass('fa-minus').addClass('fa-plus');
-            $('tr.office-city-tr[data-city=\"'+city+'\"]').slideUp(100);
-        }
-    });
 ";
 Yii::app()->clientScript->registerScript('calcFunction',$js,CClientScript::POS_READY);
 

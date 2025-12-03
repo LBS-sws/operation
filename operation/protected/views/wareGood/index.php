@@ -59,6 +59,15 @@ $this->pageTitle=Yii::app()->name . ' - WareGood Form';
                             ?>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <?php echo $form->labelEx($model,'searchU',array('class'=>"col-lg-2 control-label")); ?>
+                        <div class="col-lg-2">
+                            <?php
+                            echo $form->inlineRadioButtonList($model, 'searchU',array("1"=>"是","0"=>"否"),
+                                array('readonly'=>false)
+                            ); ?>
+                        </div>
+                    </div>
                 </div>
             </div>
             <!--查询說明-->

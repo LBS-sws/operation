@@ -68,6 +68,11 @@ return array(
                 'access'=>'YD13',
                 'url'=>'/wareClass/index',
             ),
+            //领料成本统计
+            'Warehouse Good'=>array(//领料成本统计
+                'access'=>'YD14',
+                'url'=>'/wareGood/index',
+            ),
             //仓库信息(金蝶)
             'Store Info'=>array(
                 'access'=>'YD10',

@@ -109,24 +109,38 @@ class UploadExcelForm extends CFormModel
             $this->start_title = current($list);
             if($continue){
                 $uid = Yii::app()->user->id;
-                $row = Yii::app()->db->createCommand()->select("id")->from("opr_warehouse_price")
-                    ->where("warehouse_id=:warehouse_id and year=:year and month=:month and city=:city",
+                $arrList["price"]=is_numeric($arrList["price"])?round($arrList["price"],2):0;
+                $arrList["price"]=floatval($arrList["price"]);
+                $thisDate = date("Y-m",strtotime("{$arrList["year"]}-{$arrList["month"]}-01"));
+                $row = Yii::app()->db->createCommand()->select("id,DATE_FORMAT(CONCAT(year,'-',month,'-01'),'%Y-%m') as yearMonth,price")->from("opr_warehouse_price")
+                    ->where("warehouse_id=:warehouse_id and DATE_FORMAT(CONCAT(year,'-',month,'-01'),'%Y-%m')<=:yearMonth",
                         array(
                             ':warehouse_id'=>$arrList["warehouse_id"],
-                            ':city'=>Yii::app()->user->city(),
-                            ':year'=>$arrList["year"],
-                            ':month'=>$arrList["month"]
+                            ':yearMonth'=>$thisDate,
                         )
                     )->queryRow();
                 if($row){
-                    Yii::app()->db->createCommand()->update("opr_warehouse_price",array(
-                        "warehouse_id"=>$arrList["warehouse_id"],
-                        "year"=>$arrList["year"],
-                        "month"=>$arrList["month"],
-                        "price"=>$arrList["price"],
-                        "new_num"=>1,
-                        "luu"=>$uid,
-                    ), 'id=:id', array(':id'=>$row['id']));
+                    $row["price"]=floatval($row["price"]);
+                    if($row["price"]==$arrList["price"]){
+                        continue;//价格相同不需要重复导入
+                    }else{
+                        if($row["yearMonth"]==$thisDate){//修改本月的价格
+                            Yii::app()->db->createCommand()->update("opr_warehouse_price",array(
+                                "price"=>$arrList["price"],
+                                "new_num"=>1,
+                                "luu"=>$uid,
+                            ), 'id=:id', array(':id'=>$row['id']));
+                        }else{
+                            Yii::app()->db->createCommand()->insert("opr_warehouse_price",array(
+                                "warehouse_id"=>$arrList["warehouse_id"],
+                                'city'=>Yii::app()->user->city(),
+                                "year"=>$arrList["year"],
+                                "month"=>$arrList["month"],
+                                "price"=>$arrList["price"],
+                                "lcu"=>$uid,
+                            ));
+                        }
+                    }
                 }else{
                     Yii::app()->db->createCommand()->insert("opr_warehouse_price",array(
                         "warehouse_id"=>$arrList["warehouse_id"],

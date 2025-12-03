@@ -148,6 +148,7 @@ return array(
     'Sales outbound audit'=>'銷售出庫審核',
     'report unit price'=>'导入物品单价',
     'Warehouse Class'=>'仓库物品分类',
+    'Warehouse Good'=>'领料成本统计',
     //沈超添加結束
 
 );

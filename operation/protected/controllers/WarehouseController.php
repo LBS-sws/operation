@@ -23,7 +23,7 @@ class WarehouseController extends Controller
     {
         return array(
             array('allow',
-                'actions'=>array('new','edit','delete','save','copy','importGoods','downExcel','downPriceExcel','test'),
+                'actions'=>array('new','edit','delete','save','copy','importGoods','test'),
                 'expression'=>array('WarehouseController','allowReadWrite'),
             ),
             array('allow',
@@ -31,11 +31,11 @@ class WarehouseController extends Controller
                 'expression'=>array('WarehouseController','allowUnitPrice'),
             ),
             array('allow',
-                'actions'=>array('importPrice'),
+                'actions'=>array('importPrice','downPriceExcel'),
                 'expression'=>array('WarehouseController','allowImportPrice'),
             ),
             array('allow',
-                'actions'=>array('index','view','ajaxGoodHistory'),
+                'actions'=>array('index','view','ajaxGoodHistory','downExcel'),
                 'expression'=>array('WarehouseController','allowReadOnly'),
             ),
             array('deny',  // deny all users

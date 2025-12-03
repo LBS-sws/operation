@@ -590,15 +590,30 @@ class WarehouseForm extends CFormModel
         $list["head"] = array("物品编号","物品名称","年份","月份","单价");
         $rs = Yii::app()->db->createCommand()->select("a.*")->from("opr_warehouse a")
             ->where('a.local_bool=0')->queryAll();
+        $priceRows = Yii::app()->db->createCommand()->select("warehouse_id,DATE_FORMAT(CONCAT(year,'-',month,'-01'),'%Y-%m') as yearMonth")->from("opr_warehouse_price")
+            ->group("warehouse_id,DATE_FORMAT(CONCAT(year,'-',month,'-01'),'%Y-%m')")->queryAll();
+        $priceArr=array();
+        if($priceRows){
+            foreach ($priceRows as $priceRow){
+                $row = Yii::app()->db->createCommand()->select("price as cost_price,year,month")->from("opr_warehouse_price")
+                    ->where("warehouse_id=:id and DATE_FORMAT(CONCAT(year,'-',month,'-01'),'%Y-%m')=:yearMonth",array(
+                        ":id"=>$priceRow["warehouse_id"],
+                        ":yearMonth"=>$priceRow["yearMonth"],
+                    ))->order("id desc")->queryRow();
+                if($row){
+                    $priceArr[$priceRow['warehouse_id']]=array('cost_price'=>$row["cost_price"],'year'=>$row["year"],'month'=>$row["month"]);
+                }
+            }
+        }
         $list["body"] = array();
         if($rs){
             $year = date("Y");
             $month = date("n");
             foreach ($rs as $row){
-                $priceList = Yii::app()->db->createCommand()->select("price as cost_price,year,month")->from("opr_warehouse_price")
-                    ->where("(year<date_format(:date_time,'%Y') or (year=date_format(:date_time,'%Y') and month<=date_format(:date_time,'%m'))) AND warehouse_id = :id",
-                        array(':id'=>$row['id'],':date_time'=>date("Y-m-d")))->order("year DESC,month DESC")->queryRow();
-                if(!$priceList){
+                $keyStr="".$row["id"];
+                if(key_exists($keyStr,$priceArr)){
+                    $priceList=$priceArr[$keyStr];
+                }else{
                     $priceList=array('cost_price'=>'0','year'=>'','month'=>'');
                 }
                 $arr = array(

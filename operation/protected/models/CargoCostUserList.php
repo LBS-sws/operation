@@ -4,6 +4,7 @@ class CargoCostUserList extends CListPageModel
 {
     public $year;//年份
     public $month;//月份
+    public $city;//月份
     public $username;//月份
     public function attributeLabels()
     {
@@ -26,13 +27,14 @@ class CargoCostUserList extends CListPageModel
 
     public function rules(){
         return array(
-            array('attr, pageNum, noOfItem, totalRow, searchField, searchValue, orderField, orderType, username, year, month','safe',),
+            array('attr, pageNum, noOfItem, totalRow, searchField, searchValue, orderField, orderType, username, year, month, city','safe',),
         );
     }
 
     public function retrieveDataByPage($pageNum=1)
     {
         $this->year = (empty($this->year)||!is_numeric($this->year))?date("Y"):$this->year;
+        $city = str_replace("'","\'",$this->city);
         //order_user = '$userName' OR technician = '$userName'
         $suffix =  Yii::app()->params['envSuffix'];
         $city_allow = Yii::app()->user->city_allow();
@@ -41,12 +43,12 @@ class CargoCostUserList extends CListPageModel
 				from opr_order_goods c
 				LEFT JOIN opr_order a ON c.order_id = a.id
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
-				where (a.city in ($city_allow) AND a.judge=0 AND a.status IN ('approve','finished')) AND a.lcu = '$username'
+				where a.city in ($city_allow) AND a.city ='{$city}' AND a.judge=0 AND a.status IN ('approve','finished') AND a.lcu = '{$username}'
 			";
         $sql2 = "select a.id
 				from opr_order a
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
-				where (a.city in ($city_allow) AND a.judge=0 AND a.status IN ('approve','finished')) AND a.lcu = '$username' 
+				where a.city in ($city_allow) AND a.city ='{$city}' AND a.judge=0 AND a.status IN ('approve','finished') AND a.lcu = '{$username}'
 			";
         $clause = "";
         if (!empty($this->searchField) && !empty($this->searchValue)) {
@@ -175,6 +177,7 @@ class CargoCostUserList extends CListPageModel
             if (!empty($this->month)){
                 $title.=$this->month.Yii::t("monthly","Month");
             }
+            $title.=" - ".General::getCityName($this->city);
             $title.="）";
         }
         return $title;
@@ -221,24 +224,27 @@ class CargoCostUserList extends CListPageModel
     }
 
     //設置額外的session
-    public function setProSession($username,$year,$month){
+    public function setProSession($username,$year,$month,$city){
         $session = Yii::app()->session;
         $cargoList = array(
             "username"=>$username,
             "year"=>$year,
             "month"=>$month,
+            "city"=>$city,
         );
         if (isset($session['cargoCostUser_pro']) && !empty($session['cargoCostUser_pro'])) {
             $cargoList = $session['cargoCostUser_pro'];
         }
         $criteria = array(
             "username"=>empty($username)?$cargoList["username"]:$username,
+            "city"=>empty($city)?$cargoList["city"]:$city,
             "year"=>empty($year)?$cargoList["year"]:$year,
             "month"=>$month === 'null'?$cargoList["month"]:$month
         );
         $this->year = $criteria['year'];
         $this->username = $criteria['username'];
         $this->month = $criteria['month'];
+        $this->city = $criteria['city'];
         $session['cargoCostUser_pro'] = $criteria;
     }
 }

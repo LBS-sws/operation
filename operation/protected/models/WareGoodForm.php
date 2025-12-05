@@ -116,7 +116,7 @@ class WareGoodForm extends CFormModel
             ->from("opr_order_goods a")
             ->leftJoin("opr_order b","a.order_id=b.id")
             ->leftJoin("opr_warehouse_class f","a.goods_id=f.warehouse_id")
-            ->where("b.city in ({$city_allow}) {$whereSql} and date_format(b.audit_time,'%Y-%m-%d') BETWEEN '{$start}' and '{$end}'")
+            ->where("b.judge=0 and b.status in ('approve','finished') and b.city in ({$city_allow}) {$whereSql} and date_format(b.audit_time,'%Y/%m/%d') BETWEEN '{$start}' and '{$end}'")
             ->group("b.city,ifnull(f.class_report,'其它')")
             ->queryAll();
         $data = array();
@@ -745,7 +745,7 @@ class WareGoodForm extends CFormModel
     public static function showExcelNum($text,$keyRow,$keyStr){
         if (strpos($keyStr,'_r_s-l_')!==false){//实际-理论
             $rateNum = floatval($text);
-            $text =array("bg"=>"FFFFFF","color"=>"","text"=>$text);
+            $text =array("bg"=>"","color"=>"","text"=>$text);
             if($rateNum>5){
                 $text["bg"]="FFF3CA";
             }

@@ -39,7 +39,7 @@ class CargoCostUserController extends Controller
     public static function allowReadOnly() {
         return Yii::app()->user->validFunction('YD07');
     }
-	public function actionIndex($pageNum=0,$username='',$month='null',$year='')
+	public function actionIndex($pageNum=0,$username='',$city='',$month='null',$year='')
 	{
 		$model = new CargoCostUserList;
 		if (isset($_POST['CargoCostUserList'])) {
@@ -51,7 +51,7 @@ class CargoCostUserController extends Controller
 				$model->setCriteria($criteria);
 			}
 		}
-        $model->setProSession($username,$year,$month);
+        $model->setProSession($username,$year,$month,$city);
 		$model->determinePageNum($pageNum);
 		$model->retrieveDataByPage($model->pageNum);
 		$this->render('index',array('model'=>$model));

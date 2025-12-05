@@ -33,7 +33,7 @@ class CargoCostList extends CListPageModel
         $city_allow = Yii::app()->user->city_allow();
         $userName = Yii::app()->user->name;
         //查詢列表
-        $sql1 = "select b.username,b.disp_name,c.name AS s_city,SUM(a.total_price) as total_price
+        $sql1 = "select b.username,b.disp_name,a.city,c.name AS s_city,SUM(a.total_price) as total_price
 				from opr_order a 
 				LEFT JOIN security$suffix.sec_user b ON a.lcu=b.username 
 				LEFT JOIN security$suffix.sec_city c ON a.city=c.code 
@@ -101,7 +101,8 @@ class CargoCostList extends CListPageModel
                 $this->attr[] = array(
                     'username'=>$record['username'],
                     'total_price'=>sprintf("%.2f",$record['total_price']),
-                    'city'=>$record['s_city'],
+                    'city_name'=>$record['s_city'],
+                    'city'=>$record['city'],
                     'lcu'=>$record['disp_name'],
                 );
             }

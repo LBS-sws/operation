@@ -13,5 +13,6 @@
 	<td><?php echo $this->record['val_5']; ?></td>
 	<td><?php echo $this->record['val_16']; ?></td>
 	<td><?php echo $this->record['val_11']; ?></td>
+	<td><?php echo $this->record['val_a_b']; ?></td>
 	<td><?php echo $this->record['wfstatusdesc']; ?></td>
 </tr>

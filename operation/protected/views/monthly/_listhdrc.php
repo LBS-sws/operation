@@ -58,6 +58,11 @@
 		?>
 	</th>
 	<th>
+		<?php echo TbHtml::link(Yii::t("monthly",'专利费合共').$this->drawOrderArrow('val_a_b'),'#',$this->createOrderLink('monthly-list','val_a_b'))
+			;
+		?>
+	</th>
+	<th>
 		<?php echo TbHtml::link($this->getLabelName('wfstatusdesc').$this->drawOrderArrow('wfstatusdesc'),'#',$this->createOrderLink('monthly-list','wfstatusdesc'))
 			;
 		?>

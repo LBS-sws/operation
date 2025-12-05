@@ -32,13 +32,11 @@
             echo "<a href='#'>".Yii::t("procurement","Goods List")."</a>";
         ?>
     </th>
-    <?php if (Yii::app()->user->validFunction('YN02')): ?>
-        <th>
-            <?php echo TbHtml::link($this->getLabelName('total_price'),'#')
-            ;
-            ?>
-        </th>
-    <?php endif ?>
+    <th>
+        <?php echo TbHtml::link($this->getLabelName('total_price'),'#')
+        ;
+        ?>
+    </th>
     <?php if (!Yii::app()->user->isSingleCity()): ?>
     <th>
         <?php echo TbHtml::link($this->getLabelName('city').$this->drawOrderArrow('a.city'),'#',$this->createOrderLink('delivery-list','a.city'))

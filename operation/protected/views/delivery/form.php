@@ -156,16 +156,14 @@ $this->pageTitle=Yii::app()->name . ' - Delivery Form';
                     ?>
                 </div>
             </div>
-            <?php if (Yii::app()->user->validFunction('YN02')): ?>
-                <div class="form-group">
-                    <?php echo $form->labelEx($model,'total_price',array('class'=>"col-sm-2 control-label")); ?>
-                    <div class="col-sm-3">
-                        <?php echo $form->textField($model, 'total_price',
-                            array('readonly'=>true)
-                        ); ?>
-                    </div>
+            <div class="form-group">
+                <?php echo $form->labelEx($model,'total_price',array('class'=>"col-sm-2 control-label")); ?>
+                <div class="col-sm-3">
+                    <?php echo $form->textField($model, 'total_price',
+                        array('readonly'=>true)
+                    ); ?>
                 </div>
-            <?php endif ?>
+            </div>
 
             <div class="form-group">
                 <?php echo $form->labelEx($model,'goods_list',array('class'=>"col-sm-2 control-label")); ?>

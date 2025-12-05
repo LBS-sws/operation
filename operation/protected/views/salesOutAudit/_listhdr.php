@@ -32,6 +32,11 @@
             echo "<a href='#'>".Yii::t("procurement","Goods List")."</a>";
         ?>
     </th>
+    <th>
+        <?php echo TbHtml::link($this->getLabelName('total_price'),'#')
+        ;
+        ?>
+    </th>
     <?php if (!Yii::app()->user->isSingleCity()): ?>
     <th>
         <?php echo TbHtml::link($this->getLabelName('city').$this->drawOrderArrow('a.city'),'#',$this->createOrderLink('salesOutAudit-list','a.city'))
